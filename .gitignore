@@ -49,3 +49,6 @@ node_modules/
 
 # Generated local LAN HTTPS proxy config, PID and logs
 /storage/framework/zazu-lan-https/
+
+# Downloaded local HTTPS proxy executable; never commit third-party binaries
+/tools/caddy.exe

@@ -523,6 +523,8 @@ The sync dependency sorter recognizes `customer_local_id`, so a batch submitted 
 
 The owner settings screen previously requested a pairing code with `selection: []`, while the provisioning endpoint interpreted that as an intentionally empty selection. Pairing now treats an empty selection as the default bounded working set: up to 25 recent customers, 25 jobs, 25 quotes and 25 preparation records. Each is selected through active-business queries and receives a stable local identity. Job records carry their customer local identity; quote and preparation records carry their parent job identity. The settings page discloses the initial business data copied to the trusted paired phone.
 
+The owner-generated pairing code is eight digits, single-use and short-lived. The phone's authenticated app shell exposes a discoverable pairing form on phone-sized layouts while the device is unpaired; the user enters all eight digits there. The client validates the full eight-digit value before provisioning and never silently truncates it. The older query-string-triggered browser prompt is removed. Changes to the precached offline client require a service-worker cache version bump so installed phones do not continue using stale pairing code.
+
 The bootstrap remains bounded rather than mirroring the entire database. Supporting catalogues, suppliers, purchase orders, invoices, expenses, inventory, assets and costs remain capped in the controller.
 
 ### Evidence and limits

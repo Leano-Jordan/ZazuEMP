@@ -306,6 +306,30 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("delete form.dataset.zazuSubmitting;", $app);
     }
 
+    public function test_phone_pairing_is_discoverable_and_uses_the_eight_digit_contract(): void
+    {
+        $this->signInAsOwner();
+        $response = $this->get('/dashboard');
+
+        $response->assertOk()
+            ->assertSee('data-zazu-phone-pairing', false)
+            ->assertSee('data-zazu-phone-pairing-form', false)
+            ->assertSee('data-zazu-phone-pairing-code', false)
+            ->assertSee('maxlength="8"', false)
+            ->assertSee('Pair this phone');
+
+        $app = File::get(resource_path('js/app.js'));
+        $client = File::get(public_path('zazu-offline.js'));
+        $worker = File::get(public_path('sw.js'));
+
+        $this->assertStringContainsString("if (!/^\\d{8}$/.test(normalizedCode))", $client);
+        $this->assertStringContainsString("pairing_code: normalizedCode", $client);
+        $this->assertStringNotContainsString("slice(0, 6)", $client);
+        $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
+        $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
+        $this->assertStringContainsString("zazu-static-v39", $worker);
+    }
+
     public function test_pwa_icon_files_are_present(): void
     {
         $this->assertFileExists(public_path('icons/zazu-192.svg'));

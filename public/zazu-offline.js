@@ -1625,7 +1625,10 @@
     }
 
     async function pair(pairingCode) {
-        if (!pairingCode) throw new Error('A pairing code is required.');
+        const normalizedCode = String(pairingCode ?? '').replace(/\D/g, '');
+        if (!/^\d{8}$/.test(normalizedCode)) {
+            throw new Error('Enter the complete 8-digit phone pairing code.');
+        }
 
         const response = await fetch('/api/sync/provision', {
             method: 'POST',
@@ -1634,7 +1637,7 @@
                 'Accept': 'application/json',
             },
             body: JSON.stringify({
-                pairing_code: String(pairingCode).replace(/\D/g, '').slice(0, 6),
+                pairing_code: normalizedCode,
                 device_name: 'Zazu phone',
                 device_type: 'phone',
             }),

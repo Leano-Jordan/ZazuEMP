@@ -100,3 +100,56 @@ Future enterprise integrations, advanced client portals, AI automation, multi-pr
 - OWASP ASVS 5.0 V7 Session Management: https://github.com/OWASP/ASVS/blob/master/5.0/en/0x16-V7-Session-Management.md
 - OWASP ASVS 5.0 V16 Security Logging and Error Handling: https://github.com/OWASP/ASVS/blob/master/5.0/en/0x25-V16-Security-Logging-and-Error-Handling.md
 - OWASP ASVS 5.0 V5 File Handling: https://github.com/OWASP/ASVS/blob/master/5.0/en/0x14-V5-File-Handling.md
+
+## Commercial positioning and execution direction — 2026-11-19
+
+**Decision status:** Adopted as commercial-readiness direction; does not expand or override the V1 scope freeze.
+
+### Positioning
+
+Lead with the outcome Zazu can credibly demonstrate:
+
+> **Run your business. Manage every job. Know what you actually earn. Even offline.**
+
+Zazu remains a reusable event and catering operations platform for catering, event equipment hire, sound/DJ, baking, decor, rentals, photography and related event-service businesses. Do not narrow the product to one trade without customer evidence. The wedge is the connected event/job workflow and reliable financial visibility under local-first operating conditions—not generic quoting or invoicing alone.
+
+The central commercial proof is the existing chain:
+
+**Event/Job → Quote → Acceptance → Invoice → Payment → Purchasing/Receiving → Incurred Costs → Event Contribution → Export**
+
+Describe the final figure accurately as event contribution/indicative job profitability where appropriate. Do not market it as audited accounting profit, tax advice or a complete set of accounts.
+
+### Customer communication
+
+- Evaluate a direct **Send via WhatsApp** action using the existing signed public quote URL and a normal wa.me deep link. No paid WhatsApp Business API is required for this simple handoff.
+- This is an evaluation item, not authorization to build a new messaging subsystem. First inspect the existing quote share actions, URL expiry/signature behavior, mobile handling and regression coverage. Only implement if a concrete customer workflow gap is found and the change stays within the V1 scope/owner authorization.
+- Never expose private customer data or unsigned/internal URLs in the message payload.
+
+### Trust and financial-document credibility
+
+- Complete the existing POPIA operational gate: actual data/provider inventory, owner-approved retention and disposal, data-subject request handling, incident response, access responsibilities and working contact channel. Technical controls or draft documents alone do not equal operational sign-off.
+- Verify invoice output against the applicable SARS tax-invoice requirements and the business's VAT status. Invoice numbering implementation is not proof of tax compliance. Obtain appropriate tax-adviser/legal review before making a compliance claim; do not hardcode VAT assumptions for non-VAT vendors.
+- Publish only accurate statements about data ownership, export/recovery, offline limits, security and support. Existing business archive/export is a foundation, not proof that every installation-level recovery scenario is customer self-service.
+- A public changelog and plain-language limitations page are useful launch assets, but remain subordinate to V1 workflow completion and are not new engineering release gates by themselves.
+
+### Visual and demonstration standard
+
+Prioritize the first commercial impressions: landing page, dashboard, quote creation/review, signed public quote page, and customer-facing PDF. Improve the existing Zazu visual system rather than replacing it speculatively. Judge rendered screens at real desktop and phone sizes; source inspection or generated mockups alone do not establish visual acceptance.
+
+Maintain a realistic demonstration business with ZAR-valued customers, events, quotes, invoices, payments, supplier purchases, receipts and incurred costs. Use clearly fictional demo data, credible empty states and a complete event example that makes the financial story easy to understand. Do not seed demo records into a real customer installation.
+
+### Execution sequence
+
+1. Finish the existing V1 engineering and acceptance blockers; do not interrupt the scope-frozen finish sequence for optional marketing work.
+2. Prove the populated commercial workflow with traceable source records and reconcile its displayed totals.
+3. Review the actual signed quote, public quote page, PDF and sharing flow; decide whether WhatsApp deep-linking closes a demonstrated gap.
+4. Complete POPIA operational sign-off and invoice/tax review before making trust or compliance claims.
+5. Polish the existing first-impression surfaces and prepare a fictional demonstration business for prospect demonstrations.
+6. Use early operator feedback to validate positioning and prioritize only observed workflow friction.
+
+### Guardrails
+
+- No new product tier, feature subsystem, trade-specific fork or broad redesign is authorized by this strategy.
+- No claims of customer validation, market share, adoption statistics, tax compliance or complete offline parity without current, attributable evidence.
+- Keep external research estimates distinct from verified Zazu capabilities and customer evidence.
+- V1 scope freeze, current readiness register and explicit Founder authority remain controlling.

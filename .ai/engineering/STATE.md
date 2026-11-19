@@ -1,3 +1,31 @@
+## Phone pairing discoverability and eight-digit contract correction — 2026-11-19
+
+- Root cause confirmed from current source: owner settings generated an eight-digit code and `SyncController::provision` required eight digits, but `public/zazu-offline.js` silently truncated the phone submission to six digits. The phone entry itself was only exposed through a hidden query-string prompt.
+- Corrected the client to normalize and strictly validate all eight digits before sending the provisioning request; it no longer truncates or submits incomplete codes.
+- Added a discoverable **Pair this phone** form to the authenticated app shell. It is revealed on phone-sized/mobile user-agent layouts only while the device is unpaired, provides numeric/one-time-code input, eight-digit validation and inline error feedback, and keeps the owner-generated code's 10-minute/single-use approval model intact.
+- Removed the hidden query-string/browser-prompt flow. The phone reloads after successful pairing so the newly bootstrapped business workspace is loaded.
+- Bumped the precached service-worker static cache from v38 to v39 and updated the service-worker cache regression test. This is required so installed phones do not keep executing the old truncated client.
+- Added a focused feature regression for the rendered pairing entry, strict eight-digit client contract, removal of the prompt and cache version. Existing server tests already cover eight-digit generation and one-time provisioning.
+- Updated `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md` with the user-visible pairing flow and cache invalidation rule.
+- Source and regression changes committed directly to `main`; no branches created. **Tests/CI and rendered phone acceptance have not yet been verified on this exact head.** The owner's old plain-HTTP Wi-Fi address remains unsuitable for installed PWA/service-worker acceptance; the separate private HTTPS setup must complete before physical phone acceptance.
+- No change to logout/session semantics, local queues, business-scoped IndexedDB identity or server-side pairing authorization.
+
+---
+
+## Commercial direction adopted — 2026-11-19
+
+- Added the Founder-approved commercial positioning and execution direction to `docs/COMMERCIAL_ARCHITECTURE_RESEARCH_2026-11-16.md`.
+- Positioning: **Run your business. Manage every job. Know what you actually earn. Even offline.** Keep Zazu broad across event/catering and related service businesses; do not narrow to one trade without customer evidence.
+- Commercial proof remains the existing event/job → quote → acceptance → invoice → payment → purchasing/receiving → incurred costs → event contribution → export chain. Do not describe indicative event contribution as audited accounting profit.
+- WhatsApp quote handoff is an evaluation of the existing signed-link workflow, not approval for a new messaging subsystem. Inspect existing behavior before deciding whether a gap exists.
+- Trust requirements are clarified: POPIA operational sign-off remains open; invoice numbering does not establish SARS tax compliance; claims about privacy, export/recovery and offline capability must match demonstrated behavior.
+- First-impression priorities are the landing page, dashboard, quote workflow, signed public quote page and customer PDF. Improve the existing visual system; require rendered desktop/phone evidence for UI acceptance.
+- A fictional, ZAR-valued demo business is a commercial preparation task. Do not seed demo data into real customer installations.
+- This direction does not amend the V1 scope freeze or create new release gates. Engineering remains focused on existing V1 blockers and observed workflow defects.
+- No new branch created. Documentation committed directly to `main`.
+
+---
+
 ## Sentinel Owner Admin consolidation — 2026-11-19
 
 - Integrated business-scoped Sentinel checks into the existing `/owner` Owner Admin page. The checks are limited to read-only database response, active owner membership and this business's customer/event/service data paths; they do not call the installation-wide incident recorder or return global incident metadata.
