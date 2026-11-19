@@ -1080,9 +1080,12 @@ test.describe('Zazu installed PWA offline shell', () => {
             form.requestSubmit();
         });
 
-        await expect.poll(() => dialogs.length).toBe(1);
-        expect(dialogs[0].type).toBe('alert');
-        expect(dialogs[0].message).toContain('Your business offline workspace, pending changes and device token were left untouched');
+        await expect.poll(() => dialogs.length).toBe(2);
+        expect(dialogs[0].type).toBe('confirm');
+        expect(dialogs[0].message).toContain('Signing out ends this web session');
+        expect(dialogs[1].type).toBe('alert');
+        expect(dialogs[1].message).toContain('could not reach the server to end your session');
+        expect(dialogs[1].message).toContain('offline workspace and queued work are safe');
         await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
 
         const localState = await page.evaluate(async () => ({
