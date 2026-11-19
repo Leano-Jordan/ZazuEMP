@@ -161,6 +161,13 @@ class BusinessSpreadsheetExportTest extends TestCase
         $business->users()->attach($manager->id, ['role' => 'manager']);
 
         $this->actingAs($manager)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee(route('exports.index'))
+            ->assertDontSee(route('settings.compliance'))
+            ->assertDontSee(route('settings.audit'));
+
+        $this->actingAs($manager)
             ->get(route('exports.index'))
             ->assertForbidden();
 
