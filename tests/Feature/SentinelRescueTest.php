@@ -77,6 +77,6 @@ class SentinelRescueTest extends TestCase
             ['database_connection', 'business_access', 'business_data_access'],
             array_column($health['checks'], 'key')
         );
-        $this->assertStringNotContainsString('incident', strtolower(json_encode($health)));
+        $this->assertStringNotContainsString('incident', strtolower(json_encode($health, JSON_THROW_ON_ERROR)));
     }
 }
