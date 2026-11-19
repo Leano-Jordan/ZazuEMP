@@ -1,5 +1,16 @@
 # Zazu EMP — Living Project Context
 
+## Rosscore Labs Founder and Sentinel authority — binding
+
+- The sole Founder, owner and final authority is the user. Address him directly as **you** or **Rosco** when appropriate; never describe him as a hypothetical, replaceable, future or generic founder. The company identity is **Rosscore Labs**. Do not imply ownership or authority may transfer to another person.
+- Your `/admin/sentinel` Founder Control Centre is your installation-wide oversight dashboard for monitoring every Zazu instance and platform health. It must provide useful fleet/instance visibility without exposing unnecessary customer or business-sensitive records.
+- Sentinel Rescue (`/sentinel/rescue`) is to be merged into the existing business Owner Admin experience as its health, diagnostics and safe-recovery capability. Do not preserve it as a separate owner destination/page that fragments navigation.
+- Keep scopes distinct: Rosscore Labs Founder Control Centre = cross-instance/platform oversight; business Owner Admin + integrated Sentinel Rescue = that authorised business's own health and diagnostics. Staff receive neither surface unless explicitly authorised in a future approved permission design.
+- Use one coherent Sentinel monitoring/diagnostics capability with server-enforced scope boundaries. Never expose the installation-wide incident ledger or another business's data through Owner Admin.
+- Navigation must make each authorised destination discoverable without requiring manual URL entry. Access denial remains server-enforced; hiding links is not a security control. Preserve a clear route back to the business workspace from Founder Control Centre and Owner Admin.
+- These are product and continuity decisions, not permission to change application code. Implementation still follows the current owner-issued scope and main-only repository policy.
+
+
 Product: Zazu – Event Management Platform (Zazu EMP)
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main only
