@@ -133,6 +133,40 @@ class FounderSupportAccessTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_starting_a_new_support_session_ends_the_previous_browser_session(): void
+    {
+        $founder = $this->founder();
+        $firstBusiness = $this->business();
+        $secondBusiness = $this->business();
+
+        $this->actingAs($founder)->post(
+            route('admin.sentinel.support.start', $firstBusiness),
+            ['reason' => 'First business support investigation.']
+        );
+
+        $firstSession = FounderSupportSession::query()->firstOrFail();
+
+        $this->post(
+            route('admin.sentinel.support.start', $secondBusiness),
+            ['reason' => 'Second business support investigation.']
+        );
+
+        $this->assertNotNull($firstSession->fresh()->ended_at);
+        $this->assertDatabaseHas('platform_audit_logs', [
+            'founder_support_session_id' => $firstSession->id,
+            'action' => 'founder.support.superseded',
+            'outcome' => 'success',
+        ]);
+
+        $secondSession = FounderSupportSession::query()->latest('id')->firstOrFail();
+
+        $this->get(route('admin.sentinel.support.show', $firstSession))
+            ->assertForbidden();
+
+        $this->get(route('admin.sentinel.support.show', $secondSession))
+            ->assertOk();
+    }
+
     public function test_founder_cannot_end_another_founders_support_session(): void
     {
         $this->founder();
