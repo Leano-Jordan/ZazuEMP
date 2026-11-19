@@ -74,8 +74,19 @@ class IncidentDiagnosticDownloadTest extends TestCase
         ], JSON_THROW_ON_ERROR).PHP_EOL);
 
         try {
-            $this->get('/api/support/incidents/'.$requestId)->assertNotFound();
-            $this->get('/api/support/incidents/not-a-uuid')->assertNotFound();
+            $unknownIncident = URL::temporarySignedRoute(
+                'support.incidents.show',
+                now()->addMinutes(15),
+                ['requestId' => $requestId],
+            );
+            $malformedReference = URL::temporarySignedRoute(
+                'support.incidents.show',
+                now()->addMinutes(15),
+                ['requestId' => 'not-a-uuid'],
+            );
+
+            $this->get($unknownIncident)->assertNotFound();
+            $this->get($malformedReference)->assertNotFound();
         } finally {
             File::delete($path);
         }
