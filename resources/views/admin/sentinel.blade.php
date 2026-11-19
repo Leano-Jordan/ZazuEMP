@@ -2,8 +2,8 @@
     <x-slot:title>Founder Control Centre</x-slot:title>
     <x-slot:heading>Founder Control Centre</x-slot:heading>
     <x-slot:headerAction>
-        @if(app(\\App\\Support\\CurrentBusiness::class)->resolve(auth()->user()))
-            <a href=\"{{ route('dashboard') }}\" class=\"zazu-btn zazu-btn-secondary\">Business workspace</a>
+        @if(app(\App\Support\CurrentBusiness::class)->resolve(auth()->user()))
+            <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-secondary">Business workspace</a>
         @endif
     </x-slot:headerAction>
 
