@@ -16,7 +16,18 @@
         .founder-account-table th,.founder-account-table td{text-align:left;padding:.75rem;border-bottom:1px solid var(--zazu-border,#e3e7ed)}
         .founder-account-table th{font-size:.72rem;text-transform:uppercase;color:var(--zazu-muted,#687386)}
         .founder-pill{display:inline-block;padding:.2rem .6rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:999px;font-size:.75rem}
-        @media(max-width:700px){.founder-account-grid{grid-template-columns:1fr}.founder-account-table-wrap{overflow-x:auto}}
+        @media(max-width:700px){.founder-account-grid{grid-template-columns:1fr}}
+        @media(max-width:560px){
+            .founder-account-panel{padding:.85rem}
+            .founder-account-table-wrap{max-width:100%;min-width:0}
+            .founder-account-table,.founder-account-table tbody{display:block;width:100%}
+            .founder-account-table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+            .founder-account-table tbody tr{display:block;margin:.65rem 0;padding:.35rem .65rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
+            .founder-account-table tbody td{display:flex;justify-content:space-between;gap:1rem;padding:.5rem .1rem;border-bottom:1px solid var(--zazu-border,#e3e7ed);text-align:right;overflow-wrap:anywhere}
+            .founder-account-table tbody td:last-child{border-bottom:0}
+            .founder-account-table tbody td[data-label]::before{content:attr(data-label);font-weight:600;color:var(--zazu-muted,#687386);text-align:left;flex:0 0 35%}
+            .founder-account-table tbody td[colspan]{display:block;text-align:left}
+        }
     </style>
 
     <div class="founder-account">
@@ -58,10 +69,10 @@
                     <tbody>
                     @forelse($business->users as $member)
                         <tr>
-                            <td>{{ $member->name }}</td>
-                            <td>{{ $member->email }}</td>
-                            <td>{{ ucfirst($member->pivot->role ?? 'member') }}</td>
-                            <td>{{ $member->pivot->created_at?->format('d M Y') ?? '—' }}</td>
+                            <td data-label="User">{{ $member->name }}</td>
+                            <td data-label="Email">{{ $member->email }}</td>
+                            <td data-label="Role">{{ ucfirst($member->pivot->role ?? 'member') }}</td>
+                            <td data-label="Joined">{{ $member->pivot->created_at?->format('d M Y') ?? '—' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="4" class="founder-muted">No user accounts are currently linked to this business.</td></tr>
@@ -80,11 +91,11 @@
                     <tbody>
                     @forelse($supportSessions as $support)
                         <tr>
-                            <td>{{ $support->actor?->name ?? 'Deleted account' }}<br><span class="founder-muted">{{ $support->actor?->email ?? '—' }}</span></td>
-                            <td>{{ $support->reason }}</td>
-                            <td>{{ $support->started_at?->format('d M Y H:i') ?? '—' }}</td>
-                            <td>{{ $support->expires_at?->format('d M Y H:i') ?? '—' }}</td>
-                            <td>{{ $support->ended_at ? 'Ended' : ($support->expires_at?->isFuture() ? 'Active / available' : 'Expired') }}</td>
+                            <td data-label="Founder">{{ $support->actor?->name ?? 'Deleted account' }}<br><span class="founder-muted">{{ $support->actor?->email ?? '—' }}</span></td>
+                            <td data-label="Reason">{{ $support->reason }}</td>
+                            <td data-label="Started">{{ $support->started_at?->format('d M Y H:i') ?? '—' }}</td>
+                            <td data-label="Expires">{{ $support->expires_at?->format('d M Y H:i') ?? '—' }}</td>
+                            <td data-label="State">{{ $support->ended_at ? 'Ended' : ($support->expires_at?->isFuture() ? 'Active / available' : 'Expired') }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="5" class="founder-muted">No founder support sessions have been recorded.</td></tr>
