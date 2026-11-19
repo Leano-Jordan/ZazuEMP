@@ -72,18 +72,19 @@ class PlatformAdminTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_business_owner_sees_a_private_sentinel_rescue_link(): void
+    public function test_business_owner_sees_owner_admin_and_not_the_founder_control_centre(): void
     {
         $this->signInAsOwner();
 
         $response = $this->get(route('settings.index'));
 
         $response->assertOk()
-            ->assertSee('Sentinel Rescue')
-            ->assertDontSee('Sentinel Control Centre');
+            ->assertSee('Owner Admin')
+            ->assertDontSee('Founder Control Centre')
+            ->assertDontSee('Sentinel Rescue');
 
-        $this->assertStringContainsString('href="'.route('sentinel.rescue').'"', $response->getContent());
-        $this->assertStringNotContainsString('/api/sentinel/rescue?', $response->getContent());
+        $this->assertStringContainsString('href="'.route('owner.dashboard').'"', $response->getContent());
+        $this->assertStringNotContainsString('href="'.route('sentinel.rescue').'"', $response->getContent());
     }
 
     public function test_sentinel_console_is_restricted_to_platform_administrators(): void
@@ -103,9 +104,29 @@ class PlatformAdminTest extends TestCase
         $this->actingAs($founder)
             ->get(route('admin.sentinel'))
             ->assertOk()
-            ->assertSee('Sentinel Control Centre')
+            ->assertSee('Founder Control Centre')
             ->assertSee('href="'.route('admin.sentinel').'"', false)
             ->assertDontSee('href="'.route('dashboard').'"', false);
+    }
+
+    public function test_founder_control_centre_has_a_return_path_when_the_founder_has_a_business_workspace(): void
+    {
+        $founder = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        $business = \\App\\Models\\Business::create([
+            'name' => 'Founder Workspace',
+            'slug' => 'founder-workspace',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->users()->attach($founder->id, ['role' => 'owner']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
+
+        $this->actingAs($founder)
+            ->get(route('admin.sentinel'))
+            ->assertOk()
+            ->assertSee('Founder Control Centre')
+            ->assertSee('Business workspace')
+            ->assertSee('href="'.route('dashboard').'"', false);
     }
 
     public function test_legacy_admin_list_does_not_grant_founder_access(): void
