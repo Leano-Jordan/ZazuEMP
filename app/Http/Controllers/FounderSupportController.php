@@ -7,6 +7,7 @@ use App\Models\FounderSupportSession;
 use App\Models\PlatformAuditLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 final class FounderSupportController extends Controller
