@@ -36,47 +36,46 @@ class SentinelRescueTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_failed_diagnostics_render_safe_keyed_recovery_guidance(): void
-    {
-        $html = view('sentinel.rescue', [
-            'health' => [
-                'status' => 'attention',
-                'checked_at' => now()->toIso8601String(),
-                'checks' => [[
-                    'key' => 'current_ledger',
-                    'group' => 'Sentinel',
-                    'label' => 'Current incident ledger',
-                    'status' => 'attention',
-                    'message' => 'Some lines cannot be read as incident records.',
-                ]],
-            ],
-            'phpVersion' => PHP_VERSION,
-            'laravelVersion' => app()->version(),
-        ])->render();
-
-        $this->assertStringContainsString('Recommended next step', $html);
-        $this->assertStringContainsString('Preserve the original diagnostic file.', $html);
-        $this->assertStringContainsString('Do not edit, truncate or delete ledger lines', $html);
-    }
-
-    public function test_authenticated_business_owner_can_open_local_rescue_and_return_to_workspace(): void
+    public function test_authenticated_business_owner_uses_owner_admin_for_business_health(): void
     {
         $this->signInAsOwner();
 
-        $this->get(route('sentinel.rescue'))
+        $this->get(route('owner.dashboard'))
             ->assertOk()
-            ->assertSee('Sentinel Rescue')
-            ->assertSee('A local health snapshot with safe next steps.')
-            ->assertSee('Database connection')
-            ->assertSee('Diagnostic write/read test')
-            ->assertSee('Back to workspace')
-            ->assertSee('data-filter="failed"', false)
-            ->assertSee('data-check-search', false)
-            ->assertSee('data-refresh', false)
-            ->assertSee('data-expand-details', false)
-            ->assertSee('data-check-card', false)
-            ->assertSee(route('dashboard'))
-            ->assertHeader('Cache-Control', 'no-store, private')
-            ->assertHeader('Referrer-Policy', 'no-referrer');
+            ->assertSee('Business health')
+            ->assertSee('Workspace database access')
+            ->assertSee('Business access')
+            ->assertSee('Business data access')
+            ->assertSee('Owner tools')
+            ->assertDontSee('Sentinel Rescue');
+
+        $this->get(route('sentinel.rescue'))
+            ->assertRedirect(route('owner.dashboard').'#business-health');
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Owner Admin')
+            ->assertSee(route('owner.dashboard'));
+    }
+
+    public function test_business_health_is_scoped_and_does_not_expose_the_global_incident_ledger(): void
+    {
+        $business = Business::create([
+            'name' => 'Scoped Health Business',
+            'slug' => 'scoped-health-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $owner = User::factory()->create();
+        $business->users()->attach($owner->id, ['role' => 'owner']);
+
+        $health = app(ZazuBusinessHealth::class)->inspect($business, $owner);
+
+        $this->assertSame('active_business', $health['scope']);
+        $this->assertSame(
+            ['database_connection', 'business_access', 'business_data_access'],
+            array_column($health['checks'], 'key')
+        );
+        $this->assertStringNotContainsString('incident', strtolower(json_encode($health)));
     }
 }
