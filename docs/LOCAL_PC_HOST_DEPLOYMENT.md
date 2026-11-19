@@ -54,7 +54,7 @@ Replace the example address with the address printed by the LAN launcher, then r
 The local acceptance origin now uses **Caddy as a TLS reverse proxy with its internal CA**.
 
 **Host setup**
-1. Install the official Caddy Windows executable and make `caddy.exe` available on PATH. The launcher does not download binaries or alter PATH.
+1. Download the official Windows x64 ZIP from [Caddy's download page](https://caddyserver.com/download), extract it, and place `caddy.exe` in the Zazu repository's `tools` folder (`tools\\caddy.exe`). Create the folder if it does not exist. No installer, PATH edit, or administrator access is required. The launcher checks this repository-local file first and also accepts Caddy on PATH.
 2. Start `Start-Zazu-LAN-HTTPS.cmd` on the host PC.
 3. The launcher requires an active Wi-Fi network classified as **Private**. It starts Laravel on loopback (`127.0.0.1:8000`) and binds Caddy only to that Wi-Fi IPv4 address on HTTPS port `8443`.
 4. Open the printed HTTPS URL on the phone/tablet while both devices are on the same trusted Wi-Fi network.
