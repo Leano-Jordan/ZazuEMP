@@ -7,6 +7,11 @@
 2. Read the current task/target and the latest relevant entry at the top of `.ai/engineering/STATE.md`. Do not load the full STATE file.
 3. Inspect only the source, tests and specialist contract needed for that target. Read `.ai/REPOSITORY_IDENTITY_LOCK.md`, the full Director contract, failure ledgers or archives only when the task touches those controls or needs that history.
 
+## Rosscore Labs / Sentinel continuity
+- The user is the sole Founder and final authority for Rosscore Labs and Zazu EMP; address him directly, never as a hypothetical or replaceable founder.
+- `/admin/sentinel` is his installation-wide Zazu-instance/platform oversight dashboard, without unnecessary business-sensitive records.
+- Sentinel Rescue merges into the existing business Owner Admin experience; it is not a separate owner destination. Owner diagnostics remain business-scoped; Founder oversight remains installation-wide. Preserve discoverable navigation and server-side authorization.
+
 ## Operating rules
 - Finish the agreed V1 workflows; no speculative features, perfectionism or documentation-only progress.
 - Work directly on `main`. Never create branches. Do not introduce Render or AMPPS workflows.
