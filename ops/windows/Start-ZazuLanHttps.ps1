@@ -11,11 +11,15 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProjectPath = [System.IO.Path]::GetFullPath($ProjectPath).TrimEnd('\')
 
+$localCaddy = Join-Path $ProjectPath 'tools\\caddy.exe'
 $caddyCommand = Get-Command caddy.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-if (-not $caddyCommand) {
-    throw 'Caddy was not found on PATH. Install the official Caddy Windows executable, then reopen this launcher. No download or system change was attempted.'
+if (Test-Path $localCaddy -PathType Leaf) {
+    $caddy = $localCaddy
+} elseif ($caddyCommand) {
+    $caddy = $caddyCommand.Source
+} else {
+    throw "Caddy is not installed. Download the official Windows x64 ZIP from https://caddyserver.com/download, extract caddy.exe, and place it at '$localCaddy'. Then run Start-Zazu-LAN-HTTPS.cmd again. No system settings were changed."
 }
-$caddy = $caddyCommand.Source
 
 $wifiProfile = Get-NetConnectionProfile -ErrorAction Stop |
     Where-Object {
