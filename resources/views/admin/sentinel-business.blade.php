@@ -60,6 +60,29 @@
         </section>
 
         <section class="founder-account-panel">
+            <h3 class="font-semibold mb-2">Recent founder support history</h3>
+            <p class="founder-muted mb-3">The latest 10 support sessions for this business, including their founder, reason and outcome.</p>
+            <div class="founder-account-table-wrap">
+                <table class="founder-account-table">
+                    <thead><tr><th>Founder</th><th>Reason</th><th>Started</th><th>Expires</th><th>State</th></tr></thead>
+                    <tbody>
+                    @forelse($supportSessions as $support)
+                        <tr>
+                            <td>{{ $support->actor?->name ?? 'Deleted account' }}<br><span class="founder-muted">{{ $support->actor?->email ?? '—' }}</span></td>
+                            <td>{{ $support->reason }}</td>
+                            <td>{{ $support->started_at?->format('d M Y H:i') ?? '—' }}</td>
+                            <td>{{ $support->expires_at?->format('d M Y H:i') ?? '—' }}</td>
+                            <td>{{ $support->ended_at ? 'Ended' : ($support->expires_at?->isFuture() ? 'Active / available' : 'Expired') }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" class="founder-muted">No founder support sessions have been recorded.</td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="founder-account-panel">
             <h3 class="font-semibold mb-2">Founder support access</h3>
             <p class="founder-muted mb-3">Start a separate, time-limited, read-only support session. The business owner is not impersonated and your own active workspace is not changed. Access is limited to customer names and recent event summaries.</p>
             <form method="POST" action="{{ route('admin.sentinel.support.start', $business) }}" class="grid gap-3">
