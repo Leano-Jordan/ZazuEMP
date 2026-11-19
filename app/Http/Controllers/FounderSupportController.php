@@ -48,10 +48,6 @@ final class FounderSupportController extends Controller
         abort_unless($supportSession->business, 404);
 
         $business = $supportSession->business;
-        $this->audit($request, $supportSession, 'founder.support.viewed', [
-            'access_mode' => 'read_only',
-        ]);
-
         $customers = $business->customers()->orderBy('name')->limit(20)->get(['id', 'name', 'created_at']);
         $events = $business->events()->latest('event_date')->limit(20)->get([
             'id',
@@ -59,6 +55,12 @@ final class FounderSupportController extends Controller
             'name',
             'event_date',
             'status',
+        ]);
+
+        $this->audit($request, $supportSession, 'founder.support.viewed', [
+            'customer_rows_returned' => $customers->count(),
+            'event_rows_returned' => $events->count(),
+            'access_mode' => 'read_only',
         ]);
 
         return view('admin.sentinel-support', [
