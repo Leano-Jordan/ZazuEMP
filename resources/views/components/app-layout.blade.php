@@ -335,6 +335,35 @@
             </header>
 
 <div class="zazu-content">
+                @if($business)
+                    <section class="zazu-context-card mb-4" data-zazu-phone-pairing hidden aria-labelledby="zazu-phone-pairing-title">
+                        <div class="zazu-context-title" id="zazu-phone-pairing-title">Pair this phone</div>
+                        <p class="zazu-context-copy mt-1">On the owner’s computer, open Settings → Phone sync and generate a pairing code. Enter the 8-digit code here within 10 minutes. Only pair a phone approved by the business owner.</p>
+                        <form class="mt-3" data-zazu-phone-pairing-form>
+                            <div class="zazu-field">
+                                <label class="zazu-label" for="zazu-phone-pairing-code">8-digit pairing code</label>
+                                <input
+                                    id="zazu-phone-pairing-code"
+                                    name="pairing_code"
+                                    class="zazu-input"
+                                    type="text"
+                                    inputmode="numeric"
+                                    autocomplete="one-time-code"
+                                    pattern="[0-9]{8}"
+                                    minlength="8"
+                                    maxlength="8"
+                                    placeholder="Enter 8 digits"
+                                    required
+                                    data-zazu-phone-pairing-code
+                                >
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3 mt-3">
+                                <button type="submit" class="zazu-btn zazu-btn-primary" data-zazu-phone-pairing-submit disabled>Pair phone</button>
+                                <span class="zazu-field-help" data-zazu-phone-pairing-status role="status" aria-live="polite"></span>
+                            </div>
+                        </form>
+                    </section>
+                @endif
                 @if ($errors->any())
                     <div class="zazu-error-summary" role="alert" tabindex="-1" data-error-summary>
                         <div class="zazu-error-summary-title">Please correct the highlighted fields.</div>
