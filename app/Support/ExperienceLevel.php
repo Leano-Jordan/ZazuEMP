@@ -60,7 +60,7 @@ class ExperienceLevel
     public function canSelect(Business $business, string $level, ?DateTimeInterface $at = null, ?User $user = null): bool
     {
         return $this->isPlatformAdmin($user)
-            ? isset(self::RANK[$level])
+            ? array_key_exists($level, config('zazu.experience_levels', []))
             : $this->entitlements->canSelect($business, $level, $at);
     }
 
@@ -68,7 +68,7 @@ class ExperienceLevel
     public function availableLevels(Business $business, ?DateTimeInterface $at = null, ?User $user = null): array
     {
         return $this->isPlatformAdmin($user)
-            ? array_keys(self::RANK)
+            ? array_keys(config('zazu.experience_levels', []))
             : $this->entitlements->availableTiers($business, $at);
     }
 
