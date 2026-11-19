@@ -90,13 +90,23 @@ if ($Stop) {
                 Stop-Process -Id ([int]$parent.ProcessId) -Force
                 $stopped[[string]$parent.ProcessId] = $true
             }
+        } elseif ($server.CommandLine -like "*$ProjectPath*" -and $server.CommandLine -like '*server.php*') {
+            # Laravel's PHP listener can outlive its Artisan launcher if a
+            # previous startup attempt is interrupted. The listener itself is
+            # still safe to stop when its executable and full command line
+            # identify this exact Zazu project. Do not require its parent to
+            # remain alive or retain the original Artisan command line.
+            if (-not $stopped.ContainsKey([string]$server.ProcessId)) {
+                Stop-Process -Id ([int]$server.ProcessId) -Force
+                $stopped[[string]$server.ProcessId] = $true
+            }
         } elseif ($server.CommandLine -like "*$ProjectPath*" -and $server.CommandLine -like '*artisan serve*') {
             if (-not $stopped.ContainsKey([string]$server.ProcessId)) {
                 Stop-Process -Id ([int]$server.ProcessId) -Force
                 $stopped[[string]$server.ProcessId] = $true
             }
         } else {
-            throw "Could not verify the Zazu Artisan parent for listener PID $($server.ProcessId). Nothing further was stopped."
+            throw "Could not verify listener PID $($server.ProcessId) as a Zazu Artisan/server.php process for $ProjectPath. Nothing further was stopped."
         }
     }
 
