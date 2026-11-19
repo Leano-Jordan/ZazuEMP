@@ -355,3 +355,10 @@ For installation-specific acceptance, “Owner confirmed on the Founder's PC” 
 
 ### Current baseline
 The Founder-supplied research report reviewed read-only main at cb7ab270 (2026-11-18 19:31 UTC). It reports DB-001 still OPEN, no real-install error-free acceptance, no billable customer path yet, and no completed customer pilot. Laravel/browser suites were not run for that report; test/CI claims and market estimates in it are source-reported or research assumptions, not fresh runtime verification. Treat the report's V1 completion estimate (~74%) and readiness scores as directional assessments, not acceptance evidence.
+
+
+### Navigation discoverability contract
+- Audit every owner/operator-facing index route against the persistent sidebar, section tabs, command palette and footer navigation. A route linked only from a dashboard card or another page is not sufficiently discoverable when it is a durable workspace destination.
+- Keep role visibility explicit and consistent with the route's existing server-side authorization. Never weaken middleware to make a destination visible.
+- Keep record-scoped actions (for example, event costs, preparation, requirements, travel and attachments) discoverable from their parent record rather than promoting every nested action into global navigation.
+- Add regression coverage for both the presence of authorised destinations and the absence of owner-only destinations for other roles. Verify active navigation state on destination pages.
