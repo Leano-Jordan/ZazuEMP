@@ -31,6 +31,18 @@
             <p class="founder-muted mt-3">This page provides account-level visibility only. It does not switch your session into this business or grant access to its private operational records.</p>
         </section>
 
+        <section class="founder-account-panel">
+            <h3 class="font-semibold mb-3">Business profile</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <div><span class="founder-muted">Business email</span><p>{{ $business->email ?: 'Not provided' }}</p></div>
+                <div><span class="founder-muted">Phone</span><p>{{ $business->phone ?: 'Not provided' }}</p></div>
+                <div><span class="founder-muted">Website</span><p class="break-all">{{ $business->website ?: 'Not provided' }}</p></div>
+                <div><span class="founder-muted">Address</span><p>{{ $business->address ?: 'Not provided' }}</p></div>
+                <div><span class="founder-muted">Tax number</span><p>{{ $business->tax_number ?: 'Not provided' }}</p></div>
+                <div><span class="founder-muted">Currency</span><p>{{ $business->currency ?: 'Not set' }}</p></div>
+            </div>
+        </section>
+
         <section class="founder-account-grid" aria-label="Business account summary">
             <div class="founder-account-stat"><strong>{{ number_format($business->users_count) }}</strong><span>Linked user accounts</span></div>
             <div class="founder-account-stat"><strong>{{ number_format($business->customers_count) }}</strong><span>Customers</span></div>
