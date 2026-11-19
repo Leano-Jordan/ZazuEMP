@@ -482,3 +482,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The double-click launcher now pauses after a successful or failed startup so the owner can read/copy the generated HTTPS URL and Caddy root-certificate path. Previously the successful command window could close immediately and hide both values.
 - This is a launcher usability adjustment only. It does not change the PHP/Caddy startup sequence, certificates, firewall, database, browser storage or phone data.
 - Committed directly to `main`; no branches created. Physical startup and phone certificate trust remain unverified.
+
+## Playwright contamination guard and navigation acceptance — 2026-11-20
+
+- Registration E2E now skips unless both `ZAZU_E2E_ALLOW_REGISTRATION=1` and `ZAZU_E2E_ISOLATED_DATABASE=1` are explicitly supplied. These flags are acknowledgements only; they do not provision or verify an isolated database.
+- Added `docs/PLAYWRIGHT_DATABASE_SAFETY.md` documenting the real risk created by local `reuseExistingServer` behavior and the disposable-database requirement.
+- Founder navigation feature coverage now asserts that Founder Control Centre, Owner Admin and Data export & recovery are inside the System navigation panel.
+- Service-worker cache version is v40; service-worker cache tests were updated to expect v40 (the prior v39 assertions would otherwise fail after the version bump).
+- No local PHP/Node runtime or live browser was available during this repository-only work. These source changes have not been runtime-tested; GitHub CI status must be checked after push.
+- Existing synthetic business cleanup remains a separate local database operation. Do not broaden its exact `Browser Catering + 10 hex characters` matcher.
