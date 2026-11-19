@@ -127,10 +127,21 @@ class PlatformAdminTest extends TestCase
             ->assertOk()
             ->assertSee('Founder Control Centre')
             ->assertSee('Business workspace')
+            ->assertSee('aria-controls="zazu-nav-system"', false)
             ->assertSee('href="'.route('admin.sentinel').'"', false)
             ->assertSee('href="'.route('owner.dashboard').'"', false)
             ->assertSee('href="'.route('exports.index').'"', false)
             ->assertSee('href="'.route('dashboard').'"', false);
+
+        $html = $this->get(route('admin.sentinel'))->getContent();
+        $systemStart = strpos($html, 'id="zazu-nav-system"');
+        $this->assertNotFalse($systemStart);
+        $systemEnd = strpos($html, '</div></div>', $systemStart);
+        $this->assertNotFalse($systemEnd);
+        $systemPanel = substr($html, $systemStart, $systemEnd - $systemStart);
+        $this->assertStringContainsString(route('admin.sentinel'), $systemPanel);
+        $this->assertStringContainsString(route('owner.dashboard'), $systemPanel);
+        $this->assertStringContainsString(route('exports.index'), $systemPanel);
     }
 
     public function test_legacy_admin_list_does_not_grant_founder_access(): void
