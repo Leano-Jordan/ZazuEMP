@@ -3215,12 +3215,12 @@ function handleZazuPhonePairing() {
         await offline.ready;
         panel.hidden = offline.isPaired();
         if (!panel.hidden) {
-            submit.disabled = input.value.replace(/\\D/g, '').length !== 8;
+            submit.disabled = input.value.replace(/\D/g, '').length !== 8;
         }
     };
 
     input.addEventListener('input', () => {
-        const digits = input.value.replace(/\\D/g, '').slice(0, 8);
+        const digits = input.value.replace(/\D/g, '').slice(0, 8);
         if (input.value !== digits) input.value = digits;
         input.setCustomValidity(digits.length === 8 ? '' : 'Enter all 8 digits from the owner’s phone pairing code.');
         submit.disabled = digits.length !== 8;
@@ -3229,7 +3229,7 @@ function handleZazuPhonePairing() {
 
     form.addEventListener('submit', async event => {
         event.preventDefault();
-        const code = input.value.replace(/\\D/g, '').slice(0, 8);
+        const code = input.value.replace(/\D/g, '').slice(0, 8);
         if (code.length !== 8) {
             input.setCustomValidity('Enter all 8 digits from the owner’s phone pairing code.');
             input.reportValidity();
