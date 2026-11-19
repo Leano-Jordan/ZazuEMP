@@ -71,6 +71,8 @@ class BusinessSpreadsheetExportTest extends TestCase
             ->assertOk()
             ->assertSee(route('exports.index'))
             ->assertSee('Data export &amp; recovery', false)
+            ->assertSee('Compliance', false)
+            ->assertSee('Activity audit', false)
             ->assertSee('exports backup restore recovery', false);
 
         $this->get(route('exports.index'))
