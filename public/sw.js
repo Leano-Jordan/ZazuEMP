@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v37';
+const CACHE_NAME = 'zazu-static-v38';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -472,7 +472,14 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(request.url);
 
     if (request.method === 'POST' && url.origin === self.location.origin && url.pathname === '/logout') {
-        event.waitUntil(clearActiveContext());
+        event.respondWith((async () => {
+            // Preserve the authenticated offline cache when the server cannot
+            // end the session. Invalidate it only after Laravel confirms the
+            // same successful redirect contract used by the page client.
+            const response = await fetch(request);
+            if (response.ok && response.redirected) await clearActiveContext();
+            return response;
+        })());
         return;
     }
 
