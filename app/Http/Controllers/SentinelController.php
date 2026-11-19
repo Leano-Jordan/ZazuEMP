@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\FounderSupportSession;
 use App\Models\PlatformLicenseCustomer;
 use App\Support\ZazuIncidentSummary;
 use App\Support\ZazuSentinelHealth;
