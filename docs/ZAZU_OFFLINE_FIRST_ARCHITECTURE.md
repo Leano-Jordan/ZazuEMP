@@ -79,8 +79,6 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 6. Keep focused browser acceptance for direct offline navigation, local reads/writes, reload while disconnected, and reconnect reconciliation. Do not count a cached page snapshot as a local read.
 
 7. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
-5. Keep focused browser acceptance for direct offline navigation, local reads/writes, reload while disconnected, and reconnect reconciliation. Do not count a cached page snapshot as a local read.
-6. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
 
 
 No runtime code changed in this audit. The physical Android gate remains OPEN.
