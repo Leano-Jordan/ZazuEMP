@@ -78,3 +78,37 @@ Do not merge declarations across different breakpoint or theme/state contexts. D
 ## Next execution target
 
 Finish the property-level hero and hero-side matrix from the exact current `main` files. Only then make the first CSS consolidation and its paired regression-test update.
+
+
+## Property-level hero cascade findings — 2026-11-20
+
+The exact current source was re-fetched from `main` before this pass:
+
+- `zazu-dashboard-authority.css`: 2,134 lines, blob `e0cb0ad634effe480113bc9b89f5ac2356f0ffa7`
+- `zazu-product-authority.css`: 1,885 lines, blob `6173878b926561eba9f644c621d8a3ae63ce7b6c`
+
+### Effective source-order map
+
+| Concern | Dashboard authority | Product authority | Cascade implication |
+|---|---|---|---|
+| Hero geometry | Initial block around line 61; later visual passes around 594, 1,354 and final restore around 1,988 | Hero block around 1,328 adds its own minimum height, overflow and radius | Product loads later; its `min-height:190px` can override dashboard's final `min-height:184px` because both declarations are important and selectors have equal specificity |
+| Hero surface | Final restore around 1,988 defines layered slate/blue/accent gradient and shadow | Final token palette around 1,704 sets border, background-color, background-image and shadow | Product's later important declarations win for those same properties; the rendered hero surface is not solely controlled by the dashboard file |
+| Hero text | Dashboard final restore sets lead/support presentation; dark block around 2,087 sets dark text | Product token block around 1,712 sets hero text to `var(--zazu-ink)`; dark token block around 1,858 also sets theme text | Product authority supplies the later theme-aware text colour |
+| Supporting panel | Dashboard final restore around 2,022 sets padding, border, gradient and layout; dark rules around 2,097 set dark surface | Product block around 1,375 sets margin, padding, border, background image and shadow; token block around 1,720 reasserts border, background image and shadow | Product owns several final panel surface properties today, despite the panel being dashboard-only |
+| Responsive composition | Dashboard media queries around 2,117-2,134 control collapse and mobile heading size; earlier responsive blocks also exist | Product media queries around 1,528-1,534 adjust hero and panel dimensions | Product's later responsive declarations can win when media conditions overlap |
+| Dark theme | Dashboard dark rules around 2,087 onward | Product dark rules around 1,827 onward | Product's later theme rules currently win for overlapping important properties |
+
+Line numbers are source locations at the blob SHAs above; they must be refreshed after any edit.
+
+### Confirmed redundant-looking but unsafe candidates
+
+- The dashboard file repeats the hero and hero-side selectors across multiple historical refinement blocks, but their declarations differ in geometry, copy visibility, image treatment, and breakpoints. They are not safe to collapse as selector duplicates.
+- The product file contains an older image-led hero block around line 1,328 and a later token-driven dashboard palette block around line 1,704. These are distinct visual generations; removing the earlier block without checking all properties it uniquely supplies would be unsafe.
+- The dashboard file's final visual restore is not the final cascade authority because product CSS loads after it. A simple append-to-dashboard migration would not preserve all existing outcomes.
+- The product file's token-driven dashboard rules include shared theme tokens, but their selectors are dashboard-scoped. Their migration must preserve the later dark-theme and responsive override order as one coherent group.
+
+### Decision after property comparison
+
+No CSS declaration was moved or deleted in this pass. There is not yet a proven zero-difference subset of the hero/supporting-panel rules that can be safely consolidated without changing the current cascade. The apparent repetition is partly historical design evolution and partly a cross-file authority overlap.
+
+The first code migration should therefore be a coordinated relocation of a fully mapped dashboard-only token/theme group, not a partial hero rule cleanup. Before that change, map the exact start/end of the product authority's dashboard palette section and all responsive/theme blocks it owns; then update the source-ownership tests in the same commit. Do not move only the light-theme declarations.
