@@ -139,9 +139,10 @@ test('unreachable logout host preserves the signed-in session and queued busines
     await openPublicNavigation(page);
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
 
-    await expect.poll(() => dialogs.length).toBe(1);
-    expect(dialogs[0].type).toBe('alert');
-    expect(dialogs[0].message).toContain('could not reach the server to end your session');
+    await expect.poll(() => dialogs.length).toBe(2);
+    expect(dialogs[0].type).toBe('confirm');
+    expect(dialogs[1].type).toBe('alert');
+    expect(dialogs[1].message).toContain('could not reach the server to end your session');
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
 
@@ -163,9 +164,9 @@ test('unreachable logout host preserves the signed-in session and queued busines
     await page.goto('/');
     await openPublicNavigation(page);
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect.poll(() => dialogs.length).toBe(2);
-    expect(dialogs[1].type).toBe('confirm');
-    expect(dialogs[1].message).toContain('business-scoped offline workspace and any queued changes or attachments will remain on this device');
+    await expect.poll(() => dialogs.length).toBe(3);
+    expect(dialogs[2].type).toBe('confirm');
+    expect(dialogs[2].message).toContain('business-scoped offline workspace and any queued changes or attachments will remain on this device');
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true })).toBeVisible();
 
