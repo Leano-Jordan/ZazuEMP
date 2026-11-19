@@ -78,16 +78,15 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertNotFalse($readyPosition);
         $this->assertNotFalse($syncPosition);
         $this->assertLessThan($syncPosition, $readyPosition);
-        $this->assertStringContainsString('async function canReachZazuLogoutServer()', $app);
-        $this->assertStringContainsString("fetch('/up'", $app);
-        $this->assertStringContainsString("method: 'GET'", $app);
-        $this->assertStringContainsString('Your business offline workspace, pending changes and device token were left untouched', $app);
+        $this->assertStringNotContainsString('canReachZazuLogoutServer', $app);
+        $this->assertStringNotContainsString("fetch('/up'", $app);
         $this->assertStringContainsString('async function handleZazuLogout(form)', $app);
         $logoutHandler = substr($app, strpos($app, 'async function handleZazuLogout(form)'));
-        $this->assertLessThan(
-            strpos($logoutHandler, 'HTMLFormElement.prototype.submit.call(form)'),
-            strpos($logoutHandler, 'await canReachZazuLogoutServer()')
-        );
+        $this->assertStringContainsString("method: 'POST'", $logoutHandler);
+        $this->assertStringContainsString('body: new FormData(form)', $logoutHandler);
+        $this->assertStringContainsString("redirect: 'follow'", $logoutHandler);
+        $this->assertStringContainsString('response.redirected', $logoutHandler);
+        $this->assertStringContainsString('could not reach the server to end your session', $logoutHandler);
         $this->assertStringContainsString('business-scoped offline workspace', $logoutHandler);
         $this->assertStringNotContainsString('offline.assessLogout()', $logoutHandler);
         $this->assertStringNotContainsString('offline.clearLocalSession()', $logoutHandler);
