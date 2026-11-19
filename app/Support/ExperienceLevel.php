@@ -41,25 +41,45 @@ class ExperienceLevel
     {
         $selected = $this->selected($user, $business) ?? self::DEFAULT;
 
+        if ($this->isPlatformAdmin($user)) {
+            return $selected;
+        }
+
         return $business
             ? $this->entitlements->clamp($selected, $this->entitlements->currentTier($business, $at))
             : $selected;
     }
 
-    public function maximumFor(Business $business, ?DateTimeInterface $at = null): string
+    public function maximumFor(Business $business, ?DateTimeInterface $at = null, ?User $user = null): string
     {
-        return $this->entitlements->currentTier($business, $at);
+        return $this->isPlatformAdmin($user)
+            ? self::ADVANCED
+            : $this->entitlements->currentTier($business, $at);
     }
 
-    public function canSelect(Business $business, string $level, ?DateTimeInterface $at = null): bool
+    public function canSelect(Business $business, string $level, ?DateTimeInterface $at = null, ?User $user = null): bool
     {
-        return $this->entitlements->canSelect($business, $level, $at);
+        return $this->isPlatformAdmin($user)
+            ? isset(self::RANK[$level])
+            : $this->entitlements->canSelect($business, $level, $at);
     }
 
     /** @return list<string> */
-    public function availableLevels(Business $business, ?DateTimeInterface $at = null): array
+    public function availableLevels(Business $business, ?DateTimeInterface $at = null, ?User $user = null): array
     {
-        return $this->entitlements->availableTiers($business, $at);
+        return $this->isPlatformAdmin($user)
+            ? array_keys(self::RANK)
+            : $this->entitlements->availableTiers($business, $at);
+    }
+
+    public function isPlatformAdmin(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+        $founderEmail = (string) config('zazu.platform_admin_email', '');
+
+        return $user !== null
+            && $founderEmail !== ''
+            && hash_equals($founderEmail, strtolower(trim((string) $user->email)));
     }
 
     public function isTrial(Business $business, ?DateTimeInterface $at = null): bool
