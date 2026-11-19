@@ -113,11 +113,12 @@
                     </div>
                     @endif
                     @if($isOwner || $isPlatformAdmin)
-                    <div class="zazu-nav-area {{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*') ? 'is-active' : '' }}" data-zazu-nav-area>
+                    <div class="zazu-nav-area {{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*','exports.*') ? 'is-active' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title">System</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
                             @if($isOwner)
                                 <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}" @if(request()->routeIs('owner.dashboard')) aria-current="page" @endif>Owner Admin</a>
+                                <a href="{{ route('exports.index') }}" class="zazu-nav-link {{ request()->routeIs('exports.*') ? 'active' : '' }}" @if(request()->routeIs('exports.*')) aria-current="page" @endif>Data export &amp; recovery</a>
                                 <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">Settings</a>
                                 <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
                             @endif
@@ -248,6 +249,8 @@
                                 @if($can('assets.view'))<a href="{{ route('assets.index') }}" class="{{ request()->routeIs('assets.*') ? 'active' : '' }}">Assets</a>@endif
                             @elseif(request()->routeIs('reports.*'))
                                 <span class="zazu-section-name">Insights</span><a href="{{ route('reports.index') }}" class="active">Reports</a>
+                            @elseif(request()->routeIs('exports.*'))
+                                <span class="zazu-section-name">Business data</span><a href="{{ route('exports.index') }}" class="active" aria-current="page">Data export &amp; recovery</a>
                             @elseif(request()->routeIs('settings.*'))
                                 <a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index') ? 'active' : '' }}">Business</a>
                                 @if($isOwner)<a href="{{ route('settings.compliance') }}" class="{{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a><a href="{{ route('settings.audit') }}" class="{{ request()->routeIs('settings.audit') ? 'active' : '' }}">Audit</a>@endif
@@ -293,7 +296,8 @@
                     @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" data-command-item data-search-terms="inventory stock warehouse quantities items goods" role="option"><span>Inventory</span><small>Stock control · warehouse records</small></a>@endif
                     @if($can('assets.view'))<a href="{{ route('assets.index') }}" data-command-item data-search-terms="assets equipment hire resources allocation availability register" role="option"><span>Assets</span><small>Equipment register · resource readiness</small></a>@endif
                     @if($can('reports.view'))<a href="{{ route('reports.index') }}" data-command-item data-search-terms="reports reporting analytics insights business intelligence performance" role="option"><span>Reports</span><small>Insights · business reporting</small></a>@endif
-                    @if($isOwner)<a href="{{ route('settings.index') }}" data-command-item data-search-terms="settings business configuration company profile tax branding system" role="option"><span>Business settings</span><small>Workspace configuration · business identity</small></a>
+                    @if($isOwner)<a href="{{ route('exports.index') }}" data-command-item data-search-terms="exports export data csv spreadsheet business archive backup restore recovery download" role="option"><span>Data export &amp; recovery</span><small>Download business records · archive and restore</small></a>
+                    <a href="{{ route('settings.index') }}" data-command-item data-search-terms="settings business configuration company profile tax branding system" role="option"><span>Business settings</span><small>Workspace configuration · business identity</small></a>
                     <a href="{{ route('settings.compliance') }}" data-command-item data-search-terms="compliance tax vat legal documents statutory finance" role="option"><span>Compliance</span><small>Compliance pack · controls and records</small></a>
                     <a href="{{ route('settings.audit') }}" data-command-item data-search-terms="audit log activity history accountability changes security" role="option"><span>Audit</span><small>Audit trail · system activity</small></a>
                     <a href="{{ route('onboarding.index') }}" data-command-item data-search-terms="setup onboarding business setup catalogue setup foundation" role="option"><span>Setup centre</span><small>Workspace foundation · business and catalogue setup</small></a>@endif
@@ -393,6 +397,7 @@
                         @if($can('reports.view'))<a href="{{ route('reports.index') }}" @if(request()->routeIs('reports.*')) aria-current="page" @endif>Reports</a>@endif
                         <a href="{{ route('search.index') }}" @if(request()->routeIs('search.index')) aria-current="page" @endif>Search</a>
                         @if($isOwner)
+                            <a href="{{ route('exports.index') }}" @if(request()->routeIs('exports.*')) aria-current="page" @endif>Data export &amp; recovery</a>
                             <a href="{{ route('settings.index') }}" @if(request()->routeIs('settings.index')) aria-current="page" @endif>Business settings</a>
                             <a href="{{ route('settings.audit') }}" @if(request()->routeIs('settings.audit')) aria-current="page" @endif>Activity audit</a>
                             <a href="{{ route('onboarding.index') }}" @if(request()->routeIs('onboarding.*')) aria-current="page" @endif>Setup centre</a>
