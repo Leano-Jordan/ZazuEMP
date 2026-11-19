@@ -63,6 +63,23 @@ class BusinessSpreadsheetExportTest extends TestCase
         ]);
     }
 
+    public function test_owner_can_discover_export_and_recovery_from_persistent_navigation(): void
+    {
+        $this->signInAsOwner();
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee(route('exports.index'))
+            ->assertSee('Data export &amp; recovery', false)
+            ->assertSee('exports backup restore recovery', false);
+
+        $this->get(route('exports.index'))
+            ->assertOk()
+            ->assertSee('class="zazu-nav-area is-active" data-zazu-nav-area', false)
+            ->assertSee('aria-current="page"', false)
+            ->assertSee('Data export &amp; recovery', false);
+    }
+
     public function test_owner_export_page_lists_the_available_business_datasets(): void
     {
         $this->signInAsOwner();
