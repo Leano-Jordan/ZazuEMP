@@ -135,7 +135,9 @@ test('unreachable logout host preserves the signed-in session and queued busines
         else await dialog.accept();
     });
 
-    await page.route('**/logout', route => route.abort());
+    // Simulate a genuinely disconnected installed client. A page-level route
+    // abort can miss the POST when the service worker owns the fetch event.
+    await page.context().setOffline(true);
     await openPublicNavigation(page);
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
 
@@ -146,7 +148,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
 
-    await page.unroute('**/logout');
+    await page.context().setOffline(false);
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
     await waitForOfflineRuntime(page);
