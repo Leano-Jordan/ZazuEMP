@@ -476,3 +476,9 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added a focused regression test for owner discovery and active navigation on the export page. Existing route middleware and export authorization were not changed.
 - Customer spreadsheet import is already discoverable from the Customers page action; event costs, preparation, requirements, travel and attachments are contextual job-level tools, not standalone workspace destinations. No duplicate top-level links added for those contextual workflows.
 - Changes committed directly to main; automated test execution and rendered desktop/mobile verification remain pending. Do not claim UI acceptance until verified.
+
+## LAN HTTPS launcher output visibility — 2026-11-19
+
+- The double-click launcher now pauses after a successful or failed startup so the owner can read/copy the generated HTTPS URL and Caddy root-certificate path. Previously the successful command window could close immediately and hide both values.
+- This is a launcher usability adjustment only. It does not change the PHP/Caddy startup sequence, certificates, firewall, database, browser storage or phone data.
+- Committed directly to `main`; no branches created. Physical startup and phone certificate trust remain unverified.
