@@ -112,20 +112,24 @@
                         </div></div>
                     </div>
                     @endif
+                    @if($isOwner)
+                        <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}" @if(request()->routeIs('owner.dashboard')) aria-current="page" @endif>Owner Admin</a>
+                        <a href="{{ route('exports.index') }}" class="zazu-nav-link {{ request()->routeIs('exports.*') ? 'active' : '' }}" @if(request()->routeIs('exports.*')) aria-current="page" @endif>Data export &amp; recovery</a>
+                    @endif
+                    @if($isPlatformAdmin)
+                        <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel') ? 'active' : '' }}" @if(request()->routeIs('admin.sentinel')) aria-current="page" @endif>Founder Control Centre</a>
+                    @endif
                     @if($isOwner || $isPlatformAdmin)
-                    <div class="zazu-nav-area {{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*','exports.*') ? 'is-active' : '' }}" data-zazu-nav-area>
+                    <div class="zazu-nav-area {{ request()->routeIs('settings.*','admin.*','onboarding.*') ? 'is-active' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title">System</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
                             @if($isOwner)
-                                <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}" @if(request()->routeIs('owner.dashboard')) aria-current="page" @endif>Owner Admin</a>
-                                <a href="{{ route('exports.index') }}" class="zazu-nav-link {{ request()->routeIs('exports.*') ? 'active' : '' }}" @if(request()->routeIs('exports.*')) aria-current="page" @endif>Data export &amp; recovery</a>
                                 <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.index') ? 'active' : '' }}">Settings</a>
                                 <a href="{{ route('settings.compliance') }}" class="zazu-nav-link {{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a>
                                 <a href="{{ route('settings.audit') }}" class="zazu-nav-link {{ request()->routeIs('settings.audit') ? 'active' : '' }}">Activity audit</a>
                                 <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
                             @endif
                             @if($isPlatformAdmin)
-                                <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel') ? 'active' : '' }}">Founder Control Centre</a>
                                 <a href="{{ route('admin.landing.settings') }}" class="zazu-nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">Platform</a>
                             @endif
                         </div></div>
