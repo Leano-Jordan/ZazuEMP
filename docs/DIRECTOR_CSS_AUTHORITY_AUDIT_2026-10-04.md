@@ -509,3 +509,54 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Event model casts `event_date` as a date, not a datetime. The dashboard previously formatted it with `H:i`, which rendered every event as `00:00` and falsely implied a midnight start.
 - Replaced the fabricated time with `Time TBC`; missing dates now read `Unscheduled` / `Date to be confirmed`.
 - Added a source regression test preventing time formatting on date-only event records.
+
+
+## Six-layer authority reconciliation — exact main head 2026-11-19
+
+### Current build inputs
+
+The current Vite configuration and authenticated application layout load six application stylesheets:
+
+| Stylesheet | Current lines | Intended authority |
+|---|---:|---|
+| `app.css` | 8,301 | Canonical design tokens, themes, shared base primitives and foundational shell/component rules |
+| `zazu-responsive-theme.css` | 646 | Shared responsive layout and breakpoint-specific structural behaviour |
+| `zazu-mobile-refinement.css` | 791 | Mobile shell, drawer, touch targets and mobile-specific composition |
+| `zazu-final-visual-sweep.css` | 6,642 | Existing specialized component refinements; not a second token or shared-shell authority |
+| `zazu-dashboard-authority.css` | 2,134 | Dashboard-route-specific composition and dashboard-only visual treatment |
+| `zazu-product-authority.css` | 1,885 | Shared authenticated product components and module-wide surface consistency |
+
+Total loaded CSS: 20,399 lines. This is a source-size measurement, not a claim that all 20,399 lines are redundant or should be removed.
+
+### Correction to the historical authority map
+
+The original four-file map above predates the addition of `zazu-dashboard-authority.css` and `zazu-product-authority.css`. The old four-file metrics are historical and must not be used as current stylesheet totals.
+
+The two later files have real responsibilities and are actively referenced by the current layout. They must not be removed or merged wholesale.
+
+### Confirmed ownership conflict
+
+A source-level selector inventory found 105 exact selector strings shared between `zazu-dashboard-authority.css` and `zazu-product-authority.css`. This includes dashboard-scoped shell selectors and dashboard content selectors. The dashboard file contains 778 `!important` declarations; the product file contains 473. These counts identify high cascade pressure, not 1,251 proven defects.
+
+The product stylesheet describes itself as shared across authenticated modules, but it also contains dashboard-scoped selectors. The dashboard stylesheet separately owns dashboard route composition and dashboard-specific styling. The current ownership boundary is therefore not clean.
+
+The shared-component regression test also asserts the presence of dashboard selectors inside `zazu-product-authority.css`. That test currently encodes the overlap as an expected contract. It must be revised alongside any future ownership migration; moving CSS alone would cause a false regression failure.
+
+### Decisions
+
+1. Keep all six stylesheets loaded for now. No stylesheet deletion, concatenation, or broad rewrite is authorized by this audit.
+2. Keep `app.css` as the sole owner of global design tokens and foundational shared primitives.
+3. Keep responsive structure and mobile shell behaviour in their existing responsive/mobile files. Do not transfer off-canvas, safe-area, touch-target or breakpoint ownership into product styling.
+4. Keep dashboard-only layout and dashboard content presentation in `zazu-dashboard-authority.css`.
+5. Keep reusable authenticated module components in `zazu-product-authority.css`. Its dashboard-scoped rules are an ownership exception to be isolated and migrated only after their exact declarations, cascade order, tests and theme/state behaviour are mapped.
+6. Do not mass-remove `!important`. First classify each declaration by the competing selector, specificity, theme/state, breakpoint and actual rendered intent. Retain bounded exceptions where a stronger cascade is genuinely required.
+7. Do not create a styleguide or new shared Blade components until the CSS ownership map and existing component inventory are stable. There are currently five files in `resources/views/components/`; inspect their responsibilities before proposing new abstractions.
+8. Treat `reference ui ux images/` as a design-reference library only. It is not a runtime asset directory and is excluded from shipped-media counts. Preserve it; do not delete it as release cleanup.
+
+### Next controlled engineering pass
+
+Build a property-level migration map for the 105 overlapping selectors, beginning with shell selectors and then dashboard-specific content. For each selector, record which file currently wins, the declaration differences, whether it is theme/state/breakpoint-specific, and the test assertions that depend on its current location. Only then move one coherent group at a time and update its regression tests in the same commit.
+
+### Verification boundary
+
+This reconciliation is source-inspected against main commit `a893a49c665977168413004cbf41c5b18bdd786d`. It does not claim a Vite build, automated test run, or rendered visual acceptance. Those require the local application runtime and must remain explicitly unverified until performed.
