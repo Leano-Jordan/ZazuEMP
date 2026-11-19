@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path,
+    [string]$ProjectPath,
     [string]$PhpPath,
     [ValidateRange(1024, 65535)]
     [int]$AppPort = 8000,
@@ -9,6 +9,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
+    $ProjectPath = (Resolve-Path (Join-Path $scriptDirectory '..\..')).Path
+}
 $ProjectPath = [System.IO.Path]::GetFullPath($ProjectPath).TrimEnd('\')
 
 $localCaddy = Join-Path $ProjectPath 'tools\caddy.exe'
@@ -52,7 +56,7 @@ $configPath = Join-Path $stateDirectory 'Caddyfile'
 $pidPath = Join-Path $stateDirectory 'caddy.pid'
 $stdoutPath = Join-Path $stateDirectory 'caddy.out.log'
 $stderrPath = Join-Path $stateDirectory 'caddy.err.log'
-$startServer = Join-Path $PSScriptRoot 'Start-ZazuDev.ps1'
+$startServer = Join-Path $scriptDirectory 'Start-ZazuDev.ps1'
 
 if (-not (Test-Path $startServer -PathType Leaf)) {
     throw "The Zazu host launcher is missing: $startServer"
