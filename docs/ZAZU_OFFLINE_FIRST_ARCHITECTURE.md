@@ -467,10 +467,9 @@ Only after the server confirms logout does the client ask the service worker to 
 
 ## Authenticated page-cache generation boundary
 
-Private HTML responses may finish after logout or another authenticated user takes over. The service worker now attaches an identity-generation snapshot to each navigation/HTML request and rejects late cache writes once logout or an identity switch advances the generation. The `POST /logout` request invalidates the generation immediately; queued page priming is aborted and late responses cannot silently restore a previous user's cache. This protects the asynchronous cache boundary; cross-user privacy acceptance still requires a real browser regression with delayed responses and multi-account sessions.
+Private HTML responses may finish after logout or another authenticated user takes over. The service worker attaches an identity-generation snapshot to each navigation/HTML request and rejects late cache writes once a confirmed logout or an identity switch advances the generation. A failed or unreachable `POST /logout` does not clear the authenticated page cache or advance the generation: the web session remains active, so the installed workspace must remain launchable. After Laravel confirms the successful logout redirect, the worker clears the user-scoped cache and advances the generation; late responses from the previous session cannot silently restore it.
 
-
-The persisted active-user identity read is generation-checked at every asynchronous boundary as well. A delayed Cache API read can no longer repopulate the in-memory active identity after logout has cleared it.
+The persisted active-user identity read is generation-checked at every asynchronous boundary as well. A delayed Cache API read can no longer repopulate the in-memory active identity after confirmed logout has cleared it.
 
 ## Director offline continuity cycle — 2026-10-21
 
