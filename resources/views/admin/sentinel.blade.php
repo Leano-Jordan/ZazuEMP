@@ -129,6 +129,9 @@
                     <article class="sentinel-account">
                         <div>
                             <strong>{{ $platformBusiness->name }}</strong>
+                            @if($platformBusiness->email)
+                                <div class="sentinel-muted" style="font-size:.82rem;overflow-wrap:anywhere">{{ $platformBusiness->email }}</div>
+                            @endif
                             <div class="sentinel-account-created">Created {{ $platformBusiness->created_at?->format('d M Y · H:i') ?? 'Date unavailable' }}</div>
                             <div class="sentinel-account-meta">
                                 <span class="sentinel-pill">{{ strtoupper($platformBusiness->status ?: 'unknown') }}</span>
@@ -148,7 +151,6 @@
                             @forelse($platformBusiness->users->where('id', '!=', $accountOwner?->id)->take(2) as $member)
                                 <div>{{ $member->name }} · {{ ucfirst($member->pivot->role ?? 'member') }} · {{ $member->email }}</div>
                             @empty
-                                <div>No linked users</div>
                             @endforelse
                             @if($platformBusiness->users_count > 3)
                                 <div>+ {{ $platformBusiness->users_count - 3 }} more</div>
