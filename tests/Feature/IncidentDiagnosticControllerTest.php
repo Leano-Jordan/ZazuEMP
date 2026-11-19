@@ -88,7 +88,8 @@ class IncidentDiagnosticControllerTest extends TestCase
             'exception_class' => 'RuntimeException',
         ]));
 
-        $this->get('/api/support/incidents/'.$requestId)->assertNotFound();
+        $signedUrl = URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => $requestId]);
+        $this->get($signedUrl)->assertNotFound();
     }
 
     public function test_reference_download_returns_not_found_when_no_matching_log_exists(): void
