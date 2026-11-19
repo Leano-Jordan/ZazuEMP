@@ -424,6 +424,26 @@ try {
     }
 }
 
+function Test-ZazuTcpEndpoint {
+    # Get-NetTCPConnection can return an empty result on some Windows 10
+    # PowerShell/network-stack combinations even while PHP reports its
+    # listener is running. A real loopback TCP handshake is the readiness
+    # check that matters to the reverse proxy.
+    $client = New-Object System.Net.Sockets.TcpClient
+    try {
+        $connect = $client.BeginConnect($BindAddress, $Port, $null, $null)
+        if (-not $connect.AsyncWaitHandle.WaitOne(750, $false)) {
+            return $false
+        }
+        $client.EndConnect($connect)
+        return $client.Connected
+    } catch {
+        return $false
+    } finally {
+        $client.Close()
+    }
+}
+
 function Get-ZazuStartupLogTail {
     $sections = @()
     foreach ($log in @(@{ Label = 'STDERR'; Path = $stderr }, @{ Label = 'STDOUT'; Path = $stdout })) {
@@ -449,7 +469,7 @@ for ($attempt = 0; $attempt -lt 45; $attempt++) {
         $details = Get-ZazuStartupLogTail
         throw ("Zazu server exited during startup. Startup output:`n{0}" -f $details)
     }
-    if ((Get-ZazuListener).Count -gt 0) {
+    if (Test-ZazuTcpEndpoint) {
         $ready = $true
         break
     }
