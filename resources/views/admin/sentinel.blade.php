@@ -92,6 +92,25 @@
         @media(max-width:560px){.sentinel-panel{padding:.9rem}.sentinel-account{grid-template-columns:minmax(0,1fr);gap:.7rem}.sentinel-account .sentinel-button{grid-column:auto;width:100%}.sentinel-intro{padding:1rem}.sentinel-search input{flex-basis:100%}.sentinel-search .sentinel-button{flex:1}.sentinel-section-nav{gap:.4rem}.sentinel-section-nav a{flex:1;justify-content:center}.sentinel-license-row{padding:.85rem}.sentinel-license-form{align-items:stretch}.sentinel-license-form label{flex:1 1 9rem}.sentinel-license-form .sentinel-button{width:100%}}
         @media(max-width:800px){.sentinel-license-row{grid-template-columns:1fr}}
         @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-health-grid{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
+    
+        /* Founder directory: use the available desktop content width, not viewport width. */
+        .sentinel-account > *{min-width:0}
+        .sentinel-account{grid-template-columns:minmax(0,1.2fr) minmax(220px,1fr) auto;gap:1.25rem}
+        .sentinel-account-users{overflow-wrap:anywhere;word-break:normal}
+        .sentinel-account .sentinel-button{min-width:8.5rem;white-space:normal}
+        @media(min-width:901px){
+            .sentinel-wrap{width:100%;max-width:1600px}
+            .sentinel-account{grid-template-columns:minmax(0,1.15fr) minmax(240px,.95fr) auto}
+            .sentinel-account .sentinel-button{justify-self:end}
+        }
+        @media(max-width:900px){
+            .sentinel-account{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+            .sentinel-account .sentinel-button{grid-column:1/-1;justify-self:start}
+        }
+        @media(max-width:560px){
+            .sentinel-account{grid-template-columns:minmax(0,1fr);gap:.7rem}
+            .sentinel-account .sentinel-button{grid-column:auto;width:100%}
+        }
     </style>
 
     <div class="sentinel-wrap">
