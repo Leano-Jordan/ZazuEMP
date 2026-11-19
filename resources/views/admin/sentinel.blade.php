@@ -1,6 +1,11 @@
 <x-app-layout>
-    <x-slot:title>Sentinel diagnostics</x-slot:title>
-    <x-slot:heading>Sentinel diagnostics</x-slot:heading>
+    <x-slot:title>Founder Control Centre</x-slot:title>
+    <x-slot:heading>Founder Control Centre</x-slot:heading>
+    <x-slot:headerAction>
+        @if(app(\\App\\Support\\CurrentBusiness::class)->resolve(auth()->user()))
+            <a href=\"{{ route('dashboard') }}\" class=\"zazu-btn zazu-btn-secondary\">Business workspace</a>
+        @endif
+    </x-slot:headerAction>
 
     <style nonce="{{ request()->attributes->get('cspNonce') }}">
         .sentinel-wrap{display:grid;gap:1.25rem}
@@ -76,17 +81,22 @@
     <div class="sentinel-wrap">
         <section class="sentinel-intro">
             <div>
-                <div class="sentinel-kicker">Director control · private diagnostics</div>
-                <h2 class="sentinel-title">Failure intelligence, not guesswork.</h2>
-                <p class="sentinel-copy">Sentinel reads the independent, privacy-filtered incident ledger. It groups repeat failures, exposes their technical fingerprints and preserves an occurrence timeline without querying business records.</p>
+                <div class="sentinel-kicker">Rosscore Labs · Founder control</div>
+                <h2 class="sentinel-title">Platform operations and licence control.</h2>
+                <p class="sentinel-copy">Review this installation's diagnostic evidence, investigate recurring failures and manage registered customer licences. Customer business records are not displayed here.</p>
             </div>
-            <span class="sentinel-pill">Platform admin only</span>
+            <span class="sentinel-pill">Founder only</span>
+        </section>
+
+        <section class="sentinel-panel" aria-labelledby="sentinel-installation-visibility">
+            <h3 id="sentinel-installation-visibility">Customer installation visibility</h3>
+            <p class="sentinel-muted">{{ number_format($customers->total()) }} registered installation record(s) match the current filter. This is the licensing registry, not a live fleet-health feed. Customer installations do not currently send remote health or connectivity reports, so licence status must not be read as proof that an installation is online or healthy.</p>
         </section>
 
         <section class="sentinel-panel" id="licensing">
             <div class="sentinel-health-overall">
                 <div>
-                    <h3>Licensing &amp; entitlements</h3>
+                    <h3>Registered installations · licensing &amp; entitlements</h3>
                     <p class="sentinel-muted">Founder registry for customer installations. Add the business name and unique licensing reference supplied from the customer's Business Settings, then issue, renew or revoke offline tokens.</p>
                 </div>
                 <span class="sentinel-pill">{{ $licenceSigningConfigured ? 'Signing configured' : 'Signing not configured' }}</span>
@@ -206,8 +216,8 @@
         <section class="sentinel-panel" aria-label="Sentinel diagnostic health">
             <div class="sentinel-health-overall">
                 <div>
-                    <h3>Sentinel's own health</h3>
-                    <p class="sentinel-muted">Checks the local incident evidence store, not the health of every Zazu subsystem.</p>
+                    <h3>This installation's Sentinel health</h3>
+                    <p class="sentinel-muted">Checks the local incident evidence store only. It does not report the health of remote customer installations.</p>
                 </div>
                 <span class="sentinel-pill">{{ strtoupper(str_replace('_', ' ', $health['status'])) }}</span>
             </div>
