@@ -29,6 +29,7 @@ return new class extends Migration
             $table->foreignId('business_id')->nullable()->constrained('businesses')->nullOnDelete();
             $table->foreignId('founder_support_session_id')->nullable()->constrained('founder_support_sessions')->nullOnDelete();
             $table->string('action', 100);
+            $table->string('outcome', 30)->default('success');
             $table->string('reason', 500)->nullable();
             $table->json('metadata')->nullable();
             $table->uuid('request_id')->nullable();
