@@ -34,7 +34,7 @@ The installer is safe to re-run for a partially completed fresh installation: an
 
 ## Founder Control Centre identity
 
-Before using the founder-only Sentinel Control Centre, set `ZAZU_PLATFORM_ADMIN_EMAIL` in the installation's private `.env` file to the exact email address of the designated founder account, then rebuild the configuration cache if the installation uses one. This is a single identity, not a comma-separated administrator list. The former `ZAZU_PLATFORM_ADMIN_EMAILS` variable is deliberately ignored; a business account's `admin` role does not grant platform access.
+Before using the founder-only Sentinel Control Centre, set `ZAZU_PLATFORM_ADMIN_EMAIL` in the installation's private `.env` file to the exact email address used by the designated founder to sign in to Zazu. Then run `php artisan config:clear` from the installation folder and restart Zazu. Reload the app while signed in with that matching account; the Founder Control Centre shortcut appears in the persistent sidebar. A mismatch, blank value or stale cached configuration keeps the link hidden and the route returns 403. This is a single identity, not a comma-separated administrator list. The former `ZAZU_PLATFORM_ADMIN_EMAILS` variable is deliberately ignored; a business account's `admin` role does not grant platform access. The designated founder also receives the Advanced experience preference override; this does not change the business licence or any customer's entitlement.
 
 ## Phone/tablet access
 
