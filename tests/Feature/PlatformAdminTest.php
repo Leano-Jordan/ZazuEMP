@@ -187,7 +187,7 @@ class PlatformAdminTest extends TestCase
                     'fingerprint' => $fingerprint,
                 ]))
                 ->assertOk()
-                ->assertSee('Sentinel Control Centre')
+                ->assertSee('Founder Control Centre')
                 ->assertSee($fingerprint)
                 ->assertSee('895e2c23-bc6b-4919-a891-1e8e5c1e27e4')
                 ->assertSee('DashboardController.php')
