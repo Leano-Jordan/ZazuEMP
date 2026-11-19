@@ -560,3 +560,33 @@ Build a property-level migration map for the 105 overlapping selectors, beginnin
 ### Verification boundary
 
 This reconciliation is source-inspected against main commit `a893a49c665977168413004cbf41c5b18bdd786d`. It does not claim a Vite build, automated test run, or rendered visual acceptance. Those require the local application runtime and must remain explicitly unverified until performed.
+
+
+### Deeper repeated-rule inventory — 2026-11-19
+
+A second source pass grouped exact selectors after stripping CSS comments. It found substantial repeated selector blocks inside the two authority files themselves:
+
+| Selector | Dashboard authority occurrences | Product authority occurrences |
+|---|---:|---:|
+| `body.zazu-dashboard-page .zazu-dash-hero` | 11 | 5 |
+| `body.zazu-dashboard-page .zazu-dash-hero-side` | 12 | 5 |
+| `body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-dash-actions` | 12 | — |
+| `body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn` | 11 | — |
+| `body.zazu-dashboard-page .zazu-content` | 8 | — |
+| `body.zazu-dashboard-page .zazu-dash-metric` | 8 | — |
+| `body.zazu-dashboard-page .zazu-dash-surface-head` | 8 | 6 |
+| `.zazu-form-section` | — | 12 |
+| `.zazu-command-band` | — | 9 |
+| `.zazu-panel-head` | — | 8 |
+| `.zazu-card` / `.zazu-panel` | — | 7 each |
+
+This confirms that the problem is not just two files sharing ownership. Both files also contain repeated same-selector blocks accumulated over successive refinement passes. The later rule may intentionally override an earlier rule, so these counts are a prioritisation signal, not automatic deletion candidates.
+
+### Revised execution order
+
+1. **Dashboard authority first:** map the repeated dashboard selectors in source order, starting with hero, hero-side, content gutters, quick actions and surface headings. Identify which declarations represent the current intended design and which are historical superseded states.
+2. **Dashboard/product boundary second:** isolate dashboard-scoped declarations currently living in the product stylesheet. Update `UiSharedComponentAuthorityTest` so it verifies the intended ownership boundary rather than requiring dashboard selectors in the shared product file.
+3. **Shared product components third:** consolidate repeated card, panel, form-section, command-band and panel-heading rules only where declaration equivalence is proven across route, theme, state and breakpoint contexts.
+4. **Runtime acceptance after each coherent group:** verify dashboard and representative authenticated modules at desktop, tablet and phone widths in light and dark themes. No source-only pass may be labelled visually accepted.
+
+No CSS declarations were changed as part of this inventory. The next code change must be a narrowly scoped, evidence-backed consolidation, not a rewrite of either authority file.
