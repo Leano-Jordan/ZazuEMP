@@ -123,7 +123,7 @@ final class PurgeNonFounderWorkspaces extends Command
                 $deletedUsers = User::query()
                     ->whereIn('id', $candidateUserIds)
                     ->whereDoesntHave('businesses')
-                    ->whereKeyNot($keepUserId)
+                    ->where('id', '!=', $keepUserId)
                     ->delete();
             });
 
