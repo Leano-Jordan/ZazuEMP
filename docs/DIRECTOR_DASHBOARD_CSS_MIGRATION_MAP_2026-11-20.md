@@ -141,3 +141,21 @@ The final Director palette block is not a safe standalone move. Earlier product-
 - Confirmed: a tail-only relocation would risk changing cascade order.
 - No CSS or test source changed in this pass.
 - The migration boundary is now the complete ordered set of dashboard-scoped rules, not a single contiguous block.
+
+
+### Selector-group classification
+
+A source-order pass over the complete product stylesheet identified eight mixed selector groups that combine dashboard selectors with non-dashboard selectors:
+
+- Shared sidebar shell: `body:not(.zazu-dashboard-page) .zazu-sidebar` paired with the dashboard sidebar selector.
+- Shared topbar shell: the equivalent paired topbar selector.
+- Shared dark topbar shell: paired dark-theme topbar selectors.
+- Shared section-heading surfaces: generic card/panel/form headings combined with the dashboard surface heading.
+- Shared heading typography: generic heading selectors combined with dashboard surface heading selectors.
+- Shared solid-surface reset: generic card/panel/command/KPI selectors combined with dashboard hero and surface-heading selectors.
+- Shared dark heading surface: generic dark-theme headings combined with the dashboard surface heading.
+- Final dashboard token block: the scanner reports a mixed group at its opening because the leading comment and the first selector are part of the same extracted prelude; this must be manually parsed before any edit.
+
+The first seven are genuine shared/mixed ownership cases and must remain in product authority unless split into selector-equivalent rules with identical declarations and unchanged media/theme context. The final item is a parser-boundary artifact and requires manual source parsing, not an assumption that the rule itself is mixed.
+
+The scan confirms that a bulk move by line range is not safe. The migration must be performed rule-by-rule, preserving source order and splitting only demonstrably equivalent selector lists.
