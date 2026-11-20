@@ -219,3 +219,22 @@ These should remain in product authority unless split into selector-equivalent r
 ### Current engineering decision
 
 No CSS source change is made in this pass. The parser provides a more reliable ordered inventory, but it does not prove unchanged computed styles. The next code change must be based on a property-by-property comparison of one pure dashboard block against all earlier/later declarations in both stylesheets, then paired test changes. Browser computed-style validation is still required before calling the migration visually safe.
+
+
+## Load-order verification and migration constraint — 2026-11-20
+
+The current authenticated layout was re-fetched from `main` (blob `af8367b2c23b61ea8ccb1bd1efd05f932c191bcd`). Its Vite entry order is:
+
+1. `zazu-responsive-theme.css`
+2. `zazu-mobile-refinement.css`
+3. `zazu-final-visual-sweep.css`
+4. `zazu-dashboard-authority.css`
+5. `zazu-product-authority.css`
+
+This confirms that product authority is loaded after dashboard authority. A dashboard-only selector in product authority is therefore not automatically safe to relocate: doing so changes its position relative to all product rules and can change the winning declaration, including theme and responsive overrides.
+
+The current product and dashboard authority blobs remain `6173878b926561eba9f644c621d8a3ae63ce7b6c` and `e0cb0ad634effe480113bc9b89f5ac2356f0ffa7`, respectively. No stylesheet or test file changed in this pass.
+
+### Next migration gate
+
+Before moving any block, build a property-level trace for a single candidate: selector specificity, declaration importance, source order, enclosing media/theme context, and every later matching declaration across the remaining loaded stylesheets. The candidate must have a provably unchanged winner at desktop, tablet, mobile, light and dark contexts. If the trace cannot establish that, retain the rule in product authority and continue the audit. Do not use source-string assertions as a substitute for computed-style validation.
