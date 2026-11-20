@@ -953,7 +953,7 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
         });
     });
 
-    await page.evaluate(() => window.ZazuOffline.pair('654321'));
+    await page.evaluate(() => window.ZazuOffline.pair('65432100'));
     await newTokenSync;
     await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.getState().sync?.token))
         .toBe('cross-tab-new-token');
