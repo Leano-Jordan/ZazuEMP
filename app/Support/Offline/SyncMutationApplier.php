@@ -228,8 +228,14 @@ class SyncMutationApplier
                     : null;
             }
 
-            if ($predecessor->status !== 'discarded' || ! is_string($predecessor->superseded_by_mutation_id)) {
+            if ($predecessor->status !== 'discarded') {
                 return null;
+            }
+
+            if (! is_string($predecessor->superseded_by_mutation_id)) {
+                return is_numeric($predecessor->result_revision)
+                    ? (int) $predecessor->result_revision
+                    : null;
             }
 
             $predecessorId = $predecessor->superseded_by_mutation_id;

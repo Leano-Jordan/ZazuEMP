@@ -196,6 +196,17 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertSame(2, $response['conflict']['remote_payload']['revision']);
         $this->assertSame('Keep server version', $response['conflict']['remote_payload']['record']['name']);
         $this->assertSame('discarded', $mutation->fresh()->status);
+        $this->assertSame(2, (int) $mutation->fresh()->result_revision);
+
+        $next = $this->recordCustomerUpdate($device, $identity, 'Phone edit after explicit discard', [
+            'predecessor_mutation_id' => $mutation->mutation_id,
+        ]);
+        $applied = app(SyncMutationApplier::class)->apply($next, [
+            'customer' => $this->customerUpdateHandler(),
+        ]);
+
+        $this->assertSame(3, (int) $applied->result_revision);
+        $this->assertSame('Phone edit after explicit discard', $customer->fresh()->name);
     }
 
     private function customerFixture(): array

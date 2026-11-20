@@ -48,6 +48,7 @@ final class SyncConflictRebaseService
         } else {
             $mutation?->update([
                 'status' => 'discarded',
+                'result_revision' => (int) ($remotePayload['revision'] ?? 0) ?: null,
                 'last_error' => 'Local version discarded in favour of the latest server version.',
             ]);
             $mutationStatus = 'discarded';
