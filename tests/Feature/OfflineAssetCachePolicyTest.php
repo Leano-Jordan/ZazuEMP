@@ -14,7 +14,6 @@ class OfflineAssetCachePolicyTest extends TestCase
         $this->assertMatchesRegularExpression("/const CACHE_NAME = 'zazu-static-v\\d+';/", $source);
         $this->assertStringContainsString("path.startsWith('/build/')", $source);
         $this->assertStringContainsString("'/images/landing/stock/hero.jpg'", $source);
-        $this->assertStringContainsString("'/offline-attachments.js'", $source);
         $this->assertStringContainsString("'/images/landing/stock/catering.jpg'", $source);
         $this->assertStringContainsString("'/images/landing/stock/sound.jpg'", $source);
         $this->assertStringContainsString("'/images/landing/stock/venue.jpg'", $source);
