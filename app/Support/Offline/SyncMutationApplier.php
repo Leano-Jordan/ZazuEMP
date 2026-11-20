@@ -115,31 +115,51 @@ class SyncMutationApplier
 
     private function assertExpectedRevision(SyncMutation $mutation, ?SyncEntityIdentity $identity): void
     {
-        if ($mutation->operation === 'create' && $identity) {
+        if ($this->isDuplicateCreate($mutation, $identity)) {
             throw ValidationException::withMessages([
                 'entity_id' => 'This offline create identity already belongs to a server record. Use an update with its current revision.',
             ]);
         }
 
-        if (! in_array($mutation->operation, ['update', 'upsert'], true) || ! $identity) {
+        if (! $this->requiresRevisionCheck($mutation, $identity)) {
             return;
         }
 
+        $expectedRevision = $this->expectedRevision($mutation);
+        if ($this->revisionMatches($expectedRevision, $identity)) {
+            return;
+        }
+
+        throw new StaleSyncRevisionException(
+            'This record changed on another device. Review the latest server version before keeping your local edit.',
+            app(SyncEntitySnapshotBuilder::class)->build($identity),
+        );
+    }
+
+    private function isDuplicateCreate(SyncMutation $mutation, ?SyncEntityIdentity $identity): bool
+    {
+        return $mutation->operation === 'create' && $identity !== null;
+    }
+
+    private function requiresRevisionCheck(SyncMutation $mutation, ?SyncEntityIdentity $identity): bool
+    {
+        return $identity !== null && in_array($mutation->operation, ['update', 'upsert'], true);
+    }
+
+    private function expectedRevision(SyncMutation $mutation): mixed
+    {
         $predecessorId = $mutation->payload['predecessor_mutation_id'] ?? null;
-        $expectedRevision = is_string($predecessorId) && Str::isUuid($predecessorId)
+
+        return is_string($predecessorId) && Str::isUuid($predecessorId)
             ? $this->predecessorResultRevision($mutation, $predecessorId)
             : ($mutation->payload['expected_revision'] ?? null);
+    }
 
-        if (! is_numeric($expectedRevision)
-            || (int) $expectedRevision < 1
-            || (int) $expectedRevision !== (int) $identity->revision) {
-            $remote = app(SyncEntitySnapshotBuilder::class)->build($identity);
-
-            throw new StaleSyncRevisionException(
-                'This record changed on another device. Review the latest server version before keeping your local edit.',
-                $remote,
-            );
-        }
+    private function revisionMatches(mixed $expectedRevision, SyncEntityIdentity $identity): bool
+    {
+        return is_numeric($expectedRevision)
+            && (int) $expectedRevision > 0
+            && (int) $expectedRevision === (int) $identity->revision;
     }
 
 
