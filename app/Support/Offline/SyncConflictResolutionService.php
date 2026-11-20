@@ -300,6 +300,12 @@ final class SyncConflictResolutionService
                 return;
             }
 
+            if ($predecessor?->status === 'discarded' && ! $predecessor->superseded_by_mutation_id) {
+                // The earlier local edit was explicitly discarded in favour of
+                // the server version. This edit can now be rebased directly on it.
+                return;
+            }
+
             abort_unless(
                 $predecessor?->status === 'discarded' && is_string($predecessor->superseded_by_mutation_id),
                 409,
