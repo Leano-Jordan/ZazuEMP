@@ -89,7 +89,7 @@ final class SyncConflictRebaseService
         ]);
 
         return response()->json([
-            'conflict' => $this->payload($conflict->fresh()),
+            'conflict' => app(SyncConflictPresenter::class)->payload($conflict->fresh()),
             'mutation_status' => 'new_mutation_required',
             'rebase' => ['new_mutation_id' => $newMutationId],
         ]);
@@ -173,23 +173,6 @@ final class SyncConflictRebaseService
     }
 
 
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function currentRemotePayload(SyncConflict $conflict): array
-    {
-        $identity = SyncEntityIdentity::query()
-            ->where('business_id', $conflict->business_id)
-            ->where('entity_type', $conflict->entity_type)
-            ->where('entity_uuid', $conflict->entity_id)
-            ->lockForUpdate()
-            ->first();
-
-        return $identity
-            ? app(SyncEntitySnapshotBuilder::class)->build($identity)
-            : ($conflict->remote_payload ?? []);
-    }
 
     /**
      * @param array{action:string,note?:?string} $validated

@@ -164,6 +164,32 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertSame('discarded', $mutation->fresh()->status);
         $this->assertSame('Latest server edit', $response['conflict']['remote_payload']['record']['name']);
 
+        $replacementId = $response['rebase']['new_mutation_id'];
+        $replacement = app(SyncMutationRecorder::class)->record(
+            $device,
+            'customer',
+            $identity->entity_uuid,
+            'update',
+            [
+                'local_id' => $identity->entity_uuid,
+                'expected_revision' => $response['rebase']['expected_revision'],
+                'record' => ['name' => 'Rebased phone edit'],
+            ],
+            $replacementId,
+        );
+        $applier = app(SyncMutationApplier::class);
+        $replacement = $applier->apply($replacement, ['customer' => $this->customerUpdateHandler()]);
+        $this->assertSame(3, (int) $replacement->result_revision);
+
+        // A later queued edit may still point at the immutable original ID.
+        // The server must follow its supersession link to the applied replacement.
+        $successor = $this->recordCustomerUpdate($device, $identity, 'Third phone edit', [
+            'predecessor_mutation_id' => $mutation->mutation_id,
+        ]);
+        $successor = $applier->apply($successor, ['customer' => $this->customerUpdateHandler()]);
+        $this->assertSame(4, (int) $successor->result_revision);
+        $this->assertSame('Third phone edit', $customer->fresh()->name);
+
         // A retry after a lost response must return the same replacement ID.
         $again = $service->resolve($device, $conflict->fresh(), ['action' => 'retry'])->getData(true);
         $this->assertSame($response['rebase']['new_mutation_id'], $again['rebase']['new_mutation_id']);
