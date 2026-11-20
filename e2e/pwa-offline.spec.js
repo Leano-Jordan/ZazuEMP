@@ -819,6 +819,14 @@ test.describe('Zazu installed PWA offline shell', () => {
                 token: 'atomic-failed-mutation-token',
                 device: { id: 987660, business_id: activeBusinessId },
             };
+            state.invoices = [{
+                local_id: 'atomic-failed-invoice',
+                id: null,
+                server_id: null,
+                number: 'INV-LOCAL-001',
+                status: 'draft',
+                pending_sync: true,
+            }];
             state.local_dirty = false;
             await window.ZazuOffline.persist({ allowSessionChange: true });
         }, businessId);
@@ -826,9 +834,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         // Keep the queue offline while installing deterministic server routes.
         // Otherwise the app's automatic online sync can race this test's mocked response.
         await page.context().setOffline(true);
-        const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('customer', 'create', {
-            local_id: 'atomic-failed-customer',
-            record: { name: 'Customer requiring operator review' },
+        const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('invoice', 'create', {
+            local_id: 'atomic-failed-invoice',
+            quote_local_id: 'missing-local-quote',
+            issued_at: '2026-11-20',
+            due_at: '2026-11-27',
         }));
 
         await page.route('**/api/sync/push', route => route.fulfill({
@@ -903,6 +913,13 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(failed?.status).toBe('failed');
         expect(failed?.conflict_id).toBe(987661);
         expect(failed?.last_error).toContain('related event');
+        expect(persisted.state.invoices).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                local_id: 'atomic-failed-invoice',
+                number: 'INV-LOCAL-001',
+                status: 'draft',
+            }),
+        ]));
         expect(persisted.state.conflicts).toEqual(expect.arrayContaining([
             expect.objectContaining({
                 id: 987661,
