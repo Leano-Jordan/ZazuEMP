@@ -1547,12 +1547,12 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(4, \App\Models\InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
         $this->assertSame(2, \App\Models\PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
 
-        $protocol = app(\\App\\Support\\Offline\\SyncMutationProtocol::class);
+        $protocol = app(\App\Support\Offline\SyncMutationProtocol::class);
         $deliveries = $protocol->pull($receivingDevice, 'business', 100);
         $this->assertCount(3, $deliveries);
         $this->assertSame(['purchase_order', 'purchase_receipt', 'purchase_receipt'], $deliveries->pluck('entity_type')->all());
 
-        $snapshot = app(\\App\\Support\\Offline\\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
+        $snapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
         $remoteOrder = collect($snapshot['purchase_orders'])->first(
             fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $order->id,
         );
