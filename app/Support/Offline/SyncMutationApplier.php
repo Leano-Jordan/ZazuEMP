@@ -4,6 +4,7 @@ namespace App\Support\Offline;
 
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
+use App\Models\SyncEntityIdentity;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -13,7 +14,94 @@ class SyncMutationApplier
 {
     public function __construct(private readonly SyncMutationRecorder $recorder)
     {
+    
+    private function lockEntityIdentity(SyncMutation $mutation): ?SyncEntityIdentity
+    {
+        $uuid = $mutation->payload['local_id'] ?? null;
+        if (! is_string($uuid) || ! \Illuminate\Support\Str::isUuid($uuid)) {
+            return null;
+        }
+
+        return SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', $mutation->entity_type)
+            ->where('entity_uuid', \Illuminate\Support\Str::lower($uuid))
+            ->lockForUpdate()
+            ->first();
     }
+
+    private function assertExpectedRevision(SyncMutation $mutation, ?SyncEntityIdentity $identity): void
+    {
+        if (! in_array($mutation->operation, ['update', 'upsert'], true) || ! $identity) {
+            return;
+        }
+
+        $predecessorId = $mutation->payload['predecessor_mutation_id'] ?? null;
+        $expectedRevision = null;
+
+        if (is_string($predecessorId) && \Illuminate\Support\Str::isUuid($predecessorId)) {
+            $expectedRevision = $this->predecessorResultRevision($mutation, $predecessorId);
+        } else {
+            $expectedRevision = $mutation->payload['expected_revision'] ?? null;
+        }
+
+        if (! is_numeric($expectedRevision) || (int) $expectedRevision < 1 || (int) $expectedRevision !== (int) $identity->revision) {
+            $record = $identity->record;
+            $remote = [
+                'revision' => (int) $identity->revision,
+                'record' => $record?->toArray() ?? [],
+            ];
+
+            if ($record instanceof \App\Models\Customer) {
+                $remote['record']['contacts'] = $record->contacts()->get()->toArray();
+            } elseif ($record instanceof \App\Models\Event) {
+                $remote['record']['requirements'] = $record->requirements()->get()->toArray();
+            }
+
+            throw new StaleSyncRevisionException(
+                'This record changed on another device. Review the latest server version before keeping your local edit.',
+                $remote,
+            );
+        }
+    }
+
+    private function predecessorResultRevision(SyncMutation $mutation, string $predecessorId): ?int
+    {
+        $visited = [];
+        for ($depth = 0; $depth < 8; $depth++) {
+            if (isset($visited[$predecessorId])) {
+                return null;
+            }
+            $visited[$predecessorId] = true;
+
+            $predecessor = SyncMutation::query()
+                ->where('business_id', $mutation->business_id)
+                ->where('sync_device_id', $mutation->sync_device_id)
+                ->where('mutation_id', $predecessorId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $predecessor
+                || $predecessor->entity_type !== $mutation->entity_type
+                || $predecessor->entity_id !== $mutation->entity_id) {
+                return null;
+            }
+
+            if ($predecessor->status === 'applied' && is_numeric($predecessor->result_revision)) {
+                return (int) $predecessor->result_revision;
+            }
+
+            if ($predecessor->status !== 'discarded' || ! is_string($predecessor->superseded_by_mutation_id)) {
+                return null;
+            }
+
+            $predecessorId = $predecessor->superseded_by_mutation_id;
+        }
+
+        return null;
+    }
+
+}
 
     /**
      * @param array<string, SyncMutationHandler> $handlers
@@ -69,9 +157,21 @@ class SyncMutationApplier
                 return $locked;
             }
 
-            $handler->apply($locked);
+            $identity = $this->lockEntityIdentity($locked);
+            $this->assertExpectedRevision($locked, $identity);
+
+            SyncEntityRevisionTracker::withoutTracking(fn () => $handler->apply($locked));
+
+            $identity = $this->lockEntityIdentity($locked);
+            if ($identity) {
+                if ($locked->operation !== 'create' && $identity->wasRecentlyCreated === false) {
+                    $identity->increment('revision');
+                    $identity->refresh();
+                }
+            }
 
             $locked->update([
+                'result_revision' => $identity?->revision,
                 'status' => 'applied',
                 'applied_at' => now(),
                 'attempts' => $locked->attempts + 1,

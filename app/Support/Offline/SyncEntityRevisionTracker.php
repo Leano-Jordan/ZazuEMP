@@ -7,15 +7,36 @@ use Illuminate\Support\Facades\DB;
 
 final class SyncEntityRevisionTracker
 {
+    private static int $trackingSuspended = 0;
+
+    public static function withoutTracking(callable $callback): mixed
+    {
+        self::$trackingSuspended++;
+
+        try {
+            return $callback();
+        } finally {
+            self::$trackingSuspended--;
+        }
+    }
     public function touch(Model $record, string $entityType): void
     {
-        if (! $record->exists || ! is_numeric($record->getKey())) {
+        if (self::$trackingSuspended > 0 || ! $record->exists || ! is_numeric($record->getKey())) {
             return;
         }
 
         $businessId = $record->getAttribute('business_id');
-        if (! is_numeric($businessId) && method_exists($record, 'event')) {
-            $businessId = $record->event()->withTrashed()->value('business_id');
+        if (! is_numeric($businessId)) {
+            foreach (['event', 'customer', 'quote', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
+                if (! method_exists($record, $relation)) {
+                    continue;
+                }
+
+                $businessId = $record->{$relation}()->value('business_id');
+                if (is_numeric($businessId)) {
+                    break;
+                }
+            }
         }
 
         if (! is_numeric($businessId)) {
