@@ -31,6 +31,8 @@ class SyncMutation extends Model
         'last_error',
         'occurred_at',
         'applied_at',
+        'result_revision',
+        'superseded_by_mutation_id',
     ];
 
     protected function casts(): array
@@ -39,6 +41,7 @@ class SyncMutation extends Model
             'payload' => 'array',
             'occurred_at' => 'datetime',
             'applied_at' => 'datetime',
+            'result_revision' => 'integer',
         ];
     }
 

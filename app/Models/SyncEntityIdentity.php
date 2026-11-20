@@ -17,12 +17,14 @@ class SyncEntityIdentity extends Model
         'entity_uuid',
         'record_type',
         'record_id',
+        'revision',
     ];
 
     protected function casts(): array
     {
         return [
             'record_id' => 'integer',
+            'revision' => 'integer',
         ];
     }
 

@@ -104,7 +104,7 @@ class SyncBootstrapPayloadBuilder
             ->where('business_id', $business->id)
             ->get()
             ->map(fn (BusinessCapability $capability) => [
-                'local_id' => $registry->identify($capability, 'service')->entity_uuid,
+                ...$this->identityPayload($capability, 'service', $registry),
                 'server_id' => $capability->id,
                 'record' => $capability->toArray(),
             ])
@@ -119,7 +119,7 @@ class SyncBootstrapPayloadBuilder
             ->limit(500)
             ->get()
             ->map(fn (Supplier $supplier) => [
-                'local_id' => $registry->identify($supplier, 'supplier')->entity_uuid,
+                ...$this->identityPayload($supplier, 'supplier', $registry),
                 'server_id' => $supplier->id,
                 'record' => $supplier->toArray(),
             ])
@@ -135,11 +135,11 @@ class SyncBootstrapPayloadBuilder
             ->limit(500)
             ->get()
             ->map(fn (PurchaseOrder $order) => [
-                'local_id' => $registry->identify($order, 'purchase_order')->entity_uuid,
+                ...$this->identityPayload($order, 'purchase_order', $registry),
                 'server_id' => $order->id,
                 'record' => $order->toArray(),
                 'items' => $order->items->map(fn ($item) => [
-                    'local_id' => $registry->identify($item, 'purchase_order_item')->entity_uuid,
+                    ...$this->identityPayload($item, 'purchase_order_item', $registry),
                     'server_id' => $item->id,
                     'record' => $item->toArray(),
                 ])->values(),
@@ -166,7 +166,7 @@ class SyncBootstrapPayloadBuilder
                     'deposit_balance' => $invoice->deposit_balance,
                     'items' => $invoice->items->map(fn ($item) => $item->toArray())->values(),
                     'payments' => $invoice->payments->map(fn (Payment $payment) => [
-                        'local_id' => $registry->identify($payment, 'payment')->entity_uuid,
+                        ...$this->identityPayload($payment, 'payment', $registry),
                         'server_id' => $payment->id,
                         'record' => $payment->toArray(),
                     ])->values(),
@@ -184,12 +184,12 @@ class SyncBootstrapPayloadBuilder
             ->limit(500)
             ->get()
             ->map(fn (InventoryItem $item) => [
-                'local_id' => $registry->identify($item, 'inventory_item')->entity_uuid,
+                ...$this->identityPayload($item, 'inventory_item', $registry),
                 'server_id' => $item->id,
                 'record' => array_merge($item->toArray(), [
                     'on_hand' => $item->on_hand,
                     'movements' => $item->movements->map(fn ($movement) => [
-                        'local_id' => $registry->identify($movement, 'inventory_movement')->entity_uuid,
+                        ...$this->identityPayload($movement, 'inventory_movement', $registry),
                         'server_id' => $movement->id,
                         'record' => $movement->toArray(),
                     ])->values()->all(),
@@ -207,11 +207,11 @@ class SyncBootstrapPayloadBuilder
             ->limit(500)
             ->get()
             ->map(fn (Asset $asset) => [
-                'local_id' => $registry->identify($asset, 'asset')->entity_uuid,
+                ...$this->identityPayload($asset, 'asset', $registry),
                 'server_id' => $asset->id,
                 'record' => array_merge($asset->toArray(), [
                     'allocations' => $asset->allocations->map(fn ($allocation) => [
-                        'local_id' => $registry->identify($allocation, 'asset_allocation')->entity_uuid,
+                        ...$this->identityPayload($allocation, 'asset_allocation', $registry),
                         'server_id' => $allocation->id,
                         'record' => $allocation->toArray(),
                     ])->values()->all(),
@@ -229,7 +229,7 @@ class SyncBootstrapPayloadBuilder
             ->limit(500)
             ->get()
             ->map(fn (EventCost $cost) => [
-                'local_id' => $registry->identify($cost, 'event_cost')->entity_uuid,
+                ...$this->identityPayload($cost, 'event_cost', $registry),
                 'server_id' => $cost->id,
                 'record' => array_merge($cost->toArray(), [
                     'event_name' => $cost->event?->name,
@@ -246,7 +246,7 @@ class SyncBootstrapPayloadBuilder
             ->limit(500)
             ->get()
             ->map(fn (FinanceExpense $expense) => [
-                'local_id' => $registry->identify($expense, 'expense')->entity_uuid,
+                ...$this->identityPayload($expense, 'expense', $registry),
                 'server_id' => $expense->id,
                 'record' => $expense->toArray(),
             ])
@@ -279,6 +279,7 @@ class SyncBootstrapPayloadBuilder
             $selected[] = [
                 'type' => $item['type'],
                 'local_id' => $identity->entity_uuid,
+                'revision' => (int) $identity->revision,
                 'server_id' => $record->id,
                 'record' => $this->selectedRecordData($record, $registry),
             ];
@@ -303,6 +304,20 @@ class SyncBootstrapPayloadBuilder
         }
 
         return $query->whereKey($item['id'] ?? null)->first();
+    }
+
+
+    /**
+     * @return array{local_id:string,revision:int}
+     */
+    private function identityPayload(Model $record, string $entityType, SyncEntityIdentityRegistry $registry): array
+    {
+        $identity = $registry->identify($record, $entityType);
+
+        return [
+            'local_id' => $identity->entity_uuid,
+            'revision' => (int) $identity->revision,
+        ];
     }
 
     private function selectedRecordData(Model $record, SyncEntityIdentityRegistry $registry): array
