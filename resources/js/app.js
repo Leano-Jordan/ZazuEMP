@@ -3007,6 +3007,7 @@ function setupZazuOfflineForms() {
                         reference: payload.reference,
                         paid_at: payload.paid_at,
                         notes: payload.notes || null,
+                        pending_sync: true,
                     });
 
                     const amount = Number.parseFloat(String(payload.amount || 0));
