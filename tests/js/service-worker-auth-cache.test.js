@@ -217,9 +217,7 @@ test('redirected authenticated navigations preserve the public sign-in URL', asy
     assert.equal(response.status, 302);
     assert.equal(response.headers.get('location'), loginUrl);
     await navigation.finished();
-    const staticCacheName = (await worker.caches.keys()).find(name => name.startsWith('zazu-static-v57') && !name.includes('-user-'));
-    const staticCache = await worker.caches.open(staticCacheName);
-    assert.equal(await staticCache.match('/__zazu-active-context__'), null);
+    assert.deepEqual(await worker.caches.keys(), [], 'a redirected public page must not create or populate an authenticated cache');
 });
 
 test('authenticated uploaded images are cached only in the active business cache and remain available offline', async () => {
