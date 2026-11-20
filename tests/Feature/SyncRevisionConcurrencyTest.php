@@ -65,11 +65,12 @@ class SyncRevisionConcurrencyTest extends TestCase
         [$business, $customer] = $this->customerFixture();
         $event = Event::create([
             'business_id' => $business->id,
+            'customer_id' => $customer->id,
             'reference' => 'REV-WORK-001',
             'name' => 'Revision Work',
             'status' => 'confirmed',
         ]);
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Revision Supplier',
         ]);
