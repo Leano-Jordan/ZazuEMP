@@ -30,6 +30,7 @@ use App\Support\Offline\SyncMutationProtocol;
 use App\Support\Offline\SyncMutationRecorder;
 use App\Support\Offline\SyncConflictRecorder;
 use App\Support\Offline\SyncConflictResolutionService;
+use App\Support\Offline\SyncConflictPresenter;
 use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -311,10 +312,10 @@ class SyncController extends Controller
             $query->where('status', $status);
         }
 
-        $resolver = app(SyncConflictResolutionService::class);
+        $presenter = app(SyncConflictPresenter::class);
 
         return response()->json([
-            'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $resolver->payload($conflict))->values(),
+            'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $presenter->payload($conflict))->values(),
         ]);
     }
 
