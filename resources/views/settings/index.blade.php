@@ -517,15 +517,22 @@
         const conflictList = document.querySelector('[data-zazu-offline-conflict-list]');
         const conflictStatus = document.querySelector('[data-zazu-offline-conflict-status]');
         let offlineConflictsRefreshed = false;
+        let offlineConflictsRefreshing = false;
 
         const renderOfflineConflicts = async () => {
             const offline = window.ZazuOffline;
             if (!conflictSection || !conflictList || !offline) return;
 
             await offline.ready;
-            if (!offlineConflictsRefreshed) {
-                const refreshed = await offline.refreshConflicts?.();
-                offlineConflictsRefreshed = Array.isArray(refreshed);
+            if (!offlineConflictsRefreshed && !offlineConflictsRefreshing) {
+                offlineConflictsRefreshing = true;
+                try {
+                    const refreshed = await offline.refreshConflicts?.();
+                    offlineConflictsRefreshed = Array.isArray(refreshed)
+                        || offline.getState()?.sync_authorization_required === true;
+                } finally {
+                    offlineConflictsRefreshing = false;
+                }
             }
             const offlineState = offline.getState() || {};
             const conflicts = (offlineState.conflicts || [])
