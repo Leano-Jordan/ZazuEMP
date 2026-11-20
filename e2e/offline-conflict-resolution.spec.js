@@ -78,6 +78,7 @@ test('Settings resolves stale offline edits without losing either version', asyn
             },
         ];
 
+        state.conflicts = conflicts;
         const db = await new Promise((resolve, reject) => {
             const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
             request.onsuccess = () => resolve(request.result);
@@ -94,7 +95,7 @@ test('Settings resolves stale offline edits without losing either version', asyn
                     last_error: 'Stale record version',
                 });
             }
-            tx.objectStore('state').put({ ...state, conflicts }, 'current');
+            tx.objectStore('state').put(state, 'current');
             tx.oncomplete = resolve;
             tx.onerror = () => reject(tx.error || new Error('Could not seed conflict fixtures'));
             tx.onabort = () => reject(tx.error || new Error('Conflict fixture transaction aborted'));
