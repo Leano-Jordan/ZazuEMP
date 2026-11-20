@@ -76,6 +76,7 @@ class SyncMutationApplier
             $this->assertExpectedRevision($locked, $identity);
 
             SyncEntityRevisionTracker::withoutTracking(fn () => $handler->apply($locked));
+            $this->advanceParentAggregateRevision($locked);
 
             $identity = $this->lockEntityIdentity($locked);
             if ($identity && $hadIdentity) {
@@ -135,6 +136,33 @@ class SyncMutationApplier
                 $remote,
             );
         }
+    }
+
+
+    private function advanceParentAggregateRevision(SyncMutation $mutation): void
+    {
+        $payload = $mutation->payload['record'] ?? [];
+        $parent = match ($mutation->entity_type) {
+            'quote_acceptance' => ['quote', $payload['quote_local_id'] ?? null],
+            'payment' => ['invoice', $payload['invoice_local_id'] ?? null],
+            'purchase_receipt' => ['purchase_order', $payload['purchase_order_local_id'] ?? null],
+            'inventory_movement' => ['inventory_item', $payload['inventory_item_local_id'] ?? null],
+            'asset_allocation' => ['asset', $payload['asset_local_id'] ?? null],
+            default => null,
+        };
+
+        if (! $parent || ! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
+            return;
+        }
+
+        $identity = SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', $parent[0])
+            ->where('entity_uuid', Str::lower($parent[1]))
+            ->lockForUpdate()
+            ->first();
+
+        $identity?->increment('revision');
     }
 
     private function predecessorResultRevision(SyncMutation $mutation, string $predecessorId): ?int
