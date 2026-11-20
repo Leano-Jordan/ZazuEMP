@@ -114,13 +114,12 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('async function fetchWithTimeout(request, timeoutMs = 4000)', $worker);
         $this->assertStringContainsString('fetchWithTimeout(request)', $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
-        $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
         $this->assertMatchesRegularExpression("/const CACHE_NAME = 'zazu-static-v[0-9]+';/", $worker);
         $this->assertStringContainsString('await cache.put(request, response.clone());', $worker);
         $this->assertStringContainsString('const cached = await caches.match(request);', $worker);
         $this->assertStringContainsString('if (cached) return cached;', $worker);
-        $this->assertStringContainsString("['/zazu-offline.js', '/offline-attachments.js'].includes(url.pathname)", $worker);
+        $this->assertStringContainsString("url.pathname === '/zazu-offline.js'", $worker);
         $this->assertStringContainsString('const cached = await cache.match(cacheKey);', $worker);
         $this->assertStringContainsString('if (cached) return cached;', $worker);
         $this->assertStringContainsString("const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');", $worker);
@@ -339,7 +338,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString("slice(0, 6)", $client);
         $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString("zazu-static-v51", $worker);
+        $this->assertStringContainsString("zazu-static-v52", $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
