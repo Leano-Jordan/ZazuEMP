@@ -2604,7 +2604,6 @@ function setupZazuOfflineDirectoryViews() {
         [/^\/work(?:\/|$)/, 'jobs'],
         [/^\/quotes(?:\/|$)/, 'quotes'],
         [/^\/suppliers(?:\/|$)/, 'suppliers'],
-        [/^\/services(?:\/|$)/, 'catalogue'],
         [/^\/inventory(?:\/|$)/, 'inventory_items'],
         [/^\/assets(?:\/|$)/, 'assets'],
         [/^\/purchasing(?:\/|$)/, 'purchase_orders'],
