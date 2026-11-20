@@ -790,7 +790,7 @@ test('re-pair invalidates the old sync session and retries queued work with the 
 
     const oldSync = page.evaluate(() => window.ZazuOffline.sync().catch(() => null));
     await oldPushSeen;
-    await page.evaluate(() => window.ZazuOffline.pair('123456'));
+    await page.evaluate(() => window.ZazuOffline.pair('12345678'));
     releaseOldPush();
     await oldSync;
     await newPush;

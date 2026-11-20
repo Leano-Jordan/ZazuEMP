@@ -67,7 +67,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('return !controller.signal.aborted;', $worker);
         $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
-        $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
+        $this->assertStringContainsString('await offline.pair(code)', $app);
         $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
         $layout = File::get(resource_path('views/components/app-layout.blade.php'));
         $offlineScriptPosition = strpos($layout, '<script src="/zazu-offline.js" defer></script>');

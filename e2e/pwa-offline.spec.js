@@ -1633,7 +1633,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             body: JSON.stringify({ message: 'Temporary sync outage.' }),
         }));
 
-        await page.evaluate(() => window.ZazuOffline.pair('123456'));
+        await page.evaluate(() => window.ZazuOffline.pair('12345678'));
         const outcome = await page.evaluate(async () => ({
             businessName: window.ZazuOffline.getState().business?.name,
             customerName: window.ZazuOffline.getState().customers?.[0]?.name,
@@ -1903,7 +1903,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
-            await window.ZazuOffline.pair('123456');
+            await window.ZazuOffline.pair('12345678');
             const invoice = window.ZazuOffline.getState().invoices.find(item => item.number === 'INV-OFFLINE-001');
             if (invoice?.payments?.[0]?.method !== 'EFT') {
                 throw new Error('Pairing bootstrap did not preserve nested invoice payments.');
