@@ -174,7 +174,7 @@ class SyncRevisionConcurrencyTest extends TestCase
             $this->assertArrayHasKey('entity_id', $exception->errors());
         }
 
-        $this->assertSame('Original customer', $customer->fresh()->name);
+        $this->assertSame('Revision Customer', $customer->fresh()->name);
         $this->assertSame(1, (int) $identity->fresh()->revision);
     }
 
