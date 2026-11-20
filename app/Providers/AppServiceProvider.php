@@ -90,12 +90,7 @@ class AppServiceProvider extends ServiceProvider
         foreach ($nestedRevisionParents as $model => [$relation, $entityType]) {
             foreach (['created', 'updated', 'deleting', 'restored'] as $event) {
                 Event::listen('eloquent.'.$event.': '.$model, function ($record) use ($revisionTracker, $relation, $entityType): void {
-                    if (method_exists($record, $relation)) {
-                        $parent = $record->{$relation};
-                        if ($parent) {
-                            $revisionTracker->touch($parent, $entityType);
-                        }
-                    }
+                    $revisionTracker->touchRelated($record, $relation, $entityType);
                 });
             }
         }
