@@ -2,11 +2,14 @@
 
 namespace App\Support\Offline;
 
+use App\Models\Customer;
+use App\Models\Event;
 use App\Models\SyncDevice;
-use App\Models\SyncMutation;
 use App\Models\SyncEntityIdentity;
+use App\Models\SyncMutation;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use LogicException;
 
@@ -14,18 +17,99 @@ class SyncMutationApplier
 {
     public function __construct(private readonly SyncMutationRecorder $recorder)
     {
-    
+    }
+
+    /**
+     * @param array<string, SyncMutationHandler> $handlers
+     */
+    public function apply(SyncMutation $mutation, array $handlers): SyncMutation
+    {
+        if (! $mutation->exists) {
+            throw new LogicException('A persisted sync mutation is required.');
+        }
+
+        if ($mutation->status !== 'pending') {
+            return $mutation;
+        }
+
+        $handler = $handlers[$mutation->entity_type] ?? null;
+
+        if (! $handler instanceof SyncMutationHandler) {
+            throw ValidationException::withMessages([
+                'entity_type' => 'This sync entity type has no registered safe handler.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($mutation, $handler): SyncMutation {
+            // Keep lock order consistent with SyncMutationRecorder: business,
+            // device, mutation, then aggregate identity and domain rows.
+            DB::table('businesses')->where('id', $mutation->business_id)->lockForUpdate()->first();
+
+            $lockedDevice = SyncDevice::query()
+                ->where('business_id', $mutation->business_id)
+                ->whereKey($mutation->sync_device_id)
+                ->active()
+                ->lockForUpdate()
+                ->first();
+
+            abort_unless(
+                $lockedDevice,
+                401,
+                'This sync device was revoked before the offline change could be applied.'
+            );
+
+            $locked = SyncMutation::query()
+                ->whereKey($mutation->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $locked) {
+                throw (new ModelNotFoundException)->setModel(SyncMutation::class, [$mutation->id]);
+            }
+
+            if ($locked->status !== 'pending') {
+                return $locked;
+            }
+
+            $identity = $this->lockEntityIdentity($locked);
+            $hadIdentity = $identity !== null;
+            $this->assertExpectedRevision($locked, $identity);
+
+            SyncEntityRevisionTracker::withoutTracking(fn () => $handler->apply($locked));
+
+            $identity = $this->lockEntityIdentity($locked);
+            if ($identity && $hadIdentity) {
+                $identity->increment('revision');
+                $identity->refresh();
+            }
+
+            $locked->update([
+                'result_revision' => $identity?->revision,
+                'status' => 'applied',
+                'applied_at' => now(),
+                'attempts' => $locked->attempts + 1,
+                'last_error' => null,
+            ]);
+
+            // Publish inside the same database transaction as the domain mutation.
+            // If delivery creation fails, the domain mutation and applied marker roll back together.
+            $this->recorder->publish($locked);
+
+            return $locked->fresh();
+        });
+    }
+
     private function lockEntityIdentity(SyncMutation $mutation): ?SyncEntityIdentity
     {
         $uuid = $mutation->payload['local_id'] ?? null;
-        if (! is_string($uuid) || ! \Illuminate\Support\Str::isUuid($uuid)) {
+        if (! is_string($uuid) || ! Str::isUuid($uuid)) {
             return null;
         }
 
         return SyncEntityIdentity::query()
             ->where('business_id', $mutation->business_id)
             ->where('entity_type', $mutation->entity_type)
-            ->where('entity_uuid', \Illuminate\Support\Str::lower($uuid))
+            ->where('entity_uuid', Str::lower($uuid))
             ->lockForUpdate()
             ->first();
     }
@@ -37,24 +121,22 @@ class SyncMutationApplier
         }
 
         $predecessorId = $mutation->payload['predecessor_mutation_id'] ?? null;
-        $expectedRevision = null;
+        $expectedRevision = is_string($predecessorId) && Str::isUuid($predecessorId)
+            ? $this->predecessorResultRevision($mutation, $predecessorId)
+            : ($mutation->payload['expected_revision'] ?? null);
 
-        if (is_string($predecessorId) && \Illuminate\Support\Str::isUuid($predecessorId)) {
-            $expectedRevision = $this->predecessorResultRevision($mutation, $predecessorId);
-        } else {
-            $expectedRevision = $mutation->payload['expected_revision'] ?? null;
-        }
-
-        if (! is_numeric($expectedRevision) || (int) $expectedRevision < 1 || (int) $expectedRevision !== (int) $identity->revision) {
+        if (! is_numeric($expectedRevision)
+            || (int) $expectedRevision < 1
+            || (int) $expectedRevision !== (int) $identity->revision) {
             $record = $identity->record;
             $remote = [
                 'revision' => (int) $identity->revision,
                 'record' => $record?->toArray() ?? [],
             ];
 
-            if ($record instanceof \App\Models\Customer) {
+            if ($record instanceof Customer) {
                 $remote['record']['contacts'] = $record->contacts()->get()->toArray();
-            } elseif ($record instanceof \App\Models\Event) {
+            } elseif ($record instanceof Event) {
                 $remote['record']['requirements'] = $record->requirements()->get()->toArray();
             }
 
@@ -99,90 +181,5 @@ class SyncMutationApplier
         }
 
         return null;
-    }
-
-}
-
-    /**
-     * @param array<string, SyncMutationHandler> $handlers
-     */
-    public function apply(SyncMutation $mutation, array $handlers): SyncMutation
-    {
-        if (! $mutation->exists) {
-            throw new LogicException('A persisted sync mutation is required.');
-        }
-
-        if ($mutation->status !== 'pending') {
-            return $mutation;
-        }
-
-        $handler = $handlers[$mutation->entity_type] ?? null;
-
-        if (! $handler instanceof SyncMutationHandler) {
-            throw ValidationException::withMessages([
-                'entity_type' => 'This sync entity type has no registered safe handler.',
-            ]);
-        }
-
-        return DB::transaction(function () use ($mutation, $handler): SyncMutation {
-            // Keep lock order consistent with SyncMutationRecorder: business,
-            // device, then mutation. A revoke that wins this lock prevents the
-            // queued mutation from being applied; an apply that wins completes
-            // before the revoke can commit.
-            DB::table('businesses')->where('id', $mutation->business_id)->lockForUpdate()->first();
-
-            $lockedDevice = SyncDevice::query()
-                ->where('business_id', $mutation->business_id)
-                ->whereKey($mutation->sync_device_id)
-                ->active()
-                ->lockForUpdate()
-                ->first();
-
-            abort_unless(
-                $lockedDevice,
-                401,
-                'This sync device was revoked before the offline change could be applied.'
-            );
-
-            $locked = SyncMutation::query()
-                ->whereKey($mutation->id)
-                ->lockForUpdate()
-                ->first();
-
-            if (! $locked) {
-                throw (new ModelNotFoundException)->setModel(SyncMutation::class, [$mutation->id]);
-            }
-
-            if ($locked->status !== 'pending') {
-                return $locked;
-            }
-
-            $identity = $this->lockEntityIdentity($locked);
-            $this->assertExpectedRevision($locked, $identity);
-
-            SyncEntityRevisionTracker::withoutTracking(fn () => $handler->apply($locked));
-
-            $identity = $this->lockEntityIdentity($locked);
-            if ($identity) {
-                if ($locked->operation !== 'create' && $identity->wasRecentlyCreated === false) {
-                    $identity->increment('revision');
-                    $identity->refresh();
-                }
-            }
-
-            $locked->update([
-                'result_revision' => $identity?->revision,
-                'status' => 'applied',
-                'applied_at' => now(),
-                'attempts' => $locked->attempts + 1,
-                'last_error' => null,
-            ]);
-
-            // Publish inside the same database transaction as the domain mutation.
-            // If delivery creation fails, the domain mutation and applied marker roll back together.
-            $this->recorder->publish($locked);
-
-            return $locked->fresh();
-        });
     }
 }
