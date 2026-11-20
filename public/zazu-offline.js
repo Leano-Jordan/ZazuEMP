@@ -1385,6 +1385,13 @@
             }
 
             const payload = mutation.payload?.record || {};
+            if (entityType === 'payment') {
+                const invoice = (state.invoices || []).find(item =>
+                    item.local_id === payload.invoice_local_id
+                );
+                return invoice?.payments?.find(item => item.local_id === localId) || null;
+            }
+
             if (entityType === 'inventory_movement') {
                 const inventoryItem = (state.inventory_items || []).find(item =>
                     item.local_id === payload.inventory_item_local_id
