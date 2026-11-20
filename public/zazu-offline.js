@@ -1654,15 +1654,17 @@
         for (const mutation of mutations) {
             const remote = recorded.get(mutation.id);
             const identity = remote?.identity;
-            if (!identity || remote.status !== 'applied') continue;
+            if (remote?.status !== 'applied') continue;
 
-            const localId = identity.local_id || mutation.payload?.local_id;
-            const record = findLocalRecord(identity.entity_type, localId, mutation);
-            if (record) {
-                record.id = Number(identity.server_id);
-                record.server_id = Number(identity.server_id);
-                record.local_id = localId;
-                record.revision = Number(identity.revision || record.revision || 1);
+            if (identity) {
+                const localId = identity.local_id || mutation.payload?.local_id;
+                const record = findLocalRecord(identity.entity_type, localId, mutation);
+                if (record) {
+                    record.id = Number(identity.server_id);
+                    record.server_id = Number(identity.server_id);
+                    record.local_id = localId;
+                    record.revision = Number(identity.revision || record.revision || 1);
+                }
             }
 
             const relatedIdentities = Array.isArray(remote?.related_identities)
