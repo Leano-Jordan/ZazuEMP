@@ -1,3 +1,27 @@
+## Director execution checkpoint — 2026-11-21
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main`.  
+**Verified test head:** `0dd2cc3d9c0f95ea1249b7f31807f349e67099c9`.
+
+### Targeted implementation delivered
+- Restored offline fallback for cached Customer/Work creation pages, invoice creation and numeric Work-detail pages while retaining dashboard-shell fallback for unsupported/unprimed routes.
+- Corrected offline workspace permission navigation to use Zazu's `PermissionService`. The previous Laravel `@can` directives did not evaluate Zazu's business-role permission model and hid the links.
+- Hardened the phone attachment client against session transitions: queued attachment writes, Work-ID reconciliation, list reads and local file retrieval now re-check the captured session generation.
+
+### Exact-head automated evidence
+- Laravel: **627 passed / 1 skipped / 4,334 assertions**.
+- Offline-browser desktop Chromium: **57 passed**; one expired-session URL assertion was flaky on its first attempt and passed on retry.
+- Mobile-viewport Customer/Work acceptance: **7 passed**.
+- Dedicated phone-local attachment journey: **1 passed**.
+- PostgreSQL migrations, business/workspace registration and database/private-file recovery smoke: **PASS**.
+- Composer security audit, secret scan, PHPMD, JavaScript/TypeScript, Python and Actions analysis, application check and Director Health: **PASS**. Sonar analysis was skipped.
+- Windows V1 package build and PowerShell fresh-install/recovery verification: **PASS** on source commit `490100e2ae7a4793db3e06c37833cba7b2033fb9`.
+
+### Release gates — unchanged
+Offline code and CI evidence do not close the owner-side gates. **Still OPEN:** physical Android cold launch/restart/reconnect; intended customer-PC installation recovery drill; live-business commercial reconciliation; complete offline sync matrix; POPIA operational controls; ZAZU name clearance. **V1 remains NOT READY; no readiness-score uplift is claimed.**
+
+---
+
 ## Director execution checkpoint — 2026-11-20
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
