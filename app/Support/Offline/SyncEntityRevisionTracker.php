@@ -20,6 +20,24 @@ final class SyncEntityRevisionTracker
         }
     }
 
+    public function touchRelated(Model $record, string $relationPath, string $entityType): void
+    {
+        $related = $record;
+
+        foreach (explode('.', $relationPath) as $relation) {
+            if (! method_exists($related, $relation)) {
+                return;
+            }
+
+            $related = $related->{$relation}()->first();
+            if (! $related instanceof Model) {
+                return;
+            }
+        }
+
+        $this->touch($related, $entityType);
+    }
+
     public function touch(Model $record, string $entityType): void
     {
         if (self::$trackingSuspended > 0 || ! $record->exists || ! is_numeric($record->getKey())) {
@@ -50,7 +68,7 @@ final class SyncEntityRevisionTracker
             return (int) $businessId;
         }
 
-        foreach (['event', 'customer', 'quote', 'quoteVersion', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
+        foreach (['event', 'customer', 'quote', 'quoteVersion', 'version', 'invoice', 'purchaseOrder', 'inventoryItem', 'item', 'asset'] as $relation) {
             if (! method_exists($record, $relation)) {
                 continue;
             }

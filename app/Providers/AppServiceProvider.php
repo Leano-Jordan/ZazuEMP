@@ -66,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
         ] as $model => $entityType) {
             foreach (['updated', 'deleting', 'restored'] as $event) {
                 Event::listen('eloquent.'.$event.': '.$model, function ($record) use ($revisionTracker, $entityType): void {
-                    $revisionTracker->touch($record, $entityType);
+                    $revisionTracker->touchRelated($record, $relation, $entityType);
                 });
             }
         }
@@ -78,12 +78,12 @@ class AppServiceProvider extends ServiceProvider
             CustomerContact::class => ['customer', 'customer'],
             EventRequirement::class => ['event', 'job'],
             QuoteVersion::class => ['quote', 'quote'],
-            QuoteItem::class => ['quoteVersion', 'quote'],
+            QuoteItem::class => ['version.quote', 'quote'],
             InvoiceItem::class => ['invoice', 'invoice'],
             Payment::class => ['invoice', 'invoice'],
             PurchaseOrderItem::class => ['purchaseOrder', 'purchase_order'],
             PurchaseOrderReceipt::class => ['purchaseOrder', 'purchase_order'],
-            InventoryMovement::class => ['inventoryItem', 'inventory_item'],
+            InventoryMovement::class => ['item', 'inventory_item'],
             AssetAllocation::class => ['asset', 'asset'],
         ];
 

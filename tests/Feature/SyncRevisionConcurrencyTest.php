@@ -7,11 +7,16 @@ use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\InventoryItem;
+use App\Models\InventoryMovement;
+use App\Models\Quote;
+use App\Models\QuoteItem;
 use App\Models\Supplier;
 use App\Models\SyncConflict;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
+use App\Models\QuoteVersion;
 use App\Support\Offline\StaleSyncRevisionException;
 use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use App\Support\Offline\SyncConflictResolutionService;
@@ -132,6 +137,65 @@ class SyncRevisionConcurrencyTest extends TestCase
         foreach ($identities as $identity) {
             $this->assertSame(2, (int) $identity->fresh()->revision);
         }
+    }
+
+    public function test_nested_quote_item_and_inventory_movement_writes_advance_parent_revisions(): void
+    {
+        [$business, $customer] = $this->customerFixture();
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'REV-NESTED-001',
+            'name' => 'Revision Nested Work',
+            'status' => 'confirmed',
+        ]);
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'REV-QUOTE-001',
+            'status' => 'draft',
+            'currency' => 'ZAR',
+        ]);
+        $version = QuoteVersion::create([
+            'quote_id' => $quote->id,
+            'version' => 1,
+            'status' => 'draft',
+            'subtotal' => '0.00',
+            'tax_total' => '0.00',
+            'total' => '0.00',
+            'deposit_percent' => '0.00',
+            'deposit_amount' => '0.00',
+        ]);
+        $inventory = InventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Revision Stock',
+            'unit' => 'unit',
+            'reorder_level' => '1.00',
+        ]);
+
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $quoteIdentity = $registry->identify($quote, 'quote');
+        $inventoryIdentity = $registry->identify($inventory, 'inventory_item');
+
+        QuoteItem::create([
+            'quote_version_id' => $version->id,
+            'description' => 'Nested quote line',
+            'quantity' => '1.00',
+            'unit' => 'unit',
+            'unit_price' => '100.00',
+            'line_total' => '100.00',
+        ]);
+        InventoryMovement::create([
+            'business_id' => $business->id,
+            'inventory_item_id' => $inventory->id,
+            'idempotency_key' => (string) Str::uuid(),
+            'type' => 'receipt',
+            'quantity' => '2.00',
+            'unit_cost' => '10.00',
+            'movement_date' => now()->toDateString(),
+        ]);
+
+        $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
+        $this->assertSame(2, (int) $inventoryIdentity->fresh()->revision);
     }
 
     public function test_nested_customer_contact_write_advances_the_parent_snapshot_revision(): void
