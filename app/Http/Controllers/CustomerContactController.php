@@ -27,8 +27,11 @@ class CustomerContactController extends Controller
         $this->ensureCustomer($customer, $business);
         $validated = $this->validated($request);
 
-        DB::transaction(function () use ($customer, $validated, $request): void {
+        DB::transaction(function () use ($customer, $validated, $request, $business): void {
+            DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
+
             $lockedCustomer = Customer::query()
+                ->where('business_id', $business->id)
                 ->whereKey($customer->id)
                 ->lockForUpdate()
                 ->firstOrFail();
@@ -69,8 +72,11 @@ class CustomerContactController extends Controller
         $this->ensureBelongsToCustomer($customer, $contact);
         $validated = $this->validated($request);
 
-        DB::transaction(function () use ($customer, $contact, $validated, $request): void {
+        DB::transaction(function () use ($customer, $contact, $validated, $request, $business): void {
+            DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
+
             $lockedCustomer = Customer::query()
+                ->where('business_id', $business->id)
                 ->whereKey($customer->id)
                 ->lockForUpdate()
                 ->firstOrFail();
@@ -109,8 +115,11 @@ class CustomerContactController extends Controller
 
         $cannotDelete = false;
 
-        DB::transaction(function () use ($customer, $contact, &$cannotDelete): void {
+        DB::transaction(function () use ($customer, $contact, &$cannotDelete, $business): void {
+            DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
+
             $lockedCustomer = Customer::query()
+                ->where('business_id', $business->id)
                 ->whereKey($customer->id)
                 ->lockForUpdate()
                 ->firstOrFail();
