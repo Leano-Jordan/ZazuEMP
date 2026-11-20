@@ -5,8 +5,6 @@ namespace App\Support\Offline;
 use App\Models\SyncConflict;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
-use App\Models\SyncEntityIdentity;
-use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -47,11 +45,11 @@ final class SyncConflictResolutionService
         }
 
         if ($lockedConflict->conflict_type === 'stale_record_version') {
-            return $this->resolveStaleRecordVersion($lockedConflict, $mutation, $device, $validated);
+            return app(SyncConflictRebaseService::class)->resolveStaleRecordVersion($lockedConflict, $mutation, $device, $validated);
         }
 
         if ($lockedConflict->conflict_type === 'mutation_identity_mismatch' && $validated['action'] === 'retry') {
-            return $this->resolveIdentityMismatchRetry($lockedConflict, $mutation, $device, $validated);
+            return app(SyncConflictRebaseService::class)->resolveIdentityMismatchRetry($lockedConflict, $mutation, $device, $validated);
         }
 
         $mutationStatus = $this->applyOpenConflictResolution(
@@ -68,91 +66,8 @@ final class SyncConflictResolutionService
         ]);
 
         return response()->json([
-            'conflict' => $this->payload($lockedConflict->fresh()),
+            'conflict' => app(SyncConflictPresenter::class)->payload($lockedConflict->fresh()),
             'mutation_status' => $mutationStatus,
-        ]);
-    }
-
-    private function resolveStaleRecordVersion(
-        SyncConflict $conflict,
-        ?SyncMutation $mutation,
-        SyncDevice $device,
-        array $validated,
-    ): JsonResponse {
-        $remotePayload = $this->currentRemotePayload($conflict);
-        $conflict->update(['remote_payload' => $remotePayload]);
-
-        if ($validated['action'] === 'retry') {
-            abort_unless($mutation, 404);
-            $this->assertCausalPredecessorApplied($mutation, $device);
-            abort_unless(
-                (int) ($remotePayload['revision'] ?? 0) > 0,
-                409,
-                'The latest server revision is unavailable. Refresh the workspace before rebasing.'
-            );
-            abort_unless(
-                ! ($remotePayload['deleted'] ?? false),
-                409,
-                'This record was deleted on the server. Discard the local edit or restore the record through the normal business workflow.'
-            );
-
-            $newMutationId = (string) Str::uuid();
-            $mutation->update([
-                'status' => 'discarded',
-                'last_error' => 'Superseded by an explicit rebase onto the latest server revision.',
-                'superseded_by_mutation_id' => $newMutationId,
-            ]);
-            $mutationStatus = 'new_mutation_required';
-            $rebase = [
-                'new_mutation_id' => $newMutationId,
-                'expected_revision' => (int) $remotePayload['revision'],
-            ];
-        } else {
-            $mutation?->update([
-                'status' => 'discarded',
-                'last_error' => 'Local version discarded in favour of the latest server version.',
-            ]);
-            $mutationStatus = 'discarded';
-            $rebase = null;
-        }
-
-        $conflict->update([
-            'status' => 'resolved',
-            'resolution_note' => $this->conflictResolutionNote($conflict, $validated),
-            'resolved_at' => now(),
-        ]);
-
-        return response()->json([
-            'conflict' => $this->payload($conflict->fresh()),
-            'mutation_status' => $mutationStatus,
-            'rebase' => $rebase,
-        ]);
-    }
-
-    private function resolveIdentityMismatchRetry(
-        SyncConflict $conflict,
-        ?SyncMutation $mutation,
-        SyncDevice $device,
-        array $validated,
-    ): JsonResponse {
-        abort_unless($mutation, 404);
-        $this->assertCausalPredecessorApplied($mutation, $device);
-        $newMutationId = (string) Str::uuid();
-        $mutation->update([
-            'status' => 'discarded',
-            'last_error' => 'Superseded by a new immutable mutation identifier after payload correction.',
-            'superseded_by_mutation_id' => $newMutationId,
-        ]);
-        $conflict->update([
-            'status' => 'resolved',
-            'resolution_note' => $this->conflictResolutionNote($conflict, $validated),
-            'resolved_at' => now(),
-        ]);
-
-        return response()->json([
-            'conflict' => $this->payload($conflict->fresh()),
-            'mutation_status' => 'new_mutation_required',
-            'rebase' => ['new_mutation_id' => $newMutationId],
         ]);
     }
 
@@ -169,7 +84,7 @@ final class SyncConflictResolutionService
             : null;
 
         return response()->json([
-            'conflict' => $this->payload($conflict),
+            'conflict' => app(SyncConflictPresenter::class)->payload($conflict),
             'mutation_status' => $mutationStatus,
             'rebase' => $rebase,
         ]);
@@ -287,210 +202,4 @@ final class SyncConflictResolutionService
 
 
 
-    private function assertCausalPredecessorApplied(SyncMutation $mutation, SyncDevice $device): void
-    {
-        $predecessorId = $mutation->payload['predecessor_mutation_id'] ?? null;
-        if (! is_string($predecessorId) || ! Str::isUuid($predecessorId)) {
-            return;
-        }
-
-        $visited = [];
-        for ($depth = 0; $depth < 8; $depth++) {
-            abort_if(isset($visited[$predecessorId]), 409, 'The earlier offline change has a broken causal chain.');
-            $visited[$predecessorId] = true;
-            $predecessor = $this->findCausalPredecessor($mutation, $device, $predecessorId);
-
-            if ($predecessor?->status === 'applied' && is_numeric($predecessor->result_revision)) {
-                return;
-            }
-
-            if ($predecessor?->status === 'discarded' && ! $predecessor->superseded_by_mutation_id) {
-                // The earlier local edit was explicitly discarded in favour of
-                // the server version. This edit can now be rebased directly on it.
-                return;
-            }
-
-            abort_unless(
-                $predecessor?->status === 'discarded' && is_string($predecessor->superseded_by_mutation_id),
-                409,
-                'Resolve the earlier offline change before rebasing this edit.'
-            );
-
-            $predecessorId = $predecessor->superseded_by_mutation_id;
-        }
-
-        abort(409, 'The earlier offline change has too many rebase links.');
-    }
-
-    private function findCausalPredecessor(
-        SyncMutation $mutation,
-        SyncDevice $device,
-        string $predecessorId,
-    ): ?SyncMutation {
-        $predecessor = SyncMutation::query()
-            ->where('business_id', $device->business_id)
-            ->where('sync_device_id', $device->id)
-            ->where('mutation_id', $predecessorId)
-            ->lockForUpdate()
-            ->first();
-
-        abort_unless(
-            $predecessor
-                && $predecessor->entity_type === $mutation->entity_type
-                && $predecessor->entity_id === $mutation->entity_id,
-            409,
-            'Resolve the earlier offline change before rebasing this edit.'
-        );
-
-        return $predecessor;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function currentRemotePayload(SyncConflict $conflict): array
-    {
-        $identity = SyncEntityIdentity::query()
-            ->where('business_id', $conflict->business_id)
-            ->where('entity_type', $conflict->entity_type)
-            ->where('entity_uuid', $conflict->entity_id)
-            ->lockForUpdate()
-            ->first();
-
-        if (! $identity) {
-            return $conflict->remote_payload ?? [];
-        }
-
-        return app(SyncEntitySnapshotBuilder::class)->build($identity);
-    }
-
-
-    private function conflictMessage(SyncConflict $conflict): string
-    {
-        return match ($conflict->conflict_type) {
-            'stale_record_version' => ($conflict->remote_payload['deleted'] ?? false)
-                ? 'This record was deleted on the server after this device last synced. Use the server version to remove the local copy.'
-                : 'This record changed on the server after this device last synced. Compare both versions before choosing which one to keep.',
-            'mutation_identity_mismatch' => 'This queued change was replayed with different content. Zazu will preserve it under a new mutation ID if you retry.',
-            'domain_rejection' => 'The server rejected this saved change because it no longer satisfies the current business rules.',
-            default => 'This saved change needs review before it can sync.',
-        };
-    }
-
-    /**
-     * @return array<int, array{field:string,local:string,remote:string}>
-     */
-    private function comparison(SyncConflict $conflict): array
-    {
-        $localRecord = $this->recordFromPayload($conflict->local_payload ?? []);
-        $remoteRecord = $this->recordFromPayload($conflict->remote_payload ?? []);
-        $fields = [
-            'name' => 'Name',
-            'description' => 'Description',
-            'status' => 'Status',
-            'category' => 'Category',
-            'quantity' => 'Quantity',
-            'unit' => 'Unit',
-            'contact_name' => 'Contact',
-            'phone' => 'Phone',
-            'email' => 'Email',
-            'event_type' => 'Work type',
-            'reference' => 'Reference',
-            'notes' => 'Notes',
-            'amount' => 'Amount',
-            'total_amount' => 'Total',
-            'projected_amount' => 'Projected cost',
-            'actual_amount' => 'Actual cost',
-            'sku' => 'SKU',
-            'asset_tag' => 'Asset tag',
-            'location' => 'Location',
-            'condition' => 'Condition',
-            'currency' => 'Currency',
-            'paid_amount' => 'Paid',
-            'balance' => 'Balance',
-            'expected_at' => 'Expected date',
-            'allocated_from' => 'Allocation start',
-            'allocated_until' => 'Allocation end',
-        ];
-
-        $rows = [];
-        foreach ($fields as $key => $label) {
-            $local = $localRecord[$key] ?? null;
-            $remote = $remoteRecord[$key] ?? null;
-            if ($local === $remote || (is_scalar($local) && is_scalar($remote) && (string) $local === (string) $remote)) {
-                continue;
-            }
-
-            $rows[] = [
-                'field' => $label,
-                'local' => $this->comparisonValue($local),
-                'remote' => $this->comparisonValue($remote),
-            ];
-        }
-
-        foreach (['contacts' => 'Contacts', 'requirements' => 'Requirements', 'items' => 'Line items', 'payments' => 'Payments', 'movements' => 'Movements', 'allocations' => 'Allocations'] as $key => $label) {
-            if (! is_array($localRecord[$key] ?? null) || ! is_array($remoteRecord[$key] ?? null)) {
-                continue;
-            }
-            if (count($localRecord[$key]) === count($remoteRecord[$key])) {
-                continue;
-            }
-            $rows[] = [
-                'field' => $label,
-                'local' => (string) count($localRecord[$key]),
-                'remote' => (string) count($remoteRecord[$key]),
-            ];
-        }
-
-        return array_slice($rows, 0, 12);
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     * @return array<string, mixed>
-     */
-    private function recordFromPayload(array $payload): array
-    {
-        if (is_array($payload['record'] ?? null)) {
-            return $payload['record'];
-        }
-
-        if (is_array($payload['payload']['record'] ?? null)) {
-            return $payload['payload']['record'];
-        }
-
-        return [];
-    }
-
-    private function comparisonValue(mixed $value): string
-    {
-        if ($value === null || $value === '') {
-            return '—';
-        }
-
-        if (is_bool($value)) {
-            return $value ? 'Yes' : 'No';
-        }
-
-        return is_scalar($value) ? (string) $value : 'Changed';
-    }
-
-    public function payload(SyncConflict $conflict): array
-    {
-        return [
-            'id' => $conflict->id,
-            'mutation_id' => $conflict->mutation_id,
-            'entity_type' => $conflict->entity_type,
-            'entity_id' => $conflict->entity_id,
-            'conflict_type' => $conflict->conflict_type,
-            'message' => $this->conflictMessage($conflict),
-            'comparison' => $this->comparison($conflict),
-            'status' => $conflict->status,
-            'local_payload' => $conflict->local_payload,
-            'remote_payload' => $conflict->remote_payload,
-            'resolution_note' => $conflict->resolution_note,
-            'resolved_at' => $conflict->resolved_at?->toIso8601String(),
-            'created_at' => $conflict->created_at?->toIso8601String(),
-        ];
-    }
 }
