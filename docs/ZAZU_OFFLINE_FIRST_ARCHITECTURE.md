@@ -248,6 +248,28 @@ Financial, inventory and permission state must never be silently overwritten by 
 
 **Implementation audit note — 2026-11-20:** the current sync protocol provides mutation idempotency, business/device-scoped delivery sequences and contiguous acknowledgement. However, ordinary existing-record updates currently do not carry a base record version or equivalent precondition. Several domain handlers load the current server model through the identity registry and update it without checking whether a second device changed it after the first device's snapshot. Validation conflicts and mutation-ID payload mismatches do not protect against this stale-snapshot case. Do not describe the conflict policy as fully implemented until version-aware stale-write detection, local/remote preservation, explicit resolution and same-device sequential-edit rebase behaviour are covered by regression tests.
 
+### 7.1 Required stale-update protection before V1 release
+
+This is an acceptance/design requirement, not a claim that version-aware conflict handling is already implemented.
+
+**Existing-record update contract**
+
+1. Every offline update to an existing server record carries the authoritative record version observed by the device when that local edit chain began. A version may be a monotonic revision or another server-generated token, but it must change on every relevant server-side update, including ordinary online edits.
+2. The server compares that expected version with the current record while holding the same business/record lock used for the update. A mismatch must not mutate the record; it creates a `stale_record_version` conflict containing a safe local payload and the current remote snapshot.
+3. A same-device sequence of edits made while disconnected must remain valid. The queue must preserve causal order and the server must accept a later mutation only against the exact result version of its applied predecessor. It must not trust "same device" alone: another device or online user may have changed the record between the two mutations.
+4. Conflict resolution must preserve the immutable original mutation and both value sets. Retrying a stale edit requires an explicit rebase against a refreshed remote version and a new mutation identity where appropriate. A blind retry of the same stale payload must not be presented as a resolution.
+5. The version contract applies to all supported update mutations (customer, Work/event, quote/version, supplier, asset, service/capability and any other existing-record updates). Command mutations such as payment, purchase receipt, stock movement and asset allocation retain their domain-specific idempotency and invariant checks; their multi-record effects must still be atomic.
+
+**Required regression scenarios**
+
+- Device A and device B both load version V1. B updates to V2. A submits an update based on V1. The server must retain B's V2 values, reject A's stale mutation and preserve A's local values in an open conflict.
+- One device makes two or more sequential edits to the same record while offline. After reconnection, the ordered chain must apply without a false self-conflict when no external write intervened.
+- If another device writes after the first mutation in that same-device chain has applied but before the next mutation is accepted, the later mutation must conflict rather than overwrite the intervening write.
+- Conflict retry/rebase must keep the original mutation immutable, use the refreshed remote version and a new mutation ID, preserve user-selected values and remain business/device scoped.
+- Repeat the above for representative consequential records and verify online edits update the version token as well as offline edits.
+
+**Design guardrail:** do not ship last-write-wins, do not compare timestamps only in the browser, and do not suppress conflicts by disabling offline editing. The check must be enforced server-side under lock.
+
 ## 8. Idempotency
 
 The current application already uses idempotency and business-scoped uniqueness in important commercial mutations.
