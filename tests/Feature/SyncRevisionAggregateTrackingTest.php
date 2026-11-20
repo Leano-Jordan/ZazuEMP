@@ -11,6 +11,7 @@ use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteVersion;
 use App\Models\SyncDevice;
+use App\Services\QuoteService;
 use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use Illuminate\Database\Events\QueryExecuted;
@@ -85,8 +86,8 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'description' => 'Nested quote line',
             'quantity' => '1.00',
             'unit' => 'unit',
-            'unit_price' => '100.00',
-            'line_total' => '100.00',
+            'unit_price' => '0.00',
+            'line_total' => '0.00',
         ]);
         InventoryMovement::create([
             'business_id' => $business->id,
@@ -100,6 +101,21 @@ class SyncRevisionAggregateTrackingTest extends TestCase
 
         $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
         $this->assertSame(2, (int) $inventoryIdentity->fresh()->revision);
+
+        app(QuoteService::class)->updateDraft(
+            $quote,
+            $version,
+            collect(),
+            [],
+            null,
+            false,
+            null,
+            '0.00',
+        );
+
+        // Removing the last zero-value line does not change quote totals. The
+        // child delete itself must still invalidate the parent snapshot.
+        $this->assertSame(3, (int) $quoteIdentity->fresh()->revision);
     }
 
 

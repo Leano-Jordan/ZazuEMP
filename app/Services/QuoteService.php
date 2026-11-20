@@ -308,7 +308,9 @@ class QuoteService
         array $unitPrices,
         string $currency
     ): void {
-        $version->items()->delete();
+        foreach ($version->items()->get() as $existingItem) {
+            $existingItem->delete();
+        }
 
         foreach ($requirements as $requirement) {
             $unitPrice = $unitPrices[$requirement->id] ?? '0.00';
