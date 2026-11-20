@@ -516,6 +516,7 @@
         const conflictSection = document.querySelector('[data-zazu-offline-conflicts]');
         const conflictList = document.querySelector('[data-zazu-offline-conflict-list]');
         const conflictStatus = document.querySelector('[data-zazu-offline-conflict-status]');
+        let offlineConflictsRefreshed = false;
 
         const renderOfflineConflicts = async () => {
             const offline = window.ZazuOffline;
