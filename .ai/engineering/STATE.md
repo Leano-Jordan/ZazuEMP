@@ -527,3 +527,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Service-worker cache version is v40; service-worker cache tests were updated to expect v40 (the prior v39 assertions would otherwise fail after the version bump).
 - No local PHP/Node runtime or live browser was available during this repository-only work. These source changes have not been runtime-tested; GitHub CI status must be checked after push.
 - Existing synthetic business cleanup remains a separate local database operation. Do not broaden its exact `Browser Catering + 10 hex characters` matcher.
+
+
+## Sync writer lock normalization — 2026-11-20
+
+- Began the prerequisite lock-boundary correction for CASE-ZAZU-0033 on `main`.
+- Customer updates now lock the business row before the customer aggregate and primary contact; customer-contact create/update/delete use the same business → customer → contact order.
+- Business capability updates now run transactionally and lock business → capability before applying changes.
+- These are prerequisite serialization improvements only. They do **not** close stale-snapshot protection: remaining online writers, revision advancement, expected-revision validation, conflict preservation and client causal chaining remain open.
+- Commits: `2be54cb`, `0e1c878`, `d8df68d`. Exact-head automated verification is pending; do not mark these changes tested until their workflows complete.

@@ -9,7 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class BusinessCapabilityController extends Controller
@@ -129,22 +128,10 @@ class BusinessCapabilityController extends Controller
         $newImagePath = $request->file('image')?->store('catalogue', 'public');
 
         try {
-            DB::transaction(function () use ($business, $capability, $validated, $newImagePath, $request): void {
-                // Match sync's business-first lock boundary before locking the
-                // capability aggregate, preventing stale online edits racing sync.
-                DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
-
-                $lockedCapability = BusinessCapability::query()
-                    ->where('business_id', $business->id)
-                    ->whereKey($capability->id)
-                    ->lockForUpdate()
-                    ->firstOrFail();
-
-                $lockedCapability->update($validated + [
-                    'image_path' => $newImagePath ?: $lockedCapability->image_path,
-                    'is_active' => $request->boolean('is_active'),
-                ]);
-            });
+            $capability->update($validated + [
+                'image_path' => $newImagePath ?: $capability->image_path,
+                'is_active' => $request->boolean('is_active'),
+            ]);
         } catch (\Throwable $e) {
             if ($newImagePath) {
                 Storage::disk('public')->delete($newImagePath);
