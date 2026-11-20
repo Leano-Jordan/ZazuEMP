@@ -300,7 +300,7 @@ class SyncRevisionConcurrencyTest extends TestCase
         $processor = new SyncMutationPushProcessor(
             $recorder,
             $applier,
-            $handler,
+            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
         $firstResult = $processor->process($device, [
