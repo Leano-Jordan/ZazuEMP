@@ -1,6 +1,6 @@
 ## Director engineering update — 2026-11-20
 
-**Repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only. **Current engineering head at this update:** `7343a8f`. No branches created.
+**Repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only. **Current engineering head at this update:** `1d746d9`. No branches created.
 
 ### Active engineering — CASE-ZAZU-0033, revision-aware offline sync
 
@@ -591,3 +591,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Fixed the legacy-identity default surfaced by the first Laravel run: SyncEntityIdentity now defaults to revision 2 for direct/unregistered creation, while the identity registry explicitly sets revision 1 for genuinely new registered records. The migration retains database default 2.
 - Added online revision coverage for Work, supplier, service/capability and asset roots, plus explicit conflict field comparison and both keep-local/use-server causal successor paths.
 - On `7343a8f`: Laravel unit/feature PASS (615 passed, 1 skipped, 4,198 assertions); PHPMD PASS; Zazu Quality PASS; Director Health PASS. PostgreSQL migration smoke and offline browser acceptance remain in progress.
+
+
+## Bootstrap serialization and conflict UI correction — 2026-11-20
+
+- `SyncBootstrapPayloadBuilder` now opens one transaction and locks the business row before reading workspace data or registering/reading entity revisions. This prevents a concurrent online writer from producing a bootstrap payload containing stale record fields paired with a newer revision (or the reverse). The lock order matches the business-first online writer and sync mutation protocol.
+- Added a regression test proving the bootstrap's first business read occurs inside the builder's own transaction.
+- Exact-head evidence: on `a8201a7`, Laravel unit/feature and PostgreSQL migration smoke passed; PHPMD, Zazu Quality and Director Health passed on `7343a8f`; Windows install candidate and populated upgrade/rollback passed on `98efc29`.
+- The 51-test offline browser run on `7343a8f` exposed a real settings-page JavaScript defect: `offlineConflictsRefreshed` was read before declaration, causing the catch handler to hide both conflict and re-pair UI. Commit `1d746d9` initializes that state explicitly. The rerun is pending; do not mark browser acceptance green yet.
+- CASE-ZAZU-0033 remains OPEN pending the exact-head offline browser result and full supported-aggregate writer coverage closure.

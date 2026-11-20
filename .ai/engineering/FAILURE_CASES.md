@@ -588,3 +588,6 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 
 **Verification update — `7343a8f`:** Laravel unit/feature suite passed (615 passed, 1 skipped, 4,198 assertions), as did PHPMD, Zazu Quality and Director Health. PostgreSQL migration smoke and offline browser acceptance were still running. The first Laravel run exposed a model-level legacy identity default issue (revision read as zero in the SQLite test database); explicit model default 2 now complements the migration default, while registry-created identities explicitly start at 1. Regression coverage now includes Work, supplier, service and asset online revision advancement, conflict field comparison, and causal successors after both keep-local rebase and use-server discard. CASE-ZAZU-0033 remains OPEN.
+
+
+**Bootstrap and UI verification — 2026-11-20:** bootstrap snapshot construction is now transactionally serialized under the business row lock, with a regression asserting the transaction boundary. The 51-test offline browser run on `7343a8f` exposed an undefined `offlineConflictsRefreshed` variable in settings conflict rendering; the resulting exception hid both offline conflict controls and the re-pair warning. Commit `1d746d9` initializes the flag before rendering. Browser rerun is pending; CASE-ZAZU-0033 remains OPEN.
