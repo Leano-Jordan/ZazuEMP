@@ -25,6 +25,7 @@ use App\Support\CurrentBusiness;
 use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
+use App\Support\Offline\SyncMutationPushProcessor;
 use App\Support\Offline\SyncMutationProtocol;
 use App\Support\Offline\SyncConflictRecorder;
 use App\Support\Offline\SyncConflictResolutionService;
@@ -532,7 +533,7 @@ class SyncController extends Controller
         ];
     }
 
-    public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder, SyncMutationApplier $applier, OfflineDomainMutationHandler $handler, SyncConflictRecorder $conflictRecorder): JsonResponse
+    public function push(Request $request, SyncMutationPushProcessor $processor): JsonResponse
     {
         $device = $request->attributes->get('sync_device');
 
@@ -549,94 +550,12 @@ class SyncController extends Controller
         $applied = [];
 
         foreach ($this->orderMutationsByDependencies($validated['mutations']) as $item) {
-            try {
-                $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
-            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
-                if ($exception->getStatusCode() !== 409) {
-                    throw $exception;
-                }
+            $result = $processor->process($device, $item);
+            $recorded[] = $result;
 
-                $recorded[] = $this->mutationIdentityMismatchResponse($device, $item, $conflictRecorder, $exception->getMessage());
-                continue;
+            if ($result['status'] === 'applied') {
+                $applied[] = $result['id'];
             }
-
-            $conflictId = null;
-            $conflictType = null;
-            $identity = null;
-            $retryable = false;
-
-            try {
-                $mutation = $applier->apply($mutation, [$mutation->entity_type => $handler]);
-                $applied[] = $mutation->mutation_id;
-
-                $identity = SyncEntityIdentity::query()
-                    ->where('business_id', $mutation->business_id)
-                    ->where('entity_type', $mutation->entity_type)
-                    ->where('entity_uuid', $mutation->entity_id)
-                    ->first();
-
-            } catch (\Throwable $exception) {
-                $this->rethrowUnauthorizedSyncException($exception);
-
-                $error = mb_substr($exception->getMessage(), 0, 1000);
-                $retryable = ! ($exception instanceof ValidationException);
-
-                $mutation->update([
-                    'attempts' => $mutation->attempts + 1,
-                    'last_error' => $error,
-                ]);
-
-                if ($exception instanceof StaleSyncRevisionException) {
-                    $conflict = $conflictRecorder->recordOnce(
-                        $device,
-                        $mutation->entity_type,
-                        $mutation->entity_id,
-                        'stale_record_version',
-                        $mutation->mutation_id,
-                        $mutation->payload,
-                        $exception->remotePayload(),
-                    );
-
-                    $conflictId = $conflict->id;
-                    $conflictType = 'stale_record_version';
-                    $retryable = false;
-                } elseif ($exception instanceof ValidationException) {
-                    $conflict = $conflictRecorder->recordOnce(
-                        $device,
-                        $mutation->entity_type,
-                        $mutation->entity_id,
-                        'domain_rejection',
-                        $mutation->mutation_id,
-                        $mutation->payload,
-                        ['message' => $error],
-                    );
-
-                    $conflictId = $conflict->id;
-                    $conflictType = 'domain_rejection';
-                }
-            }
-
-            $relatedIdentity = $mutation->status === 'applied'
-                ? $this->relatedIdentityForMutation($mutation)
-                : null;
-
-            $recorded[] = [
-                'id' => $mutation->mutation_id,
-                'sequence' => $mutation->sequence,
-                'status' => $mutation->status,
-                'applied' => $mutation->status === 'applied',
-                'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
-                'conflict_id' => $conflictId,
-                'conflict_type' => $conflictType,
-                'retryable' => $retryable,
-                'identity' => $identity ? [
-                    'entity_type' => $identity->entity_type,
-                    'local_id' => $identity->entity_uuid,
-                    'server_id' => $identity->record_id,
-                    'revision' => (int) $identity->revision,
-                ] : null,
-                'related_identity' => $relatedIdentity,
-            ];
         }
 
         $device->update(['last_seen_at' => now()]);
@@ -648,108 +567,6 @@ class SyncController extends Controller
         ]);
     }
 
-
-    /**
-     * Return the parent aggregate revision when a synced child operation
-     * changes a snapshot that is stored inside its parent on other devices.
-     *
-     * @return array{entity_type:string,local_id:string,server_id:int,revision:int}|null
-     */
-    private function relatedIdentityForMutation(SyncMutation $mutation): ?array
-    {
-        $payload = $mutation->payload['record'] ?? [];
-        $parent = match ($mutation->entity_type) {
-            'quote_acceptance' => ['quote', $payload['quote_local_id'] ?? null],
-            'payment' => ['invoice', $payload['invoice_local_id'] ?? null],
-            'purchase_receipt' => ['purchase_order', $payload['purchase_order_local_id'] ?? null],
-            'inventory_movement' => ['inventory_item', $payload['inventory_item_local_id'] ?? null],
-            'asset_allocation' => ['asset', $payload['asset_local_id'] ?? null],
-            default => null,
-        };
-
-        if (! $parent || ! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
-            return null;
-        }
-
-        $identity = SyncEntityIdentity::query()
-            ->where('business_id', $mutation->business_id)
-            ->where('entity_type', $parent[0])
-            ->where('entity_uuid', Str::lower($parent[1]))
-            ->first();
-
-        if (! $identity) {
-            return null;
-        }
-
-        return [
-            'entity_type' => $identity->entity_type,
-            'local_id' => $identity->entity_uuid,
-            'server_id' => (int) $identity->record_id,
-            'revision' => (int) $identity->revision,
-        ];
-    }
-
-    /**
-     * Turn a changed-payload replay into a per-mutation conflict instead of
-     * aborting the complete push batch with an opaque HTTP 409.
-     *
-     * @param array<string, mixed> $item
-     * @return array<string, mixed>
-     */
-    private function mutationIdentityMismatchResponse(
-        SyncDevice $device,
-        array $item,
-        SyncConflictRecorder $conflictRecorder,
-        string $message
-    ): array {
-        $existing = SyncMutation::query()
-            ->where('business_id', $device->business_id)
-            ->where('sync_device_id', $device->id)
-            ->where('mutation_id', $item['id'])
-            ->firstOrFail();
-
-        $localPayload = [
-            'entity_type' => $item['entity_type'],
-            'entity_id' => $item['entity_id'],
-            'operation' => $item['operation'],
-            'payload' => $item['payload'] ?? [],
-        ];
-        $remotePayload = [
-            'entity_type' => $existing->entity_type,
-            'entity_id' => $existing->entity_id,
-            'operation' => $existing->operation,
-            'payload' => $existing->payload ?? [],
-        ];
-
-        $conflict = $conflictRecorder->recordOnce(
-            $device,
-            $item['entity_type'],
-            $item['entity_id'],
-            'mutation_identity_mismatch',
-            $existing->mutation_id,
-            $localPayload,
-            $remotePayload,
-        );
-
-        return [
-            'id' => $existing->mutation_id,
-            'sequence' => $existing->sequence,
-            'status' => 'pending',
-            'applied' => false,
-            'error' => mb_substr($message, 0, 1000),
-            'conflict_id' => $conflict->id,
-            'conflict_type' => 'mutation_identity_mismatch',
-            'retryable' => false,
-            'identity' => null,
-        ];
-    }
-
-    /**
-     * Keep dependent offline mutations behind mutations that create their referenced local identities.
-     *
-     * @param array<int, array<string, mixed>> $mutations
-     * @return array<int, array<string, mixed>>
-     */
     private function orderMutationsByDependencies(array $mutations): array
     {
         $byLocalId = [];
