@@ -202,6 +202,7 @@ class SyncMutationApplier
         }
 
         $identity?->increment('revision');
+        app(SyncMutationRelatedRevisionAdvancer::class)->advance($mutation);
     }
 
 
