@@ -600,3 +600,6 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Exact-head evidence: on `a8201a7`, Laravel unit/feature and PostgreSQL migration smoke passed; PHPMD, Zazu Quality and Director Health passed on `7343a8f`; Windows install candidate and populated upgrade/rollback passed on `98efc29`.
 - The 51-test offline browser run on `7343a8f` exposed a real settings-page JavaScript defect: `offlineConflictsRefreshed` was read before declaration, causing the catch handler to hide both conflict and re-pair UI. Commit `1d746d9` initializes that state explicitly. The rerun is pending; do not mark browser acceptance green yet.
 - CASE-ZAZU-0033 remains OPEN pending the exact-head offline browser result and full supported-aggregate writer coverage closure.
+
+
+- Offline client behavior changed in `public/zazu-offline.js`; service-worker cache advanced to `zazu-static-v50` and matching cache fixtures updated so installed clients fetch the revision-aware queue code after worker activation.

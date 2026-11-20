@@ -610,3 +610,8 @@ Automated coverage now asserts database/private-file checksum generation in the 
 - Static cache version advanced to v31 so existing user-only page caches are retired on activation.
 - This is a security/correctness prerequisite for reliable offline use with multi-business accounts. It does not alter the business-scoped IndexedDB workspace or claim full offline parity.
 - JS worker regression and PHP source-contract coverage added. Exact-head CI and physical PC/mobile acceptance remain pending.
+
+
+## Offline client revision rollout — 2026-11-20
+
+The offline mutation client now carries server base revisions, predecessor links and a durable local queue order. Because `/zazu-offline.js` is precached cache-first, this change advances the service-worker static cache from `zazu-static-v49` to `zazu-static-v50`. Existing installations must activate the new worker before the revision protocol is considered deployed. The matching service-worker cache regression fixtures were advanced with it.
