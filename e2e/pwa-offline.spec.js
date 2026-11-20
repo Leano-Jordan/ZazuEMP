@@ -1969,7 +1969,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const error = await page.evaluate(async () => {
             try {
-                await window.ZazuOffline.pair('654321');
+                await window.ZazuOffline.pair('65432100');
                 return null;
             } catch (failure) {
                 return failure.message;
