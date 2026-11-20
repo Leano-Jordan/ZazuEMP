@@ -252,8 +252,30 @@
             <p class="zazu-card-description">Customers, jobs and quotes saved on this device remain available here when the server is disconnected.</p>
         </div>
         <nav class="zazu-action-group" aria-label="Offline workspace navigation">
-            <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Open customers</a>
-            <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Open work</a>
+            @can('customers.view')
+                <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Customers</a>
+            @endcan
+            @can('work.view')
+                <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Work</a>
+            @endcan
+            @can('quotes.view')
+                <a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-secondary">Quotes</a>
+            @endcan
+            @can('suppliers.view')
+                <a href="{{ route('suppliers.index') }}" class="zazu-btn zazu-btn-secondary">Suppliers</a>
+            @endcan
+            @can('purchasing.view')
+                <a href="{{ route('purchasing.index') }}" class="zazu-btn zazu-btn-secondary">Purchasing</a>
+            @endcan
+            @can('inventory.view')
+                <a href="{{ route('inventory.index') }}" class="zazu-btn zazu-btn-secondary">Inventory</a>
+            @endcan
+            @can('assets.view')
+                <a href="{{ route('assets.index') }}" class="zazu-btn zazu-btn-secondary">Assets</a>
+            @endcan
+            @can('finance.view')
+                <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Finance</a>
+            @endcan
         </nav>
         <span class="zazu-chip zazu-chip-neutral">Device local</span>
     </header>
