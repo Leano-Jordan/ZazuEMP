@@ -161,7 +161,11 @@
                             </div>
                         </div>
                         <div class="sentinel-account-users">
-                            @php($accountOwner = $platformBusiness->users->first(fn ($member) => ($member->pivot->role ?? null) === 'owner'))
+                            @php
+                                $accountOwner = $platformBusiness->users->first(
+                                    fn ($member) => ($member->pivot->role ?? null) === 'owner'
+                                );
+                            @endphp
                             @if($accountOwner)
                                 <div><strong>Owner:</strong> {{ $accountOwner->name }}</div>
                                 <div>{{ $accountOwner->email }}</div>
