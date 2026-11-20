@@ -1910,7 +1910,7 @@ class OfflineSyncFoundationTest extends TestCase
         // Verify that a second paired installation receives the committed
         // commercial chain, reconciles nested payment data, and acknowledges
         // only its contiguous delivery prefix.
-        $protocol = app(\\App\\Support\\Offline\\SyncMutationProtocol::class);
+        $protocol = app(\App\Support\Offline\SyncMutationProtocol::class);
         $delivered = $protocol->pull($receivingDevice, 'business', 100);
         $this->assertCount(4, $delivered);
         $this->assertSame([1, 2, 3, 4], $delivered->pluck('delivery_sequence')->all());
@@ -1919,7 +1919,7 @@ class OfflineSyncFoundationTest extends TestCase
             $delivered->pluck('entity_type')->all(),
         );
 
-        $remoteSnapshot = app(\\App\\Support\\Offline\\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
+        $remoteSnapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
         $remoteInvoice = collect($remoteSnapshot['invoices'])->first(
             fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $invoice->id,
         );
