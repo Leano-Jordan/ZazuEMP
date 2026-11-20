@@ -5,6 +5,8 @@ namespace App\Support\Offline;
 use App\Models\SyncConflict;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
+use App\Models\SyncEntityIdentity;
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -40,6 +42,46 @@ final class SyncConflictResolutionService
             return response()->json([
                 'conflict' => $this->payload($lockedConflict),
                 'mutation_status' => $this->resolvedConflictMutationStatus($lockedConflict, $mutation),
+            ]);
+        }
+
+        if ($lockedConflict->conflict_type === 'stale_record_version') {
+            $remotePayload = $this->currentRemotePayload($lockedConflict);
+            $lockedConflict->update(['remote_payload' => $remotePayload]);
+
+            if ($validated['action'] === 'retry') {
+                abort_unless($mutation, 404);
+                $newMutationId = (string) Str::uuid();
+                $mutation->update([
+                    'status' => 'discarded',
+                    'last_error' => 'Superseded by an explicit rebase onto the latest server revision.',
+                    'superseded_by_mutation_id' => $newMutationId,
+                ]);
+
+                $mutationStatus = 'new_mutation_required';
+                $rebase = [
+                    'new_mutation_id' => $newMutationId,
+                    'expected_revision' => (int) ($remotePayload['revision'] ?? 0),
+                ];
+            } else {
+                $mutation?->update([
+                    'status' => 'discarded',
+                    'last_error' => 'Local version discarded in favour of the latest server version.',
+                ]);
+                $mutationStatus = 'discarded';
+                $rebase = null;
+            }
+
+            $lockedConflict->update([
+                'status' => 'resolved',
+                'resolution_note' => $this->conflictResolutionNote($lockedConflict, $validated),
+                'resolved_at' => now(),
+            ]);
+
+            return response()->json([
+                'conflict' => $this->payload($lockedConflict->fresh()),
+                'mutation_status' => $mutationStatus,
+                'rebase' => $rebase,
             ]);
         }
 
@@ -166,6 +208,38 @@ final class SyncConflictResolutionService
         }
 
         return $action === 'retry' ? 'new_mutation_required' : 'discarded';
+    }
+
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function currentRemotePayload(SyncConflict $conflict): array
+    {
+        $identity = SyncEntityIdentity::query()
+            ->where('business_id', $conflict->business_id)
+            ->where('entity_type', $conflict->entity_type)
+            ->where('entity_uuid', $conflict->entity_id)
+            ->lockForUpdate()
+            ->first();
+
+        if (! $identity) {
+            return $conflict->remote_payload ?? [];
+        }
+
+        $record = $identity->record;
+        $payload = [
+            'revision' => (int) $identity->revision,
+            'record' => $record?->toArray() ?? [],
+        ];
+
+        if ($record instanceof \App\Models\Customer) {
+            $payload['record']['contacts'] = $record->contacts()->get()->toArray();
+        } elseif ($record instanceof \App\Models\Event) {
+            $payload['record']['requirements'] = $record->requirements()->get()->toArray();
+        }
+
+        return $payload;
     }
 
     public function payload(SyncConflict $conflict): array

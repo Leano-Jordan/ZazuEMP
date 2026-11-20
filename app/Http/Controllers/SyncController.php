@@ -586,7 +586,21 @@ class SyncController extends Controller
                     'last_error' => $error,
                 ]);
 
-                if ($exception instanceof ValidationException) {
+                if ($exception instanceof StaleSyncRevisionException) {
+                    $conflict = $conflictRecorder->recordOnce(
+                        $device,
+                        $mutation->entity_type,
+                        $mutation->entity_id,
+                        'stale_record_version',
+                        $mutation->mutation_id,
+                        $mutation->payload,
+                        $exception->remotePayload(),
+                    );
+
+                    $conflictId = $conflict->id;
+                    $conflictType = 'stale_record_version';
+                    $retryable = false;
+                } elseif ($exception instanceof ValidationException) {
                     $conflict = $conflictRecorder->recordOnce(
                         $device,
                         $mutation->entity_type,
@@ -615,6 +629,7 @@ class SyncController extends Controller
                     'entity_type' => $identity->entity_type,
                     'local_id' => $identity->entity_uuid,
                     'server_id' => $identity->record_id,
+                    'revision' => (int) $identity->revision,
                 ] : null,
             ];
         }

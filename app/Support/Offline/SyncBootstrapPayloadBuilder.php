@@ -156,7 +156,7 @@ class SyncBootstrapPayloadBuilder
             ->limit(500)
             ->get()
             ->map(fn (Invoice $invoice) => [
-                'local_id' => $registry->identify($invoice, 'invoice')->entity_uuid,
+                ...$this->identityPayload($invoice, 'invoice', $registry),
                 'server_id' => $invoice->id,
                 'record' => array_merge($invoice->toArray(), [
                     'paid_amount' => $invoice->paid_amount,
