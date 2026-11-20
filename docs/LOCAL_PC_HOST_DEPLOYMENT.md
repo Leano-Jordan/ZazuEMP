@@ -5,6 +5,42 @@
 **Production direction:** Paid, persistent public server only when the owner is ready  
 **Repository policy:** `main` only; no feature branches
 
+
+## Authoritative phone-access route and port map
+
+**Use the HTTPS launcher as the single supported phone/tablet route for current PWA and offline acceptance.** Do not choose a URL by combining an IP from an earlier session with a port from another setup. The current Wi-Fi IP is detected at startup and printed by the launcher.
+
+| Address / port | Purpose | Where it works |
+|---|---|---|
+| `http://127.0.0.1:8000` | Laravel development server / HTTPS proxy upstream | Host PC only |
+| `https://<current-PC-private-Wi-Fi-IP>:8443` | Caddy HTTPS reverse proxy | Phone/tablet on the same trusted private Wi-Fi; **canonical phone URL** |
+| `http://<current-PC-private-Wi-Fi-IP>:8000` | Legacy/plain HTTP LAN mode via `Start-Zazu-LAN.cmd` | Same Wi-Fi only; not the PWA/offline acceptance origin |
+| `127.0.0.1:2019` | Caddy admin API | Host PC loopback only; never a phone URL |
+| `5173` | Vite HMR/development asset server when explicitly running the Vite workflow | Development tooling only; not the HTTPS phone route |
+
+### Correct startup sequence for phone testing
+
+1. Stop any manually running `php artisan serve` in the VS Code terminal with **Ctrl+C**. The HTTPS launcher manages its own Laravel process; do not try to run two servers on port 8000.
+2. From the Zazu repository root on the PC, run `Start-Zazu-LAN-HTTPS.cmd`.
+3. Copy the exact line printed as **Phone/tablet URL**. It will have the form `https://<detected-PC-Wi-Fi-IP>:8443`. The IP is dynamic; do not reuse a previous IP unless the launcher prints it again.
+4. On the phone, stay on the same trusted private Wi-Fi and open that exact URL. It must load without a certificate warning.
+5. Stop this mode with `Stop-Zazu-LAN-HTTPS.cmd`, which stops both the Caddy proxy and its Laravel upstream.
+
+The HTTPS launcher starts Laravel itself on `127.0.0.1:8000`, enables secure session cookies for that process, verifies/uses compiled Vite assets, and starts Caddy on the selected private Wi-Fi IPv4 address at HTTPS port `8443`. The phone connects only to Caddy; it must not connect directly to port 8000.
+
+### Certificate identity
+
+The launcher prints the exact Caddy public CA certificate path (`root.crt`). An Android certificate installed previously is suitable only if it is this Caddy installation's matching root certificate. The source repository cannot inspect the phone's installed certificate store, so verify by opening the exact printed HTTPS URL and confirming Chrome shows no certificate warning. Do not reinstall a different certificate just because the URL/IP changed; the root CA and the IP-specific leaf certificate are different things. Never transfer the CA private key.
+
+### Avoid mixing origins and launchers
+
+- `Start-Zazu-Dev.cmd` is the host-PC loopback development workflow.
+- `Start-Zazu-LAN.cmd` is plain HTTP LAN access and is not the supported installed-PWA/offline route.
+- `Start-Zazu-LAN-HTTPS.cmd` is the canonical phone/tablet route.
+- `php artisan serve` in VS Code is not, by itself, the Caddy HTTPS route.
+- HTTP and HTTPS are different browser origins with separate IndexedDB, service-worker and installation state. Preserve pending local work and do not clear browser storage when switching origins.
+
+
 ## 1. Deployment boundary
 
 The owner's Windows PC is not the planned permanent public production server. It can, however, host Zazu temporarily on a trusted private Wi-Fi network so phones/tablets on that same network can reach it. This LAN mode is for controlled development and acceptance, not internet-facing production. No domain or paid hosting is required for same-network HTTP access.
