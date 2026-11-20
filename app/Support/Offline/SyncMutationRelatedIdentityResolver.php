@@ -93,9 +93,19 @@ final class SyncMutationRelatedIdentityResolver
             return;
         }
 
+        $lineIds = $this->resolvedPurchaseOrderLineIds(
+            (int) $mutation->business_id,
+            (int) $order->id,
+            $mutation->payload['record']['received_quantities'] ?? [],
+        );
+        if ($lineIds === []) {
+            return;
+        }
+
         $inventoryItemIds = DB::table('inventory_movements')
             ->where('business_id', $mutation->business_id)
             ->where('purchase_order_id', $order->id)
+            ->whereIn('purchase_order_item_id', $lineIds)
             ->distinct()
             ->pluck('inventory_item_id');
 
@@ -114,6 +124,57 @@ final class SyncMutationRelatedIdentityResolver
         foreach ($inventoryIdentities as $identity) {
             $this->append($identities, $identity);
         }
+    }
+
+    /**
+     * Resolve only purchase-order lines named by this receipt. Returning every
+     * inventory item ever linked to the order would advance unrelated client
+     * revisions without refreshing their snapshots.
+     *
+     * @return array<int, int>
+     */
+    private function resolvedPurchaseOrderLineIds(
+        int $businessId,
+        int $purchaseOrderId,
+        mixed $receivedQuantities,
+    ): array {
+        if (! is_array($receivedQuantities)) {
+            return [];
+        }
+
+        $candidateIds = [];
+        foreach (array_keys($receivedQuantities) as $lineIdentityOrId) {
+            if (is_string($lineIdentityOrId) && Str::isUuid($lineIdentityOrId)) {
+                $identity = SyncEntityIdentity::query()
+                    ->where('business_id', $businessId)
+                    ->where('entity_type', 'purchase_order_item')
+                    ->where('entity_uuid', Str::lower($lineIdentityOrId))
+                    ->first();
+
+                if ($identity) {
+                    $candidateIds[] = (int) $identity->record_id;
+                }
+
+                continue;
+            }
+
+            if (is_numeric($lineIdentityOrId) && (int) $lineIdentityOrId > 0) {
+                $candidateIds[] = (int) $lineIdentityOrId;
+            }
+        }
+
+        if ($candidateIds === []) {
+            return [];
+        }
+
+        return DB::table('purchase_order_items')
+            ->where('business_id', $businessId)
+            ->where('purchase_order_id', $purchaseOrderId)
+            ->whereIn('id', array_values(array_unique($candidateIds)))
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
     }
 
     private function identityByUuid(SyncMutation $mutation, string $entityType, string $uuid): ?SyncEntityIdentity

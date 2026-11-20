@@ -141,15 +141,15 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         $this->assertSame(2, (int) $fixture['quote']->fresh()->revision);
         $this->assertSame(2, (int) $fixture['job']->fresh()->revision);
         $this->assertRelatedRevisions($accepted, [
-            'quote' => 2,
-            'job' => 2,
+            'quote:'.$fixture['quote']->entity_uuid => 2,
+            'job:'.$fixture['job']->entity_uuid => 2,
         ]);
 
         $payment = $this->applyCommand($device, 'payment', [
             'invoice_local_id' => $fixture['invoice']->entity_uuid,
         ]);
         $this->assertSame(2, (int) $fixture['invoice']->fresh()->revision);
-        $this->assertRelatedRevisions($payment, ['invoice' => 2]);
+        $this->assertRelatedRevisions($payment, ['invoice:'.$fixture['invoice']->entity_uuid => 2]);
 
         $receipt = $this->applyCommand($device, 'purchase_receipt', [
             'purchase_order_local_id' => $fixture['order']->entity_uuid,
@@ -157,22 +157,23 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         ]);
         $this->assertSame(2, (int) $fixture['order']->fresh()->revision);
         $this->assertSame(3, (int) $fixture['inventory']->fresh()->revision);
+        $this->assertSame(2, (int) $fixture['unreceived_inventory']->fresh()->revision);
         $this->assertRelatedRevisions($receipt, [
-            'purchase_order' => 2,
-            'inventory_item' => 3,
+            'purchase_order:'.$fixture['order']->entity_uuid => 2,
+            'inventory_item:'.$fixture['inventory']->entity_uuid => 3,
         ]);
 
         $movement = $this->applyCommand($device, 'inventory_movement', [
             'inventory_item_local_id' => $fixture['inventory']->entity_uuid,
         ]);
         $this->assertSame(4, (int) $fixture['inventory']->fresh()->revision);
-        $this->assertRelatedRevisions($movement, ['inventory_item' => 4]);
+        $this->assertRelatedRevisions($movement, ['inventory_item:'.$fixture['inventory']->entity_uuid => 4]);
 
         $allocation = $this->applyCommand($device, 'asset_allocation', [
             'asset_local_id' => $fixture['asset']->entity_uuid,
         ]);
         $this->assertSame(2, (int) $fixture['asset']->fresh()->revision);
-        $this->assertRelatedRevisions($allocation, ['asset' => 2]);
+        $this->assertRelatedRevisions($allocation, ['asset:'.$fixture['asset']->entity_uuid => 2]);
     }
 
     private function commandRevisionFixture(Business $business, Customer $customer): array
@@ -229,6 +230,22 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'unit' => 'unit',
             'reorder_level' => '1.00',
         ]);
+        $unreceivedLine = PurchaseOrderItem::create([
+            'business_id' => $business->id,
+            'purchase_order_id' => $order->id,
+            'description' => 'Unreceived command stock',
+            'quantity' => '3.00',
+            'received_quantity' => '0.00',
+            'unit' => 'unit',
+            'unit_price' => '5.00',
+            'line_total' => '15.00',
+        ]);
+        $unreceivedInventory = InventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Unreceived command stock',
+            'unit' => 'unit',
+            'reorder_level' => '1.00',
+        ]);
         $asset = Asset::create([
             'business_id' => $business->id,
             'asset_tag' => 'REV-COMMAND-ASSET',
@@ -240,6 +257,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         ]);
         $registry = app(SyncEntityIdentityRegistry::class);
         $inventoryIdentity = $registry->identify($inventory, 'inventory_item');
+        $unreceivedInventoryIdentity = $registry->identify($unreceivedInventory, 'inventory_item');
 
         InventoryMovement::create([
             'business_id' => $business->id,
@@ -253,12 +271,25 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'movement_date' => now()->toDateString(),
         ]);
 
+        InventoryMovement::create([
+            'business_id' => $business->id,
+            'inventory_item_id' => $unreceivedInventory->id,
+            'purchase_order_id' => $order->id,
+            'purchase_order_item_id' => $unreceivedLine->id,
+            'idempotency_key' => (string) Str::uuid(),
+            'type' => 'receipt',
+            'quantity' => '1.00',
+            'unit_cost' => '5.00',
+            'movement_date' => now()->toDateString(),
+        ]);
+
         return [
             'job' => $registry->identify($event, 'job'),
             'quote' => $registry->identify($quote, 'quote'),
             'invoice' => $registry->identify($invoice, 'invoice'),
             'order' => $registry->identify($order, 'purchase_order'),
             'inventory' => $inventoryIdentity,
+            'unreceived_inventory' => $unreceivedInventoryIdentity,
             'asset' => $registry->identify($asset, 'asset'),
             'line' => $line,
         ];
@@ -289,12 +320,14 @@ class SyncRevisionAggregateTrackingTest extends TestCase
     private function assertRelatedRevisions(SyncMutation $mutation, array $expected): void
     {
         $actual = collect(app(SyncMutationRelatedIdentityResolver::class)->resolve($mutation))
-            ->mapWithKeys(fn (array $identity): array => [$identity['entity_type'] => $identity['revision']])
+            ->mapWithKeys(fn (array $identity): array => [
+                $identity['entity_type'].':'.$identity['local_id'] => $identity['revision'],
+            ])
             ->all();
+        ksort($actual);
+        ksort($expected);
 
-        foreach ($expected as $entityType => $revision) {
-            $this->assertSame($revision, $actual[$entityType] ?? null, $entityType.' acknowledgement revision mismatch');
-        }
+        $this->assertSame($expected, $actual, 'Acknowledgement must contain only the aggregates changed by this command.');
     }
 
     private function customerFixture(): array
