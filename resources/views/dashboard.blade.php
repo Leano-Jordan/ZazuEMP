@@ -252,30 +252,31 @@
             <p class="zazu-card-description">Customers, jobs and quotes saved on this device remain available here when the server is disconnected.</p>
         </div>
         <nav class="zazu-action-group" aria-label="Offline workspace navigation">
-            @can('customers.view')
+            @php($offlineWorkspacePermissions = app(\App\Support\PermissionService::class))
+            @if($offlineWorkspacePermissions->allows('customers.view'))
                 <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Open customers</a>
-            @endcan
-            @can('work.view')
+            @endif
+            @if($offlineWorkspacePermissions->allows('work.view'))
                 <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Open work</a>
-            @endcan
-            @can('quotes.view')
+            @endif
+            @if($offlineWorkspacePermissions->allows('quotes.view'))
                 <a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-secondary">Quotes</a>
-            @endcan
-            @can('suppliers.view')
+            @endif
+            @if($offlineWorkspacePermissions->allows('suppliers.view'))
                 <a href="{{ route('suppliers.index') }}" class="zazu-btn zazu-btn-secondary">Suppliers</a>
-            @endcan
-            @can('purchasing.view')
+            @endif
+            @if($offlineWorkspacePermissions->allows('purchasing.view'))
                 <a href="{{ route('purchasing.index') }}" class="zazu-btn zazu-btn-secondary">Purchasing</a>
-            @endcan
-            @can('inventory.view')
+            @endif
+            @if($offlineWorkspacePermissions->allows('inventory.view'))
                 <a href="{{ route('inventory.index') }}" class="zazu-btn zazu-btn-secondary">Inventory</a>
-            @endcan
-            @can('assets.view')
+            @endif
+            @if($offlineWorkspacePermissions->allows('assets.view'))
                 <a href="{{ route('assets.index') }}" class="zazu-btn zazu-btn-secondary">Assets</a>
-            @endcan
-            @can('finance.view')
+            @endif
+            @if($offlineWorkspacePermissions->allows('finance.view'))
                 <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Finance</a>
-            @endcan
+            @endif
         </nav>
         <span class="zazu-chip zazu-chip-neutral">Device local</span>
     </header>
