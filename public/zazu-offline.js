@@ -1054,7 +1054,8 @@
 
         const remotePayload = result.conflict?.remote_payload || {};
         const remoteRevision = Number(remotePayload.revision || 0);
-        if (retryWithNewMutationId && (!result.rebase?.new_mutation_id || remoteRevision < 1)) {
+        const isStaleRevisionConflict = result.conflict?.conflict_type === 'stale_record_version';
+        if (retryWithNewMutationId && isStaleRevisionConflict && (!result.rebase?.new_mutation_id || remoteRevision < 1)) {
             throw new Error('The latest server revision could not be confirmed. Keep the local change queued and retry conflict resolution.');
         }
 
@@ -1096,15 +1097,18 @@
                 if (mutation && shouldRetry) {
                     const retry = { ...mutation, status: 'pending' };
                     if (retryWithNewMutationId) {
-                        // The server permanently retires the original ID and
-                        // supplies its replacement. Preserve created_at so this
-                        // rebased mutation stays ahead of its causal successors.
-                        retry.id = result.rebase.new_mutation_id;
-                        retry.payload = {
-                            ...retry.payload,
-                            expected_revision: remoteRevision,
-                        };
-                        delete retry.payload.predecessor_mutation_id;
+                        // Preserve queue order so a rebased predecessor remains
+                        // ahead of any later edits to the same local aggregate.
+                        retry.id = result.rebase?.new_mutation_id || crypto.randomUUID();
+                        if (isStaleRevisionConflict) {
+                            retry.payload = {
+                                ...retry.payload,
+                                expected_revision: remoteRevision,
+                            };
+                            delete retry.payload.predecessor_mutation_id;
+                        } else {
+                            retry.created_at = new Date().toISOString();
+                        }
                     }
                     delete retry.conflict_id;
                     delete retry.server_sequence;
@@ -1318,7 +1322,7 @@
             const prepareMutation = () => {
                 if (!currentReady || !queueReady || sessionMismatch) return;
                 const queuedForEntity = (queuedRequest.result || [])
-                    .filter(item => item.status === 'pending'
+                    .filter(item => ['pending', 'failed'].includes(item.status)
                         && item.entity_type === entityType
                         && String(item.entity_id) === String(mutation.entity_id))
                     .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));

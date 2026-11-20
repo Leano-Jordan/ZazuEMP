@@ -40,18 +40,40 @@ final class SyncConflictResolutionService
 
         if ($lockedConflict->status !== 'open') {
             $mutationStatus = $this->resolvedConflictMutationStatus($lockedConflict, $mutation);
-            $rebase = $lockedConflict->conflict_type === 'stale_record_version'
-                && $mutationStatus === 'new_mutation_required'
-                ? [
+            $rebase = $mutationStatus === 'new_mutation_required'
+                ? array_filter([
                     'new_mutation_id' => $mutation?->superseded_by_mutation_id,
-                    'expected_revision' => (int) ($lockedConflict->remote_payload['revision'] ?? 0),
-                ]
+                    'expected_revision' => $lockedConflict->conflict_type === 'stale_record_version'
+                        ? (int) ($lockedConflict->remote_payload['revision'] ?? 0)
+                        : null,
+                ], static fn ($value) => $value !== null)
                 : null;
 
             return response()->json([
                 'conflict' => $this->payload($lockedConflict),
                 'mutation_status' => $mutationStatus,
                 'rebase' => $rebase,
+            ]);
+        }
+
+        if ($lockedConflict->conflict_type === 'mutation_identity_mismatch' && $validated['action'] === 'retry') {
+            abort_unless($mutation, 404);
+            $newMutationId = (string) Str::uuid();
+            $mutation->update([
+                'status' => 'discarded',
+                'last_error' => 'Superseded by a new immutable mutation identifier after payload correction.',
+                'superseded_by_mutation_id' => $newMutationId,
+            ]);
+            $lockedConflict->update([
+                'status' => 'resolved',
+                'resolution_note' => $this->conflictResolutionNote($lockedConflict, $validated),
+                'resolved_at' => now(),
+            ]);
+
+            return response()->json([
+                'conflict' => $this->payload($lockedConflict->fresh()),
+                'mutation_status' => 'new_mutation_required',
+                'rebase' => ['new_mutation_id' => $newMutationId],
             ]);
         }
 
