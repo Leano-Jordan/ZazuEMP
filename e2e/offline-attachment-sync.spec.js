@@ -238,6 +238,123 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
 });
 
 
+test('transient attachment upload failures retry while the app remains online', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Attachment retry timer contract runs once in Chromium.');
+
+    await login(page);
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+
+    const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
+    await expect(jobRow).toBeVisible();
+    await jobRow.locator('[data-zazu-inspector-open]').first().click();
+    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
+    await page.getByRole('link', { name: 'Open job record' }).click();
+    const attachmentForm = page.locator('[data-zazu-offline-attachment-form]');
+    await expect(attachmentForm).toBeVisible();
+    const eventId = Number(await attachmentForm.getAttribute('data-zazu-event-id'));
+    const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+    expect(eventId).toBeGreaterThan(0);
+    expect(businessId).toBeGreaterThan(0);
+
+    await page.evaluate(async ({ activeBusinessId, token }) => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = {
+            token,
+            device: { id: 987667, business_id: activeBusinessId },
+        };
+        state.local_dirty = false;
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+    }, { activeBusinessId: businessId, token: DEVICE_TOKEN });
+
+    const requests = { uploads: 0, key: null };
+    await page.route('**/api/sync/**', async route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        expect(request.headers()['authorization']).toBe('Bearer ' + DEVICE_TOKEN);
+
+        if (url.pathname === '/api/sync/pull') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+            return;
+        }
+        if (url.pathname === '/api/sync/bootstrap') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+            return;
+        }
+        if (url.pathname === '/api/sync/attachments' && request.method() === 'POST') {
+            requests.uploads++;
+            const body = request.postData() || '';
+            const key = body.match(/name="idempotency_key"\r\n\r\n([^\r\n]+)/)?.[1] || null;
+            const uploadedEventId = Number(body.match(/name="event_id"\r\n\r\n([^\r\n]+)/)?.[1] || 0);
+            if (!requests.key) requests.key = key;
+            expect(key).toMatch(/^[0-9a-f-]{36}$/i);
+            expect(uploadedEventId).toBe(eventId);
+            expect(body).toContain('retry-after-outage.txt');
+
+            if (requests.uploads === 1) {
+                await route.fulfill({
+                    status: 503,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ message: 'Temporary attachment storage outage.' }),
+                });
+                return;
+            }
+
+            await route.fulfill({
+                status: 201,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    duplicate: false,
+                    attachment: {
+                        id: 99001,
+                        event_id: eventId,
+                        idempotency_key: key,
+                        original_name: 'retry-after-outage.txt',
+                        mime_type: 'text/plain',
+                        size: Buffer.byteLength('retry this upload safely'),
+                        description: '',
+                        created_at: new Date().toISOString(),
+                    },
+                }),
+            });
+            return;
+        }
+
+        await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+    });
+
+    await page.evaluate(async id => {
+        await window.ZazuOffline.queueAttachment(
+            id,
+            new File(['retry this upload safely'], 'retry-after-outage.txt', { type: 'text/plain' })
+        );
+    }, eventId);
+
+    await expect.poll(() => requests.uploads, { timeout: 15_000 }).toBe(2);
+    const outcome = await page.evaluate(async id => {
+        const records = await window.ZazuOffline.loadAttachments(id);
+        const record = records.find(item => item.original_name === 'retry-after-outage.txt');
+        const file = record ? await window.ZazuOffline.getAttachmentFile(record.idempotency_key) : null;
+        return {
+            status: record?.status ?? null,
+            attempts: record?.attempts ?? null,
+            retryable: record?.retryable ?? null,
+            lastError: record?.last_error ?? null,
+            key: record?.idempotency_key ?? null,
+            text: file ? await file.text() : null,
+        };
+    }, eventId);
+
+    expect(outcome.status).toBe('synced');
+    expect(outcome.attempts).toBe(2);
+    expect(outcome.retryable).toBe(false);
+    expect(outcome.lastError).toBeNull();
+    expect(outcome.key).toBe(requests.key);
+    expect(outcome.text).toBe('retry this upload safely');
+});
+
 test('existing synced Work records can queue attachments while disconnected', async ({ page }, testInfo) => {
     test.setTimeout(25_000);
     test.skip(testInfo.project.name !== 'chromium', 'Existing-job offline attachment control runs once.');
