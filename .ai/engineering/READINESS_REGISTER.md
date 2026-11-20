@@ -7,6 +7,16 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 ## Owner-approved V1 scheduling addition — 2026-11-17
 Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `71c8fc5c7aeba392b95e26aee694945b286f2c8e`; Laravel 532/1 skipped/3,714 assertions and PHPMD pass. Windows package + PowerShell install/recovery pass on 2ef2a0b; PostgreSQL migration/recovery and offline-browser acceptance PASS at exact application-code baseline 71c8fc5 in run 44152431508.
 
+## Owner-directed offline sync reliability gate — OPEN (2026-11-20)
+
+The Founder has explicitly added end-to-end offline sync quality across the supported V1 workflow matrix as a release target. This is distinct from successful phone pairing and from the separate PC/server-independent phone launch gate. Pairing remains CLOSED by Founder confirmation.
+
+**Required evidence:** trace every declared offline operation from UI through business-scoped IndexedDB, durable queue, mutation handler and stable identity registry, then through server acknowledgement/pull/bootstrap and final client reconciliation. Verify restart durability, transient and partial failure retries, duplicate/reordered delivery idempotency, parent/child references, pagination/cursors, business/device isolation, conflict preservation and resolution, attachment byte/metadata integrity, and financial/inventory/purchase/scheduling lifecycle parity. Verify representative journeys on the actual PC and phone after automated coverage passes.
+
+**Current exact-head evidence:** main at 561ad304 has an offline browser acceptance failure (43 passed / 2 failed); mobile customer/Work and phone-local attachment follow-on jobs were skipped after the desktop suite failed. The two current failures include stale six-digit pairing test input and an obsolete expected cross-business error string. These are test-contract findings, not proof of a new physical pairing failure. Broad sync quality remains OPEN and must be assessed domain by domain; do not mark it complete based on one green journey.
+
+**Scope boundary:** no parallel offline engine, no cache-only workaround, no weakening of business isolation/idempotency/conflict tests, and no unsupported app-wide offline claim. Work within the existing offline client, mutation protocol, domain handlers, identity registry, attachment subsystem and documented offline workflow matrix.
+
 ## Open runtime blocker — repeated DB-001 (2026-11-17)
 
 **Status:** OPEN — cause not yet proven  
