@@ -2,8 +2,6 @@
 
 namespace App\Support\Offline;
 
-use App\Models\Customer;
-use App\Models\Event;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
@@ -117,6 +115,12 @@ class SyncMutationApplier
 
     private function assertExpectedRevision(SyncMutation $mutation, ?SyncEntityIdentity $identity): void
     {
+        if ($mutation->operation === 'create' && $identity) {
+            throw ValidationException::withMessages([
+                'entity_id' => 'This offline create identity already belongs to a server record. Use an update with its current revision.',
+            ]);
+        }
+
         if (! in_array($mutation->operation, ['update', 'upsert'], true) || ! $identity) {
             return;
         }
