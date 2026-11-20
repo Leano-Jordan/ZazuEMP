@@ -1015,11 +1015,16 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.context().setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
 
+        await expect.poll(() => pushedEntityType).toBe('event_cost');
+        await expect.poll(() => page.evaluate(() => {
+            const cost = window.ZazuOffline.getState().costs.find(item => item.local_id === 'offline-event-cost-identity');
+            return { id: cost?.id ?? null, serverId: cost?.server_id ?? null, pendingSync: cost?.pending_sync ?? null };
+        })).toEqual({ id: 95001, serverId: 95001, pendingSync: false });
+
         const reconciled = await page.evaluate(async () => ({
             cost: window.ZazuOffline.getState().costs.find(item => item.local_id === 'offline-event-cost-identity'),
             pending: await window.ZazuOffline.pending(),
         }));
-        expect(pushedEntityType).toBe('event_cost');
         expect(reconciled.pending).toHaveLength(0);
         expect(reconciled.cost).toMatchObject({
             local_id: 'offline-event-cost-identity',
