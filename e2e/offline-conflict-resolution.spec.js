@@ -106,7 +106,7 @@ test('Settings resolves stale offline edits without losing either version', asyn
 
     const resolutionRequests = [];
     await page.route('**/api/sync/push', route => route.abort());
-    await page.route(/\\/api\\/sync\\/conflicts\\?status=open$/, route => route.fulfill({
+    await page.route('**/api/sync/conflicts*', route => route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
