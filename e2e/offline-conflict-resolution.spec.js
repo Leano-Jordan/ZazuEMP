@@ -166,6 +166,10 @@ test('Settings resolves stale offline edits without losing either version', asyn
 
     await page.context().setOffline(false);
     await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(async () => {
+        await window.ZazuOffline.ready;
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    });
     const section = page.locator('[data-zazu-offline-conflicts]');
     await expect(section).toBeVisible();
     await expect(section.getByText('Phone version to keep')).toBeVisible();
