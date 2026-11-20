@@ -553,7 +553,7 @@ self.addEventListener('fetch', (event) => {
                 // with stale authenticated HTML.
                 if (!response.ok) {
                     if (response.status >= 500 && response.status <= 599) {
-                        return cachedAppPage(request);
+                        return cachedAppPage(request, request.mode === 'navigate');
                     }
                     return response;
                 }
@@ -564,7 +564,7 @@ self.addEventListener('fetch', (event) => {
                 event.waitUntil(cacheRenderedPage(request, response.clone(), requestGeneration));
                 return response;
             } catch {
-                return cachedAppPage(request);
+                return cachedAppPage(request, request.mode === 'navigate');
             }
         })());
         return;
