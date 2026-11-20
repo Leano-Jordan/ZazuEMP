@@ -134,33 +134,44 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         [$business, $customer, $device] = $this->customerFixtureWithDevice();
         $fixture = $this->commandRevisionFixture($business, $customer);
 
-        $this->applyCommand($device, 'quote_acceptance', [
+        $accepted = $this->applyCommand($device, 'quote_acceptance', [
             'quote_local_id' => $fixture['quote']->entity_uuid,
         ]);
         $this->assertSame(2, (int) $fixture['quote']->fresh()->revision);
         $this->assertSame(2, (int) $fixture['job']->fresh()->revision);
+        $this->assertRelatedRevisions($accepted, [
+            'quote' => 2,
+            'job' => 2,
+        ]);
 
-        $this->applyCommand($device, 'payment', [
+        $payment = $this->applyCommand($device, 'payment', [
             'invoice_local_id' => $fixture['invoice']->entity_uuid,
         ]);
         $this->assertSame(2, (int) $fixture['invoice']->fresh()->revision);
+        $this->assertRelatedRevisions($payment, ['invoice' => 2]);
 
-        $this->applyCommand($device, 'purchase_receipt', [
+        $receipt = $this->applyCommand($device, 'purchase_receipt', [
             'purchase_order_local_id' => $fixture['order']->entity_uuid,
             'received_quantities' => [$fixture['line']->id => '1.00'],
         ]);
         $this->assertSame(2, (int) $fixture['order']->fresh()->revision);
         $this->assertSame(3, (int) $fixture['inventory']->fresh()->revision);
+        $this->assertRelatedRevisions($receipt, [
+            'purchase_order' => 2,
+            'inventory_item' => 3,
+        ]);
 
-        $this->applyCommand($device, 'inventory_movement', [
+        $movement = $this->applyCommand($device, 'inventory_movement', [
             'inventory_item_local_id' => $fixture['inventory']->entity_uuid,
         ]);
         $this->assertSame(4, (int) $fixture['inventory']->fresh()->revision);
+        $this->assertRelatedRevisions($movement, ['inventory_item' => 4]);
 
-        $this->applyCommand($device, 'asset_allocation', [
+        $allocation = $this->applyCommand($device, 'asset_allocation', [
             'asset_local_id' => $fixture['asset']->entity_uuid,
         ]);
         $this->assertSame(2, (int) $fixture['asset']->fresh()->revision);
+        $this->assertRelatedRevisions($allocation, ['asset' => 2]);
     }
 
     private function commandRevisionFixture(Business $business, Customer $customer): array
@@ -252,7 +263,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         ];
     }
 
-    private function applyCommand(SyncDevice $device, string $entityType, array $record): void
+    private function applyCommand(SyncDevice $device, string $entityType, array $record): SyncMutation
     {
         $handler = new class implements SyncMutationHandler {
             public function apply(SyncMutation $mutation): void
@@ -268,7 +279,21 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             ['record' => $record],
         );
 
-        app(SyncMutationApplier::class)->apply($mutation, [$entityType => $handler]);
+        return app(SyncMutationApplier::class)->apply($mutation, [$entityType => $handler]);
+    }
+
+    /**
+     * @param array<string, int> $expected
+     */
+    private function assertRelatedRevisions(SyncMutation $mutation, array $expected): void
+    {
+        $actual = collect(app(SyncMutationRelatedIdentityResolver::class)->resolve($mutation))
+            ->mapWithKeys(fn (array $identity): array => [$identity['entity_type'] => $identity['revision']])
+            ->all();
+
+        foreach ($expected as $entityType => $revision) {
+            $this->assertSame($revision, $actual[$entityType] ?? null, $entityType.' acknowledgement revision mismatch');
+        }
     }
 
     private function customerFixture(): array
