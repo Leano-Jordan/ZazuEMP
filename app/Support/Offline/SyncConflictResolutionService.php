@@ -17,9 +17,13 @@ final class SyncConflictResolutionService
      */
     public function resolve(SyncDevice $device, SyncConflict $conflict, array $validated): JsonResponse
     {
-        return DB::transaction(
-            fn (): JsonResponse => $this->resolveLockedConflict($device, $conflict, $validated)
-        );
+        return DB::transaction(function () use ($device, $conflict, $validated): JsonResponse {
+            // Conflict resolution must serialize with online and offline writes
+            // using the same business-first lock boundary.
+            DB::table('businesses')->where('id', $device->business_id)->lockForUpdate()->first();
+
+            return $this->resolveLockedConflict($device, $conflict, $validated);
+        });
     }
 
     /**
