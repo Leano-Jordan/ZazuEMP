@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v55';
+const CACHE_NAME = 'zazu-static-v56';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -121,6 +121,21 @@ async function dynamicCache() {
         ? contextCacheName()
         : ((await loadActiveContext()) ? contextCacheName() : null);
     return name ? caches.open(name) : null;
+}
+
+function shouldPreferOfflineShell(request, pathname) {
+    if (request.mode !== 'navigate') return false;
+
+    // These authenticated routes contain real offline-capable forms or
+    // job-specific controls. Preserve their exact cached HTML when it exists;
+    // cachedAppPage still falls back to the dashboard shell when it does not.
+    const preserveExactRoute = [
+        '/customers/create',
+        '/work/create',
+        '/finance/invoices/create',
+    ].includes(pathname) || /^\/work\/\d+$/.test(pathname);
+
+    return !preserveExactRoute;
 }
 
 async function cachedAppPage(request, preferShell = false) {
@@ -541,7 +556,7 @@ self.addEventListener('fetch', (event) => {
             // attempting the unreachable Laravel host. Resolve the authenticated
             // page from its user/business cache immediately instead.
             if (self.navigator?.onLine === false) {
-                return cachedAppPage(request, request.mode === 'navigate' && !['/customers/create', '/work/create'].includes(url.pathname));
+                return cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname));
             }
 
             try {
@@ -553,7 +568,7 @@ self.addEventListener('fetch', (event) => {
                 // with stale authenticated HTML.
                 if (!response.ok) {
                     if (response.status >= 500 && response.status <= 599) {
-                        return cachedAppPage(request, request.mode === 'navigate' && !['/customers/create', '/work/create'].includes(url.pathname));
+                        return cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname));
                     }
                     return response;
                 }
@@ -564,7 +579,7 @@ self.addEventListener('fetch', (event) => {
                 event.waitUntil(cacheRenderedPage(request, response.clone(), requestGeneration));
                 return response;
             } catch {
-                return cachedAppPage(request, request.mode === 'navigate' && !['/customers/create', '/work/create'].includes(url.pathname));
+                return cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname));
             }
         })());
         return;
