@@ -90,6 +90,7 @@ class OfflineBootstrapWriteLockTest extends TestCase
         }
 
         $this->assertNotNull($insertIndex, "Expected an insert into {$table}.");
+        $insertIndex = (int) $insertIndex;
         $this->assertGreaterThan(0, $insertIndex);
         $lockQuery = strtolower($this->queries[$insertIndex - 1]);
         $this->assertStringContainsString('select', $lockQuery);

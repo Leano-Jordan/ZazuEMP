@@ -113,11 +113,19 @@ class AssetController extends Controller
             'acquired_at'=>['nullable','date'],'purchase_cost'=>['required','numeric','min:0'],
             'capability_id'=>['nullable','integer'],'notes'=>['nullable','string'],
         ]);
-        if (!empty($data['capability_id'])) {
-            abort_unless(BusinessCapability::where('business_id',$businessId)->where('capability_type','rental')->whereKey($data['capability_id'])->exists(), 404);
-        }
         DB::transaction(function () use ($data, $businessId, $currency): void {
             Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            if (!empty($data['capability_id'])) {
+                abort_unless(
+                    BusinessCapability::query()
+                        ->where('business_id', $businessId)
+                        ->where('capability_type', 'rental')
+                        ->whereKey($data['capability_id'])
+                        ->exists(),
+                    404,
+                );
+            }
 
             Asset::create([...$data,'business_id'=>$businessId,'currency'=>$currency,'status'=>'available']);
         });

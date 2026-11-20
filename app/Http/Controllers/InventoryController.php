@@ -55,11 +55,19 @@ class InventoryController extends Controller
             'unit'=>['required','string','max:50'],'reorder_level'=>['required','numeric','decimal:0,2','min:0'],
             'capability_id'=>['nullable','integer'],
         ]);
-        if (!empty($data['capability_id'])) {
-            abort_unless(BusinessCapability::where('business_id',$businessId)->where('capability_type','product')->whereKey($data['capability_id'])->exists(), 404);
-        }
         $item = DB::transaction(function () use ($data, $businessId): InventoryItem {
             Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            if (!empty($data['capability_id'])) {
+                abort_unless(
+                    BusinessCapability::query()
+                        ->where('business_id', $businessId)
+                        ->where('capability_type', 'product')
+                        ->whereKey($data['capability_id'])
+                        ->exists(),
+                    404,
+                );
+            }
 
             return InventoryItem::create([...$data,'business_id'=>$businessId]);
         });
