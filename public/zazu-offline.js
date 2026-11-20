@@ -1015,7 +1015,7 @@
     async function refreshConflicts() {
         await ready;
         if (sessionCleared || !state?.sync?.token || !navigator.onLine) {
-            return state?.conflicts || [];
+            return null;
         }
 
         const previousState = state;
@@ -1023,7 +1023,7 @@
             const response = await api('/api/sync/conflicts?status=open');
             const result = await response.json().catch(() => ({}));
             if (!response.ok || !Array.isArray(result.conflicts)) {
-                return state?.conflicts || [];
+                return null;
             }
 
             state = {
@@ -1034,7 +1034,7 @@
             return state.conflicts;
         } catch (error) {
             state = previousState;
-            return state?.conflicts || [];
+            return null;
         }
     }
 

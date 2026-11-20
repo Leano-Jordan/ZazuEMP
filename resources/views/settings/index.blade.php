@@ -522,7 +522,10 @@
             if (!conflictSection || !conflictList || !offline) return;
 
             await offline.ready;
-            await offline.refreshConflicts?.();
+            if (!offlineConflictsRefreshed) {
+                const refreshed = await offline.refreshConflicts?.();
+                offlineConflictsRefreshed = Array.isArray(refreshed);
+            }
             const offlineState = offline.getState() || {};
             const conflicts = (offlineState.conflicts || [])
                 .filter(conflict => conflict.status === 'open');
