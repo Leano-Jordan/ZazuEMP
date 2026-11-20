@@ -103,7 +103,7 @@ final class SyncConflictRebaseService
         }
 
         $visited = [];
-        for ($depth = 0; $depth < 8; $depth++) {
+        for ($depth = 0; $depth < SyncMutationCausalRevisionResolver::MAX_SUPERSESSION_HOPS; $depth++) {
             abort_if(isset($visited[$predecessorId]), 409, 'The earlier offline change has a broken causal chain.');
             $visited[$predecessorId] = true;
             $predecessor = $this->findCausalPredecessor($mutation, $device, $predecessorId);
