@@ -635,3 +635,10 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The test keeps the browser online, aborts the lightweight `/up` connectivity probe, and requires previously synced customer data to appear in the device-local workspace.
 - This is distinct from airplane-mode coverage and directly targets the reported “last online page” symptom at the workspace-visibility boundary. It does not replace the physical Android cold-launch/restart test.
 - Commit: `c9df48a`. Exact-head browser verification is pending.
+
+
+### Conflict UI restart durability strengthened
+
+- The new Settings conflict-journey test now reloads the browser after seeding failed mutations and conflict snapshots in the business-scoped IndexedDB database, then verifies the operator can still compare and resolve both records.
+- Sync pull/bootstrap/push endpoints are bounded by deterministic test routes so the test isolates local persistence and the conflict-resolution API contract rather than depending on unrelated sync timing.
+- Commit: `5b56a7c`. Exact-head Chromium acceptance remains pending.
