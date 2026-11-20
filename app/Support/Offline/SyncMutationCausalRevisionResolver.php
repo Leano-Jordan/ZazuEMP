@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 final class SyncMutationCausalRevisionResolver
 {
-    private const MAX_SUPERSESSION_HOPS = 256;
+    public const MAX_SUPERSESSION_HOPS = 256;
 
     public function expectedRevision(SyncMutation $mutation): mixed
     {
