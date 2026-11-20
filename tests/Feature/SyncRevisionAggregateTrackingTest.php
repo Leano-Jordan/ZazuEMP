@@ -184,6 +184,9 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'unit' => 'unit',
             'reorder_level' => '1.00',
         ]);
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $inventoryIdentity = $registry->identify($inventory, 'inventory_item');
+
         InventoryMovement::create([
             'business_id' => $business->id,
             'inventory_item_id' => $inventory->id,
@@ -196,12 +199,10 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'movement_date' => now()->toDateString(),
         ]);
 
-        $registry = app(SyncEntityIdentityRegistry::class);
         $jobIdentity = $registry->identify($event, 'job');
         $quoteIdentity = $registry->identify($quote, 'quote');
         $invoiceIdentity = $registry->identify($invoice, 'invoice');
         $orderIdentity = $registry->identify($order, 'purchase_order');
-        $inventoryIdentity = $registry->identify($inventory, 'inventory_item');
 
         $handler = new class implements SyncMutationHandler {
             public function apply(SyncMutation $mutation): void
