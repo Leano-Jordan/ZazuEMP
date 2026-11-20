@@ -1,13 +1,13 @@
 # Zazu EMP — Offline-First Architecture Contract
 
 **Status:** ACTIVE ARCHITECTURE DIRECTION  
-**Director update:** 2026-10-03  
-**Current source baseline:** main
+**Director update:** 2026-11-20  
+**Current repository branch:** `main` · **latest full application-code verification baseline:** `526bdf38dab6ff540c143b0e57dfcee468006dc3`
 
-## Director source audit — 2026-11-14
+## Director source audit — 2026-11-20
 
-**Verified application/test baseline:** `aaa47895b334b3bbf3a68f89b66e4ff6a0738032`  
-**Exact-head automated evidence:** [Laravel / PostgreSQL / offline browser workflow 43567837212](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43567837212) — 496 passed, 1 skipped; PostgreSQL recovery passed; 29 offline browser tests passed.
+**Latest full application/test baseline:** `526bdf38dab6ff540c143b0e57dfcee468006dc3`  
+**Exact-baseline automated evidence:** Laravel 607 passed / 1 skipped / 4,158 assertions; PostgreSQL migration, registration, backup/restore and private-file recovery passed; offline browser 51 desktop + 6 mobile-viewport + 1 phone-local Work/attachment journey passed. PHPMD, Psalm, Windows V1 package and populated upgrade/rollback passed on application-equivalent parent `30e70e929dc848c0119c8452395ad225a23b7c47`. Repository workflows observed on documentation head `91f41ec` passed Director Health, Zazu Quality, Director Contract Lint and Push-on-main; SonarCloud was skipped. Subsequent commits are documentation-only and are not a fresh application verification.
 
 ### Confirmed implementation boundary
 
@@ -72,16 +72,16 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 1. **Matrix complete.** Use this table as the baseline; do not re-audit or re-list the same handlers.
 2. **Implemented:** the dashboard device-local workspace renders locally stored customers, jobs and quotes from IndexedDB when the Zazu origin is unavailable; synced records remain visible and sync state is explicit. This is a dashboard workspace, not general local route/detail parity.
 3. **Customer relationship read/edit slice implemented and browser-verified:** the in-place device-local panel reads customer details, linked Work and linked quote summaries, and queues supported profile/contact/billing edits. Per-record sync status is cleared only after server acknowledgement. This does not claim full customer route parity.
-4. **Work read/edit slice implemented in source:** local Work inspection assembles job/customer, services, quotes, preparation, costs, purchasing and invoices. Supported field edits, requirement-list changes, eligible customer reassignment and guarded lifecycle transitions queue locally. The server reuses `EventLifecycleService`, rejects closed-record edits and preserves requirement metadata; reassignment is rejected when quotes exist. Laravel and Playwright regression coverage was added, but execution against the current head remains unverified.
+4. **Work read/edit slice implemented in source:** local Work inspection assembles job/customer, services, quotes, preparation, costs, purchasing and invoices. Supported field edits, requirement-list changes, eligible customer reassignment and guarded lifecycle transitions queue locally. The server reuses `EventLifecycleService`, rejects closed-record edits and preserves requirement metadata; reassignment is rejected when quotes exist. The Work inspector, disconnected Work inspection and customer reassignment journeys are included in the exact-baseline offline browser suite at `526bdf3`; broader field/requirement edit permutations remain part of the OPEN sync acceptance matrix.
 
-5. **Quote read/acceptance slice implemented in source:** dashboard quote rows expose an expandable local panel for the saved version, quote lines, linked invoice and payments. The panel now queues the existing quote_acceptance mutation and updates the local state; a focused Playwright regression was added for the queued payload and optimistic state. Exact-head execution remains unverified. Next verify reconnect acknowledgement, server lifecycle transition and the accepted-quote-to-invoice handoff from local data.
+5. **Quote read/acceptance slice implemented in source:** dashboard quote rows expose an expandable local panel for the saved version, quote lines, linked invoice and payments. The panel queues the existing quote_acceptance mutation and updates local state. Disconnected inspection of a quote version, linked invoice and payments is included in the exact-baseline offline browser suite at `526bdf3`. The complete acceptance → server acknowledgement/lifecycle transition → invoice handoff remains part of the OPEN sync acceptance matrix; do not infer that the read-panel test proves that full chain.
 
 6. Keep focused browser acceptance for direct offline navigation, local reads/writes, reload while disconnected, and reconnect reconciliation. Do not count a cached page snapshot as a local read.
 
 7. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
 
 
-No runtime code changed in this audit. The physical Android gate remains OPEN.
+No runtime code changed in the 2026-11-20 source audit or subsequent documentation reconciliation. The physical Android gate remains OPEN.
 
 ---
 
