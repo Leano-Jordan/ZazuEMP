@@ -46,6 +46,7 @@ class OfflineEventScheduleSyncTest extends TestCase
 
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
             'local_id' => $identity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Offline multi-day event',
                 'event_type' => 'Other',
@@ -106,6 +107,7 @@ class OfflineEventScheduleSyncTest extends TestCase
             ->entity_uuid;
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
             'local_id' => $identity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Legacy queued update',
                 'event_type' => 'Other',
@@ -156,6 +158,7 @@ class OfflineEventScheduleSyncTest extends TestCase
 
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
             'local_id' => $identity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Existing event',
                 'event_type' => 'Other',

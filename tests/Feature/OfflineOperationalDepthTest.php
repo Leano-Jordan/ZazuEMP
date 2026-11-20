@@ -261,6 +261,7 @@ class OfflineOperationalDepthTest extends TestCase
             $allocationIdentity = $registry->identify($allocation, 'asset_allocation')->entity_uuid;
             $release = $recorder->record($device, 'asset_allocation', $allocationIdentity, 'update', [
                 'local_id' => $allocationIdentity,
+                'expected_revision' => 1,
                 'record' => [
                     'asset_local_id' => $assetUuid,
                     'status' => 'returned',
@@ -362,6 +363,7 @@ class OfflineOperationalDepthTest extends TestCase
 
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
             'local_id' => $identity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Changed while offline',
                 'event_type' => 'Other',
@@ -408,6 +410,7 @@ class OfflineOperationalDepthTest extends TestCase
         $assetUuid = $registry->identify($asset, 'asset')->entity_uuid;
         $mutation = app(SyncMutationRecorder::class)->record($device, 'asset', $assetUuid, 'update', [
             'local_id' => $assetUuid,
+            'expected_revision' => 1,
             'record' => [
                 'asset_tag' => $otherAsset->asset_tag,
                 'name' => 'Portable Sound System',

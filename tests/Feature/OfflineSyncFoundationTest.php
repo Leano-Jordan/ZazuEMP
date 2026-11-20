@@ -1640,6 +1640,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $create = app(SyncMutationRecorder::class)->record($device, 'quote', $quoteLocalId, 'create', [
             'local_id' => $quoteLocalId,
+            'expected_revision' => 1,
             'record' => [
                 'event_local_id' => $eventIdentity->entity_uuid,
                 'reference' => 'QUO-OFFLINE-001',
@@ -1669,6 +1670,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $update = app(SyncMutationRecorder::class)->record($device, 'quote', $quoteLocalId, 'update', [
             'local_id' => $quoteLocalId,
+            'expected_revision' => 1,
             'record' => [
                 'event_local_id' => $eventIdentity->entity_uuid,
                 'status' => 'draft',

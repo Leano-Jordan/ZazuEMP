@@ -69,6 +69,7 @@ class OfflineWorkLifecycleTest extends TestCase
 
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
             'local_id' => $identity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Offline Services Job',
                 'event_type' => 'Other',
@@ -129,6 +130,7 @@ class OfflineWorkLifecycleTest extends TestCase
             ->entity_uuid;
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $jobIdentity, 'update', [
             'local_id' => $jobIdentity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Offline Reassignment Job',
                 'event_type' => 'Other',
@@ -163,6 +165,7 @@ class OfflineWorkLifecycleTest extends TestCase
             ->entity_uuid;
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
             'local_id' => $identity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Offline Status Job',
                 'event_type' => 'Other',
@@ -202,6 +205,7 @@ class OfflineWorkLifecycleTest extends TestCase
             ->entity_uuid;
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
             'local_id' => $identity,
+            'expected_revision' => 1,
             'record' => [
                 'name' => 'Offline Completion Job',
                 'event_type' => 'Other',
