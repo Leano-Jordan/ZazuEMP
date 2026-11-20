@@ -1126,7 +1126,10 @@
                 const localId = mutation?.payload?.local_id || mutation?.entity_id;
                 const list = target ? (nextState[target] || []) : [];
                 const index = list.findIndex(item => item.local_id === localId);
-                if (index >= 0 && remotePayload.record && typeof remotePayload.record === 'object') {
+                if (index >= 0 && shouldDiscard && remotePayload.deleted) {
+                    list.splice(index, 1);
+                    nextState[target] = list;
+                } else if (index >= 0 && remotePayload.record && typeof remotePayload.record === 'object') {
                     const current = list[index];
                     if (shouldDiscard) {
                         const serverRecord = remotePayload.record;

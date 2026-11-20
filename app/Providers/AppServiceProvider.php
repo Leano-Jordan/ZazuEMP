@@ -64,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
             Asset::class => 'asset',
             EventCost::class => 'event_cost',
         ] as $model => $entityType) {
-            foreach (['updated', 'deleting'] as $event) {
+            foreach (['updated', 'deleting', 'restored'] as $event) {
                 Event::listen('eloquent.'.$event.': '.$model, function ($record) use ($revisionTracker, $entityType): void {
                     $revisionTracker->touch($record, $entityType);
                 });
@@ -88,7 +88,7 @@ class AppServiceProvider extends ServiceProvider
         ];
 
         foreach ($nestedRevisionParents as $model => [$relation, $entityType]) {
-            foreach (['created', 'updated', 'deleting'] as $event) {
+            foreach (['created', 'updated', 'deleting', 'restored'] as $event) {
                 Event::listen('eloquent.'.$event.': '.$model, function ($record) use ($revisionTracker, $relation, $entityType): void {
                     if (method_exists($record, $relation)) {
                         $parent = $record->{$relation};
@@ -100,7 +100,7 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        foreach (['created', 'updated', 'deleting'] as $event) {
+        foreach (['created', 'updated', 'deleting', 'restored'] as $event) {
             Event::listen('eloquent.'.$event.': '.AssetAllocation::class, function ($record) use ($revisionTracker): void {
                 $revisionTracker->touch($record, 'asset_allocation');
             });

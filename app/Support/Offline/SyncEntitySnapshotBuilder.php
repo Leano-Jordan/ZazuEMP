@@ -19,6 +19,7 @@ final class SyncEntitySnapshotBuilder
     public function build(SyncEntityIdentity $identity): array
     {
         $record = $identity->record;
+        $deleted = $record === null || (method_exists($record, 'trashed') && $record->trashed());
         $data = $record?->toArray() ?? [];
 
         if ($record instanceof Customer) {
@@ -51,6 +52,7 @@ final class SyncEntitySnapshotBuilder
 
         return [
             'revision' => (int) $identity->revision,
+            'deleted' => $deleted,
             'record' => $data,
         ];
     }

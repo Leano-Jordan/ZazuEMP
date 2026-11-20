@@ -86,6 +86,11 @@ final class SyncConflictResolutionService
                 409,
                 'The latest server revision is unavailable. Refresh the workspace before rebasing.'
             );
+            abort_unless(
+                ! ($remotePayload['deleted'] ?? false),
+                409,
+                'This record was deleted on the server. Discard the local edit or restore the record through the normal business workflow.'
+            );
 
             $newMutationId = (string) Str::uuid();
             $mutation->update([
