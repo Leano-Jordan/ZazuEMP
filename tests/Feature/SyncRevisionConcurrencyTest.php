@@ -163,6 +163,11 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertSame('Keep this phone edit', $mutation->fresh()->payload['record']['name']);
         $this->assertSame('discarded', $mutation->fresh()->status);
         $this->assertSame('Latest server edit', $response['conflict']['remote_payload']['record']['name']);
+        $this->assertContains([
+            'field' => 'Name',
+            'local' => 'Keep this phone edit',
+            'remote' => 'Latest server edit',
+        ], $response['conflict']['comparison']);
 
         $replacementId = $response['rebase']['new_mutation_id'];
         $replacement = app(SyncMutationRecorder::class)->record(
