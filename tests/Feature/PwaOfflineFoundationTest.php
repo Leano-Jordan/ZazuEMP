@@ -170,6 +170,8 @@ class PwaOfflineFoundationTest extends TestCase
 
         $this->assertStringContainsString('async function cachedAppPage(request, preferShell = false)', $worker);
         $this->assertStringContainsString('(preferShell && offlineShell) || cachedPage || offlineShell || Response.error()', $worker);
+        $this->assertStringContainsString("request.mode === 'navigate' && response.redirected && response.url", $worker);
+        $this->assertStringContainsString('Response.redirect(destination.href, 302)', $worker);
         $this->assertStringContainsString('function shouldPreferOfflineShell(request, pathname)', $worker);
         $this->assertStringContainsString("'/finance/invoices/create'", $worker);
         $this->assertStringContainsString("|| /^\\/work\\/\\d+$/.test(pathname)", $worker);
@@ -374,7 +376,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString("slice(0, 6)", $client);
         $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString("zazu-static-v56", $worker);
+        $this->assertStringContainsString("zazu-static-v57", $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
