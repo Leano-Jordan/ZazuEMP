@@ -13,12 +13,15 @@ use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
 use App\Support\Offline\StaleSyncRevisionException;
+use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use App\Support\Offline\SyncConflictResolutionService;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationHandler;
 use App\Support\Offline\SyncMutationRecorder;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -46,6 +49,26 @@ class SyncRevisionConcurrencyTest extends TestCase
 
         $this->assertSame(1, (int) $newIdentity->revision);
         $this->assertSame(2, (int) $legacyIdentity->revision);
+    }
+
+    public function test_bootstrap_reads_aggregate_data_and_revisions_inside_one_business_transaction(): void
+    {
+        [$business, $customer, $device] = $this->customerFixtureWithDevice();
+        $baselineLevel = DB::connection()->transactionLevel();
+        $businessReadLevel = null;
+
+        DB::listen(function (QueryExecuted $query) use (&$businessReadLevel): void {
+            if ($businessReadLevel !== null || ! str_contains(strtolower($query->sql), 'businesses')) {
+                return;
+            }
+
+            $businessReadLevel = $query->connection->transactionLevel();
+        });
+
+        app(SyncBootstrapPayloadBuilder::class)->build($device);
+
+        $this->assertNotNull($businessReadLevel);
+        $this->assertGreaterThan($baselineLevel, $businessReadLevel);
     }
 
     public function test_online_customer_write_advances_the_registered_aggregate_revision(): void
