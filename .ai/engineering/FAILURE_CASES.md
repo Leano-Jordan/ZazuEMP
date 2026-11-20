@@ -13,6 +13,8 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 ## Case index
 
+| CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | OPEN | No authoritative record revision is carried or checked; a second device can overwrite an intervening write | Revision contract + two-device and same-device causal-chain tests |
+
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
 | CASE-ZAZU-0001 | Dashboard account access | GET /dashboard queries missing business_user.primary_niche | CLOSED | Local SQLite schema was behind repository migrations | Monitor deploy/runtime migration evidence |
@@ -542,3 +544,30 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Loop prevention:** When a dashboard token alias is defined in both a generic and theme-qualified selector, assert the computed value under both themes. Review specificity before assuming a later source-order rule wins.
 
+
+
+### CASE-ZAZU-0033
+
+**Status:** OPEN — confirmed source-level data-integrity defect; runtime reproduction and correction pending.  
+**Engineering diagnostic code:** ENG-DATA-003.  
+**First observed:** 2026-11-20.  
+**Target:** Existing-record offline updates for supported V1 entities (customer, Work/job, supplier, service/capability and asset).
+
+**Failure fingerprint:** Two paired devices bootstrap the same business record. Device B updates the record online or through sync. Device A later pushes an offline update based on its older snapshot. The server resolves the stable business-scoped identity to the current row and applies A's payload without checking the revision A originally observed. The older payload can therefore replace B's newer values.
+
+**Classification:** F1 — application data-integrity/concurrency defect. This is not a queue-order or mutation-idempotency failure. The client queue is ordered by creation time and the server has transactional mutation sequencing; neither establishes that the record snapshot is current.
+
+**Observed source evidence:**
+- `public/zazu-offline.js::queueMutation` persists `local_id`, `server_id` and `record`, but no base revision or causal revision token.
+- `SyncEntityIdentity` stores business/entity/record identity only; it has no monotonic revision.
+- `OfflineDomainMutationHandler::existing` resolves the current row through the identity registry. Existing customer, Work, supplier, service and asset handlers then call model `update()` without comparing the device's observed revision.
+- `SyncController::push` records validation/domain conflicts and mutation-ID payload mismatches. It has no stale-record-version conflict classification or remote-record snapshot for this case.
+- Existing regression coverage exercises idempotency, dependency ordering, business/device isolation and domain invariants, but no two-device stale-snapshot test or same-device sequential-edit revision chain exists.
+
+**Required correction contract:** Introduce a server-generated monotonic revision for each supported synchronised aggregate. Every relevant online and offline write must advance it transactionally. Every offline update must carry the revision it expects. Under the existing business/device/mutation lock order, the server compares and rejects a stale revision before domain mutation. Preserve the original local payload and current remote snapshot in a `stale_record_version` conflict. A user-directed keep-local resolution must create a new immutable mutation ID based on the latest server revision; use-server resolution must discard the local mutation and refresh. Same-device queued edits must chain revisions in causal order; an intervening external write must break that chain and create a conflict.
+
+**Guardrails:** no `updated_at`-only comparison, browser-clock comparison, last-write-wins, silent payload replacement, mutation-ID reuse with changed payload, or weakening of payment/receipt/stock/allocation idempotency. Include customer contacts and Work requirements in the aggregate revision because they are represented in those offline snapshots.
+
+**Verification required:** two-device stale update; same-device two/three queued edits; external write between queued edits; first mutation rejected then later mutation; rebase with a new mutation ID; preservation of both payloads; online update revision bump; business isolation; representative customer/Work/supplier/service/asset paths; full Laravel, PostgreSQL and offline-browser regression.
+
+**Stop condition:** do not ship partial protection that increments revisions only for offline writes or only for a subset of ordinary online writers. Until the complete writer map is covered, keep the sync reliability gate OPEN and release NOT READY.

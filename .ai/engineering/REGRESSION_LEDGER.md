@@ -208,3 +208,12 @@ A service worker keyed authenticated HTML only by user, while the local IndexedD
 ## Identifier correction note
 
 The offline authenticated-page cache/business-context control was previously assigned duplicate identifier REG-015. REG-015 remains reserved for the resource-register right-edge layout control. The offline cache control is corrected to REG-023, the next unused identifier after REG-022. No application behavior changed.
+
+
+## REG-024 — Offline existing-record stale snapshot overwrite
+
+An offline mutation may be based on an older business-record snapshot than the server currently holds. Stable entity identity, ordered mutation delivery and idempotent replay do not detect that the record itself changed after bootstrap.
+
+**Control:** every supported existing-record offline update carries an authoritative server revision. Relevant online and offline writes advance that revision transactionally. The server checks the expected revision under lock and preserves stale local and current remote values in a conflict. Same-device queued edits chain revisions; an intervening external write breaks the chain. Conflict retry uses a new mutation ID and an explicitly reviewed latest base revision.
+
+**Status:** CONTROL REQUIRED — implementation and regression evidence OPEN. See CASE-ZAZU-0033 / ENG-DATA-003.
