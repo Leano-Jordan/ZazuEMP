@@ -1232,7 +1232,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             select.value = '98401';
         });
 
-        await page.locator('input[name="amount"]').fill('100.00');
+        await page.locator('input[name="amount"]').fill('250.00');
         await page.locator('select[name="method"]').selectOption('bank_transfer');
         await page.locator('input[name="paid_at"]').fill('2026-11-20');
         await page.context().setOffline(true);
@@ -1244,6 +1244,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             const invoice = window.ZazuOffline.getState().invoices.find(item => item.local_id === 'offline-payment-invoice-identity');
             return {
                 invoice: {
+                    status: invoice?.status,
                     paidAmount: invoice?.paid_amount,
                     balance: invoice?.balance,
                     payments: invoice?.payments || [],
@@ -1251,12 +1252,13 @@ test.describe('Zazu installed PWA offline shell', () => {
                 pending: await window.ZazuOffline.pending(),
             };
         });
-        expect(local.invoice.paidAmount).toBe('100.00');
-        expect(local.invoice.balance).toBe('150.00');
+        expect(local.invoice.status).toBe('paid');
+        expect(local.invoice.paidAmount).toBe('250.00');
+        expect(local.invoice.balance).toBe('0.00');
         expect(local.invoice.payments).toHaveLength(1);
         expect(local.invoice.payments[0]).toMatchObject({
             invoice_id: 98401,
-            amount: '100.00',
+            amount: '250.00',
             method: 'bank_transfer',
             pending_sync: true,
             id: null,
