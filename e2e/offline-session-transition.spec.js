@@ -223,6 +223,8 @@ test('workspace switching submits the selected business and preserves each busin
     ), { user: userId, business: firstBusinessId });
     expect(firstBusinessCache.length).toBeGreaterThan(0);
 
+    await page.context().setOffline(true);
+
     const firstMutationId = await page.evaluate(async businessId => {
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
@@ -239,6 +241,11 @@ test('workspace switching submits the selected business and preserves each busin
         });
         return mutation.id;
     }, firstBusinessId);
+
+    // Keep the mutation pending after reconnect so the only operation under
+    // test is the real business-context transition, not a sync retry.
+    await page.route('**/api/sync/**', route => route.abort());
+    await page.context().setOffline(false);
 
     const switchWorkspace = async (businessId) => {
         await page.locator('[data-user-trigger]').click();
