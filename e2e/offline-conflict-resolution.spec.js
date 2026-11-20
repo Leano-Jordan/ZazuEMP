@@ -107,6 +107,16 @@ test('Settings resolves stale offline edits without losing either version', asyn
 
     const resolutionRequests = [];
     await page.route('**/api/sync/push', route => route.abort());
+    await page.route('**/api/sync/pull*', route => route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ mutations: [] }),
+    }));
+    await page.route('**/api/sync/bootstrap', route => route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({}),
+    }));
     await page.route('**/api/sync/conflicts*', route => route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -165,6 +175,9 @@ test('Settings resolves stale offline edits without losing either version', asyn
     });
 
     await page.context().setOffline(false);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect.poll(() => page.evaluate(() => Boolean(window.ZazuOffline?.ready))).toBe(true);
+    await page.evaluate(() => window.ZazuOffline.ready);
     await page.goto('/settings', { waitUntil: 'domcontentloaded' });
     await page.evaluate(async () => {
         await window.ZazuOffline.ready;
