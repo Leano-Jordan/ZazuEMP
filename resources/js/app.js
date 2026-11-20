@@ -3630,6 +3630,7 @@ function registerZazuServiceWorker() {
         // or role-specific shortcuts do not expose links on the dashboard.
         const routes = [...new Set([
             window.location.pathname,
+            '/dashboard',
             '/customers',
             '/customers/create',
             '/work',
@@ -3663,6 +3664,29 @@ function registerZazuServiceWorker() {
         };
         target.postMessage({ type: 'prime-pages', userId, businessId, routes }, [channel.port2]);
     };
+
+
+    window.addEventListener('zazu:offline-pages-primed', event => {
+        const existing = document.querySelector('[data-zazu-offline-pages-notice]');
+        if (event.detail?.success) {
+            existing?.remove();
+            return;
+        }
+
+        if (existing) return;
+        const notice = document.createElement('aside');
+        notice.dataset.zazuOfflinePagesNotice = '1';
+        notice.className = 'zazu-offline-origin-notice';
+        notice.setAttribute('role', 'status');
+        notice.setAttribute('aria-live', 'polite');
+
+        const title = document.createElement('strong');
+        title.textContent = 'Offline workspace is not fully prepared.';
+        const description = document.createElement('p');
+        description.textContent = 'Zazu could not cache the Customers and Work pages. Stay connected and reload before relying on this device offline.';
+        notice.append(title, description);
+        document.body.prepend(notice);
+    });
 
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', {

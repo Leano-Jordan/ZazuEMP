@@ -2476,6 +2476,36 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     });
+    test('primes Customers and Work routes for disconnected phone navigation', async ({ page, context }) => {
+        test.setTimeout(90_000);
+
+        await login(page);
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await expect.poll(() => page.evaluate(() => document.documentElement.dataset.zazuOfflinePagesPrimed || 'pending'), {
+            timeout: 45_000,
+        }).toBe('true');
+
+        await page.evaluate(async () => {
+            await navigator.serviceWorker.ready;
+        });
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+        await context.setOffline(true);
+
+        for (const [path, heading] of [
+            ['/customers', 'Customers'],
+            ['/customers/create', 'New customer'],
+            ['/work', 'Event Operations'],
+            ['/work/create', 'New job'],
+        ]) {
+            const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+            expect(response?.ok(), path + ' must be available from the authenticated offline cache').toBe(true);
+            await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+            await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+        }
+    });
+
     test('inspects a device-local quote version, invoice and payments while disconnected', async ({ page, context }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Local quote inspection contract runs once on desktop Chromium.');

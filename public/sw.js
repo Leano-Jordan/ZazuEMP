@@ -386,6 +386,7 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
 
     const primedPrivateMediaUrls = new Set();
     const primedStaticAssetUrls = new Set();
+    const primedRoutes = new Set();
 
     try {
         for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
@@ -418,6 +419,7 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                         || pageUserId !== activeUserId || pageBusinessId !== activeBusinessId) return;
 
                     await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
+                    primedRoutes.add(new URL(path, self.location.origin).pathname);
                     await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);
                     await primePrivateMediaFromHtml(
                         html,
@@ -436,7 +438,9 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         if (activePrimeController === controller) activePrimeController = null;
     }
 
-    return !controller.signal.aborted;
+    const requiredOfflineRoutes = ['/dashboard', '/customers', '/work'];
+    return !controller.signal.aborted
+        && requiredOfflineRoutes.every((path) => primedRoutes.has(path));
 }
 
 async function clearActiveContext() {
