@@ -546,6 +546,7 @@
             for (const conflict of conflicts) {
                 const row = document.createElement('article');
                 row.className = 'zazu-list-item';
+                row.dataset.conflictId = String(conflict.id);
 
                 const details = document.createElement('div');
                 details.className = 'min-w-0 flex-1';

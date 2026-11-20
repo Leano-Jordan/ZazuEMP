@@ -1701,7 +1701,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('[data-zazu-offline-conflicts]')).toBeVisible();
         await expect(page.locator('[data-zazu-offline-conflict-list] article')).toHaveCount(2);
 
-        await page.getByRole('button', { name: 'Retry sync' }).first().click();
+        await page.locator('[data-zazu-offline-conflict-list] article[data-conflict-id="987651"]')
+            .getByRole('button', { name: 'Retry sync' }).click();
         await expect.poll(() => resolutions.length).toBe(1);
         await expect.poll(() => page.locator('[data-zazu-offline-conflict-list] article').count()).toBe(1);
 
@@ -1714,7 +1715,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(retryQueue[0].conflict_id).toBeUndefined();
 
         page.once('dialog', dialog => dialog.accept());
-        await page.getByRole('button', { name: 'Discard change' }).click();
+        await page.locator('[data-zazu-offline-conflict-list] article[data-conflict-id="987652"]')
+            .getByRole('button', { name: 'Discard change' }).click();
         await expect.poll(() => resolutions.length).toBe(2);
         await expect.poll(() => page.locator('[data-zazu-offline-conflicts]').isVisible()).toBe(false);
 
