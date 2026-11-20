@@ -1065,7 +1065,6 @@
             job: 'jobs',
             quote: 'quotes',
             preparation: 'preparations',
-            service: 'catalogue',
             supplier: 'suppliers',
             purchase_order: 'purchase_orders',
             invoice: 'invoices',
@@ -1533,6 +1532,7 @@
 
         const identityTargets = {
             customer: 'customers',
+            service: 'catalogue',
             job: 'jobs',
             quote: 'quotes',
             preparation: 'preparations',
