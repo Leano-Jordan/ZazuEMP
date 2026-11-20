@@ -7,6 +7,14 @@ use App\Models\Customer;
 use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
+use App\Models\Invoice;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
+use App\Models\Supplier;
+use App\Models\SyncMutation;
+use App\Support\Offline\SyncMutationApplier;
+use App\Support\Offline\SyncMutationHandler;
+use App\Support\Offline\SyncMutationRecorder;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteVersion;
@@ -118,6 +126,126 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         $this->assertGreaterThan(2, (int) $quoteIdentity->fresh()->revision);
     }
 
+
+
+    public function test_offline_commands_advance_every_related_aggregate_revision(): void
+    {
+        [$business, $customer, $device] = $this->customerFixtureWithDevice();
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'REV-COMMAND-WORK',
+            'name' => 'Revision Command Work',
+            'status' => 'confirmed',
+        ]);
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'REV-COMMAND-QUOTE',
+            'status' => 'sent',
+            'currency' => 'ZAR',
+        ]);
+        $invoice = Invoice::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'number' => 'INV-REV-COMMAND-001',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'issued_at' => now()->toDateString(),
+        ]);
+        $supplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Revision Command Supplier',
+        ]);
+        $order = PurchaseOrder::create([
+            'business_id' => $business->id,
+            'supplier_id' => $supplier->id,
+            'reference' => 'PO-REV-COMMAND-001',
+            'status' => 'ordered',
+            'currency' => 'ZAR',
+            'total_amount' => '50.00',
+        ]);
+        $line = PurchaseOrderItem::create([
+            'business_id' => $business->id,
+            'purchase_order_id' => $order->id,
+            'description' => 'Revision command stock',
+            'quantity' => '5.00',
+            'received_quantity' => '0.00',
+            'unit' => 'unit',
+            'unit_price' => '10.00',
+            'line_total' => '50.00',
+        ]);
+        $inventory = InventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Revision command stock',
+            'unit' => 'unit',
+            'reorder_level' => '1.00',
+        ]);
+        InventoryMovement::create([
+            'business_id' => $business->id,
+            'inventory_item_id' => $inventory->id,
+            'purchase_order_id' => $order->id,
+            'purchase_order_item_id' => $line->id,
+            'idempotency_key' => (string) Str::uuid(),
+            'type' => 'receipt',
+            'quantity' => '1.00',
+            'unit_cost' => '10.00',
+            'movement_date' => now()->toDateString(),
+        ]);
+
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $jobIdentity = $registry->identify($event, 'job');
+        $quoteIdentity = $registry->identify($quote, 'quote');
+        $invoiceIdentity = $registry->identify($invoice, 'invoice');
+        $orderIdentity = $registry->identify($order, 'purchase_order');
+        $inventoryIdentity = $registry->identify($inventory, 'inventory_item');
+
+        $handler = new class implements SyncMutationHandler {
+            public function apply(SyncMutation $mutation): void
+            {
+                // The command's domain outcome is covered by its lifecycle tests.
+                // This isolates the applier's parent-revision propagation contract.
+            }
+        };
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $applyCommand = function (string $entityType, array $record) use ($device, $handler, $recorder, $applier): void {
+            $mutation = $recorder->record(
+                $device,
+                $entityType,
+                (string) Str::uuid(),
+                'create',
+                ['record' => $record],
+            );
+            $applier->apply($mutation, [$entityType => $handler]);
+        };
+
+        $applyCommand('quote_acceptance', [
+            'quote_local_id' => $quoteIdentity->entity_uuid,
+        ]);
+        $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
+        $this->assertSame(2, (int) $jobIdentity->fresh()->revision);
+
+        $applyCommand('payment', [
+            'invoice_local_id' => $invoiceIdentity->entity_uuid,
+        ]);
+        $this->assertSame(2, (int) $invoiceIdentity->fresh()->revision);
+
+        $applyCommand('purchase_receipt', [
+            'purchase_order_local_id' => $orderIdentity->entity_uuid,
+            'received_quantities' => [$line->id => '1.00'],
+        ]);
+        $this->assertSame(2, (int) $orderIdentity->fresh()->revision);
+        $this->assertSame(3, (int) $inventoryIdentity->fresh()->revision);
+
+        $applyCommand('inventory_movement', [
+            'inventory_item_local_id' => $inventoryIdentity->entity_uuid,
+        ]);
+        $this->assertSame(4, (int) $inventoryIdentity->fresh()->revision);
+    }
 
     private function customerFixture(): array
     {
