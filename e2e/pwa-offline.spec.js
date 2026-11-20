@@ -964,7 +964,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 device: { id: 987663, business_id: activeBusinessId },
             };
             state.inventory_items = [{
-                local_id: 'local-inventory-item-' + serverItemId,
+                local_id: 'offline-stock-item-acceptance',
                 id: serverItemId,
                 server_id: serverItemId,
                 name,
@@ -1067,9 +1067,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.evaluate(() => window.ZazuOffline.sync());
         await expect.poll(() => syncedTypes.length).toBe(2);
         await expect.poll(() => page.evaluate(() => {
-            const item = window.ZazuOffline.getState().inventory_items.find(record => record.local_id === 'local-inventory-item-' + document.querySelector('form[data-zazu-offline-item-id]')?.dataset.zazuOfflineItemId);
+            const item = window.ZazuOffline.getState().inventory_items.find(record => record.local_id === 'offline-stock-item-acceptance');
             const asset = window.ZazuOffline.getState().assets.find(record => record.local_id === 'local-asset-identity');
-            const movement = item?.movements?.find(record => record.local_id);
             const allocation = asset?.allocations?.find(record => record.local_id === 'local-asset-allocation-identity');
             return {
                 movementId: item?.movements?.find(record => record.type === 'receipt')?.server_id ?? null,
