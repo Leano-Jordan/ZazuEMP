@@ -41,19 +41,38 @@ self.addEventListener('install', (event) => {
     );
 });
 
+async function migratePreviousCaches() {
+    const keys = await caches.keys();
+    const previous = keys
+        .filter((key) => key.startsWith('zazu-static-')
+            && key !== CACHE_NAME
+            && !key.startsWith(CACHE_NAME + '-user-'))
+        .sort((a, b) => {
+            const version = (name) => Number(name.match(/^zazu-static-v(\\d+)/)?.[1] || 0);
+            return version(b) - version(a);
+        });
+
+    for (const oldName of previous) {
+        const source = await caches.open(oldName);
+        const userSuffix = oldName.match(/-user-\\d+-business-\\d+$/)?.[0] || '';
+        const target = await caches.open(CACHE_NAME + userSuffix);
+
+        // Preserve authenticated page snapshots, private media, active identity
+        // and already-downloaded build assets across a static-client release.
+        // New precached assets already in the target cache always take priority.
+        for (const request of await source.keys()) {
+            if (await target.match(request)) continue;
+            const response = await source.match(request);
+            if (response) await target.put(request, response.clone());
+        }
+    }
+
+    await Promise.all(previous.map((key) => caches.delete(key)));
+}
+
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(
-                keys
-                    .filter((key) =>
-                        key.startsWith('zazu-static-')
-                        && key !== CACHE_NAME
-                        && !key.startsWith(CACHE_NAME + '-user-')
-                    )
-                    .map((key) => caches.delete(key))
-            )
-        ).then(() => self.clients.claim())
+        migratePreviousCaches().then(() => self.clients.claim())
     );
 });
 

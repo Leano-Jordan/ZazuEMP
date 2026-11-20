@@ -83,6 +83,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
             },
             add: async (key) => { entries.set(requestUrl(key), new MockResponse('asset')); },
             delete: async (key) => entries.delete(requestUrl(key)),
+            keys: async () => [...entries.keys()].map((url) => new MockRequest(url)),
         };
     }
 
@@ -149,8 +150,44 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
         };
     }
 
-    return { caches, dispatchFetch, dispatchMessage, fetchCalls, Request: MockRequest, Response: MockResponse, setOnline: (online) => { self.navigator.onLine = online; } };
+    function dispatchActivate() {
+        const pending = [];
+        listeners.get('activate')({
+            waitUntil: (promise) => pending.push(Promise.resolve(promise)),
+        });
+        return Promise.all(pending);
+    }
+
+    return { caches, dispatchActivate, dispatchFetch, dispatchMessage, fetchCalls, Request: MockRequest, Response: MockResponse, setOnline: (online) => { self.navigator.onLine = online; } };
 }
+
+test('service worker upgrades preserve authenticated offline pages and active business context', async () => {
+    const worker = bootWorker();
+    const oldStatic = await worker.caches.open('zazu-static-v49');
+    const oldUser = await worker.caches.open('zazu-static-v49-user-41-business-17');
+    await oldStatic.put('/__zazu-active-context__', new MockResponse(JSON.stringify({
+        user_id: '41',
+        business_id: '17',
+    })));
+    await oldStatic.put('/build/old-dashboard.css', new MockResponse('cached-css'));
+    await oldUser.put('/dashboard', new MockResponse('<main>Saved dashboard</main>'));
+    await oldUser.put('/media/business/logo', new MockResponse('private-logo'));
+
+    await worker.dispatchActivate();
+
+    const names = await worker.caches.keys();
+    assert.ok(names.includes('zazu-static-v50'));
+    assert.ok(names.includes('zazu-static-v50-user-41-business-17'));
+    assert.equal(names.includes('zazu-static-v49'), false);
+    assert.equal(names.includes('zazu-static-v49-user-41-business-17'), false);
+
+    const currentStatic = await worker.caches.open('zazu-static-v50');
+    const currentUser = await worker.caches.open('zazu-static-v50-user-41-business-17');
+    assert.ok(await currentStatic.match('/__zazu-active-context__'));
+    assert.equal(await (await currentStatic.match('/build/old-dashboard.css')).text(), 'cached-css');
+    assert.equal(await (await currentUser.match('/dashboard')).text(), '<main>Saved dashboard</main>');
+    assert.equal(await (await currentUser.match('/media/business/logo')).text(), 'private-logo');
+});
 
 test('authenticated uploaded images are cached only in the active business cache and remain available offline', async () => {
     let hostAvailable = true;
