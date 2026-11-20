@@ -59,10 +59,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('db.onversionchange = () => db.close();', $attachmentOpen);
         $this->assertStringContainsString('Do not reject prematurely.', $attachmentOpen);
         $this->assertStringNotContainsString('request.onblocked = () => reject', $attachmentOpen);
-        $this->assertMatchesRegularExpression(
-            "/navigator\\.serviceWorker\\.register\\('\\/sw\\.js',\\s*\\{\\s*scope:\\s*'\\/'/",
-            $app,
-        );
+        $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js',", $app);
+        $this->assertStringContainsString("scope: '/',", $app);
         $this->assertStringContainsString("target.postMessage({ type: 'prime-pages', userId, businessId, routes }, [channel.port2])", $app);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages-complete'", $app);
         $this->assertStringContainsString("zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false'", $app);
