@@ -185,6 +185,12 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("app(\\App\\Support\\PermissionService::class)", $dashboard);
         $this->assertStringContainsString("->allows('customers.view')", $dashboard);
         $this->assertStringContainsString("->allows('work.view')", $dashboard);
+        $this->assertStringContainsString("->allows('quotes.view')", $dashboard);
+        $this->assertStringContainsString("->allows('suppliers.view')", $dashboard);
+        $this->assertStringContainsString("->allows('purchasing.view')", $dashboard);
+        $this->assertStringContainsString("->allows('inventory.view')", $dashboard);
+        $this->assertStringContainsString("->allows('assets.view')", $dashboard);
+        $this->assertStringContainsString("->allows('finance.view')", $dashboard);
         $this->assertStringNotContainsString("@can('customers.view')", $dashboard);
         $this->assertStringContainsString('finance\/expenses', $app);
         $this->assertStringContainsString('(?:costs|travel)', $app);
