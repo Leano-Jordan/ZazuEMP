@@ -447,8 +447,21 @@
             }
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                if (expectedSessionGeneration !== null
+                    && (sessionCleared || sessionGeneration !== expectedSessionGeneration)) {
+                    tx.abort();
+                    reject(new Error('The device session changed before the local attachment could be saved.'));
+                    return;
+                }
                 tx.objectStore(ATTACHMENT_STORE).put(record);
-                tx.oncomplete = resolve;
+                tx.oncomplete = () => {
+                    if (expectedSessionGeneration !== null
+                        && (sessionCleared || sessionGeneration !== expectedSessionGeneration)) {
+                        reject(new Error('The device session changed while the local attachment was being saved.'));
+                        return;
+                    }
+                    resolve();
+                };
                 tx.onerror = () => reject(tx.error || new Error('The local attachment could not be saved.'));
                 tx.onabort = () => reject(tx.error || new Error('The local attachment save was aborted.'));
             });
@@ -557,10 +570,12 @@
         return record;
     }
     async function reconcileAttachmentEventIds() {
+        const reconciliationGeneration = sessionGeneration;
         const jobs = Array.isArray(state?.jobs) ? state.jobs : [];
         if (!jobs.length || sessionCleared || ACTIVE_BUSINESS_ID < 1) return 0;
 
         const records = await readAttachmentRecords();
+        if (sessionCleared || sessionGeneration !== reconciliationGeneration) return 0;
         const updates = [];
 
         for (const record of records) {
@@ -584,11 +599,23 @@
 
         const db = await openAttachmentDb();
         try {
+            if (sessionCleared || sessionGeneration !== reconciliationGeneration) return 0;
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                if (sessionCleared || sessionGeneration !== reconciliationGeneration) {
+                    tx.abort();
+                    reject(new Error('The device session changed before attachment links could be reconciled.'));
+                    return;
+                }
                 const store = tx.objectStore(ATTACHMENT_STORE);
                 for (const record of updates) store.put(record);
-                tx.oncomplete = resolve;
+                tx.oncomplete = () => {
+                    if (sessionCleared || sessionGeneration !== reconciliationGeneration) {
+                        reject(new Error('The device session changed while attachment links were being reconciled.'));
+                        return;
+                    }
+                    resolve();
+                };
                 tx.onerror = () => reject(tx.error || new Error('Offline attachment job links could not be updated.'));
                 tx.onabort = () => reject(tx.error || new Error('Offline attachment job-link update was aborted.'));
             });
@@ -596,7 +623,7 @@
             db.close();
         }
 
-        return updates.length;
+        return sessionCleared || sessionGeneration !== reconciliationGeneration ? 0 : updates.length;
     }
 
     let attachmentSyncing = false;
@@ -723,42 +750,45 @@
         return { uploaded, pending: await countPendingAttachments() };
     }
 
+    async function localAttachmentsForSession(expectedGeneration, eventId, localEventId, hasServerIdentity) {
+        if (sessionCleared || sessionGeneration !== expectedGeneration) return [];
+        const records = await readAttachmentRecords();
+        if (sessionCleared || sessionGeneration !== expectedGeneration) return [];
+        return records.filter(record =>
+            Number(record.business_id) === ACTIVE_BUSINESS_ID
+            && (hasServerIdentity
+                ? Number(record.event_id) === Number(eventId)
+                : String(record.event_local_id || '') === String(localEventId || ''))
+        ).sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')));
+    }
+
     async function loadAttachments(eventId, localEventId = null) {
         await ready;
+        const readSessionGeneration = sessionGeneration;
+        const readSessionToken = state?.sync?.token || null;
         const targetEventId = Number(eventId);
         const targetLocalEventId = String(localEventId || '').trim();
         const hasServerIdentity = Number.isSafeInteger(targetEventId) && targetEventId > 0;
         if (!hasServerIdentity && !/^[a-zA-Z0-9_-]{1,120}$/.test(targetLocalEventId)) return [];
 
-        if (hasServerIdentity && navigator.onLine && state?.sync?.token && !sessionCleared) {
-            const readSessionGeneration = sessionGeneration;
-            const readSessionToken = state.sync.token;
+        if (hasServerIdentity && navigator.onLine && readSessionToken && !sessionCleared) {
             try {
                 await syncAttachments();
                 if (sessionCleared || sessionGeneration !== readSessionGeneration
                     || state?.sync?.token !== readSessionToken) {
-                    return (await readAttachmentRecords()).filter(record =>
-                        Number(record.business_id) === ACTIVE_BUSINESS_ID
-                        && Number(record.event_id) === targetEventId
-                    );
-                }
+                                        return localAttachmentsForSession(readSessionGeneration, targetEventId, targetLocalEventId, hasServerIdentity);
+}
                 const response = await api('/api/sync/attachments?event_id=' + encodeURIComponent(targetEventId));
                 if (sessionCleared || sessionGeneration !== readSessionGeneration
                     || state?.sync?.token !== readSessionToken) {
-                    return (await readAttachmentRecords()).filter(record =>
-                        Number(record.business_id) === ACTIVE_BUSINESS_ID
-                        && Number(record.event_id) === targetEventId
-                    );
-                }
+                                        return localAttachmentsForSession(readSessionGeneration, targetEventId, targetLocalEventId, hasServerIdentity);
+}
                 if (response.ok) {
                     const result = await response.json();
                     if (sessionCleared || sessionGeneration !== readSessionGeneration
                         || state?.sync?.token !== readSessionToken) {
-                        return (await readAttachmentRecords()).filter(record =>
-                            Number(record.business_id) === ACTIVE_BUSINESS_ID
-                            && Number(record.event_id) === targetEventId
-                        );
-                    }
+                                            return localAttachmentsForSession(readSessionGeneration, targetEventId, targetLocalEventId, hasServerIdentity);
+}
                     for (const attachment of result.attachments || []) {
                         if (sessionCleared || sessionGeneration !== readSessionGeneration
                             || state?.sync?.token !== readSessionToken) break;
@@ -826,396 +856,8 @@
             }
         }
 
-        return (await readAttachmentRecords()).filter(record =>
-            Number(record.business_id) === ACTIVE_BUSINESS_ID
-            && (hasServerIdentity
-                ? Number(record.event_id) === targetEventId
-                : String(record.event_local_id || '') === targetLocalEventId)
-        ).sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')));
-    }
-
-    async function getAttachmentFile(idempotencyKey) {
-        const record = await readAttachmentRecord(String(idempotencyKey || ''));
-        if (!record || Number(record.business_id) !== ACTIVE_BUSINESS_ID || !(record.file instanceof Blob)) {
-            throw new Error('This file is not available in the local phone copy.');
-        }
-        return record.file;
-    }
-
-    async function assessLogout() {
-        await ready;
-
-        if (!storageAvailable) {
-            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null, attachmentPendingCount: null };
-        }
-
-        try {
-            const [records, attachmentPendingCount] = await Promise.all([allMutations(), countPendingAttachments()]);
-            const pendingCount = records.filter(item => item.status === 'pending').length;
-            const failedCount = records.length - pendingCount;
-            const conflictCount = (state?.conflicts || []).filter(item => item.status === 'open').length;
-
-            return {
-                inspectionFailed: false,
-                total: records.length,
-                pendingCount,
-                failedCount,
-                conflictCount,
-                attachmentPendingCount,
-                localDirty: Boolean(state?.local_dirty),
-            };
-        } catch {
-            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null, attachmentPendingCount: null };
-        }
-    }
-
-    async function clearStoredWorkspace(broadcast = true) {
-        const wasCleared = sessionCleared;
-        sessionGeneration++;
-        sessionCleared = true;
-        activeSyncController?.abort();
-
-        try {
-            // Attachments are business-scoped too. Clear them before the
-            // mutation workspace so a failed attachment cleanup blocks logout.
-            await clearAttachmentWorkspace();
-            const db = await openDb();
-            const migrationMarker = await new Promise((resolve, reject) => {
-                const request = db.transaction(STATE, 'readonly')
-                    .objectStore(STATE)
-                    .get('legacy-migrated');
-                request.onsuccess = () => resolve(request.result || null);
-                request.onerror = () => reject(request.error || new Error('Local migration state could not be inspected.'));
-            });
-            await new Promise((resolve, reject) => {
-                const tx = db.transaction([STATE, QUEUE], 'readwrite');
-                tx.objectStore(STATE).clear();
-                if (migrationMarker) tx.objectStore(STATE).put(migrationMarker, 'legacy-migrated');
-                tx.objectStore(QUEUE).clear();
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error || new Error('Local offline session cleanup failed.'));
-                tx.onabort = () => reject(tx.error || new Error('Local offline session cleanup was aborted.'));
-            });
-
-            state = blank();
-            storageAvailable = true;
-            if (broadcast) sessionChannel?.postMessage({ type: 'clear-session' });
-        } catch (error) {
-            sessionCleared = wasCleared;
-            throw error;
-        }
-    }
-
-    function pendingDeviceRevocationKey() {
-        return PENDING_DEVICE_REVOCATION_PREFIX + ACTIVE_BUSINESS_ID;
-    }
-
-    function readPendingDeviceRevocation() {
-        if (ACTIVE_BUSINESS_ID < 1) return null;
-        try {
-            const marker = JSON.parse(localStorage.getItem(pendingDeviceRevocationKey()) || 'null');
-            return marker
-                && Number(marker.business_id) === ACTIVE_BUSINESS_ID
-                && typeof marker.installation_id === 'string'
-                && /^[0-9a-f-]{36}$/i.test(marker.installation_id)
-                ? marker : null;
-        } catch {
-            return null;
-        }
-    }
-
-    function rememberPendingDeviceRevocation(installationId) {
-        if (ACTIVE_BUSINESS_ID < 1 || typeof installationId !== 'string'
-            || !/^[0-9a-f-]{36}$/i.test(installationId)) return false;
-        try {
-            localStorage.setItem(pendingDeviceRevocationKey(), JSON.stringify({
-                business_id: ACTIVE_BUSINESS_ID,
-                installation_id: installationId,
-                requested_at: new Date().toISOString(),
-            }));
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    async function retryPendingDeviceRevocation() {
-        const marker = readPendingDeviceRevocation();
-        if (!marker) return { ok: true, reason: 'not_pending' };
-        if (pendingDeviceRevocationAttempt) return pendingDeviceRevocationAttempt;
-        if (!navigator.onLine) return { ok: false, reason: 'offline' };
-
-        const attempt = (async () => {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (!csrfToken) return { ok: false, reason: 'missing_session' };
-
-            const controller = new AbortController();
-            const timeout = window.setTimeout(() => controller.abort(), 1800);
-            try {
-                const response = await fetch('/settings/sync/devices/revoke-installation', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                    },
-                    body: JSON.stringify({ installation_id: marker.installation_id }),
-                    cache: 'no-store',
-                    signal: controller.signal,
-                });
-
-                if (!response.ok) {
-                    return {
-                        ok: false,
-                        reason: response.status === 403 ? 'owner_required'
-                            : response.status === 404 ? 'business_unavailable' : 'server_rejected',
-                    };
-                }
-
-                const result = await response.json().catch(() => ({}));
-                if (result.revoked !== true) return { ok: false, reason: 'unconfirmed' };
-
-                // Reuse the same non-secret installation identity only after the
-                // owner-authenticated revocation has been confirmed server-side.
-                if (!state?.installation_id) {
-                    state.installation_id = marker.installation_id;
-                    await writeState({ allowSessionChange: true });
-                }
-                localStorage.removeItem(pendingDeviceRevocationKey());
-                return { ok: true, reason: null };
-            } catch {
-                return { ok: false, reason: controller.signal.aborted ? 'timeout' : 'unreachable' };
-            } finally {
-                window.clearTimeout(timeout);
-            }
-        })();
-
-        pendingDeviceRevocationAttempt = attempt;
-        try {
-            return await attempt;
-        } finally {
-            if (pendingDeviceRevocationAttempt === attempt) pendingDeviceRevocationAttempt = null;
-        }
-    }
-
-    async function revokeDeviceToken(token) {
-        if (!token) return { ok: true, reason: 'not_paired' };
-        if (!navigator.onLine) return { ok: false, reason: 'offline' };
-
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 1800);
-
-        try {
-            const response = await fetch('/api/sync/revoke', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-                cache: 'no-store',
-                signal: controller.signal,
-            });
-
-            return response.ok
-                ? { ok: true, reason: null }
-                : { ok: false, reason: 'server_rejected' };
-        } catch {
-            return { ok: false, reason: controller.signal.aborted ? 'timeout' : 'unreachable' };
-        } finally {
-            window.clearTimeout(timeout);
-        }
-    }
-
-    async function clearLocalSession() {
-        await ready;
-        const token = state?.sync?.token || null;
-        const installationId = state?.installation_id || null;
-        await clearStoredWorkspace(true);
-
-        // Local logout must succeed even without the server. When immediate
-        // revocation cannot reach the host, retain only the non-secret device
-        // identity so the next owner session can revoke it through its web login.
-        const result = await revokeDeviceToken(token);
-        const queuedForRetry = !result.ok && rememberPendingDeviceRevocation(installationId);
-        return { ...result, queued_for_retry: queuedForRetry };
-    }
-
-
-    async function refreshConflicts() {
-        await ready;
-        if (sessionCleared || !state?.sync?.token || !navigator.onLine) {
-            return null;
-        }
-
-        const previousState = state;
-        try {
-            const response = await api('/api/sync/conflicts?status=open');
-            const result = await response.json().catch(() => ({}));
-            if (!response.ok || !Array.isArray(result.conflicts)) {
-                return null;
-            }
-
-            state = {
-                ...state,
-                conflicts: result.conflicts,
-            };
-            await writeState();
-            return state.conflicts;
-        } catch (error) {
-            state = previousState;
-            return null;
-        }
-    }
-
-    async function resolveConflict(conflictId, action, note = null) {
-        await ready;
-
-        const id = Number(conflictId);
-        if (!Number.isSafeInteger(id) || id < 1) {
-            throw new Error('A valid sync conflict is required.');
-        }
-        if (!['retry', 'discard'].includes(action)) {
-            throw new Error('Choose whether to retry or discard the saved change.');
-        }
-        if (sessionCleared || !state?.sync?.token) {
-            throw new Error('Pair this device with Zazu before resolving its sync conflicts.');
-        }
-
-        const conflictSessionToken = state.sync.token;
-        const queued = await allMutations();
-        if (!queued.some(item => Number(item.conflict_id) === id)) {
-            throw new Error('The saved offline change could not be found on this device. Refresh the sync state before resolving it.');
-        }
-
-        const response = await api('/api/sync/conflicts/' + id + '/resolve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, note }),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (sessionCleared || state?.sync?.token !== conflictSessionToken) {
-            throw new Error('The device session changed while this conflict was being resolved. Refresh the workspace before retrying.');
-        }
-        if (!response.ok) {
-            throw new Error(result.message || 'Zazu could not resolve this offline sync conflict.');
-        }
-
-        const mutationStatus = result.mutation_status;
-        const retryWithNewMutationId = mutationStatus === 'new_mutation_required';
-        const shouldRetry = mutationStatus === 'pending' || retryWithNewMutationId;
-        const shouldDiscard = ['discarded', 'applied'].includes(mutationStatus);
-        if (!shouldRetry && !shouldDiscard) {
-            throw new Error('The server did not confirm whether this offline change should be retried or removed.');
-        }
-
-        const remotePayload = result.conflict?.remote_payload || {};
-        const remoteRevision = Number(remotePayload.revision || 0);
-        const isStaleRevisionConflict = result.conflict?.conflict_type === 'stale_record_version';
-        if (retryWithNewMutationId && isStaleRevisionConflict && (!result.rebase?.new_mutation_id || remoteRevision < 1)) {
-            throw new Error('The latest server revision could not be confirmed. Keep the local change queued and retry conflict resolution.');
-        }
-
-        const identityTargets = {
-            customer: 'customers',
-            service: 'catalogue',
-            job: 'jobs',
-            quote: 'quotes',
-            preparation: 'preparations',
-            supplier: 'suppliers',
-            purchase_order: 'purchase_orders',
-            invoice: 'invoices',
-            expense: 'expenses',
-            inventory_item: 'inventory_items',
-            asset: 'assets',
-            event_cost: 'costs',
-        };
-
-        const db = await openDb();
-        await new Promise((resolve, reject) => {
-            const tx = db.transaction([STATE, QUEUE], 'readwrite');
-            const store = tx.objectStore(QUEUE);
-            const stateStore = tx.objectStore(STATE);
-            const all = store.getAll();
-            const currentState = stateStore.get('current');
-            let sessionMismatch = false;
-            let persistedState = null;
-            let allReady = false;
-            let stateReady = false;
-
-            const finishResolution = () => {
-                if (!allReady || !stateReady || sessionMismatch) return;
-                const mutation = (all.result || []).find(item => Number(item.conflict_id) === id);
-                const nextState = {
-                    ...(persistedState || state || blank()),
-                    conflicts: [...((persistedState || state || blank()).conflicts || [])],
-                };
-
-                if (mutation && shouldRetry) {
-                    const retry = { ...mutation, status: 'pending' };
-                    if (retryWithNewMutationId) {
-                        // Preserve queue order so a rebased predecessor remains
-                        // ahead of any later edits to the same local aggregate.
-                        retry.id = result.rebase?.new_mutation_id || crypto.randomUUID();
-                        if (isStaleRevisionConflict) {
-                            retry.payload = {
-                                ...retry.payload,
-                                expected_revision: remoteRevision,
-                            };
-                            delete retry.payload.predecessor_mutation_id;
-                        }
-                    }
-                    if (retry.id !== mutation.id) {
-                        store.delete(mutation.id);
-                    }
-                    delete retry.conflict_id;
-                    delete retry.server_sequence;
-                    delete retry.server_status;
-                    delete retry.last_error;
-                    store.put(retry);
-                } else if (mutation && shouldDiscard) {
-                    store.delete(mutation.id);
-                }
-
-                const target = identityTargets[mutation?.entity_type];
-                const localId = mutation?.payload?.local_id || mutation?.entity_id;
-                const parentAsset = mutation?.entity_type === 'asset_allocation'
-                    ? (nextState.assets || []).find(asset => (asset.allocations || []).some(item => item.local_id === localId))
-                    : null;
-                const list = mutation?.entity_type === 'asset_allocation'
-                    ? (parentAsset?.allocations || [])
-                    : (target ? (nextState[target] || []) : []);
-                const index = list.findIndex(item => item.local_id === localId);
-                if (index >= 0 && shouldDiscard && remotePayload.deleted) {
-                    list.splice(index, 1);
-                    if (parentAsset) {
-                        parentAsset.allocations = list;
-                    } else if (target) {
-                        nextState[target] = list;
-                    }
-                } else if (index >= 0 && remotePayload.record && typeof remotePayload.record === 'object') {
-                    const current = list[index];
-                    if (shouldDiscard) {
-                        const serverRecord = remotePayload.record;
-                        list[index] = {
-                            ...current,
-                            ...serverRecord,
-                            id: current.server_id ?? current.id ?? serverRecord.id,
-                            server_id: current.server_id ?? current.id ?? serverRecord.id,
-                            local_id: localId,
-                            revision: remoteRevision || current.revision || 1,
-                            pending_sync: false,
-                        };
-                        if (mutation.entity_type === 'customer' && Array.isArray(serverRecord.contacts)) {
-                            const primary = serverRecord.contacts.find(item => item.is_primary) || serverRecord.contacts[0] || {};
-                            list[index].contact_name = primary.name || null;
-                            list[index].phone = primary.phone || null;
-                            list[index].email = primary.email || null;
-                        } else if (mutation.entity_type === 'job' && serverRecord.customer_id) {
-                            const linkedCustomer = (nextState.customers || []).find(item =>
-                                Number(item.server_id ?? item.id) === Number(serverRecord.customer_id)
-                            );
-                            list[index].customer_local_id = linkedCustomer?.local_id || null;
+                            return localAttachmentsForSession(readSessionGeneration, targetEventId, targetLocalEventId, hasServerIdentity);
+list[index].customer_local_id = linkedCustomer?.local_id || null;
                             list[index].customer_name = linkedCustomer?.name || serverRecord.customer_name || null;
                         } else if (mutation.entity_type === 'quote' && serverRecord.event_id) {
                             const linkedJob = (nextState.jobs || []).find(item =>
