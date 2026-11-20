@@ -121,14 +121,6 @@ class WorkController extends Controller
         $validated = $request->validate($this->rules(), $this->validationMessages());
         $scheduleValidator->validate($validated);
 
-        $customer = Customer::query()
-            ->where('business_id', $business->id)
-            ->with('primaryContact')
-            ->findOrFail($validated['customer_id']);
-
-        $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
-        $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
-
         $services = array_values(array_unique($validated['services'] ?? []));
         if (!empty($validated['other_service'])) {
             $services[] = Str::limit(trim($validated['other_service']), 100, '');
@@ -141,7 +133,21 @@ class WorkController extends Controller
             }
         }
 
-        $event = DB::transaction(function () use ($validated, $customer, $services, $business, $categoryByService) {
+        $event = DB::transaction(function () use ($validated, $services, $business, $categoryByService) {
+            // Serialize customer/contact selection against concurrent customer
+            // edits before taking the snapshot copied into the new Work record.
+            DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
+
+            $customer = Customer::query()
+                ->where('business_id', $business->id)
+                ->whereKey($validated['customer_id'])
+                ->with('primaryContact')
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
+            $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
+
             $event = Event::create([
                 'business_id' => $business->id,
                 'customer_id' => $customer->id,
@@ -232,17 +238,22 @@ class WorkController extends Controller
         ], $this->validationMessages());
         $scheduleValidator->validate($validated);
 
-        $customer = Customer::query()
-            ->where('business_id', $business->id)
-            ->with('primaryContact')
-            ->findOrFail($validated['customer_id']);
-
-        $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
-        $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
-
         try {
-            DB::transaction(function () use ($event, $validated, $customer, $business, $lifecycle): void {
+            DB::transaction(function () use ($event, $validated, $business, $lifecycle): void {
                 $lockedEvent = $lifecycle->lock($business->id, $event->id);
+
+                // The business lock is already held by lifecycle->lock(). Reload
+                // the selected customer and contacts inside that same boundary;
+                // pre-transaction form validation is not a concurrency guarantee.
+                $customer = Customer::query()
+                    ->where('business_id', $business->id)
+                    ->whereKey($validated['customer_id'])
+                    ->with('primaryContact')
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
+                $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
 
                 abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot be edited.');
 
