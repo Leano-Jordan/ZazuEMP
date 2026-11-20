@@ -53,6 +53,19 @@ final class SyncEntityRevisionTracker
         }
 
         if (! is_numeric($businessId)) {
+            foreach (['event', 'customer', 'quote', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
+                if (! method_exists($record, $relation)) {
+                    continue;
+                }
+
+                $businessId = $record->{$relation}()->value('business_id');
+                if (is_numeric($businessId)) {
+                    break;
+                }
+            }
+        }
+
+        if (! is_numeric($businessId)) {
             return;
         }
 

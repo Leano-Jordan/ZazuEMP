@@ -243,6 +243,7 @@
             return {
                 ...(record || {}),
                 local_id: item?.local_id ?? record?.local_id ?? null,
+                revision: Number(item?.revision ?? record?.revision ?? 1),
                 ...(serverId !== null ? { id: serverId, server_id: serverId } : {}),
             };
         };
@@ -1174,6 +1175,28 @@
     });
 
 
+    function localRevisionForEntity(workspace, entityType, localId) {
+        const collections = {
+            customer: 'customers',
+            job: 'jobs',
+            quote: 'quotes',
+            service: 'catalogue',
+            preparation: 'preparations',
+            supplier: 'suppliers',
+            purchase_order: 'purchase_orders',
+            invoice: 'invoices',
+            expense: 'expenses',
+            inventory_item: 'inventory_items',
+            asset: 'assets',
+            event_cost: 'costs',
+        };
+        const collection = collections[entityType];
+        const record = collection
+            ? (workspace?.[collection] || []).find(item => item.local_id === localId)
+            : null;
+        return Number(record?.revision || 1);
+    }
+
     async function queueMutation(entityType, operation, payload, nextState = null) {
         await ready;
         if (sessionCleared) {
@@ -1217,8 +1240,33 @@
             const stateToPersist = { ...(nextState || state), local_dirty: true };
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
             const stateStore = tx.objectStore(STATE);
+            const queueStore = tx.objectStore(QUEUE);
             const currentState = stateStore.get('current');
+            const queuedRequest = queueStore.getAll();
             let sessionMismatch = false;
+            let currentReady = false;
+            let queueReady = false;
+
+            const prepareMutation = () => {
+                if (!currentReady || !queueReady || sessionMismatch) return;
+                const queuedForEntity = (queuedRequest.result || [])
+                    .filter(item => item.status === 'pending'
+                        && item.entity_type === entityType
+                        && String(item.entity_id) === String(mutation.entity_id))
+                    .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+                const predecessor = queuedForEntity[queuedForEntity.length - 1] || null;
+
+                if (['update', 'upsert'].includes(operation)) {
+                    if (predecessor) {
+                        mutationPayload.predecessor_mutation_id = predecessor.id;
+                    } else {
+                        mutationPayload.expected_revision = localRevisionForEntity(stateToPersist, entityType, mutationPayload.local_id);
+                    }
+                }
+
+                queueStore.put(mutation);
+                stateStore.put(stateToPersist, 'current');
+            };
 
             currentState.onsuccess = () => {
                 const persistedToken = currentState.result?.sync?.token || null;
@@ -1227,15 +1275,17 @@
                     tx.abort();
                     return;
                 }
-                tx.objectStore(QUEUE).put(mutation);
-                stateStore.put(stateToPersist, 'current');
+                currentReady = true;
+                prepareMutation();
+            };
+            queuedRequest.onsuccess = () => {
+                queueReady = true;
+                prepareMutation();
             };
             currentState.onerror = () => tx.abort();
+            queuedRequest.onerror = () => tx.abort();
             tx.oncomplete = () => {
                 state = stateToPersist;
-                // A local save may happen while the browser still reports
-                // online but the host is unavailable. Start recovery even if
-                // the initial device registration never obtained a token.
                 if (navigator.onLine) scheduleSyncRetry();
                 resolve(mutation);
             };
@@ -1443,6 +1493,7 @@
                 record.id = Number(identity.server_id);
                 record.server_id = Number(identity.server_id);
                 record.local_id = localId;
+                record.revision = Number(identity.revision || record.revision || 1);
             }
         }
 
