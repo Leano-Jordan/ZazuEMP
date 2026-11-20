@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v51';
+const CACHE_NAME = 'zazu-static-v52';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -11,7 +11,6 @@ const ACTIVE_CONTEXT_STATE = new Request('/__zazu-active-context__');
 
 const PRECACHE_ASSETS = [
     '/manifest.webmanifest',
-    '/offline-attachments.js',
     '/zazu-offline.js',
     '/icons/zazu-192.svg',
     '/icons/zazu-512.svg',
@@ -570,12 +569,13 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // These two scripts are precached as part of the offline client, but they
-    // are not Vite /build assets. Serve the cached copies when disconnected.
+    // The shared offline client is not a Vite /build asset; serve its cached
+    // copy when disconnected. The retired standalone attachment script is not
+    // loaded by the application and is deliberately excluded from this cache.
     if (
         request.method === 'GET'
         && url.origin === self.location.origin
-        && ['/zazu-offline.js', '/offline-attachments.js'].includes(url.pathname)
+        && url.pathname === '/zazu-offline.js'
     ) {
         event.respondWith((async () => {
             const cache = await caches.open(CACHE_NAME);
