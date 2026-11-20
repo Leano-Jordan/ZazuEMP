@@ -1,3 +1,27 @@
+## Director update — 2026-11-20 (offline sync integrity audit)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
+**Latest full application-code verification baseline:** `526bdf38dab6ff540c143b0e57dfcee468006dc3`.  
+**Latest completed repository workflows observed during this audit:** Rosscore Director Health, Zazu Quality, Director Contract Lint and Push-on-main passed on documentation head `91f41ec`; SonarCloud was skipped. Subsequent commits in this reconciliation changed documentation only; they are not a fresh application test run.
+
+### Offline sync finding
+- Confirmed F1 data-integrity defect: existing-record offline updates do not carry an authoritative base revision. The server resolves the current record and applies a stale device payload without detecting an intervening online or other-device edit.
+- Registered as `CASE-ZAZU-0033` / `ENG-DATA-003`; regression control `REG-024`.
+- Scope includes update-capable handlers for customer (including contacts), Work/event (including requirements), preparation, quote/draft version, inventory item, event cost, asset, supplier, service/capability and purchase order.
+- The initial online/offline writer trace has confirmed customer/contact, Work/requirements, quote/version, preparation, supplier, capability, asset/allocation, invoice/payment, inventory movement and purchase-receipt paths. It remains explicitly PARTIAL; all aggregate writers and transaction/lock boundaries must be mapped before a safe revision implementation.
+- Required correction remains server-enforced monotonic revisions, same-device causal edit chaining and loss-preserving stale conflicts/rebase. No timestamps-only check, last-write-wins or mutation-ID reuse. Payment, receipt, stock and allocation idempotency must remain intact.
+- No application code was changed during this source audit. The revision defect remains OPEN; no fix or runtime reproduction is claimed.
+
+### Current release position
+- Offline sync reliability across the supported V1 matrix remains OPEN.
+- Physical Android standalone offline launch/restart/reconnect, installed-PC DB-001 diagnosis and recovery, populated commercial reconciliation, POPIA operational sign-off and ZAZU name clearance remain OPEN.
+- PC-to-phone pairing remains CLOSED by Founder confirmation.
+- V1 remains **NOT READY / NO-GO**. Evidence maturity remains 73/100 with no uplift.
+
+**Current living records:** `.ai/engineering/STATE.md`, `.ai/engineering/READINESS_REGISTER.md`, and `docs/V1_RELEASE_CHECKLIST.md`. Historical checkpoints below remain dated evidence, not current state.
+
+---
+
 ## Director update — 2026-11-18 (DB-001 diagnostic classification)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main`  
