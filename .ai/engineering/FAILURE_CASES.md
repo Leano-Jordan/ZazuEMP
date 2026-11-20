@@ -585,3 +585,6 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 
 **2026-11-20 follow-through:** same-device causal chains now have explicit regression coverage after both keep-local rebase and use-server discard. A discard stores the current remote revision on the terminal mutation so later queued edits are not stranded. Conflict rebase/presentation responsibilities were extracted into separate services after PHPMD identified excessive resolver complexity. The exact-head CI run for `2b4d73b` is pending; CASE-ZAZU-0033 remains OPEN and no verification status is uplifted.
+
+
+**Verification update — `7343a8f`:** Laravel unit/feature suite passed (615 passed, 1 skipped, 4,198 assertions), as did PHPMD, Zazu Quality and Director Health. PostgreSQL migration smoke and offline browser acceptance were still running. The first Laravel run exposed a model-level legacy identity default issue (revision read as zero in the SQLite test database); explicit model default 2 now complements the migration default, while registry-created identities explicitly start at 1. Regression coverage now includes Work, supplier, service and asset online revision advancement, conflict field comparison, and causal successors after both keep-local rebase and use-server discard. CASE-ZAZU-0033 remains OPEN.

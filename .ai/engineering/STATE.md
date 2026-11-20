@@ -1,6 +1,6 @@
 ## Director engineering update — 2026-11-20
 
-**Repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only. **Current engineering head at this update:** `197e4cf` (documentation-only follow-up; implementation commit `2b4d73b`). No branches created.
+**Repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only. **Current engineering head at this update:** `7343a8f`. No branches created.
 
 ### Active engineering — CASE-ZAZU-0033, revision-aware offline sync
 
@@ -16,7 +16,7 @@ A substantial implementation slice is now committed directly to `main`:
 
 ### Regression coverage added
 
-`SyncRevisionConcurrencyTest` covers online revision advancement, stale-device rejection with remote snapshot, same-device sequential mutation chaining, an intervening external write, explicit keep-local rebase with a new mutation ID, application of the rebased mutation and a later successor still referencing the immutable original ID, plus use-server discard followed by a valid successor. Existing offline update fixtures now supply expected revisions.
+`SyncRevisionConcurrencyTest` covers online revision advancement, stale-device rejection with remote snapshot, same-device sequential mutation chaining, an intervening external write, explicit keep-local rebase with a new mutation ID, application of the rebased mutation and a later successor still referencing the immutable original ID, use-server discard followed by a valid successor, conflict field comparison, and online revision bumps for Work, supplier, service and asset aggregates. Existing offline update fixtures now supply expected revisions.
 
 - Conflict rebase and presentation logic were split into `SyncConflictRebaseService` and `SyncConflictPresenter` to bring the resolver back within PHPMD complexity limits. A first PHPMD run exposed excessive resolver complexity; the refactor is awaiting exact-head CI confirmation.
 
@@ -583,4 +583,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added causal continuity after an explicit use-server discard: the discarded mutation records the latest server revision, and the next same-device mutation can use that result revision rather than being stranded behind a predecessor with no result.
 - Expanded regression coverage to prove both paths: a keep-local replacement mutation applies under its new immutable ID and a later edit can still follow the original mutation's supersession link; a use-server discard records the current revision and a later queued edit applies against it.
 - Split conflict rebase operations and conflict presentation/comparison out of the resolver to address the PHPMD complexity failure. Exact-head CI is pending; no test result is being inferred from the refactor.
-- Current implementation head: `2b4d73b`; current documentation head: `197e4cf`. CASE-ZAZU-0033 remains OPEN.
+- Current implementation/test head: `7343a8f`. CASE-ZAZU-0033 remains OPEN.
+
+
+## Exact-head regression follow-through — 2026-11-20
+
+- Fixed the legacy-identity default surfaced by the first Laravel run: SyncEntityIdentity now defaults to revision 2 for direct/unregistered creation, while the identity registry explicitly sets revision 1 for genuinely new registered records. The migration retains database default 2.
+- Added online revision coverage for Work, supplier, service/capability and asset roots, plus explicit conflict field comparison and both keep-local/use-server causal successor paths.
+- On `7343a8f`: Laravel unit/feature PASS (615 passed, 1 skipped, 4,198 assertions); PHPMD PASS; Zazu Quality PASS; Director Health PASS. PostgreSQL migration smoke and offline browser acceptance remain in progress.
