@@ -22,6 +22,7 @@ use App\Support\Offline\SyncMutationRecorder;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -146,6 +147,35 @@ class SyncRevisionConcurrencyTest extends TestCase
         ]);
 
         $this->assertSame(2, (int) $identity->fresh()->revision);
+    }
+
+    public function test_create_mutation_cannot_overwrite_an_existing_registered_identity(): void
+    {
+        [$business, $customer] = $this->customerFixture();
+        $identity = app(SyncEntityIdentityRegistry::class)->identify($customer, 'customer');
+        $device = $this->device($business);
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'customer',
+            $identity->entity_uuid,
+            'create',
+            [
+                'local_id' => $identity->entity_uuid,
+                'record' => ['name' => 'Attempted create overwrite'],
+            ],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'customer' => $this->customerUpdateHandler(),
+            ]);
+            $this->fail('A create mutation must not update a record already bound to its local identity.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('entity_id', $exception->errors());
+        }
+
+        $this->assertSame('Original customer', $customer->fresh()->name);
+        $this->assertSame(1, (int) $identity->fresh()->revision);
     }
 
     public function test_stale_device_update_is_rejected_and_returns_the_current_remote_snapshot(): void
