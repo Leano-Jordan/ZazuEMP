@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v56';
+const CACHE_NAME = 'zazu-static-v57';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -561,6 +561,23 @@ self.addEventListener('fetch', (event) => {
 
             try {
                 const response = await fetchWithTimeout(request);
+
+                // A service worker that fetches a protected route can receive
+                // the final HTML response after Laravel redirects an expired
+                // web session to the public sign-in page. Re-emit that redirect
+                // for top-level navigations so the browser updates its URL too;
+                // otherwise sign-in HTML can appear underneath a protected URL.
+                if (request.mode === 'navigate' && response.redirected && response.url) {
+                    try {
+                        const destination = new URL(response.url);
+                        if (destination.origin === self.location.origin && destination.href !== request.url) {
+                            return Response.redirect(destination.href, 302);
+                        }
+                    } catch {
+                        // Invalid or non-local redirect destinations are never replayed by the worker.
+                    }
+                }
+
                 // A reachable host can still be temporarily unhealthy (for
                 // example, Laravel returning 503 during restart). Keep the
                 // authenticated local workspace usable for transient 5xx
