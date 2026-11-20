@@ -297,6 +297,21 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const persistedCustomer = await page.evaluate((name) => window.ZazuOffline?.getState()?.customers?.find(customer => customer.name === name) || null, customerName);
     expect(persistedCustomer).toBeTruthy();
 
+    // A fresh page in the same installed-browser context must recover the
+    // authenticated cached shell and the durable local working set without
+    // relying on the previous page's JavaScript memory.
+    const coldLaunchPage = await page.context().newPage();
+    const coldLaunchResponse = await coldLaunchPage.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    expect(coldLaunchResponse?.ok()).toBe(true);
+    await coldLaunchPage.evaluate(() => window.ZazuOffline.ready);
+    await expect(coldLaunchPage.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeVisible({ timeout: 8000 });
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace] [data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace] [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    const coldLaunchQueue = await coldLaunchPage.evaluate(async () => await window.ZazuOffline.pending());
+    expect(coldLaunchQueue.map((mutation) => mutation.id)).toEqual(expect.arrayContaining(persistedQueue.map((mutation) => mutation.id)));
+    await coldLaunchPage.close();
+
     // Offline records must be visible in the normal operating directories,
     // not merely present in IndexedDB.
     await page.goto('/work', { waitUntil: 'domcontentloaded' });
