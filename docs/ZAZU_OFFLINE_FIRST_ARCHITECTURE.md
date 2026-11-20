@@ -640,13 +640,18 @@ Exact-head backend, PostgreSQL, quality and Director Health checks passed on imp
 
 ## Current implementation update — 2026-11-21
 
-The authenticated offline shell and attachment boundary advanced on `main`:
+The authenticated offline shell, session transition and attachment boundary advanced on `main`:
 
-- Service-worker cache is `zazu-static-v56`. Unprimed disconnected top-level routes use the dashboard shell, while cached Customer/Work creation, invoice creation and numeric Work-detail routes retain their exact HTML where those pages are required for existing offline workflows.
-- The workspace directory navigation now calls Zazu's `PermissionService` directly. This fixes a mismatch where Laravel `@can` directives silently omitted links because Zazu business roles are evaluated by `PermissionService`, not registered as Laravel Gate permissions.
-- The active attachment client now checks the session generation around local attachment writes, Work-ID reconciliation, attachment reads and file retrieval. Stale asynchronous work from a prior session cannot surface a file or attachment list after logout/re-pair.
-- Regression coverage includes exact-route preservation, workspace permission rendering, session-boundary attachment handling, the late-download/logout race and the existing phone-local attachment journey.
+- Service-worker cache is `zazu-static-v57`. Unprimed disconnected top-level routes use the dashboard shell, while cached Customer/Work creation, invoice creation and numeric Work-detail routes retain their exact HTML where those pages are required for existing offline workflows.
+- Redirected authenticated navigations now propagate the final same-origin redirect back to the browser. An expired session therefore reaches the public sign-in URL instead of rendering sign-in HTML under a protected URL; redirected public HTML is not written into the authenticated page cache.
+- The workspace directory navigation calls Zazu's `PermissionService` directly. It does not use Laravel `@can`, which does not evaluate the business-role permission map.
+- The active attachment client checks session generation around local attachment writes, Work-ID reconciliation, attachment reads and file retrieval. A prior session cannot surface attachment data after logout/re-pair.
+- Regression coverage includes exact-route preservation, workspace permission rendering, redirect propagation/no-cache behavior, attachment session boundaries, the late-download/logout race and the phone-local attachment journey.
 
-**Automated evidence — exact test head `0dd2cc3d9c0f95ea1249b7f31807f349e67099c9`:** Laravel `627 passed / 1 skipped / 4,334 assertions`; Chromium desktop suite `57 passed` with one expired-session redirect assertion flaky on its first attempt and passing on retry; mobile-viewport customer/Work suite `7 passed`; dedicated phone-local attachment journey `1 passed`; PostgreSQL migration/account/workspace/private-file recovery smoke and all reported quality/security checks passed. The Windows package build and PowerShell fresh-install verification passed on the immediately preceding source commit `490100e2ae7a4793db3e06c37833cba7b2033fb9`.
+**Automated evidence — exact test head `1768de8b00ff0064b3b53cd757d4118fbfe04608`:** Laravel and PostgreSQL recovery passed; Chromium desktop `58 passed`; mobile-viewport Customer/Work `7 passed`; dedicated phone-local attachment journey `1 passed`. Composer security audit, secret scan, application check, PHPMD, Director Health and JavaScript/TypeScript, Python and Actions analysis passed. Sonar analysis was skipped.
+
+**Business archive restore hardening — exact test head `0bb76a158e22b9671ce5dfc32b54a29c81cda72b`:** import now accepts only `manifest.json`, `data.json` and the file payload entries explicitly declared by the archive manifest; unexpected ZIP entries are rejected before target-workspace mutation. Laravel `628 passed / 1 skipped / 4,340 assertions` and PostgreSQL recovery smoke passed. Offline-browser acceptance was still running when this note was written.
+
+The Windows package build and PowerShell fresh-install verification passed on source commit `490100e2ae7a4793db3e06c37833cba7b2033fb9`.
 
 These are CI/browser-emulation results, not proof of a physical Android cold launch, restart or reconnection. Physical Android acceptance remains OPEN.
