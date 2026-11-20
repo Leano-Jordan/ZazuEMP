@@ -1,12 +1,12 @@
 # Zazu EMP — V1 Readiness Register
 
-Last verified application-code baseline: ae3d49cae7973c2db708d5ff88c3a3eb51c35b54
+Last verified application-code baseline: 526bdf38dab6ff540c143b0e57dfcee468006dc3
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
 ## Director source audit refresh — 2026-11-20
 
-Repository HEAD `91f41ec2c0a389ce92324a6a3d3a7d0a01492e0d` has passing Rosscore Director Health, Zazu Quality, Director Contract Lint and Push-on-main workflows. The exact-head quality workflow covers locked npm audit, service-worker auth/cache-race checks, Composer security audit and secret scanning; it is not the Laravel/offline acceptance suite. Latest full app test evidence remains on application-code baseline `526bdf3` (Laravel 607/1 skipped/4,158 assertions; PostgreSQL recovery; offline browser 51 desktop + 6 mobile + 1 phone-local attachment journey).
+During the 2026-11-20 source audit, documentation head `91f41ec` passed Rosscore Director Health, Zazu Quality, Director Contract Lint and Push-on-main workflows. The exact-head quality workflow covers locked npm audit, service-worker auth/cache-race checks, Composer security audit and secret scanning; it is not the Laravel/offline acceptance suite. Latest full app test evidence remains on application-code baseline `526bdf3` (Laravel 607/1 skipped/4,158 assertions; PostgreSQL recovery; offline browser 51 desktop + 6 mobile + 1 phone-local attachment journey).
 
 The source-level path map for all 17 offline entity types is now recorded in `docs/V1_RELEASE_CHECKLIST.md`. Static mapping is complete; runtime replay/reconciliation acceptance remains OPEN.
 
