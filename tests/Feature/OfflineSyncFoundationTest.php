@@ -341,6 +341,85 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('failed', $delivery->fresh()->status);
     }
 
+    public function test_sync_pull_revalidates_device_after_middleware_authentication_snapshot(): void
+    {
+        $business = Business::create([
+            'name' => 'Revoked Pull Snapshot Business',
+            'slug' => 'revoked-pull-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $sourceDevice,
+            'event',
+            'revoked-pull-event',
+            'upsert',
+            ['name' => 'Must not be disclosed after revocation'],
+        );
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+        app(SyncMutationRecorder::class)->publish($mutation);
+
+        $authenticatedSnapshot = $destinationDevice->fresh();
+        $destinationDevice->update(['status' => 'revoked', 'revoked_at' => now()]);
+
+        try {
+            app(SyncMutationProtocol::class)->pull($authenticatedSnapshot);
+            $this->fail('A stale authenticated device snapshot must not pull after revocation.');
+        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+    }
+
+    public function test_sync_acknowledgement_revalidates_device_after_middleware_authentication_snapshot(): void
+    {
+        $business = Business::create([
+            'name' => 'Revoked Ack Snapshot Business',
+            'slug' => 'revoked-ack-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $sourceDevice,
+            'event',
+            'revoked-ack-event',
+            'upsert',
+            ['name' => 'Acknowledgement must be rejected'],
+        );
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+        app(SyncMutationRecorder::class)->publish($mutation);
+
+        $authenticatedSnapshot = $destinationDevice->fresh();
+        $destinationDevice->update(['status' => 'revoked', 'revoked_at' => now()]);
+
+        try {
+            app(SyncMutationProtocol::class)->acknowledgeThrough($authenticatedSnapshot, 1);
+            $this->fail('A stale authenticated device snapshot must not acknowledge after revocation.');
+        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+
+        $this->assertSame(0, SyncCursor::query()->where('sync_device_id', $destinationDevice->id)->count());
+        $this->assertSame('pending', SyncDelivery::query()
+            ->where('destination_device_id', $destinationDevice->id)
+            ->value('status'));
+    }
+
     public function test_sync_pull_exposes_receiver_delivery_sequence_for_acknowledgement(): void
     {
         $business = Business::create([
