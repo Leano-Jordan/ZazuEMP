@@ -176,6 +176,9 @@ class PwaOfflineFoundationTest extends TestCase
             $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $dashboard);
         }
         $this->assertStringContainsString('const offlineRouteViews = [', $app);
+        $this->assertStringContainsString("route('quotes.index')", $dashboard);
+        $this->assertStringContainsString("route('inventory.index')", $dashboard);
+        $this->assertStringContainsString("route('finance.index')", $dashboard);
         $this->assertStringContainsString('finance\/expenses', $app);
         $this->assertStringContainsString('(?:costs|travel)', $app);
         $this->assertStringContainsString('workspace.dataset.zazuOfflineActiveView = activeView || \'overview\';', $app);
