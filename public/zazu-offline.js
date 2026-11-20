@@ -1011,6 +1011,34 @@
         return { ...result, queued_for_retry: queuedForRetry };
     }
 
+
+    async function refreshConflicts() {
+        await ready;
+        if (sessionCleared || !state?.sync?.token || !navigator.onLine) {
+            return state?.conflicts || [];
+        }
+
+        const previousState = state;
+        try {
+            const response = await api('/api/sync/conflicts?status=open');
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || !Array.isArray(result.conflicts)) {
+                return state?.conflicts || [];
+            }
+
+            state = {
+                ...state,
+                conflicts: result.conflicts,
+            };
+            await writeState();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+            return state.conflicts;
+        } catch (error) {
+            state = previousState;
+            return state?.conflicts || [];
+        }
+    }
+
     async function resolveConflict(conflictId, action, note = null) {
         await ready;
 
@@ -2144,6 +2172,7 @@
         assessLogout,
         clearLocalSession,
         resolveConflict,
+        refreshConflicts,
         refreshBootstrap,
         persist: writeState,
         pending,
