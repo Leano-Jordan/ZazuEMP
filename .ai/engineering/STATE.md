@@ -627,3 +627,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Source implementation was not changed; this is acceptance coverage for the existing conflict protocol.
 - Commits: `c5ef89d`, `0a2ada0`, `a57108d`, `3a82905`, `e40878d`, `e43392e`.
 - Exact-head Laravel/browser and quality verification on `e43392e` is pending. Do not claim this test passes until its workflow reports success. CASE-ZAZU-0033 remains OPEN; V1 remains NOT READY.
+
+
+### Host-outage offline workspace visibility regression added
+
+- Added a second browser acceptance case in `e2e/offline-work-creation.spec.js` for the precise LAN failure mode where `navigator.onLine` remains true but the Zazu host is unreachable.
+- The test keeps the browser online, aborts the lightweight `/up` connectivity probe, and requires previously synced customer data to appear in the device-local workspace.
+- This is distinct from airplane-mode coverage and directly targets the reported “last online page” symptom at the workspace-visibility boundary. It does not replace the physical Android cold-launch/restart test.
+- Commit: `c9df48a`. Exact-head browser verification is pending.
