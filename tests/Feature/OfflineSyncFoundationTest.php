@@ -1464,6 +1464,11 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
+
+        $receivingDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
         $supplier = \App\Models\Supplier::create([
             'business_id' => $business->id,
             'name' => 'Partial Supplier',
@@ -1541,6 +1546,21 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('received', $order->fresh()->status);
         $this->assertSame(4, \App\Models\InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
         $this->assertSame(2, \App\Models\PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
+
+        $protocol = app(\\App\\Support\\Offline\\SyncMutationProtocol::class);
+        $deliveries = $protocol->pull($receivingDevice, 'business', 100);
+        $this->assertCount(3, $deliveries);
+        $this->assertSame(['purchase_order', 'purchase_receipt', 'purchase_receipt'], $deliveries->pluck('entity_type')->all());
+
+        $snapshot = app(\\App\\Support\\Offline\\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
+        $remoteOrder = collect($snapshot['purchase_orders'])->first(
+            fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $order->id,
+        );
+        $this->assertNotNull($remoteOrder);
+        $this->assertSame(['10.00', '8.00'], collect($remoteOrder['items'])->pluck('record.received_quantity')->all());
+
+        $cursor = $protocol->acknowledgeThrough($receivingDevice, 3, 'business');
+        $this->assertSame(3, (int) $cursor->last_acknowledged_sequence);
     }
 
     public function test_offline_receipt_rejects_a_line_identity_from_another_business(): void
