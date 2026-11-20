@@ -363,6 +363,59 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertNotSame($first->mutation_id, $replacement->mutation_id);
     }
 
+    public function test_conflict_rebase_accepts_a_causal_chain_longer_than_eight_links(): void
+    {
+        [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
+        $recorder = app(SyncMutationRecorder::class);
+        $chain = [];
+
+        for ($index = 0; $index < 12; $index++) {
+            $chain[] = $this->recordCustomerUpdate($device, $identity, 'Queued edit '.($index + 1), [
+                'expected_revision' => 1,
+            ]);
+        }
+
+        foreach ($chain as $index => $predecessor) {
+            if (isset($chain[$index + 1])) {
+                $predecessor->update([
+                    'status' => 'discarded',
+                    'superseded_by_mutation_id' => $chain[$index + 1]->mutation_id,
+                ]);
+                continue;
+            }
+
+            $predecessor->update([
+                'status' => 'applied',
+                'result_revision' => 1,
+                'applied_at' => now(),
+            ]);
+        }
+
+        $mutation = $this->recordCustomerUpdate($device, $identity, 'Edit after long chain', [
+            'predecessor_mutation_id' => $chain[0]->mutation_id,
+        ]);
+        $conflict = SyncConflict::create([
+            'business_id' => $business->id,
+            'sync_device_id' => $device->id,
+            'mutation_id' => $mutation->mutation_id,
+            'entity_type' => 'customer',
+            'entity_id' => $identity->entity_uuid,
+            'conflict_type' => 'stale_record_version',
+            'status' => 'open',
+            'local_payload' => $mutation->payload,
+            'remote_payload' => ['revision' => 1, 'record' => ['name' => 'Current server version']],
+        ]);
+
+        $response = app(SyncConflictResolutionService::class)
+            ->resolve($device, $conflict, ['action' => 'retry'])
+            ->getData(true);
+
+        $this->assertSame('new_mutation_required', $response['mutation_status']);
+        $this->assertSame(1, $response['rebase']['expected_revision']);
+        $this->assertNotSame($mutation->mutation_id, $response['rebase']['new_mutation_id']);
+        $this->assertSame('discarded', $mutation->fresh()->status);
+    }
+
     public function test_stale_conflict_discard_returns_latest_server_snapshot(): void
     {
         [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
