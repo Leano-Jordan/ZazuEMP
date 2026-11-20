@@ -931,6 +931,81 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(persisted.state.local_dirty).toBe(false);
     });
 
+    test('a disconnected stock receipt updates the local balance and movement history', async ({ page }, testInfo) => {
+        test.setTimeout(45_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Inventory movement UI acceptance runs once in Chromium.');
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        const itemName = 'Offline movement acceptance item';
+        await page.goto('/inventory/create', { waitUntil: 'domcontentloaded' });
+        await page.locator('input[name="name"]').fill(itemName);
+        await page.locator('input[name="sku"]').fill('OFFLINE-MOVE-001');
+        await page.locator('input[name="unit"]').fill('unit');
+        await page.locator('input[name="reorder_level"]').fill('1.00');
+        await page.getByRole('button', { name: 'Save item' }).click();
+        await page.waitForURL('**/inventory');
+
+        const itemRow = page.locator('.zazu-list-item').filter({ hasText: itemName });
+        await expect(itemRow).toBeVisible();
+        const movementForm = itemRow.locator('form[data-zazu-offline-entity="inventory_movement"]').first();
+        const itemId = Number(await movementForm.getAttribute('data-zazu-offline-item-id'));
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(itemId).toBeGreaterThan(0);
+        expect(businessId).toBeGreaterThan(0);
+
+        await page.evaluate(async ({ activeBusinessId, serverItemId, name }) => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'offline-inventory-movement-token',
+                device: { id: 987663, business_id: activeBusinessId },
+            };
+            state.inventory_items = [{
+                local_id: 'local-inventory-item-' + serverItemId,
+                id: serverItemId,
+                server_id: serverItemId,
+                name,
+                unit: 'unit',
+                on_hand: 0,
+                movements: [],
+            }];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        }, { activeBusinessId: businessId, serverItemId: itemId, name: itemName });
+
+        await page.context().setOffline(true);
+        await movementForm.locator('input[name="quantity"]').fill('3.50');
+        await movementForm.locator('input[name="unit_cost"]').fill('2.50');
+        await movementForm.locator('input[name="movement_date"]').fill('2026-11-20');
+        await movementForm.getByRole('button', { name: 'Receive' }).click();
+        await expect(movementForm.getByRole('status')).toContainText('Saved on this device');
+
+        const local = await page.evaluate(async serverItemId => {
+            const item = window.ZazuOffline.getState().inventory_items.find(record => Number(record.server_id) === serverItemId);
+            return {
+                onHand: item?.on_hand,
+                movements: item?.movements || [],
+                pending: await window.ZazuOffline.pending(),
+            };
+        }, itemId);
+
+        expect(local.onHand).toBe(3.5);
+        expect(local.movements).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                type: 'receipt',
+                quantity: '3.50',
+                unit_cost: '2.50',
+                pending_sync: true,
+                server_id: null,
+            }),
+        ]));
+        expect(local.pending).toHaveLength(1);
+        expect(local.pending[0].entity_type).toBe('inventory_movement');
+    });
+
     test('event-cost mutations receive their canonical server identity after sync', async ({ page }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Event-cost identity reconciliation runs once in Chromium.');
