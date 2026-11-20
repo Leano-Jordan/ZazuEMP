@@ -1,3 +1,10 @@
+## Director disposition refresh — 2026-11-20
+
+- **DB-001: DORMANT / MONITORING, not an active release blocker.** The Founder reports no recent recurrence. The historical root cause remains unproven; do not claim that the error was fixed. Resume investigation only on recurrence or new evidence. Keep historical references and diagnostics. The **installation recovery gate remains OPEN** as a separate V1 requirement.
+- Revision-aware stale-write implementation is present on `main`; the old missing-base-revision implementation finding is superseded. Remaining sync acceptance is the full workflow matrix, command-side parent revision evidence, retries/replay/reconciliation and physical device checks.
+- Bounded online-writer source review has inspected root/nested model hooks and customer/contact, Work, service/capability, supplier, quote, finance, purchase, inventory and asset write paths. No additional confirmed aggregate revision bypass was found in the inspected paths. This is not a claim that runtime acceptance is complete.
+- Added `SyncRevisionAggregateTrackingTest::test_offline_commands_advance_every_related_aggregate_revision` on `main` at `98f5921`; exact-head CI is pending.
+
 # Zazu EMP — V1 Readiness Register
 
 Last verified application-code baseline: 526bdf38dab6ff540c143b0e57dfcee468006dc3
@@ -30,22 +37,22 @@ The Founder has explicitly added end-to-end offline sync quality across the supp
 
 **Verified sync changes:** failed mutations/open conflicts now block destructive bootstrap replacement; canonical IDs reconcile for `event_cost`, nested `payment`, `inventory_movement` and `asset_allocation`; disconnected stock receipts update local inventory balance/history; a final offline invoice payment marks the local invoice paid; retryable attachment failures are included in the existing backoff scheduler while preserving the idempotency key. Targeted browser regressions cover these paths.
 
-**Acceptance remains OPEN:** revision-aware stale-write protection is implemented and has server-side regression coverage, but broad sync parity, exhaustive writer/transaction audit and exact-head offline-browser acceptance remain open. Physical Android standalone offline launch/restart/reconnect, DB-001, installed-target recovery, live commercial reconciliation, POPIA operations and ZAZU name clearance also remain open. Pairing remains CLOSED by Founder confirmation. Release remains NOT READY; evidence maturity remains 73/100 with no uplift.
+**Acceptance remains OPEN:** revision-aware stale-write protection is implemented and has server-side regression coverage, but broad sync parity, exhaustive writer/transaction audit and exact-head offline-browser acceptance remain open. Physical Android standalone offline launch/restart/reconnect, installed-target recovery, live commercial reconciliation, POPIA operations and ZAZU name clearance also remain open. Pairing remains CLOSED by Founder confirmation. Release remains NOT READY; evidence maturity remains 73/100 with no uplift.
 
 **Scope boundary:** no parallel offline engine, no cache-only workaround, no weakening of business isolation/idempotency/conflict tests, and no unsupported app-wide offline claim. Work within the existing offline client, mutation protocol, domain handlers, identity registry, attachment subsystem and documented offline workflow matrix.
 
-## Open runtime blocker — repeated DB-001 (2026-11-17)
+## Dormant incident record — DB-001 (first reported 2026-11-17; current status updated 2026-11-20)
 
-**Status:** OPEN — cause not yet proven  
+**Status:** DORMANT / MONITORING — no recent recurrence reported by Founder; cause remains unproven.  
 **Owner-reported references:** `2bc77a48-5c6c-4095-afe2-fa079f60e4ba`, `aa9080f4-9580-41c9-a643-439b31928ffa`
 
-The owner reported repeated database errors on the installed Windows application. The latest reference was supplied with the Account access error screen; its exact triggering action is not recorded.
+Historical record: the owner previously reported database errors on the installed Windows application. The exact triggering action for the earlier references was not recorded. The Founder now reports that DB-001 has not appeared recently, so active investigation is paused.
 
 **Source finding:** Work creation/editing now writes five scheduling columns introduced by migration `2026_11_17_000001_add_event_schedule_fields.php`. The previous shared Windows start script did not check or apply pending migrations. This makes local schema drift the leading hypothesis, but the reference number alone does not reveal the SQL exception.
 
 **Correction on main:** Windows startup now checks migration status. If migrations are pending, it creates and verifies a full installation backup containing the database and private files before applying them, then checks that all migrations completed. Startup stops if backup, migration or final status verification fails.
 
-**Closure evidence still required:** Exact-head Windows startup/upgrade CI; successful execution on the owner's intended installation; confirmation that all migrations are current; and successful completion of the job save that previously failed. No root cause or runtime fix is claimed yet.
+**Current handling:** no active reproduction chase. Reopen only if DB-001 recurs or new evidence materially changes the assessment. No root cause or runtime fix is claimed. The separate installation-recovery gate still requires a controlled drill on the intended installed target.
 
 ## Existing release gates
 | Gate | Disposition | Closure evidence |

@@ -1,3 +1,17 @@
+## Director update — 2026-11-20 (current main reconciliation)
+
+**Repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` only · **code commits:** `353ba56` (command-revision regression added), corrected in `98f5921` (inventory baseline captured before command effects). No branches created.
+
+- **DB-001 disposition: DORMANT / MONITORING.** The Founder reports that the error has not appeared recently. No root cause or fix is claimed. Do not spend active engineering time reproducing the historical incident unless it recurs or new evidence appears. Preserve references and incident records. This supersedes dated entries below that described DB-001 as an active blocker. **Installation recovery remains OPEN independently** until the controlled recovery drill is completed on the intended installed PC.
+- **Revision-aware stale-write protection is present on main.** The server uses aggregate revisions, immutable same-device causal mutation chains, stale conflict snapshots and explicit keep-local/use-server resolution. Do not reopen the old “missing base revision” finding as though the implementation were absent.
+- **Writer audit — bounded source pass:** inspected the Eloquent revision listeners and the customer/contact, Work, service/capability, supplier, quote, invoice/payment, purchasing, inventory and asset write paths, including relevant relationship/query-builder updates. No additional confirmed revision bypass was found in those inspected paths. Keep the remaining audit classified as source review until automated and physical acceptance close the wider matrix.
+- **New regression:** `SyncRevisionAggregateTrackingTest::test_offline_commands_advance_every_related_aggregate_revision` exercises quote acceptance → Work, payment → invoice, purchase receipt → purchase order and inventory, and inventory movement → inventory item revision propagation. The test was added on main at `98f5921`; exact-head Laravel CI is pending.
+- **Exact-head baseline before this new regression:** at `7d288c6`, Laravel tests and PostgreSQL migration/registration/backup/restore/private-file recovery passed; the offline-browser and mobile viewport suites passed, with the phone-local attachment substep still running at last observation. Zazu Quality and Push-on-main passed; SonarCloud was skipped. Do not attribute those results to `98f5921` until its run completes.
+
+**Active release gates:** full offline sync matrix and exact-head acceptance; physical Android standalone offline cold launch/restart/reconnect; installation recovery drill on the target PC; populated quote-to-payment-to-cost/profit reconciliation; POPIA operational controls; ZAZU name clearance. PC-to-phone pairing remains CLOSED. V1 remains NOT READY; evidence maturity remains 73/100 with no uplift.
+
+---
+
 ## Director engineering update — 2026-11-20
 
 **Repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only. **Current engineering head at this update:** `1d746d9`. No branches created.

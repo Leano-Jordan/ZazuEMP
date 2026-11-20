@@ -4,12 +4,13 @@ Latest full application-code verification baseline: 526bdf38dab6ff540c143b0e57df
 Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
-## Open database incident — owner installation
+## Dormant database incident — owner installation (status updated 2026-11-20)
 
-- [ ] Resolve the repeated owner-reported DB-001 errors. References: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`.
-- [ ] Confirm the cause using the installed application's diagnostic record; local SQLite migration drift is currently only a hypothesis.
-- [ ] Verify backup-first migration on the intended Windows installation, then repeat the affected job workflow successfully.
-- Windows startup source now checks migration status, creates and verifies a full database/private-files backup before pending migrations, and checks the final migration state. Exact-head CI and owner-installation execution remain pending.
+- **Disposition: DORMANT / MONITORING — not an active V1 blocker.** Founder reports DB-001 has not appeared recently.
+- Historical references retained: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`; later recurrence history remains in the incident record.
+- Root cause remains unproven. Do not claim a fix or spend active engineering time reproducing it unless the error recurs or new evidence appears.
+- Windows startup source checks migration status, creates and verifies a full database/private-files backup before applying pending migrations, and verifies final migration state.
+- [ ] **Separate V1 gate:** complete the controlled installation recovery drill on the intended Windows installation with representative data and private files. This remains open regardless of DB-001 recurrence status.
 
 ## Current code follow-up — 2026-11-17
 
@@ -170,7 +171,7 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Online invoices and offline invoice sync share consecutive business/month-scoped numbers in the existing `INV-YYYYMM-` format; offline records refresh to the canonical server number and voided numbers are not reused.
 - [ ] Tax-adviser/legal review of invoice numbering and tax-invoice presentation.
 - [ ] Direct generated PDF-file attachment and desktop/Android practical acceptance remain open.
-- DB-001 remains OPEN; this commercial increment does not change the V1 release disposition.
+- DB-001 is DORMANT / MONITORING by current Founder report; the separate installation-recovery gate remains OPEN.
 
 
 ### Offline revision-aware sync hardening — 2026-11-20
