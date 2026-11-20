@@ -1111,6 +1111,9 @@
                             retry.created_at = new Date().toISOString();
                         }
                     }
+                    if (retry.id !== mutation.id) {
+                        store.delete(mutation.id);
+                    }
                     delete retry.conflict_id;
                     delete retry.server_sequence;
                     delete retry.server_status;
