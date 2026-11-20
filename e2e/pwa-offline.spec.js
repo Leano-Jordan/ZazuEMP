@@ -1704,7 +1704,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('[data-zazu-offline-conflict-list] article')).toHaveCount(2);
 
         await page.locator('[data-zazu-offline-conflict-list] article[data-conflict-id="987651"]')
-            .getByRole('button', { name: 'Retry sync' }).click();
+            .getByRole('button', { name: 'Retry with new ID' }).click();
         await expect.poll(() => resolutions.length).toBe(1);
         await expect.poll(() => page.locator('[data-zazu-offline-conflict-list] article').count()).toBe(1);
 
