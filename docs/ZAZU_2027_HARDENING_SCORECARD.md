@@ -1,3 +1,17 @@
+## Director execution checkpoint — 2026-11-21 (online revision coverage)
+
+**Verified application/test HEAD:** `ecc6ba1e973839af2b6fe0caa25fbd927f961ab3` on `main`.
+
+- Laravel: **630 passed / 1 skipped / 4,353 assertions**.
+- Offline browser: **58 desktop Chromium passed**, **7 mobile-viewport passed**, and **1 phone-local Work/attachment/reconnect journey passed**.
+- PostgreSQL migration, registration and database/private-file recovery smoke: **PASS**.
+- PHPMD, Zazu Quality, Director Health, Push-on-main, JavaScript/TypeScript, Python and Actions analysis: **PASS**. SonarCloud: **SKIPPED**, not counted.
+- Added exact-head online revision regressions for Work requirements, invoice items/payments, purchase-order items/receipts, asset allocations, preparation records, expenses and event costs. These passed with the full Laravel suite.
+
+**Evidence maturity remains 73/100; no numerical uplift is claimed.** This closes a verification gap in online aggregate revision tracking, but the complete offline sync matrix and real installed-device proof remain open. Next engineering target: end-to-end cross-device replay/reconciliation across the supported mutation matrix. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain owner acceptance gates. ZAZU name clearance remains deferred by owner direction. No production deployment or live business data changed.
+
+---
+
 ## Director reconciliation — 2026-11-17 (V1 correction batch)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified source/control head:** `7cb17334d53312265521769223bcac4f42eda772`
