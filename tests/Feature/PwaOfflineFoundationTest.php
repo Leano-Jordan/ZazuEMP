@@ -162,6 +162,16 @@ class PwaOfflineFoundationTest extends TestCase
     }
 
 
+    public function test_disconnected_top_level_navigation_prefers_the_local_dashboard_over_a_stale_route_snapshot(): void
+    {
+        $worker = File::get(public_path('sw.js'));
+
+        $this->assertStringContainsString('async function cachedAppPage(request, preferShell = false)', $worker);
+        $this->assertStringContainsString('(preferShell && offlineShell) || cachedPage || offlineShell || Response.error()', $worker);
+        $this->assertStringContainsString('cachedAppPage(request, request.mode === \'navigate\')', $worker);
+        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v53\';', $worker);
+    }
+
     public function test_insecure_network_origins_explain_the_offline_installation_requirement(): void
     {
         $app = File::get(resource_path('js/app.js'));
@@ -335,7 +345,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString("slice(0, 6)", $client);
         $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString("zazu-static-v52", $worker);
+        $this->assertStringContainsString("zazu-static-v53", $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
