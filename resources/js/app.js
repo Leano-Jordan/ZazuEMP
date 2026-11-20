@@ -2422,6 +2422,39 @@ function setupZazuOfflineForms() {
         if (form.dataset.zazuOfflineBound === '1') return;
         form.dataset.zazuOfflineBound = '1';
 
+        const offlineFormSignature = () => JSON.stringify(
+            [...new FormData(form).entries()].map(([name, value]) => [
+                name,
+                typeof File !== 'undefined' && value instanceof File
+                    ? ['file', value.name, value.size, value.lastModified, value.type]
+                    : String(value),
+            ]),
+        );
+
+        const unlockChangedOfflineDraft = () => {
+            if (form.dataset.zazuOfflineSaved !== '1') return;
+            if (form.dataset.zazuOfflineSavedSignature === offlineFormSignature()) return;
+
+            // Keep duplicate-submit protection until the user actually changes
+            // the saved form. A changed draft may be queued as a new mutation.
+            delete form.dataset.zazuOfflineSaved;
+            delete form.dataset.zazuOfflineSavedSignature;
+            delete form.dataset.zazuOfflineSubmitting;
+
+            const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
+            if (!submit) return;
+
+            submit.disabled = false;
+            submit.removeAttribute('aria-busy');
+            if (submit.dataset.zazuSubmitLabel) {
+                submit.textContent = submit.dataset.zazuSubmitLabel;
+                delete submit.dataset.zazuSubmitLabel;
+            }
+        };
+
+        form.addEventListener('input', unlockChangedOfflineDraft);
+        form.addEventListener('change', unlockChangedOfflineDraft);
+
         form.addEventListener('submit', async (event) => {
             if (!window.ZazuOffline) return;
 
@@ -3251,21 +3284,29 @@ function setupZazuOfflineForms() {
             state.local_dirty = true;
             await window.ZazuOffline.queueMutation(entity, operation, payload, state);
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+            form.dataset.zazuOfflineSavedSignature = offlineFormSignature();
             form.dataset.zazuOfflineSaved = '1';
 
             const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
             if (submit) {
+                if (!submit.dataset.zazuSubmitLabel) {
+                    submit.dataset.zazuSubmitLabel = submit.textContent || submit.value || '';
+                }
                 submit.disabled = true;
                 submit.textContent = 'Saved locally';
             }
 
-            const notice = document.createElement('div');
-            notice.className = 'zazu-notice';
-            notice.setAttribute('role', 'status');
+            let notice = form.querySelector('[data-zazu-offline-save-notice]');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.className = 'zazu-notice';
+                notice.setAttribute('role', 'status');
+                notice.dataset.zazuOfflineSaveNotice = '1';
+                form.prepend(notice);
+            }
             notice.textContent = scheduleConflictNames.length
                 ? 'Saved on this device. Schedule overlap with: ' + scheduleConflictNames.join(', ') + '. Review the calendar before confirming this job. It will sync when Zazu reconnects.'
                 : 'Saved on this device. It will sync automatically when Zazu reconnects.';
-            form.prepend(notice);
             } catch (error) {
                 // IndexedDB quota, blocked upgrades, and transaction failures
                 // must not leave the submit button stuck or silently lose the user's work.
