@@ -602,4 +602,17 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - CASE-ZAZU-0033 remains OPEN pending the exact-head offline browser result and full supported-aggregate writer coverage closure.
 
 
-- Offline client behavior changed in `public/zazu-offline.js`; service-worker cache advanced to `zazu-static-v50` and matching cache fixtures updated so installed clients fetch the revision-aware queue code after worker activation.
+- Offline client behavior changed in `public/zazu-offline.js`; service-worker cache advanced to `zazu-static-v51` and matching cache fixtures updated so installed clients fetch the revision-aware queue code after worker activation.
+
+
+## CASE-ZAZU-0033 — related aggregate acknowledgement and v1 gate — 2026-11-20
+
+**Implementation head:** `7d5f861` on `main`. This section supersedes earlier notes that the cache was v50 or that the current source was still at the October baseline.
+
+- The server now returns `related_identities` alongside the backwards-compatible singular `related_identity`. Quote acceptance returns both the Quote and linked Work identities; a purchase receipt returns the Purchase Order and each inventory item whose movement history was changed. Existing payment, inventory movement and asset allocation parent acknowledgements remain represented.
+- The browser reconciler now processes related identities even when the command itself has no standalone identity. This is required for quote acceptance, payment and purchase receipt commands. Optimistic offline quote acceptance also updates the linked Work status when it is still draft, matching the server transition.
+- Service-worker static cache is `zazu-static-v51`; test fixtures were advanced with it. A browser regression covers identity-less quote-acceptance and purchase-receipt acknowledgements across several related roots.
+- Command-side parent revision advancement is explicit for quote acceptance → Work and purchase receipt → affected inventory items, in addition to the existing quote, invoice, Purchase Order, inventory and asset parents.
+- Online write trace reviewed: customer/contact, import, Work/lifecycle, quote, capability, supplier, asset, event cost/preparation, invoice/payment/expense, inventory and purchasing controllers/services. The inspected updates to existing tracked roots use the business-first lock boundary and Eloquent revision events. The inspected raw/bulk operations either also update the aggregate root in the same transaction (e.g. quote status replacement) or restore into a newly-created empty business without existing sync identities. This is a broad source trace, not yet proof that no future or indirect writer can bypass the contract; keep the final writer audit gate open until the repository-wide write inventory is closed.
+- Exact-head evidence at `7d5f861`: Laravel unit/feature PASS, PostgreSQL migration smoke PASS, PHPMD PASS, Zazu Quality PASS, Director Health PASS. Offline browser acceptance, including the new multi-aggregate acknowledgement case, was still running when this state was written. SonarCloud is skipped by workflow configuration.
+- CASE-ZAZU-0033 remains OPEN until the exact-head browser result and remaining supported-aggregate writer audit pass. V1 readiness and the documented 73/100 evidence-maturity score are unchanged. Physical Android/PC acceptance, operator recovery drill, populated commercial reconciliation, DB-001 and legal/operational sign-off remain separate gates.

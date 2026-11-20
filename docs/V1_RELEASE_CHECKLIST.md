@@ -171,3 +171,19 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [ ] Tax-adviser/legal review of invoice numbering and tax-invoice presentation.
 - [ ] Direct generated PDF-file attachment and desktop/Android practical acceptance remain open.
 - DB-001 remains OPEN; this commercial increment does not change the V1 release disposition.
+
+
+### Offline revision-aware sync hardening — 2026-11-20
+
+- [x] Server-side monotonic aggregate revisions and stale-update rejection are implemented.
+- [x] Same-device mutation chains use actual predecessor result revisions; unresolved predecessors remain queued/retryable instead of creating duplicate conflicts.
+- [x] Keep-local conflict resolution uses a new immutable mutation ID; use-server resolution records the current revision for later dependent edits.
+- [x] Parent revision advancement covers quote acceptance → Work and purchase receipt → affected inventory items, as well as payment, inventory movement and asset allocation parent changes.
+- [x] Push acknowledgements expose all affected related identities; client reconciles them even when the command has no standalone identity.
+- [x] Regression coverage added for cross-device stale writes, same-device chains, conflict rebase/discard, cross-record command revisions and multi-aggregate browser acknowledgement.
+- [x] Service-worker cache v51 and matching test fixtures.
+- [ ] Exact-head offline browser acceptance including the new related-aggregate case.
+- [ ] Final exhaustive inventory of indirect, queued and command-side writers.
+- [ ] Physical installed-device offline/restart/reconnect acceptance remains a separate owner-operated gate.
+
+Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality and Director Health passed on `7d5f861`; offline browser acceptance was still running when this checklist note was written. CASE-ZAZU-0033 remains OPEN and V1 remains NOT READY until the remaining gates are evidenced. This implementation increment does not uplift the readiness score.

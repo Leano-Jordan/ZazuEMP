@@ -615,3 +615,18 @@ Automated coverage now asserts database/private-file checksum generation in the 
 ## Offline client revision rollout — 2026-11-20
 
 The offline mutation client now carries server base revisions, predecessor links and a durable local queue order. Because `/zazu-offline.js` is precached cache-first, this change advances the service-worker static cache from `zazu-static-v49` to `zazu-static-v50`. Existing installations must activate the new worker before the revision protocol is considered deployed. The matching service-worker cache regression fixtures were advanced with it.
+
+
+## Related aggregate revision acknowledgements — 2026-11-20
+
+Server command mutations may alter more than the record represented by their mutation ID. The push response therefore preserves the legacy `related_identity` field and additionally returns `related_identities` for every affected synchronised aggregate that can be resolved after application.
+
+- Quote acceptance returns the Quote and linked Work identities because accepting the quote can confirm draft Work.
+- Purchase receipts return the Purchase Order and inventory-item identities for the stock movements created by the receipt.
+- Payment, inventory movement and asset-allocation commands continue to return the affected invoice, stock item and asset parent identities respectively.
+- The phone client applies related revisions even when the command has no standalone identity. This prevents a source device from continuing with a stale local revision after its own successful command.
+- Offline quote acceptance also mirrors the server's conditional draft-to-confirmed Work transition locally.
+
+The service-worker static cache is now `zazu-static-v51`; matching worker fixtures were advanced so installed clients retrieve the acknowledgement reconciler. Automated coverage includes Laravel tests for command-side parent revision advancement and browser acceptance for identity-less commands affecting multiple local records.
+
+Exact-head backend, PostgreSQL, quality and Director Health checks passed on implementation head `7d5f861`. The offline-browser workflow was still running when this note was added. CASE-ZAZU-0033 remains open until browser acceptance, the final online-writer inventory and physical device acceptance are complete.
