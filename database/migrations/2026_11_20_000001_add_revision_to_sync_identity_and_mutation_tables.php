@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sync_entity_identities', function (Blueprint $table): void {
-            $table->unsignedBigInteger('revision')->default(1)->after('record_id');
+            $table->unsignedBigInteger('revision')->default(2)->after('record_id');
         });
 
         Schema::table('sync_mutations', function (Blueprint $table): void {

@@ -41,6 +41,7 @@ class SyncEntityIdentityRegistry
                 'entity_uuid' => (string) Str::uuid(),
                 'record_type' => $recordType,
                 'record_id' => $recordId,
+                'revision' => 1,
             ]);
         });
     }
@@ -96,6 +97,7 @@ class SyncEntityIdentityRegistry
                 'entity_uuid' => $entityUuid,
                 'record_type' => $recordType,
                 'record_id' => $recordId,
+                'revision' => 1,
             ]);
         });
     }
