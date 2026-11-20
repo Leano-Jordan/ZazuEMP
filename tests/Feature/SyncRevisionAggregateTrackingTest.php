@@ -16,6 +16,7 @@ use App\Models\SyncMutation;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationHandler;
 use App\Support\Offline\SyncMutationRecorder;
+use App\Support\Offline\SyncMutationRelatedIdentityResolver;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteVersion;
