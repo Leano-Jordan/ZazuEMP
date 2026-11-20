@@ -9,6 +9,7 @@
 - Registered as `CASE-ZAZU-0033` / `ENG-DATA-003`; regression control `REG-024`.
 - Scope includes update-capable handlers for customer (including contacts), Work/event (including requirements), preparation, quote/draft version, inventory item, event cost, asset, supplier, service/capability and purchase order.
 - The initial online/offline writer trace has confirmed customer/contact, Work/requirements, quote/version, preparation, supplier, capability, asset/allocation, invoice/payment, inventory movement and purchase-receipt paths. It remains explicitly PARTIAL; all aggregate writers and transaction/lock boundaries must be mapped before a safe revision implementation.
+- Lock review found concrete gaps: CustomerController update is transactional but has no shared business/customer row lock; BusinessCapabilityController update writes without a transaction/row lock; CustomerContactController locks customer/contact rows but not the common business row. Work, quote, supplier, asset, finance, inventory and purchasing paths use differing lock combinations. No post-save-only revision increment can safely close these races.
 - Required correction remains server-enforced monotonic revisions, same-device causal edit chaining and loss-preserving stale conflicts/rebase. No timestamps-only check, last-write-wins or mutation-ID reuse. Payment, receipt, stock and allocation idempotency must remain intact.
 - No application code was changed during this source audit. The revision defect remains OPEN; no fix or runtime reproduction is claimed.
 
