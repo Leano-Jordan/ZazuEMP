@@ -2,6 +2,7 @@
 
 namespace App\Support\Offline;
 
+use App\Models\Asset;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
@@ -157,15 +158,37 @@ final class SyncMutationPushProcessor
             default => null,
         };
 
-        if (! $parent || ! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
+        if (! $parent) {
             return null;
         }
 
-        $identity = SyncEntityIdentity::query()
-            ->where('business_id', $mutation->business_id)
-            ->where('entity_type', $parent[0])
-            ->where('entity_uuid', Str::lower($parent[1]))
-            ->first();
+        if ($parent[0] === 'asset' && (! is_string($parent[1]) || ! Str::isUuid($parent[1]))) {
+            $allocationIdentity = SyncEntityIdentity::query()
+                ->where('business_id', $mutation->business_id)
+                ->where('entity_type', 'asset_allocation')
+                ->where('entity_uuid', $mutation->entity_id)
+                ->first();
+            $allocation = $allocationIdentity?->record;
+            $assetId = $allocation instanceof \App\Models\AssetAllocation ? $allocation->asset_id : null;
+            $identity = is_numeric($assetId)
+                ? SyncEntityIdentity::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->where('entity_type', 'asset')
+                    ->where('record_type', (new Asset)->getMorphClass())
+                    ->where('record_id', (int) $assetId)
+                    ->first()
+                : null;
+        } else {
+            if (! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
+                return null;
+            }
+
+            $identity = SyncEntityIdentity::query()
+                ->where('business_id', $mutation->business_id)
+                ->where('entity_type', $parent[0])
+                ->where('entity_uuid', Str::lower($parent[1]))
+                ->first();
+        }
 
         if (! $identity) {
             return null;
