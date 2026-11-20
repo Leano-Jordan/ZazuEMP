@@ -129,7 +129,7 @@ final class SyncMutationPushProcessor
             return [
                 'id' => $conflict->id,
                 'type' => 'stale_record_version',
-                'details' => app(SyncConflictResolutionService::class)->payload($conflict),
+                'details' => app(SyncConflictPresenter::class)->payload($conflict),
                 'retryable' => false,
             ];
         }
@@ -148,7 +148,7 @@ final class SyncMutationPushProcessor
             return [
                 'id' => $conflict->id,
                 'type' => 'domain_rejection',
-                'details' => app(SyncConflictResolutionService::class)->payload($conflict),
+                'details' => app(SyncConflictPresenter::class)->payload($conflict),
             ];
         }
 
@@ -276,7 +276,7 @@ final class SyncMutationPushProcessor
             'error' => mb_substr($message, 0, 1000),
             'conflict_id' => $conflict->id,
             'conflict_type' => 'mutation_identity_mismatch',
-            'conflict' => app(SyncConflictResolutionService::class)->payload($conflict),
+            'conflict' => app(SyncConflictPresenter::class)->payload($conflict),
             'retryable' => false,
             'identity' => null,
             'related_identity' => null,

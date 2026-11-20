@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 final class SyncConflictRebaseService
 {
-    private function resolveStaleRecordVersion(
+    public function resolveStaleRecordVersion(
         SyncConflict $conflict,
         ?SyncMutation $mutation,
         SyncDevice $device,
@@ -61,13 +61,13 @@ final class SyncConflictRebaseService
         ]);
 
         return response()->json([
-            'conflict' => $this->payload($conflict->fresh()),
+            'conflict' => app(SyncConflictPresenter::class)->payload($conflict->fresh()),
             'mutation_status' => $mutationStatus,
             'rebase' => $rebase,
         ]);
     }
 
-    private function resolveIdentityMismatchRetry(
+    public function resolveIdentityMismatchRetry(
         SyncConflict $conflict,
         ?SyncMutation $mutation,
         SyncDevice $device,
