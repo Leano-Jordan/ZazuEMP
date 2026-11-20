@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\EventRequirement;
@@ -115,7 +116,11 @@ class AssetController extends Controller
         if (!empty($data['capability_id'])) {
             abort_unless(BusinessCapability::where('business_id',$businessId)->where('capability_type','rental')->whereKey($data['capability_id'])->exists(), 404);
         }
-        Asset::create([...$data,'business_id'=>$businessId,'currency'=>$currency,'status'=>'available']);
+        DB::transaction(function () use ($data, $businessId, $currency): void {
+            Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            Asset::create([...$data,'business_id'=>$businessId,'currency'=>$currency,'status'=>'available']);
+        });
         return redirect()->route('assets.index')->with('success','Asset added to the register.');
     }
 

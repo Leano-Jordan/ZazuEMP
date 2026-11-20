@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
@@ -57,7 +58,11 @@ class InventoryController extends Controller
         if (!empty($data['capability_id'])) {
             abort_unless(BusinessCapability::where('business_id',$businessId)->where('capability_type','product')->whereKey($data['capability_id'])->exists(), 404);
         }
-        $item = InventoryItem::create([...$data,'business_id'=>$businessId]);
+        $item = DB::transaction(function () use ($data, $businessId): InventoryItem {
+            Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            return InventoryItem::create([...$data,'business_id'=>$businessId]);
+        });
         Audit::record('inventory.item.created', $item, ['name' => $item->name], $businessId);
         return redirect()->route('inventory.index')->with('success','Inventory item created.');
     }

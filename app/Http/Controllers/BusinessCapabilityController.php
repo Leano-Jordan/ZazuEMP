@@ -87,11 +87,15 @@ class BusinessCapabilityController extends Controller
         $photoPath = $request->file('image')?->store('catalogue', 'public');
 
         try {
-            BusinessCapability::create($validated + [
-                'business_id' => $business->id,
-                'image_path' => $photoPath,
-                'is_active' => $request->boolean('is_active', true),
-            ]);
+            DB::transaction(function () use ($validated, $business, $photoPath, $request): void {
+                Business::query()->whereKey($business->id)->lockForUpdate()->firstOrFail();
+
+                BusinessCapability::create($validated + [
+                    'business_id' => $business->id,
+                    'image_path' => $photoPath,
+                    'is_active' => $request->boolean('is_active', true),
+                ]);
+            });
         } catch (\Throwable $e) {
             if ($photoPath) {
                 Storage::disk('public')->delete($photoPath);

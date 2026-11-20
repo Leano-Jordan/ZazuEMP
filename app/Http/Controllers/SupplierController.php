@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\Supplier;
 use App\Models\EventRequirement;
 use App\Support\Audit;
@@ -36,7 +37,11 @@ class SupplierController extends Controller
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $data = $this->validated($request);
 
-        $supplier = Supplier::create([...$data, 'business_id' => $businessId]);
+        $supplier = DB::transaction(function () use ($data, $businessId): Supplier {
+            Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            return Supplier::create([...$data, 'business_id' => $businessId]);
+        });
 
         Audit::record('suppliers.created', $supplier, [
             'name' => $supplier->name,

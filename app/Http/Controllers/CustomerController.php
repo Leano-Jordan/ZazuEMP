@@ -46,6 +46,9 @@ class CustomerController extends Controller
 
         try {
             DB::transaction(function () use ($validated, $photoPath, $business): void {
+                // Serialize new aggregates with sync bootstrap and other writers.
+                Business::query()->whereKey($business->id)->lockForUpdate()->firstOrFail();
+
                 $customer = Customer::create([
                     'business_id' => $business->id,
                     'name' => trim($validated['name']),
@@ -99,6 +102,8 @@ class CustomerController extends Controller
         ]);
 
         $customer = DB::transaction(function () use ($validated, $business): Customer {
+            Business::query()->whereKey($business->id)->lockForUpdate()->firstOrFail();
+
             $customer = Customer::create([
                 'business_id' => $business->id,
                 'name' => trim($validated['name']),
