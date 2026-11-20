@@ -193,6 +193,82 @@ test('unreachable logout host preserves the signed-in session and queued busines
     expect(preservedAfterRelogin).toEqual({ paired: true, mutationPresent: true });
 });
 
+test('workspace switching submits the selected business and preserves each business offline queue', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Workspace identity transition runs once on desktop Chromium.');
+
+    await login(page);
+    await waitForOfflineRuntime(page);
+
+    const firstBusinessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
+    const firstBusinessName = await page.locator('title').textContent();
+    expect(firstBusinessId).toBeGreaterThan(0);
+
+    const secondBusinessId = Number(await page.locator('[data-business-switch] option').filter({
+        hasText: 'Zazu Demo Secondary Workspace',
+    }).getAttribute('value'));
+    expect(secondBusinessId).toBeGreaterThan(0);
+    expect(secondBusinessId).not.toBe(firstBusinessId);
+
+    const firstMutationId = await page.evaluate(async businessId => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = {
+            token: 'first-business-switch-token',
+            device: { id: 987680, business_id: businessId },
+        };
+        state.local_dirty = false;
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+
+        const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
+            local_id: 'switch-boundary-' + crypto.randomUUID(),
+            name: 'First business queued customer',
+        });
+        return mutation.id;
+    }, firstBusinessId);
+
+    const switchWorkspace = async (businessId) => {
+        await page.locator('[data-user-trigger]').click();
+        await expect(page.locator('[data-business-switch]')).toBeVisible();
+        await page.locator('[data-business-switch]').selectOption(String(businessId));
+        await expect.poll(
+            () => page.locator('body').getAttribute('data-zazu-business-id'),
+            { message: 'the workspace selector must submit the selected business context' },
+        ).toBe(String(businessId));
+        await waitForOfflineRuntime(page);
+    };
+
+    await switchWorkspace(secondBusinessId);
+
+    const secondWorkspace = await page.evaluate(async () => ({
+        businessId: Number(document.body.dataset.zazuBusinessId),
+        pending: await window.ZazuOffline.pending(),
+        paired: window.ZazuOffline.isPaired(),
+    }));
+    expect(secondWorkspace).toEqual({
+        businessId: secondBusinessId,
+        pending: [],
+        paired: false,
+    });
+
+    const userId = Number(await page.locator('body').getAttribute('data-zazu-user-id'));
+    const oldBusinessCache = await page.evaluate(({ user, business }) => caches.keys().then(keys =>
+        keys.filter(name => name.includes('-user-' + user + '-business-' + business))
+    ), { user: userId, business: firstBusinessId });
+    expect(oldBusinessCache).toHaveLength(0);
+
+    await switchWorkspace(firstBusinessId);
+
+    const restoredFirstWorkspace = await page.evaluate(async mutationId => ({
+        businessId: Number(document.body.dataset.zazuBusinessId),
+        pending: (await window.ZazuOffline.pending()).map(item => item.id),
+        paired: window.ZazuOffline.isPaired(),
+    }), firstMutationId);
+    expect(restoredFirstWorkspace.businessId).toBe(firstBusinessId);
+    expect(restoredFirstWorkspace.pending).toContain(firstMutationId);
+    expect(restoredFirstWorkspace.paired).toBe(true);
+});
+
 test('expired web session requires sign-in without erasing the trusted offline workspace', async ({ page }, testInfo) => {
     test.setTimeout(45_000);
     test.skip(testInfo.project.name !== 'chromium', 'Expired-session preservation runs once; responsive navigation is covered separately.');

@@ -100,6 +100,27 @@ function setupZazuUserMenus() {
     });
 }
 
+function setupZazuBusinessSwitcher() {
+    document.querySelectorAll('[data-business-switch]').forEach((select) => {
+        if (select.dataset.zazuBusinessSwitchBound === '1') return;
+
+        const form = select.closest('form');
+        if (!(form instanceof HTMLFormElement)) return;
+
+        select.dataset.zazuBusinessSwitchBound = '1';
+        select.addEventListener('change', () => {
+            const businessId = Number(select.value);
+            if (!Number.isSafeInteger(businessId) || businessId < 1) return;
+            if (form.dataset.zazuBusinessSwitchSubmitting === '1') return;
+
+            form.dataset.zazuBusinessSwitchSubmitting = '1';
+            select.setAttribute('aria-busy', 'true');
+            // Keep the select enabled so its business_id remains in the POST body.
+            form.requestSubmit();
+        });
+    });
+}
+
 function setupZazuToasts() {
     document.querySelectorAll('[data-zazu-toast]').forEach((toast) => {
         if (toast.dataset.zazuToastBound === '1') return;
@@ -761,6 +782,7 @@ const initializeZazuUi = () => {
     setupZazuThemeToggle();
     setupZazuCatalogue();
     setupZazuUserMenus();
+    setupZazuBusinessSwitcher();
     setupZazuToasts();
     setupBrandingUploads();
     setupZazuHelper();

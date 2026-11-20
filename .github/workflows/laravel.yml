@@ -224,6 +224,8 @@ jobs:
         mkdir -p database storage/logs
         touch database/database.sqlite
         php artisan migrate:fresh --seed --force
+    - name: Prepare second business for workspace-switch acceptance
+      run: php artisan db:seed --class='Database\Seeders\DemoBusinessSwitchSeeder' --force
     - name: Install Chromium for Playwright
       run: npx playwright install --with-deps chromium
     - name: Run offline browser acceptance suite
