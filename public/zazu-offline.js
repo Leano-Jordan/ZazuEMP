@@ -312,11 +312,22 @@
         state.version = bootstrap.version || new Date().toISOString();
     }
 
+    function compareMutationOrder(a, b) {
+        const aOrder = Number(a?.queue_order || 0);
+        const bOrder = Number(b?.queue_order || 0);
+        if (aOrder > 0 && bOrder > 0 && aOrder !== bOrder) return aOrder - bOrder;
+
+        const createdOrder = String(a?.created_at || '').localeCompare(String(b?.created_at || ''));
+        if (createdOrder !== 0) return createdOrder;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return String(a?.id || '').localeCompare(String(b?.id || ''));
+    }
+
     async function pending() {
         const db = await openDb();
         return new Promise((resolve, reject) => {
             const request = db.transaction(QUEUE).objectStore(QUEUE).index('status').getAll('pending');
-            request.onsuccess = () => resolve((request.result || []).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))));
+            request.onsuccess = () => resolve((request.result || []).sort(compareMutationOrder));
             request.onerror = () => reject(request.error);
         });
     }
@@ -1393,11 +1404,23 @@
 
             const prepareMutation = () => {
                 if (!currentReady || !queueReady || sessionMismatch) return;
-                const queuedForEntity = (queuedRequest.result || [])
+                const queueItems = queuedRequest.result || [];
+                const hasLegacyOrder = queueItems.some(item => !Number.isSafeInteger(Number(item.queue_order)) || Number(item.queue_order) < 1);
+                if (hasLegacyOrder) {
+                    const orderedQueue = [...queueItems].sort(compareMutationOrder);
+                    orderedQueue.forEach((item, index) => {
+                        item.queue_order = index + 1;
+                        queueStore.put(item);
+                    });
+                }
+                const nextQueueOrder = queueItems.reduce((maximum, item) => Math.max(maximum, Number(item.queue_order) || 0), 0) + 1;
+                mutation.queue_order = nextQueueOrder;
+
+                const queuedForEntity = queueItems
                     .filter(item => ['pending', 'failed'].includes(item.status)
                         && item.entity_type === entityType
                         && String(item.entity_id) === String(mutation.entity_id))
-                    .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+                    .sort(compareMutationOrder);
                 const predecessor = queuedForEntity[queuedForEntity.length - 1] || null;
 
                 if (['update', 'upsert'].includes(operation)) {
