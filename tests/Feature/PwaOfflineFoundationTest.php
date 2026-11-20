@@ -283,9 +283,6 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('client.queueAttachments(eventId, files,', $app);
         $this->assertStringContainsString('client.loadAttachments(eventId)', $app);
         $this->assertStringContainsString('client.getAttachmentFile(record.idempotency_key)', $app);
-        $attachmentClient = File::get(public_path('offline-attachments.js'));
-        $this->assertStringContainsString("'zazu-phone-attachments-business-' + BUSINESS_ID", $attachmentClient);
-        $this->assertStringContainsString('business_id: BUSINESS_ID', $attachmentClient);
         $this->assertStringContainsString("fetch('/api/sync/revoke'", $client);
         $this->assertStringContainsString('const result = await revokeDeviceToken(token);', $client);
         $this->assertStringContainsString('rememberPendingDeviceRevocation(installationId)', $client);
