@@ -498,6 +498,13 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.context().setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
         await expect.poll(() => pushedTypes.length).toBe(2);
+        // The online event may have started the first sync before the explicit
+        // call above. Wait for the durable queue/ack transaction to finish before
+        // inspecting the state that it reconciles.
+        await expect.poll(
+            () => page.evaluate(async () => (await window.ZazuOffline.pending()).length),
+            { message: 'all command acknowledgements must be durably reconciled' },
+        ).toBe(0);
 
         const state = await page.evaluate(async () => {
             const current = window.ZazuOffline.getState();
