@@ -277,7 +277,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 name: 'Offline Supplier Proof', phone: '0123456789', email: 'supplier@example.test',
                 address: 'Soshanguve',
             }];
-            state.capabilities = [{
+            state.catalogue = [{
                 id: 802, server_id: 802, local_id: identity('02'),
                 name: 'Offline Catering Service', capability_type: 'service', is_active: false,
             }];

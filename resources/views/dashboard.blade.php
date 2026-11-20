@@ -282,9 +282,9 @@
                 <div class="zazu-empty">No supplier records stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Services and catalogue saved on this device" data-zazu-offline-collection="capabilities">
+        <section class="zazu-dash-surface" aria-label="Services and catalogue saved on this device" data-zazu-offline-collection="catalogue">
             <h3 class="zazu-dash-panel-heading">Services &amp; catalogue</h3>
-            <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="capabilities">
+            <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="catalogue">
                 <div class="zazu-empty">No service records stored on this device.</div>
             </div>
         </section>

@@ -2343,7 +2343,7 @@ function setupZazuOfflineDirectoryViews() {
                 ['Address', record.address], ['Notes', record.notes],
             ],
         },
-        capabilities: {
+        catalogue: {
             entity: 'service',
             title: record => record.name || 'Unnamed service',
             meta: record => [record.capability_type, (record.is_active ?? record.active) === false ? 'Inactive' : 'Active'].filter(Boolean).join(' · '),
