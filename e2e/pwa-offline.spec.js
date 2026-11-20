@@ -931,6 +931,104 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(persisted.state.local_dirty).toBe(false);
     });
 
+    test('event-cost mutations receive their canonical server identity after sync', async ({ page }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Event-cost identity reconciliation runs once in Chromium.');
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(businessId).toBeGreaterThan(0);
+
+        await page.evaluate(async activeBusinessId => {
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'event-cost-identity-token',
+                device: { id: 987662, business_id: activeBusinessId },
+            };
+            state.costs = [{
+                local_id: 'offline-event-cost-identity',
+                id: null,
+                server_id: null,
+                description: 'Offline transport cost',
+                pending_sync: true,
+            }];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        }, businessId);
+
+        await page.context().setOffline(true);
+        const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('event_cost', 'create', {
+            local_id: 'offline-event-cost-identity',
+            event_local_id: 'offline-event-cost-job',
+            category: 'transport',
+            description: 'Offline transport cost',
+            currency: 'ZAR',
+            projected_amount: '250.00',
+            actual_amount: '250.00',
+            status: 'incurred',
+        }));
+
+        let pushedEntityType = null;
+        await page.route('**/api/sync/push', async route => {
+            const body = route.request().postDataJSON();
+            const item = body.mutations.find(candidate => candidate.id === mutation.id);
+            pushedEntityType = item?.entity_type || null;
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    recorded: [{
+                        id: mutation.id,
+                        sequence: 1,
+                        status: 'applied',
+                        applied: true,
+                        error: null,
+                        retryable: false,
+                        identity: {
+                            entity_type: 'event_cost',
+                            local_id: 'offline-event-cost-identity',
+                            server_id: 95001,
+                        },
+                    }],
+                    applied: [mutation.id],
+                }),
+            });
+        });
+        await page.route('**/api/sync/pull**', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ mutations: [] }),
+        }));
+        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                business: { id: businessId, name: 'Event cost identity business', currency: 'ZAR' },
+            }),
+        }));
+
+        await page.context().setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+
+        const reconciled = await page.evaluate(async () => ({
+            cost: window.ZazuOffline.getState().costs.find(item => item.local_id === 'offline-event-cost-identity'),
+            pending: await window.ZazuOffline.pending(),
+        }));
+        expect(pushedEntityType).toBe('event_cost');
+        expect(reconciled.pending).toHaveLength(0);
+        expect(reconciled.cost).toMatchObject({
+            local_id: 'offline-event-cost-identity',
+            id: 95001,
+            server_id: 95001,
+            pending_sync: false,
+        });
+    });
+
     test('paired device can retry or discard a failed offline sync change', async ({ page }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Sync conflict controls run once; responsive layouts are covered by the settings suite.');
