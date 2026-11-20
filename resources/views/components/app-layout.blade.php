@@ -16,7 +16,7 @@
         $isOwner = $currentRole === 'owner';
         $founderEmail = (string) config('zazu.platform_admin_email', '');
         $isPlatformAdmin = $founderEmail !== '' && hash_equals($founderEmail, strtolower(trim((string) auth()->user()->email)));
-        $brandHomeUrl = $business ? route('dashboard') : ($isPlatformAdmin ? route('admin.sentinel') : route('dashboard'));
+        $brandHomeUrl = $isPlatformAdmin ? route('admin.sentinel') : route('dashboard');
         $experienceLevel = app(\App\Support\ExperienceLevel::class)->for(auth()->user(), $business);
         $experienceLabel = app(\App\Support\ExperienceLevel::class)->label($experienceLevel);
         $primaryNiche = app(\App\Support\NicheFocus::class)->for(auth()->user(), $business);
