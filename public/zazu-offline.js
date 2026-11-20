@@ -1423,21 +1423,33 @@
 
         return new Promise((resolve, reject) => {
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
-            const queueRequest = tx.objectStore(QUEUE).index('status').getAll('pending');
+            const queueStore = tx.objectStore(QUEUE);
+            const pendingRequest = queueStore.index('status').getAll('pending');
+            const failedRequest = queueStore.index('status').getAll('failed');
             const stateRequest = tx.objectStore(STATE).get('current');
-            let queueReady = false;
+            let pendingReady = false;
+            let failedReady = false;
             let stateReady = false;
             let applied = false;
 
             const reconcile = () => {
-                if (!queueReady || !stateReady || applied) return;
-
-                // A local mutation may have been saved while the network
-                // bootstrap was in flight. Never let a remote snapshot replace
-                // that newer local workspace or acknowledge past its queue.
-                if (queueRequest.result?.length || sessionCleared) return;
+                if (!pendingReady || !failedReady || !stateReady || applied) return;
 
                 const persistedState = stateRequest.result;
+                const hasOpenConflict = (persistedState?.conflicts || []).some(conflict => conflict.status === 'open');
+
+                // A failed mutation remains part of the local working set until
+                // its conflict is explicitly resolved. A remote bootstrap can
+                // replace whole collections (invoices, inventory, assets, etc.),
+                // so it must not erase locally saved records while a failed item
+                // or open conflict still needs operator attention.
+                if (
+                    pendingRequest.result?.length
+                    || failedRequest.result?.length
+                    || hasOpenConflict
+                    || sessionCleared
+                ) return;
+
                 if (!persistedState || persistedState.sync?.token !== expectedToken) return;
 
                 state = persistedState;
@@ -1446,15 +1458,20 @@
                 applied = true;
             };
 
-            queueRequest.onsuccess = () => {
-                queueReady = true;
+            pendingRequest.onsuccess = () => {
+                pendingReady = true;
+                reconcile();
+            };
+            failedRequest.onsuccess = () => {
+                failedReady = true;
                 reconcile();
             };
             stateRequest.onsuccess = () => {
                 stateReady = true;
                 reconcile();
             };
-            queueRequest.onerror = () => tx.abort();
+            pendingRequest.onerror = () => tx.abort();
+            failedRequest.onerror = () => tx.abort();
             stateRequest.onerror = () => tx.abort();
             tx.oncomplete = () => resolve(applied);
             tx.onerror = () => reject(tx.error || new Error('Offline bootstrap reconciliation failed.'));
