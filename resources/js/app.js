@@ -2721,12 +2721,52 @@ function setupZazuOfflineForms() {
                     window.alert('This invoice is not available in this device copy yet.');
                     return;
                 }
+                if (invoice.status !== 'issued') {
+                    window.alert('Only issued invoices can accept payments.');
+                    return;
+                }
+
+                const toCents = value => {
+                    const amount = Number.parseFloat(String(value ?? ''));
+                    return Number.isFinite(amount) ? Math.round(amount * 100) : NaN;
+                };
+                const amountCents = toCents(get('amount'));
+                const totalCents = toCents(invoice.total);
+                const paidCents = (invoice.payments || []).reduce(
+                    (sum, payment) => sum + (Number.isFinite(toCents(payment.amount)) ? toCents(payment.amount) : 0),
+                    0,
+                );
+                if (!Number.isSafeInteger(amountCents) || amountCents <= 0 || !Number.isSafeInteger(totalCents)) {
+                    window.alert('Enter a valid payment amount.');
+                    return;
+                }
+                if (amountCents > Math.max(0, totalCents - paidCents)) {
+                    window.alert('Payment cannot exceed the outstanding invoice balance.');
+                    return;
+                }
+
+                const paymentType = get('type') || 'payment';
+                if (paymentType === 'deposit') {
+                    const requiredDepositCents = toCents(invoice.deposit_required);
+                    const paidDepositCents = (invoice.payments || [])
+                        .filter(payment => payment.type === 'deposit')
+                        .reduce((sum, payment) => sum + (Number.isFinite(toCents(payment.amount)) ? toCents(payment.amount) : 0), 0);
+                    if (!Number.isSafeInteger(requiredDepositCents) || requiredDepositCents <= 0) {
+                        window.alert('This invoice has no deposit requirement.');
+                        return;
+                    }
+                    if (paidDepositCents + amountCents > requiredDepositCents) {
+                        window.alert('This deposit would exceed the required deposit amount.');
+                        return;
+                    }
+                }
+
                 payload = {
                     local_id: localId,
                     server_id: null,
                     invoice_local_id: invoice.local_id,
-                    type: get('type') || 'payment',
-                    amount: get('amount'),
+                    type: paymentType,
+                    amount: (amountCents / 100).toFixed(2),
                     method: get('method') || null,
                     reference: get('reference') || null,
                     paid_at: get('paid_at') || null,
@@ -3025,16 +3065,27 @@ function setupZazuOfflineForms() {
                         pending_sync: true,
                     });
 
-                    const amount = Number.parseFloat(String(payload.amount || 0));
-                    const currentPaid = Number.parseFloat(String(invoice.paid_amount || 0));
-                    if (Number.isFinite(amount)) {
-                        invoice.paid_amount = (currentPaid + amount).toFixed(2);
-                        const total = Number.parseFloat(String(invoice.total || 0));
-                        if (Number.isFinite(total)) {
-                            const nextBalance = Math.max(0, total - currentPaid - amount);
-                            invoice.balance = nextBalance.toFixed(2);
-                            if (nextBalance === 0) invoice.status = 'paid';
-                        }
+                    const toCents = value => {
+                        const amount = Number.parseFloat(String(value ?? ''));
+                        return Number.isFinite(amount) ? Math.round(amount * 100) : 0;
+                    };
+                    const paidCents = invoice.payments.reduce(
+                        (sum, payment) => sum + toCents(payment.amount),
+                        0,
+                    );
+                    const totalCents = toCents(invoice.total);
+                    invoice.paid_amount = (paidCents / 100).toFixed(2);
+                    const nextBalanceCents = Math.max(0, totalCents - paidCents);
+                    invoice.balance = (nextBalanceCents / 100).toFixed(2);
+                    if (nextBalanceCents === 0) invoice.status = 'paid';
+
+                    if (payload.type === 'deposit') {
+                        const depositPaidCents = invoice.payments
+                            .filter(payment => payment.type === 'deposit')
+                            .reduce((sum, payment) => sum + toCents(payment.amount), 0);
+                        const requiredDepositCents = toCents(invoice.deposit_required);
+                        invoice.deposit_paid_amount = (depositPaidCents / 100).toFixed(2);
+                        invoice.deposit_balance = (Math.max(0, requiredDepositCents - depositPaidCents) / 100).toFixed(2);
                     }
                 }
             }
