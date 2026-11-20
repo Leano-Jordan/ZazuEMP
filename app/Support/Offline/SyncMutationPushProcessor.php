@@ -203,6 +203,7 @@ final class SyncMutationPushProcessor
             'retryable' => false,
             'identity' => null,
             'related_identity' => null,
+            'related_identities' => [],
         ];
     }
 }
