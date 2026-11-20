@@ -1,14 +1,14 @@
 # Zazu EMP — V1 Commercial Release Roadmap
 
-**Status:** LIVE  
-**Last Director cycle:** 2026-11-08  
+**Status:** SUPPORTING ROADMAP — historical planning detail; not a current release-gate authority  
+**Last reconciled:** 2026-11-20  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Latest verified application/test source SHA:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a`  
-**Release-control docs commits:** documentation-only commits may follow and do not change the application assessment baseline.  
+**Latest full application-code verification baseline:** `526bdf38dab6ff540c143b0e57dfcee468006dc3`  
+**Current release disposition:** NOT READY · evidence maturity 73/100 · offline sync reliability OPEN.  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
-> **Current exact-head reconciliation (2026-11-08):** application/test SHA `d44ec33` passes Laravel (407 / 2,758 assertions), Quality, Psalm, PHPMD, populated upgrade/rollback and browser smoke (65 passed / 22 skipped). SonarCloud is skipped. The canonical `docs/V1_RELEASE_CHECKLIST.md` owns current release evidence; older run IDs and snapshots in this supporting roadmap are historical unless explicitly reconciled there.
+> **Authority note (2026-11-20):** This roadmap's phase tables and execution checkpoints are retained as historical planning context and must not be treated as current statuses. The live source of truth is `.ai/engineering/STATE.md`; the sole readiness register is `.ai/engineering/READINESS_REGISTER.md`; and current V1 acceptance is controlled by `docs/V1_RELEASE_CHECKLIST.md`. Latest full application-code evidence is recorded there at `526bdf3`. The 2026-11-20 source audit confirmed stale offline update overwrites (CASE-ZAZU-0033 / ENG-DATA-003); no application fix is yet implemented or accepted.
 
 ## Director operating rule
 
