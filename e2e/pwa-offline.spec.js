@@ -261,6 +261,48 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(() => window.ZazuOffline.getState().sync?.token)).toBe('registration-retry-test-token');
     });
 
+    test('offline updates carry a base revision and preserve same-record queue order', async ({ page }) => {
+        await login(page);
+        await page.context().setOffline(true);
+
+        const result = await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const localId = 'revision-queue-customer';
+            const state = window.ZazuOffline.getState();
+            state.customers = [{
+                id: 420001,
+                server_id: 420001,
+                local_id: localId,
+                revision: 7,
+                name: 'Queue revision fixture',
+            }];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+
+            const first = await window.ZazuOffline.queueMutation('customer', 'update', {
+                local_id: localId,
+                server_id: 420001,
+                record: { name: 'First queued edit' },
+            });
+            const second = await window.ZazuOffline.queueMutation('customer', 'update', {
+                local_id: localId,
+                server_id: 420001,
+                record: { name: 'Second queued edit' },
+            });
+
+            return {
+                first,
+                second,
+                pending: await window.ZazuOffline.pending(),
+            };
+        });
+
+        expect(result.first.payload.expected_revision).toBe(7);
+        expect(result.first.queue_order).toBeLessThan(result.second.queue_order);
+        expect(result.second.payload.predecessor_mutation_id).toBe(result.first.id);
+        expect(result.pending.map(item => item.id)).toEqual([result.first.id, result.second.id]);
+    });
+
     test('retries queued mutations when an installed app resumes after reconnect', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Installed-app resume reconnect contract runs once.');
