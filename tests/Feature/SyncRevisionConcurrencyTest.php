@@ -282,6 +282,78 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertSame($response['rebase']['new_mutation_id'], $again['rebase']['new_mutation_id']);
     }
 
+    public function test_rejected_first_mutation_does_not_orphan_a_later_same_device_edit_after_rebase(): void
+    {
+        [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $handler = $this->customerUpdateHandler();
+
+        $first = $this->recordCustomerUpdate($device, $identity, 'First phone edit', [
+            'expected_revision' => 1,
+        ]);
+        $customer->update(['name' => 'Intervening server edit']);
+
+        try {
+            $applier->apply($first, ['customer' => $handler]);
+            $this->fail('The first mutation must be rejected against the newer server revision.');
+        } catch (StaleSyncRevisionException $exception) {
+            $this->assertSame(2, $exception->remotePayload()['revision']);
+        }
+
+        $second = $this->recordCustomerUpdate($device, $identity, 'Second phone edit', [
+            'predecessor_mutation_id' => $first->mutation_id,
+        ]);
+
+        try {
+            $applier->apply($second, ['customer' => $handler]);
+            $this->fail('A successor must not bypass its unresolved predecessor.');
+        } catch (StaleSyncRevisionException $exception) {
+            $this->assertSame(2, $exception->remotePayload()['revision']);
+        }
+
+        $conflict = SyncConflict::create([
+            'business_id' => $business->id,
+            'sync_device_id' => $device->id,
+            'mutation_id' => $first->mutation_id,
+            'entity_type' => 'customer',
+            'entity_id' => $identity->entity_uuid,
+            'conflict_type' => 'stale_record_version',
+            'status' => 'open',
+            'local_payload' => $first->payload,
+            'remote_payload' => ['revision' => 1, 'record' => ['name' => 'Old snapshot']],
+        ]);
+
+        $resolution = app(SyncConflictResolutionService::class)
+            ->resolve($device, $conflict, ['action' => 'retry'])
+            ->getData(true);
+
+        $this->assertSame('new_mutation_required', $resolution['mutation_status']);
+        $this->assertSame(2, $resolution['rebase']['expected_revision']);
+
+        $replacement = $recorder->record(
+            $device,
+            'customer',
+            $identity->entity_uuid,
+            'update',
+            [
+                'local_id' => $identity->entity_uuid,
+                'expected_revision' => $resolution['rebase']['expected_revision'],
+                'record' => ['name' => 'First phone edit'],
+            ],
+            $resolution['rebase']['new_mutation_id'],
+        );
+        $replacement = $applier->apply($replacement, ['customer' => $handler]);
+        $this->assertSame(3, (int) $replacement->result_revision);
+
+        $second = $applier->apply($second, ['customer' => $handler]);
+        $this->assertSame(4, (int) $second->result_revision);
+        $this->assertSame('Second phone edit', $customer->fresh()->name);
+        $this->assertSame('First phone edit', $first->fresh()->payload['record']['name']);
+        $this->assertSame('Second phone edit', $second->fresh()->payload['record']['name']);
+        $this->assertNotSame($first->mutation_id, $replacement->mutation_id);
+    }
+
     public function test_stale_conflict_discard_returns_latest_server_snapshot(): void
     {
         [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
