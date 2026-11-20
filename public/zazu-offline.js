@@ -364,6 +364,19 @@
         }
     }
 
+    async function hasRetryablePendingAttachments() {
+        if (!ACTIVE_BUSINESS_ID) return false;
+        const records = await readAttachmentRecords();
+        return records.some(record =>
+            record.status === 'pending'
+            && record.retryable === true
+            && Number(record.business_id) === ACTIVE_BUSINESS_ID
+            && Number.isSafeInteger(Number(record.event_id))
+            && Number(record.event_id) > 0
+            && record.file instanceof Blob
+        );
+    }
+
     async function clearAttachmentWorkspace() {
         if (ACTIVE_BUSINESS_ID < 1) return;
         const db = await openAttachmentDb();
@@ -605,6 +618,7 @@
                     await writeAttachmentRecord({
                         ...record,
                         attempts: Number(record.attempts || 0) + 1,
+                        retryable: true,
                         last_error: 'Upload paused. Zazu will retry when the connection is available.',
                     }, uploadSessionGeneration);
                     break;
@@ -616,9 +630,11 @@
                 if (!response.ok) {
                     await recordSyncAuthorizationFailure(response);
                     const result = await response.json().catch(() => ({}));
+                    const retryable = [408, 425, 429].includes(response.status) || response.status >= 500;
                     await writeAttachmentRecord({
                         ...record,
                         attempts: Number(record.attempts || 0) + 1,
+                        retryable,
                         last_error: result.message || 'The server did not accept this attachment. It remains saved on this phone.',
                     }, uploadSessionGeneration);
                     if ([401, 403, 429].includes(response.status)) break;
@@ -641,6 +657,7 @@
                     await writeAttachmentRecord({
                         ...record,
                         attempts: Number(record.attempts || 0) + 1,
+                        retryable: true,
                         last_error: 'The server response did not match this file and Work record. The original file remains queued for a safe retry.',
                     }, uploadSessionGeneration);
                     continue;
@@ -651,6 +668,7 @@
                     status: 'synced',
                     attachment: result.attachment,
                     attempts: Number(record.attempts || 0) + 1,
+                    retryable: false,
                     last_error: null,
                     synced_at: new Date().toISOString(),
                 }, uploadSessionGeneration);
@@ -662,6 +680,13 @@
             }
         } finally {
             attachmentSyncing = false;
+            if (!sessionCleared && navigator.onLine && state?.sync?.token) {
+                try {
+                    if (await hasRetryablePendingAttachments()) scheduleSyncRetry();
+                } catch {
+                    // A later foreground/resume cycle can inspect the durable queue again.
+                }
+            }
         }
 
         return { uploaded, pending: await countPendingAttachments() };
@@ -1634,7 +1659,11 @@
             if (!sessionCleared && navigator.onLine && state?.sync?.token
                 && !state.sync_authorization_required) {
                 try {
-                    if ((await pending()).length) {
+                    const [queuedMutations, retryableAttachments] = await Promise.all([
+                        pending(),
+                        hasRetryablePendingAttachments(),
+                    ]);
+                    if (queuedMutations.length || retryableAttachments) {
                         scheduleSyncRetry();
                     } else {
                         clearSyncRetry(true);
