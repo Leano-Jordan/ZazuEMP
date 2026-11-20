@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Readiness Register
 
-Last verified application-code baseline: ba94b39e0460e4e57c560e98541808c762f50e25
+Last verified application-code baseline: 34124eff9622ab78ec5b80d65b5a8a9457464195
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
@@ -15,7 +15,11 @@ The Founder has explicitly added end-to-end offline sync quality across the supp
 
 **Additional integrity gap confirmed by source inspection (2026-11-20):** ordinary offline update mutations do not currently carry a base record version/precondition. Several handlers resolve the latest server record through `existing()` and then call `update()` without detecting that another trusted device changed it after the local snapshot. The conflict pipeline handles validation/domain rejections and changed-payload mutation IDs, but this is not equivalent to stale-record conflict detection. Treat concurrent same-record edits as OPEN until version-aware conflict behaviour is designed and tested, including safe rebasing of multiple sequential local edits from the same device. Do not patch this with an unreviewed last-write-wins rule.
 
-**Current exact-head evidence:** main at 561ad304 has an offline browser acceptance failure (43 passed / 2 failed); mobile customer/Work and phone-local attachment follow-on jobs were skipped after the desktop suite failed. The two current failures include stale six-digit pairing test input and an obsolete expected cross-business error string. These are test-contract findings, not proof of a new physical pairing failure. Broad sync quality remains OPEN and must be assessed domain by domain; do not mark it complete based on one green journey.
+**Exact-head evidence — `34124eff9622ab78ec5b80d65b5a8a9457464195` (2026-11-20):** Laravel PASS — 607 passed / 1 skipped / 4,155 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery PASS; offline browser PASS — 48 desktop tests, 6 mobile-viewport tests and 1 phone-local Work/attachment journey; Zazu Quality, Director Health and CodeQL/Push-on-main PASS. SonarCloud skipped. PHPMD remains FAIL for complexity/length in the two workspace-cleanup commands. Playwright recorded a transient cross-account navigation failure and recovered on retry; the overall browser workflow passed.
+
+**Verified sync changes:** failed mutations/open conflicts now block destructive bootstrap replacement; canonical IDs reconcile for `event_cost`, nested `payment`, `inventory_movement` and `asset_allocation`; disconnected stock receipts update local inventory balance/history; a final offline invoice payment marks the local invoice paid; retryable attachment failures are included in the existing backoff scheduler while preserving the idempotency key. Targeted browser regressions cover these paths.
+
+**Acceptance remains OPEN:** these fixes do not establish sync parity across every supported operation or prove physical-device operation. Concurrent same-record edits still lack a base-version/precondition, so stale updates can overwrite newer server state. Physical Android standalone offline launch/restart/reconnect, DB-001, installed-target recovery, live commercial reconciliation, POPIA operations and ZAZU name clearance remain open. Pairing remains CLOSED by Founder confirmation. Release remains NOT READY; evidence maturity remains 73/100 with no uplift.
 
 **Scope boundary:** no parallel offline engine, no cache-only workaround, no weakening of business isolation/idempotency/conflict tests, and no unsupported app-wide offline claim. Work within the existing offline client, mutation protocol, domain handlers, identity registry, attachment subsystem and documented offline workflow matrix.
 
