@@ -936,6 +936,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'Purchase receipt reconciliation runs once in Chromium.');
 
         await login(page);
+        await trustCurrentDevice(page);
         await page.goto('/purchasing', { waitUntil: 'domcontentloaded' });
 
         const orderLink = page.locator('a.zazu-list-item').filter({ hasText: 'PO-ZAZU-DEMO-002' }).first();
