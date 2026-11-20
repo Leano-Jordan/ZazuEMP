@@ -2831,7 +2831,15 @@ function setupZazuOfflineForms() {
                     window.alert('This purchase order is not available in this device copy yet.');
                     return;
                 }
+                if (order.status !== 'ordered') {
+                    window.alert('This purchase order is not open for receiving in this device copy.');
+                    return;
+                }
 
+                const toHundredths = (value) => {
+                    const amount = Number.parseFloat(String(value ?? 0));
+                    return Number.isFinite(amount) ? Math.round(amount * 100) : 0;
+                };
                 const receivedQuantities = {};
                 for (const input of form.querySelectorAll('[name^="received_quantity["]')) {
                     const quantity = Number.parseFloat(String(input.value || '').trim());
@@ -2842,7 +2850,14 @@ function setupZazuOfflineForms() {
                         window.alert('A purchase order line is not available in this device copy yet.');
                         return;
                     }
-                    receivedQuantities[item.local_id] = String(quantity);
+
+                    const remaining = toHundredths(item.quantity) - toHundredths(item.received_quantity);
+                    const incoming = toHundredths(quantity);
+                    if (incoming > remaining) {
+                        window.alert('This receipt exceeds the remaining ordered quantity for ' + (item.description || 'this line') + '.');
+                        return;
+                    }
+                    receivedQuantities[item.local_id] = (incoming / 100).toFixed(2);
                 }
                 if (!Object.keys(receivedQuantities).length) {
                     window.alert('Enter at least one received quantity before saving.');
@@ -3059,29 +3074,42 @@ function setupZazuOfflineForms() {
 
             if (entity === 'purchase_receipt') {
                 const order = state.purchase_orders?.find(item => item.local_id === payload.purchase_order_local_id);
+                const toHundredths = (value) => {
+                    const amount = Number.parseFloat(String(value ?? 0));
+                    return Number.isFinite(amount) ? Math.round(amount * 100) : 0;
+                };
                 if (order?.items) {
                     for (const [lineLocalId, quantity] of Object.entries(payload.received_quantities)) {
                         const line = order.items.find(item => item.local_id === lineLocalId);
                         if (!line) continue;
-                        const received = Number.parseFloat(String(line.received_quantity ?? 0)) + Number.parseFloat(String(quantity));
-                        line.received_quantity = received.toFixed(2);
+                        const receivedHundredths = toHundredths(line.received_quantity)
+                            + toHundredths(quantity);
+                        line.received_quantity = (receivedHundredths / 100).toFixed(2);
+                        line.pending_sync = true;
                     }
                     const complete = order.items.every(item =>
-                        Number.parseFloat(String(item.received_quantity ?? 0)) >= Number.parseFloat(String(item.quantity ?? 0))
+                        toHundredths(item.received_quantity) >= toHundredths(item.quantity)
                     );
                     if (complete) order.status = 'received';
+                    order.pending_sync = true;
 
                     for (const [lineLocalId, quantityValue] of Object.entries(payload.received_quantities)) {
                         const line = order.items.find(item => item.local_id === lineLocalId);
                         if (!line) continue;
 
-                        const quantity = Number.parseFloat(String(quantityValue));
-                        if (!Number.isFinite(quantity) || quantity <= 0) continue;
+                        const quantityHundredths = toHundredths(quantityValue);
+                        if (quantityHundredths <= 0) continue;
 
-                        let inventoryItem = state.inventory_items?.find(item =>
-                            (line.capability_id != null && Number(item.capability_id) === Number(line.capability_id))
-                            || String(item.name || '').trim().toLowerCase() === String(line.description || '').trim().toLowerCase()
-                        );
+                        const description = String(line.description || '').trim().toLowerCase();
+                        const capabilityId = line.capability_id == null ? null : Number(line.capability_id);
+                        const inventoryMatchesServer = (item) => {
+                            const sameCapability = capabilityId === null
+                                || Number(item.capability_id ?? 0) === capabilityId;
+                            const sameDescription = String(item.name || '').trim().toLowerCase() === description
+                                || String(item.sku || '').trim().toLowerCase() === description;
+                            return sameCapability && sameDescription;
+                        };
+                        let inventoryItem = state.inventory_items?.find(inventoryMatchesServer);
 
                         if (!inventoryItem) {
                             inventoryItem = {
@@ -3093,13 +3121,16 @@ function setupZazuOfflineForms() {
                                 unit: line.unit || 'unit',
                                 reorder_level: '0',
                                 on_hand: 0,
+                                pending_sync: true,
                                 movements: [],
                             };
                             state.inventory_items = state.inventory_items || [];
                             state.inventory_items.push(inventoryItem);
                         }
 
-                        inventoryItem.on_hand = Number.parseFloat(String(inventoryItem.on_hand ?? 0)) + quantity;
+                        const onHandHundredths = toHundredths(inventoryItem.on_hand);
+                        inventoryItem.on_hand = Number(((onHandHundredths + quantityHundredths) / 100).toFixed(2));
+                        inventoryItem.pending_sync = true;
                         inventoryItem.movements = inventoryItem.movements || [];
                         inventoryItem.movements.push({
                             local_id: crypto.randomUUID(),
@@ -3109,11 +3140,12 @@ function setupZazuOfflineForms() {
                             purchase_order_id: order.id,
                             purchase_order_item_id: line.id,
                             type: 'receipt',
-                            quantity: quantity.toFixed(2),
+                            quantity: (quantityHundredths / 100).toFixed(2),
                             unit_cost: line.unit_price,
                             movement_date: new Date().toISOString().slice(0, 10),
                             reference: order.reference,
                             notes: 'Receipt from purchase order.',
+                            pending_sync: true,
                         });
                     }
                 }
