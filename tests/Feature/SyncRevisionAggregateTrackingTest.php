@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Asset;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
@@ -155,6 +156,11 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'inventory_item_local_id' => $fixture['inventory']->entity_uuid,
         ]);
         $this->assertSame(4, (int) $fixture['inventory']->fresh()->revision);
+
+        $this->applyCommand($device, 'asset_allocation', [
+            'asset_local_id' => $fixture['asset']->entity_uuid,
+        ]);
+        $this->assertSame(2, (int) $fixture['asset']->fresh()->revision);
     }
 
     private function commandRevisionFixture(Business $business, Customer $customer): array
@@ -211,6 +217,15 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'unit' => 'unit',
             'reorder_level' => '1.00',
         ]);
+        $asset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'REV-COMMAND-ASSET',
+            'name' => 'Revision command asset',
+            'status' => 'available',
+            'condition' => 'good',
+            'purchase_cost' => '2500.00',
+            'currency' => 'ZAR',
+        ]);
         $registry = app(SyncEntityIdentityRegistry::class);
         $inventoryIdentity = $registry->identify($inventory, 'inventory_item');
 
@@ -232,6 +247,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'invoice' => $registry->identify($invoice, 'invoice'),
             'order' => $registry->identify($order, 'purchase_order'),
             'inventory' => $inventoryIdentity,
+            'asset' => $registry->identify($asset, 'asset'),
             'line' => $line,
         ];
     }
