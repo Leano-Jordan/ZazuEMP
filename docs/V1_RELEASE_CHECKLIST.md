@@ -36,6 +36,7 @@ Offline synchronization is a separate V1 reliability target from phone pairing a
 - [ ] Verify stable local identities, parent/child references, business scoping, idempotency and server canonical IDs across create → update → related mutation sequences.
 - [ ] Verify pull cursors, pagination, acknowledgements and bootstrap/re-bootstrap do not skip or replay changes across devices and businesses.
 - [ ] Verify conflict detection and retry/discard handling preserve both authoritative and local data; consequential conflicts must not be silently overwritten.
+- [ ] Verify concurrent edits from two trusted devices cannot silently overwrite a newer server record. Existing-record offline updates must carry a trustworthy base version or equivalent precondition, create a resolvable conflict when stale, and preserve both local and remote values. Multiple sequential edits queued by the same device must not conflict with their own earlier mutation.
 - [ ] Verify attachment bytes, metadata, job linkage, checksums/idempotency, retry and download/open behavior, including the supported offline-created Work linkage path.
 - [ ] Verify supported financial, inventory, purchase/receipt, schedule and asset mutations preserve server validation, money/date precision and lifecycle rules.
 - [ ] Run targeted server/client regression coverage and the full exact-head Laravel + browser acceptance suites; then verify representative sync journeys on the actual PC and phone.
