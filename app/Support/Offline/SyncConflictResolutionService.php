@@ -39,85 +39,15 @@ final class SyncConflictResolutionService
         $mutation = $this->lockConflictMutation($lockedConflict, $device);
 
         if ($lockedConflict->status !== 'open') {
-            $mutationStatus = $this->resolvedConflictMutationStatus($lockedConflict, $mutation);
-            $rebase = $mutationStatus === 'new_mutation_required'
-                ? array_filter([
-                    'new_mutation_id' => $mutation?->superseded_by_mutation_id,
-                    'expected_revision' => $lockedConflict->conflict_type === 'stale_record_version'
-                        ? (int) ($lockedConflict->remote_payload['revision'] ?? 0)
-                        : null,
-                ], static fn ($value) => $value !== null)
-                : null;
-
-            return response()->json([
-                'conflict' => $this->payload($lockedConflict),
-                'mutation_status' => $mutationStatus,
-                'rebase' => $rebase,
-            ]);
-        }
-
-        if ($lockedConflict->conflict_type === 'mutation_identity_mismatch' && $validated['action'] === 'retry') {
-            abort_unless($mutation, 404);
-            $this->assertCausalPredecessorApplied($mutation, $device);
-            $newMutationId = (string) Str::uuid();
-            $mutation->update([
-                'status' => 'discarded',
-                'last_error' => 'Superseded by a new immutable mutation identifier after payload correction.',
-                'superseded_by_mutation_id' => $newMutationId,
-            ]);
-            $lockedConflict->update([
-                'status' => 'resolved',
-                'resolution_note' => $this->conflictResolutionNote($lockedConflict, $validated),
-                'resolved_at' => now(),
-            ]);
-
-            return response()->json([
-                'conflict' => $this->payload($lockedConflict->fresh()),
-                'mutation_status' => 'new_mutation_required',
-                'rebase' => ['new_mutation_id' => $newMutationId],
-            ]);
+            return $this->resolvedConflictResponse($lockedConflict, $mutation);
         }
 
         if ($lockedConflict->conflict_type === 'stale_record_version') {
-            $remotePayload = $this->currentRemotePayload($lockedConflict);
-            $lockedConflict->update(['remote_payload' => $remotePayload]);
+            return $this->resolveStaleRecordVersion($lockedConflict, $mutation, $device, $validated);
+        }
 
-            if ($validated['action'] === 'retry') {
-                abort_unless($mutation, 404);
-                $this->assertCausalPredecessorApplied($mutation, $device);
-                abort_unless((int) ($remotePayload['revision'] ?? 0) > 0, 409, 'The latest server revision is unavailable. Refresh the workspace before rebasing.');
-                $newMutationId = (string) Str::uuid();
-                $mutation->update([
-                    'status' => 'discarded',
-                    'last_error' => 'Superseded by an explicit rebase onto the latest server revision.',
-                    'superseded_by_mutation_id' => $newMutationId,
-                ]);
-
-                $mutationStatus = 'new_mutation_required';
-                $rebase = [
-                    'new_mutation_id' => $newMutationId,
-                    'expected_revision' => (int) ($remotePayload['revision'] ?? 0),
-                ];
-            } else {
-                $mutation?->update([
-                    'status' => 'discarded',
-                    'last_error' => 'Local version discarded in favour of the latest server version.',
-                ]);
-                $mutationStatus = 'discarded';
-                $rebase = null;
-            }
-
-            $lockedConflict->update([
-                'status' => 'resolved',
-                'resolution_note' => $this->conflictResolutionNote($lockedConflict, $validated),
-                'resolved_at' => now(),
-            ]);
-
-            return response()->json([
-                'conflict' => $this->payload($lockedConflict->fresh()),
-                'mutation_status' => $mutationStatus,
-                'rebase' => $rebase,
-            ]);
+        if ($lockedConflict->conflict_type === 'mutation_identity_mismatch' && $validated['action'] === 'retry') {
+            return $this->resolveIdentityMismatchRetry($lockedConflict, $mutation, $device, $validated);
         }
 
         $mutationStatus = $this->applyOpenConflictResolution(
@@ -136,6 +66,103 @@ final class SyncConflictResolutionService
         return response()->json([
             'conflict' => $this->payload($lockedConflict->fresh()),
             'mutation_status' => $mutationStatus,
+        ]);
+    }
+
+    private function resolveStaleRecordVersion(
+        SyncConflict $conflict,
+        ?SyncMutation $mutation,
+        SyncDevice $device,
+        array $validated,
+    ): JsonResponse {
+        $remotePayload = $this->currentRemotePayload($conflict);
+        $conflict->update(['remote_payload' => $remotePayload]);
+
+        if ($validated['action'] === 'retry') {
+            abort_unless($mutation, 404);
+            $this->assertCausalPredecessorApplied($mutation, $device);
+            abort_unless(
+                (int) ($remotePayload['revision'] ?? 0) > 0,
+                409,
+                'The latest server revision is unavailable. Refresh the workspace before rebasing.'
+            );
+
+            $newMutationId = (string) Str::uuid();
+            $mutation->update([
+                'status' => 'discarded',
+                'last_error' => 'Superseded by an explicit rebase onto the latest server revision.',
+                'superseded_by_mutation_id' => $newMutationId,
+            ]);
+            $mutationStatus = 'new_mutation_required';
+            $rebase = [
+                'new_mutation_id' => $newMutationId,
+                'expected_revision' => (int) $remotePayload['revision'],
+            ];
+        } else {
+            $mutation?->update([
+                'status' => 'discarded',
+                'last_error' => 'Local version discarded in favour of the latest server version.',
+            ]);
+            $mutationStatus = 'discarded';
+            $rebase = null;
+        }
+
+        $conflict->update([
+            'status' => 'resolved',
+            'resolution_note' => $this->conflictResolutionNote($conflict, $validated),
+            'resolved_at' => now(),
+        ]);
+
+        return response()->json([
+            'conflict' => $this->payload($conflict->fresh()),
+            'mutation_status' => $mutationStatus,
+            'rebase' => $rebase,
+        ]);
+    }
+
+    private function resolveIdentityMismatchRetry(
+        SyncConflict $conflict,
+        ?SyncMutation $mutation,
+        SyncDevice $device,
+        array $validated,
+    ): JsonResponse {
+        abort_unless($mutation, 404);
+        $this->assertCausalPredecessorApplied($mutation, $device);
+        $newMutationId = (string) Str::uuid();
+        $mutation->update([
+            'status' => 'discarded',
+            'last_error' => 'Superseded by a new immutable mutation identifier after payload correction.',
+            'superseded_by_mutation_id' => $newMutationId,
+        ]);
+        $conflict->update([
+            'status' => 'resolved',
+            'resolution_note' => $this->conflictResolutionNote($conflict, $validated),
+            'resolved_at' => now(),
+        ]);
+
+        return response()->json([
+            'conflict' => $this->payload($conflict->fresh()),
+            'mutation_status' => 'new_mutation_required',
+            'rebase' => ['new_mutation_id' => $newMutationId],
+        ]);
+    }
+
+    private function resolvedConflictResponse(SyncConflict $conflict, ?SyncMutation $mutation): JsonResponse
+    {
+        $mutationStatus = $this->resolvedConflictMutationStatus($conflict, $mutation);
+        $rebase = $mutationStatus === 'new_mutation_required'
+            ? array_filter([
+                'new_mutation_id' => $mutation?->superseded_by_mutation_id,
+                'expected_revision' => $conflict->conflict_type === 'stale_record_version'
+                    ? (int) ($conflict->remote_payload['revision'] ?? 0)
+                    : null,
+            ], static fn ($value) => $value !== null)
+            : null;
+
+        return response()->json([
+            'conflict' => $this->payload($conflict),
+            'mutation_status' => $mutationStatus,
+            'rebase' => $rebase,
         ]);
     }
 
@@ -260,38 +287,47 @@ final class SyncConflictResolutionService
 
         $visited = [];
         for ($depth = 0; $depth < 8; $depth++) {
-            if (isset($visited[$predecessorId])) {
-                abort(409, 'The earlier offline change has a broken causal chain.');
-            }
+            abort_if(isset($visited[$predecessorId]), 409, 'The earlier offline change has a broken causal chain.');
             $visited[$predecessorId] = true;
+            $predecessor = $this->findCausalPredecessor($mutation, $device, $predecessorId);
 
-            $predecessor = SyncMutation::query()
-                ->where('business_id', $device->business_id)
-                ->where('sync_device_id', $device->id)
-                ->where('mutation_id', $predecessorId)
-                ->lockForUpdate()
-                ->first();
-
-            abort_unless(
-                $predecessor
-                    && $predecessor->entity_type === $mutation->entity_type
-                    && $predecessor->entity_id === $mutation->entity_id,
-                409,
-                'Resolve the earlier offline change before rebasing this edit.'
-            );
-
-            if ($predecessor->status === 'applied' && is_numeric($predecessor->result_revision)) {
+            if ($predecessor?->status === 'applied' && is_numeric($predecessor->result_revision)) {
                 return;
             }
 
-            if ($predecessor->status !== 'discarded' || ! is_string($predecessor->superseded_by_mutation_id)) {
-                abort(409, 'Resolve the earlier offline change before rebasing this edit.');
-            }
+            abort_unless(
+                $predecessor?->status === 'discarded' && is_string($predecessor->superseded_by_mutation_id),
+                409,
+                'Resolve the earlier offline change before rebasing this edit.'
+            );
 
             $predecessorId = $predecessor->superseded_by_mutation_id;
         }
 
         abort(409, 'The earlier offline change has too many rebase links.');
+    }
+
+    private function findCausalPredecessor(
+        SyncMutation $mutation,
+        SyncDevice $device,
+        string $predecessorId,
+    ): ?SyncMutation {
+        $predecessor = SyncMutation::query()
+            ->where('business_id', $device->business_id)
+            ->where('sync_device_id', $device->id)
+            ->where('mutation_id', $predecessorId)
+            ->lockForUpdate()
+            ->first();
+
+        abort_unless(
+            $predecessor
+                && $predecessor->entity_type === $mutation->entity_type
+                && $predecessor->entity_id === $mutation->entity_id,
+            409,
+            'Resolve the earlier offline change before rebasing this edit.'
+        );
+
+        return $predecessor;
     }
 
     /**

@@ -178,21 +178,15 @@ class SyncMutationApplier
             }
             $visited[$predecessorId] = true;
 
-            $predecessor = SyncMutation::query()
-                ->where('business_id', $mutation->business_id)
-                ->where('sync_device_id', $mutation->sync_device_id)
-                ->where('mutation_id', $predecessorId)
-                ->lockForUpdate()
-                ->first();
-
-            if (! $predecessor
-                || $predecessor->entity_type !== $mutation->entity_type
-                || $predecessor->entity_id !== $mutation->entity_id) {
+            $predecessor = $this->findPredecessorMutation($mutation, $predecessorId);
+            if (! $predecessor) {
                 return null;
             }
 
-            if ($predecessor->status === 'applied' && is_numeric($predecessor->result_revision)) {
-                return (int) $predecessor->result_revision;
+            if ($predecessor->status === 'applied') {
+                return is_numeric($predecessor->result_revision)
+                    ? (int) $predecessor->result_revision
+                    : null;
             }
 
             if ($predecessor->status !== 'discarded' || ! is_string($predecessor->superseded_by_mutation_id)) {
@@ -203,5 +197,23 @@ class SyncMutationApplier
         }
 
         return null;
+    }
+
+    private function findPredecessorMutation(SyncMutation $mutation, string $predecessorId): ?SyncMutation
+    {
+        $predecessor = SyncMutation::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('sync_device_id', $mutation->sync_device_id)
+            ->where('mutation_id', $predecessorId)
+            ->lockForUpdate()
+            ->first();
+
+        if (! $predecessor
+            || $predecessor->entity_type !== $mutation->entity_type
+            || $predecessor->entity_id !== $mutation->entity_id) {
+            return null;
+        }
+
+        return $predecessor;
     }
 }
