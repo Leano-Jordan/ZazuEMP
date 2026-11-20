@@ -2598,12 +2598,18 @@ function setupZazuOfflineDirectoryViews() {
     };
 
     const offlineRouteViews = [
-        [/^\/customers(?:\/|$)/, 'customers'], [/^\/work(?:\/|$)/, 'jobs'],
-        [/^\/quotes(?:\/|$)/, 'quotes'], [/^\/suppliers(?:\/|$)/, 'suppliers'],
-        [/^\/services(?:\/|$)/, 'catalogue'], [/^\/inventory(?:\/|$)/, 'inventory_items'],
-        [/^\/assets(?:\/|$)/, 'assets'], [/^\/(?:purchasing|purchase-orders)(?:\/|$)/, 'purchase_orders'],
-        [/^\/finance(?:\/|$)/, 'invoices'], [/^\/expenses(?:\/|$)/, 'expenses'],
-        [/^\/costs(?:\/|$)/, 'costs'],
+        [/^\/customers(?:\/|$)/, 'customers'],
+        [/^\/work\/[^/]+\/(?:quotes)(?:\/|$)/, 'quotes'],
+        [/^\/work\/[^/]+\/(?:costs|travel)(?:\/|$)/, 'costs'],
+        [/^\/work(?:\/|$)/, 'jobs'],
+        [/^\/quotes(?:\/|$)/, 'quotes'],
+        [/^\/suppliers(?:\/|$)/, 'suppliers'],
+        [/^\/services(?:\/|$)/, 'catalogue'],
+        [/^\/inventory(?:\/|$)/, 'inventory_items'],
+        [/^\/assets(?:\/|$)/, 'assets'],
+        [/^\/purchasing(?:\/|$)/, 'purchase_orders'],
+        [/^\/finance\/expenses(?:\/|$)/, 'expenses'],
+        [/^\/finance(?:\/|$)/, 'invoices'],
     ];
 
     const applyOfflineRouteView = () => {
