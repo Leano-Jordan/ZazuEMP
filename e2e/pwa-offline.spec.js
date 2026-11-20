@@ -335,6 +335,14 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(workspace.getByText('Soshanguve')).toBeVisible();
         await workspace.getByRole('button', { name: 'View saved details' }).nth(1).click();
         await expect(workspace.getByText('Inactive', { exact: true })).toBeVisible();
+
+        const stockSection = workspace.locator('[data-zazu-offline-collection="inventory_items"]');
+        await stockSection.getByRole('button', { name: 'View saved details' }).click();
+        await expect(stockSection.getByText('Recent stock movements')).toBeVisible();
+
+        const invoiceSection = workspace.locator('[data-zazu-offline-collection="invoices"]');
+        await invoiceSection.getByRole('button', { name: 'View saved details' }).click();
+        await expect(invoiceSection.getByText('EFT-01')).toBeVisible();
     });
 
     test('offline updates carry a base revision and preserve same-record queue order', async ({ page }) => {
