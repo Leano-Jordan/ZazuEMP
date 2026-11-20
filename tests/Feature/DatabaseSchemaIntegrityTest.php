@@ -49,7 +49,14 @@ class DatabaseSchemaIntegrityTest extends TestCase
         $missing = [];
 
         foreach (File::allFiles(app_path('Models')) as $file) {
-            if ($file->getFilename() === 'BelongsToBusiness.php' || $file->getExtension() !== 'php') {
+            if (
+                in_array($file->getFilename(), [
+                    'BelongsToBusiness.php',
+                    'FounderSupportSession.php',
+                    'PlatformAuditLog.php',
+                ], true)
+                || $file->getExtension() !== 'php'
+            ) {
                 continue;
             }
 
@@ -98,6 +105,22 @@ class DatabaseSchemaIntegrityTest extends TestCase
         $this->assertSame([], $missing);
     }
 
+    public function test_platform_support_and_audit_records_are_global_but_business_attributable(): void
+    {
+        foreach ([
+            \\App\\Models\\FounderSupportSession::class,
+            \\App\\Models\\PlatformAuditLog::class,
+        ] as $className) {
+            $model = new $className();
+            $this->assertTrue(Schema::hasColumn($model->getTable(), 'business_id'));
+            $this->assertNotContains(
+                BelongsToBusiness::class,
+                class_uses_recursive($className),
+                $className.' must remain platform-scoped.',
+            );
+        }
+    }
+
     /**
     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
     * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -107,7 +130,14 @@ class DatabaseSchemaIntegrityTest extends TestCase
         $missing = [];
 
         foreach (File::allFiles(app_path('Models')) as $file) {
-            if ($file->getFilename() === 'BelongsToBusiness.php' || $file->getExtension() !== 'php') {
+            if (
+                in_array($file->getFilename(), [
+                    'BelongsToBusiness.php',
+                    'FounderSupportSession.php',
+                    'PlatformAuditLog.php',
+                ], true)
+                || $file->getExtension() !== 'php'
+            ) {
                 continue;
             }
 
