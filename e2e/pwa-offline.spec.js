@@ -1478,6 +1478,95 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
     });
 
+    test('offline deposits respect the quote deposit requirement', async ({ page }, testInfo) => {
+        test.setTimeout(35_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Offline deposit limit runs once in Chromium.');
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/finance/payments/create', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(businessId).toBeGreaterThan(0);
+
+        await page.evaluate(async activeBusinessId => {
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'offline-deposit-limit-token',
+                device: { id: 987665, business_id: activeBusinessId },
+            };
+            state.invoices = [{
+                local_id: 'offline-deposit-invoice',
+                id: 98601,
+                server_id: 98601,
+                number: 'INV-OFFLINE-DEPOSIT-001',
+                status: 'issued',
+                currency: 'ZAR',
+                total: '250.00',
+                paid_amount: '0.00',
+                balance: '250.00',
+                deposit_required: '75.00',
+                deposit_paid_amount: '0.00',
+                deposit_balance: '75.00',
+                payments: [],
+            }];
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        }, businessId);
+
+        const invoiceSelect = page.locator('select[name="invoice_id"]');
+        await invoiceSelect.evaluate(select => {
+            select.add(new Option('INV-OFFLINE-DEPOSIT-001 · ZAR 250.00 outstanding', '98601'));
+            select.value = '98601';
+        });
+        await page.locator('select[name="type"]').selectOption('deposit');
+        const paymentForm = page.locator('form[data-zazu-offline-entity="payment"]');
+        await page.context().setOffline(true);
+
+        let depositError = null;
+        page.once('dialog', async dialog => {
+            depositError = dialog.message();
+            await dialog.dismiss();
+        });
+        await page.locator('input[name="amount"]').fill('75.01');
+        await paymentForm.getByRole('button', { name: 'Record payment' }).click();
+        await expect.poll(() => depositError).toContain('This deposit would exceed the required deposit amount.');
+        expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
+
+        await page.locator('input[name="amount"]').fill('75.00');
+        await paymentForm.getByRole('button', { name: 'Record payment' }).click();
+        await expect(paymentForm.getByRole('status')).toContainText('Saved on this device');
+
+        const state = await page.evaluate(async () => {
+            const invoice = window.ZazuOffline.getState().invoices.find(item => item.local_id === 'offline-deposit-invoice');
+            return {
+                status: invoice?.status,
+                paidAmount: invoice?.paid_amount,
+                balance: invoice?.balance,
+                depositPaid: invoice?.deposit_paid_amount,
+                depositBalance: invoice?.deposit_balance,
+                payment: invoice?.payments?.[0] ?? null,
+                pending: await window.ZazuOffline.pending(),
+            };
+        });
+
+        expect(state.status).toBe('issued');
+        expect(state.paidAmount).toBe('75.00');
+        expect(state.balance).toBe('175.00');
+        expect(state.depositPaid).toBe('75.00');
+        expect(state.depositBalance).toBe('0.00');
+        expect(state.payment).toMatchObject({
+            type: 'deposit',
+            amount: '75.00',
+            pending_sync: true,
+            id: null,
+            server_id: null,
+        });
+        expect(state.pending).toHaveLength(1);
+        expect(state.pending[0].entity_type).toBe('payment');
+    });
+
     test('paired device can retry or discard a failed offline sync change', async ({ page }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Sync conflict controls run once; responsive layouts are covered by the settings suite.');
