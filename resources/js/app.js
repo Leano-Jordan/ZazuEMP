@@ -3635,19 +3635,6 @@ function registerZazuServiceWorker() {
             '/customers/create',
             '/work',
             '/work/create',
-            ...[...document.querySelectorAll('a[href]')]
-                .map((link) => {
-                    try {
-                        const url = new URL(link.href, window.location.href);
-                        if (url.origin !== window.location.origin) return null;
-                        if (url.search || url.hash) return null;
-                        if (url.pathname === '/logout' || url.pathname.startsWith('/api/')) return null;
-                        return url.pathname;
-                    } catch {
-                        return null;
-                    }
-                })
-                .filter(Boolean)
         ])];
 
         const target = navigator.serviceWorker.controller || registration.active;
