@@ -176,13 +176,13 @@ test('service worker upgrades preserve authenticated offline pages and active bu
     await worker.dispatchActivate();
 
     const names = await worker.caches.keys();
-    assert.ok(names.includes('zazu-static-v52'));
-    assert.ok(names.includes('zazu-static-v52-user-41-business-17'));
+    assert.ok(names.includes('zazu-static-v53'));
+    assert.ok(names.includes('zazu-static-v53-user-41-business-17'));
     assert.equal(names.includes('zazu-static-v49'), false);
     assert.equal(names.includes('zazu-static-v49-user-41-business-17'), false);
 
-    const currentStatic = await worker.caches.open('zazu-static-v52');
-    const currentUser = await worker.caches.open('zazu-static-v52-user-41-business-17');
+    const currentStatic = await worker.caches.open('zazu-static-v53');
+    const currentUser = await worker.caches.open('zazu-static-v53-user-41-business-17');
     assert.ok(await currentStatic.match('/__zazu-active-context__'));
     assert.equal(await (await currentStatic.match('/build/old-dashboard.css')).text(), 'cached-css');
     assert.equal(await currentStatic.match('/dashboard'), null, 'authenticated pages must never migrate into the shared cache');
@@ -218,11 +218,11 @@ test('authenticated uploaded images are cached only in the active business cache
     await online.finished();
 
     const names = await worker.caches.keys();
-    assert.ok(names.includes('zazu-static-v52-user-41-business-17'));
-    assert.equal(names.includes('zazu-static-v52'), true);
-    const privateCache = await worker.caches.open('zazu-static-v52-user-41-business-17');
+    assert.ok(names.includes('zazu-static-v53-user-41-business-17'));
+    assert.equal(names.includes('zazu-static-v53'), true);
+    const privateCache = await worker.caches.open('zazu-static-v53-user-41-business-17');
     assert.ok(await privateCache.match('/media/business/logo'));
-    const staticCache = await worker.caches.open('zazu-static-v52');
+    const staticCache = await worker.caches.open('zazu-static-v53');
     assert.equal(await staticCache.match('/media/business/logo'), null, 'private media must not enter the shared cache');
 
     hostAvailable = false;
@@ -297,10 +297,10 @@ test('page priming caches referenced private images before disconnected launch',
         routes: ['/dashboard'],
     });
 
-    const privateCache = await worker.caches.open('zazu-static-v52-user-41-business-17');
+    const privateCache = await worker.caches.open('zazu-static-v53-user-41-business-17');
     assert.ok(await privateCache.match('/media/profile/customer/12'));
     assert.ok(await privateCache.match('/media/business/dashboard?v=9'));
-    const staticCache = await worker.caches.open('zazu-static-v52');
+    const staticCache = await worker.caches.open('zazu-static-v53');
     assert.equal(await staticCache.match('/media/profile/customer/12'), null);
     assert.equal(await staticCache.match('/media/business/dashboard?v=9'), null);
 
@@ -359,7 +359,7 @@ test('page priming caches the page CSS, JavaScript and CSS dependencies for a st
         routes: ['/dashboard'],
     });
 
-    const staticCache = await worker.caches.open('zazu-static-v52');
+    const staticCache = await worker.caches.open('zazu-static-v53');
     for (const path of [
         '/build/assets/app.css?id=abc',
         '/build/assets/app.js?id=def',
@@ -403,7 +403,7 @@ test('uploaded images are not cached without an authenticated business context',
 
 test('a persisted identity read finishing after logout cannot restore the identity or prime private pages', async () => {
     const worker = bootWorker();
-    const cache = await worker.caches.open('zazu-static-v52');
+    const cache = await worker.caches.open('zazu-static-v53');
     const readStarted = deferred();
     const releaseRead = deferred();
 
@@ -411,7 +411,7 @@ test('a persisted identity read finishing after logout cannot restore the identi
         readStarted.resolve();
         return releaseRead.promise;
     }));
-    const privateCache = await worker.caches.open('zazu-static-v52-user-41-business-17');
+    const privateCache = await worker.caches.open('zazu-static-v53-user-41-business-17');
     await privateCache.put('/dashboard', new MockResponse('private dashboard'));
 
     const priming = worker.dispatchMessage({
@@ -428,7 +428,7 @@ test('a persisted identity read finishing after logout cannot restore the identi
 
     assert.equal(worker.fetchCalls.length, 0, 'stale identity must not trigger page priming');
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v52-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v53-user-')),
         false,
         'logout must leave no cached authenticated page',
     );
@@ -440,16 +440,16 @@ test('a failed logout request preserves the authenticated page cache and active 
         if (new URL(request.url).pathname === '/logout') throw new Error('Server is unreachable');
         return new MockResponse('online');
     });
-    const staticCache = await worker.caches.open('zazu-static-v52');
+    const staticCache = await worker.caches.open('zazu-static-v53');
     await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({ user_id: '41', business_id: '17' })));
-    const privateCache = await worker.caches.open('zazu-static-v52-user-41-business-17');
+    const privateCache = await worker.caches.open('zazu-static-v53-user-41-business-17');
     await privateCache.put('/dashboard', new MockResponse('<main>private dashboard</main>'));
 
     const logout = worker.dispatchFetch(new worker.Request('/logout', { method: 'POST' }));
     await assert.rejects(logout.response, /Server is unreachable/);
     await logout.finished();
 
-    assert.ok((await worker.caches.keys()).includes('zazu-static-v52-user-41-business-17'));
+    assert.ok((await worker.caches.keys()).includes('zazu-static-v53-user-41-business-17'));
     assert.ok(await staticCache.match('/__zazu-active-context__'));
 });
 
@@ -464,9 +464,9 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
         return networkResponse.promise;
     });
 
-    const staticCache = await worker.caches.open('zazu-static-v52');
+    const staticCache = await worker.caches.open('zazu-static-v53');
     await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({ user_id: '41', business_id: '17' })));
-    const privateCache = await worker.caches.open('zazu-static-v52-user-41-business-17');
+    const privateCache = await worker.caches.open('zazu-static-v53-user-41-business-17');
     await privateCache.put('/dashboard', new MockResponse('<main>private dashboard</main>'));
 
     const navigation = worker.dispatchFetch(new worker.Request('/dashboard', {
@@ -489,7 +489,7 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
     await navigation.finished();
 
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v52-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v53-user-')),
         false,
         'a late response must not recreate the logged-out user cache',
     );
@@ -509,10 +509,10 @@ test('logout clears a context that was primed immediately before the session end
 
     await Promise.all([priming, logout]);
 
-    const state = await worker.caches.open('zazu-static-v52');
+    const state = await worker.caches.open('zazu-static-v53');
     assert.equal(await state.match('/__zazu-active-context__'), null);
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v52-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v53-user-')),
         false,
         'logout must clear any page cache created immediately before it',
     );
@@ -633,16 +633,16 @@ test('a successful business switch clears the previous business page cache befor
     });
 
     await worker.dispatchMessage({ type: 'prime-pages', userId: '41', businessId: '17', routes: ['/dashboard'] });
-    assert.ok((await worker.caches.keys()).includes('zazu-static-v52-user-41-business-17'));
+    assert.ok((await worker.caches.keys()).includes('zazu-static-v53-user-41-business-17'));
 
     const switched = worker.dispatchFetch(new worker.Request('/business/switch', { method: 'POST' }));
     const switchResponse = await switched.response;
     assert.equal(switchResponse.status, 302);
     await switched.finished();
 
-    const state = await worker.caches.open('zazu-static-v52');
+    const state = await worker.caches.open('zazu-static-v53');
     assert.equal(await state.match('/__zazu-active-context__'), null);
-    assert.equal((await worker.caches.keys()).some(name => name.startsWith('zazu-static-v52-user-41-business-')), false);
+    assert.equal((await worker.caches.keys()).some(name => name.startsWith('zazu-static-v53-user-41-business-')), false);
 
     const nextPage = worker.dispatchFetch(new worker.Request('/dashboard', {
         method: 'GET',
@@ -654,8 +654,8 @@ test('a successful business switch clears the previous business page cache befor
     await nextPage.finished();
 
     const names = await worker.caches.keys();
-    assert.ok(names.includes('zazu-static-v52-user-41-business-29'));
-    assert.equal(names.includes('zazu-static-v52-user-41-business-17'), false);
+    assert.ok(names.includes('zazu-static-v53-user-41-business-29'));
+    assert.equal(names.includes('zazu-static-v53-user-41-business-17'), false);
 });
 
 
@@ -705,15 +705,15 @@ test('a private image response arriving after a business switch is not cached in
     await imageRequest.finished();
 
     const names = await worker.caches.keys();
-    assert.ok(names.includes('zazu-static-v52-user-41-business-29'));
-    const newBusinessCache = await worker.caches.open('zazu-static-v52-user-41-business-29');
+    assert.ok(names.includes('zazu-static-v53-user-41-business-29'));
+    const newBusinessCache = await worker.caches.open('zazu-static-v53-user-41-business-29');
     assert.equal(
         await newBusinessCache.match('/media/business/logo'),
         null,
         'a late response from the previous business must never enter the new business cache',
     );
     assert.equal(
-        names.includes('zazu-static-v52-user-41-business-17'),
+        names.includes('zazu-static-v53-user-41-business-17'),
         false,
         'switching businesses must remove the previous private cache',
     );
@@ -810,4 +810,37 @@ test('an installed app navigation serves the authenticated cached page without a
 
     assert.equal(worker.fetchCalls.length, 1, 'only the initial online page-prime request is allowed');
     assert.equal(new URL(worker.fetchCalls[0].url).pathname, '/dashboard');
+});
+
+test('failed top-level navigation falls back to the local dashboard instead of stale route HTML', async () => {
+    const worker = bootWorker(async () => {
+        throw new Error('Host unavailable during navigation.');
+    });
+
+    const staticCache = await worker.caches.open('zazu-static-v53');
+    await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({
+        user_id: '41',
+        business_id: '17',
+    })));
+
+    const businessCache = await worker.caches.open('zazu-static-v53-user-41-business-17');
+    await businessCache.put('/dashboard', new MockResponse(
+        '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Local dashboard shell</main></body></html>',
+    ));
+    await businessCache.put('/customers', new MockResponse(
+        '<!doctype html><html><body><main>Stale server-rendered customer snapshot</main></body></html>',
+    ));
+
+    const navigation = worker.dispatchFetch(new worker.Request('/customers', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }));
+
+    const response = await navigation.response;
+    assert.equal(response.ok, true);
+    const html = await response.text();
+    assert.match(html, /Local dashboard shell/);
+    assert.doesNotMatch(html, /Stale server-rendered customer snapshot/);
+    await navigation.finished();
 });
