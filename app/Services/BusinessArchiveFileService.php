@@ -28,12 +28,23 @@ final class BusinessArchiveFileService
 
     private function assertArchivePayloadEntriesAreDeclared(ZipArchive $zip, array $manifest): void
     {
-        $declaredEntries = array_fill_keys(array_column($manifest['files'], 'entry'), true);
+        // Business archives are data containers, not general-purpose ZIP files.
+        // Accept only the two required metadata entries and payloads explicitly
+        // referenced by the validated manifest; ignore nothing silently.
+        $declaredEntries = array_fill_keys(['manifest.json', 'data.json'], true);
+        foreach ($manifest['files'] as $file) {
+            $declaredEntries[(string) $file['entry']] = true;
+        }
+
         for ($index = 0; $index < $zip->numFiles; $index++) {
             $stat = $zip->statIndex($index);
-            $entry = $stat['name'] ?? '';
-            if (is_string($entry) && Str::startsWith($entry, 'payload/files/') && ! isset($declaredEntries[$entry])) {
-                throw new RuntimeException('The archive contains an undeclared file payload.');
+            $entry = $stat['name'] ?? null;
+            if (! is_string($entry) || ! isset($declaredEntries[$entry])) {
+                if (is_string($entry) && Str::startsWith($entry, 'payload/files/')) {
+                    throw new RuntimeException('The archive contains an undeclared file payload.');
+                }
+
+                throw new RuntimeException('The business archive contains an unexpected ZIP entry.');
             }
         }
     }
