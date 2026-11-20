@@ -1031,7 +1031,6 @@
                 conflicts: result.conflicts,
             };
             await writeState();
-            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             return state.conflicts;
         } catch (error) {
             state = previousState;
