@@ -612,15 +612,6 @@ const setupZazuHierarchicalNavigation = () => {
         });
     };
 
-    const syncActiveAreaForViewport = () => {
-        const activeArea = areas.find((area) => area.classList.contains('is-active'));
-        if (!activeArea) return;
-
-        closeOthers(activeArea);
-        activeArea.classList.add('is-open');
-        activeArea.querySelector('[data-zazu-nav-trigger]')?.setAttribute('aria-expanded', 'true');
-    };
-
     areas.forEach((area) => {
         const trigger = area.querySelector('[data-zazu-nav-trigger]');
         if (!trigger) return;
@@ -644,8 +635,6 @@ const setupZazuHierarchicalNavigation = () => {
         document.querySelector('[data-zazu-nav-trigger][aria-expanded="true"]')?.focus();
     });
 
-    syncActiveAreaForViewport();
-    window.matchMedia('(max-width: 850px)').addEventListener?.('change', syncActiveAreaForViewport);
 };
 
 function setupZazuHelper() {
