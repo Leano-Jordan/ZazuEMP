@@ -185,6 +185,8 @@ test('service worker upgrades preserve authenticated offline pages and active bu
     const currentUser = await worker.caches.open('zazu-static-v50-user-41-business-17');
     assert.ok(await currentStatic.match('/__zazu-active-context__'));
     assert.equal(await (await currentStatic.match('/build/old-dashboard.css')).text(), 'cached-css');
+    assert.equal(await currentStatic.match('/dashboard'), null, 'authenticated pages must never migrate into the shared cache');
+    assert.equal(await currentStatic.match('/media/business/logo'), null, 'private media must never migrate into the shared cache');
     assert.equal(await (await currentUser.match('/dashboard')).text(), '<main>Saved dashboard</main>');
     assert.equal(await (await currentUser.match('/media/business/logo')).text(), 'private-logo');
 });
