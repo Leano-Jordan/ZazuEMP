@@ -1503,12 +1503,13 @@
                         nextState.conflicts = [
                             ...nextState.conflicts.filter(item => Number(item.id) !== Number(remote.conflict_id)),
                             {
+                                ...(remote.conflict || {}),
                                 id: remote.conflict_id,
                                 mutation_id: mutation.id,
                                 entity_type: mutation.entity_type,
                                 entity_id: mutation.entity_id,
-                                conflict_type: remote.conflict_type || 'domain_rejection',
-                                message: remote.error,
+                                conflict_type: remote.conflict_type || remote.conflict?.conflict_type || 'domain_rejection',
+                                message: remote.conflict?.message || remote.error,
                                 status: 'open',
                             },
                         ];

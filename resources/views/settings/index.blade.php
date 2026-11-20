@@ -549,11 +549,34 @@
                 title.className = 'block';
                 title.textContent = (conflict.entity_type || 'Offline change') + ' · ' + (conflict.entity_id || 'record');
 
+                const staleVersion = conflict.conflict_type === 'stale_record_version';
+                const serverDeleted = staleVersion && conflict.remote_payload?.deleted === true;
                 const message = document.createElement('p');
                 message.className = 'zazu-context-copy mt-1';
                 message.textContent = conflict.message || 'The server rejected this saved change.';
 
                 details.append(title, message);
+
+                if (staleVersion && Array.isArray(conflict.comparison) && conflict.comparison.length > 0) {
+                    const comparison = document.createElement('div');
+                    comparison.className = 'mt-3 grid gap-2';
+                    for (const change of conflict.comparison) {
+                        const item = document.createElement('div');
+                        item.className = 'rounded-lg border border-[var(--zazu-border)] p-3 text-sm';
+                        const field = document.createElement('strong');
+                        field.className = 'block';
+                        field.textContent = change.field || 'Changed field';
+                        const local = document.createElement('p');
+                        local.className = 'mt-1';
+                        local.textContent = 'Your saved version: ' + (change.local ?? '—');
+                        const remote = document.createElement('p');
+                        remote.className = 'mt-1';
+                        remote.textContent = 'Current server version: ' + (change.remote ?? '—');
+                        item.append(field, local, remote);
+                        comparison.append(item);
+                    }
+                    details.append(comparison);
+                }
 
                 const actions = document.createElement('div');
                 actions.className = 'flex flex-wrap gap-2 mt-3';
@@ -561,12 +584,13 @@
                 const retry = document.createElement('button');
                 retry.type = 'button';
                 retry.className = 'zazu-btn zazu-btn-secondary';
-                retry.textContent = 'Retry sync';
+                retry.textContent = staleVersion ? 'Keep my changes' : (conflict.conflict_type === 'mutation_identity_mismatch' ? 'Retry with new ID' : 'Retry sync');
+                retry.hidden = serverDeleted;
 
                 const discard = document.createElement('button');
                 discard.type = 'button';
                 discard.className = 'zazu-btn zazu-btn-ghost';
-                discard.textContent = 'Discard change';
+                discard.textContent = staleVersion ? 'Use server version' : 'Discard change';
 
                 const setBusy = (busy) => {
                     retry.disabled = busy;
@@ -578,7 +602,9 @@
                     conflictStatus.textContent = 'Returning the saved change to the sync queue…';
                     try {
                         await offline.resolveConflict(conflict.id, 'retry');
-                        conflictStatus.textContent = 'Retry queued. Zazu will sync it now or when the connection returns.';
+                        conflictStatus.textContent = staleVersion
+                            ? 'Your changes were rebased onto the latest server version. Zazu will sync them now or when the connection returns.'
+                            : 'Retry queued. Zazu will sync it now or when the connection returns.';
                     } catch (error) {
                         conflictStatus.textContent = error.message || 'Could not retry this saved change.';
                     } finally {
@@ -592,7 +618,9 @@
                     conflictStatus.textContent = 'Discarding the saved change…';
                     try {
                         await offline.resolveConflict(conflict.id, 'discard');
-                        conflictStatus.textContent = 'Saved change discarded.';
+                        conflictStatus.textContent = staleVersion
+                            ? 'The local record was replaced with the current server version.'
+                            : 'Saved change discarded.';
                     } catch (error) {
                         conflictStatus.textContent = error.message || 'Could not discard this saved change.';
                     } finally {
