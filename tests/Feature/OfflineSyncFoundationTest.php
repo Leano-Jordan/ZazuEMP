@@ -2495,6 +2495,7 @@ class OfflineSyncFoundationTest extends TestCase
         $resolved = $controller->resolveConflict($resolveRequest, $conflict);
 
         $this->assertSame('new_mutation_required', $resolved->getData(true)['mutation_status']);
+        $replacementMutationId = $resolved->getData(true)['rebase']['new_mutation_id'];
 
         // Simulate the phone retrying the resolution request after the first
         // response was lost. The server must repeat the new-ID instruction.
@@ -2505,7 +2506,9 @@ class OfflineSyncFoundationTest extends TestCase
         $replayed = $controller->resolveConflict($replayedRequest, $conflict);
 
         $this->assertSame('new_mutation_required', $replayed->getData(true)['mutation_status']);
-        $this->assertSame('applied', $original->fresh()->status);
+        $this->assertSame($replacementMutationId, $replayed->getData(true)['rebase']['new_mutation_id']);
+        $this->assertSame('discarded', $original->fresh()->status);
+        $this->assertSame($replacementMutationId, $original->fresh()->superseded_by_mutation_id);
         $this->assertSame('resolved', $conflict->fresh()->status);
     }
 
