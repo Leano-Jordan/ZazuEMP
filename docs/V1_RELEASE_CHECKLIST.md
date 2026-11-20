@@ -1,7 +1,7 @@
 # Zazu EMP — V1 Release Checklist
 
 Latest full application-code verification baseline: 526bdf38dab6ff540c143b0e57dfcee468006dc3.
-Current repository documentation head: 8090c9633f3309c1c4323da352942ccc44f64ef6 (documentation-only; not an application-code verification run).
+Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Open database incident — owner installation
