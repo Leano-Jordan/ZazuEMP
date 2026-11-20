@@ -2113,6 +2113,8 @@ function setupZazuOfflineDirectoryViews() {
                     nextQuote.status = 'accepted';
                     if (nextQuote.latest_version) nextQuote.latest_version.status = 'accepted';
                     if (nextQuote.latestVersion) nextQuote.latestVersion.status = 'accepted';
+                    const linkedWork = nextState.jobs?.find(item => item.local_id === nextQuote.event_local_id);
+                    if (linkedWork?.status === 'draft') linkedWork.status = 'confirmed';
 
                     acceptButton.disabled = true;
                     acceptButton.textContent = 'Saving acceptance…';
@@ -3065,6 +3067,9 @@ function setupZazuOfflineForms() {
                 if (quote) {
                     quote.status = 'accepted';
                     if (quote.latest_version) quote.latest_version.status = 'accepted';
+                    if (quote.latestVersion) quote.latestVersion.status = 'accepted';
+                    const linkedWork = state.jobs?.find(item => item.local_id === quote.event_local_id);
+                    if (linkedWork?.status === 'draft') linkedWork.status = 'confirmed';
                 }
             }
 

@@ -2,11 +2,9 @@
 
 namespace App\Support\Offline;
 
-use App\Models\Asset;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -84,6 +82,10 @@ final class SyncMutationPushProcessor
             $retryable = $conflict['retryable'] ?? $retryable;
         }
 
+        $relatedIdentities = $mutation->status === 'applied'
+            ? app(SyncMutationRelatedIdentityResolver::class)->resolve($mutation)
+            : [];
+
         return [
             'id' => $mutation->mutation_id,
             'sequence' => $mutation->sequence,
@@ -100,9 +102,8 @@ final class SyncMutationPushProcessor
                 'server_id' => (int) $identity->record_id,
                 'revision' => (int) $identity->revision,
             ] : null,
-            'related_identity' => $mutation->status === 'applied'
-                ? $this->relatedIdentityForMutation($mutation)
-                : null,
+            'related_identity' => $relatedIdentities[0] ?? null,
+            'related_identities' => $relatedIdentities,
         ];
     }
 
@@ -153,84 +154,6 @@ final class SyncMutationPushProcessor
         }
 
         return ['id' => null, 'type' => null];
-    }
-
-    /**
-     * @return array<string, mixed>|null
-     */
-    private function relatedIdentityForMutation(SyncMutation $mutation): ?array
-    {
-        $parent = $this->parentIdentityDescriptor($mutation);
-        $identity = $parent ? $this->findRelatedIdentity($mutation, $parent) : null;
-
-        if (! $identity) {
-            return null;
-        }
-
-        return [
-            'entity_type' => $identity->entity_type,
-            'local_id' => $identity->entity_uuid,
-            'server_id' => (int) $identity->record_id,
-            'revision' => (int) $identity->revision,
-        ];
-    }
-
-    /**
-     * @return array{0:string,1:mixed}|null
-     */
-    private function parentIdentityDescriptor(SyncMutation $mutation): ?array
-    {
-        $payload = $mutation->payload['record'] ?? [];
-
-        return match ($mutation->entity_type) {
-            'quote_acceptance' => ['quote', $payload['quote_local_id'] ?? null],
-            'payment' => ['invoice', $payload['invoice_local_id'] ?? null],
-            'purchase_receipt' => ['purchase_order', $payload['purchase_order_local_id'] ?? null],
-            'inventory_movement' => ['inventory_item', $payload['inventory_item_local_id'] ?? null],
-            'asset_allocation' => ['asset', $payload['asset_local_id'] ?? null],
-            default => null,
-        };
-    }
-
-    /**
-     * @param array{0:string,1:mixed} $parent
-     */
-    private function findRelatedIdentity(SyncMutation $mutation, array $parent): ?SyncEntityIdentity
-    {
-        if ($parent[0] === 'asset' && (! is_string($parent[1]) || ! Str::isUuid($parent[1]))) {
-            return $this->assetParentIdentityFromAllocation($mutation);
-        }
-
-        if (! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
-            return null;
-        }
-
-        return SyncEntityIdentity::query()
-            ->where('business_id', $mutation->business_id)
-            ->where('entity_type', $parent[0])
-            ->where('entity_uuid', Str::lower($parent[1]))
-            ->first();
-    }
-
-    private function assetParentIdentityFromAllocation(SyncMutation $mutation): ?SyncEntityIdentity
-    {
-        $allocationIdentity = SyncEntityIdentity::query()
-            ->where('business_id', $mutation->business_id)
-            ->where('entity_type', 'asset_allocation')
-            ->where('entity_uuid', $mutation->entity_id)
-            ->first();
-        $allocation = $allocationIdentity?->record;
-
-        if (! $allocation instanceof \App\Models\AssetAllocation) {
-            return null;
-        }
-
-        return SyncEntityIdentity::query()
-            ->where('business_id', $mutation->business_id)
-            ->where('entity_type', 'asset')
-            ->where('record_type', (new Asset)->getMorphClass())
-            ->where('record_id', $allocation->asset_id)
-            ->first();
     }
 
     /**

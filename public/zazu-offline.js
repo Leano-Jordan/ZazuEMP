@@ -1665,13 +1665,17 @@
                 record.revision = Number(identity.revision || record.revision || 1);
             }
 
-            const related = remote?.related_identity;
-            if (related) {
+            const relatedIdentities = Array.isArray(remote?.related_identities)
+                ? remote.related_identities
+                : (remote?.related_identity ? [remote.related_identity] : []);
+            for (const related of relatedIdentities) {
                 const target = identityTargets[related.entity_type];
-                const parent = target
+                const relatedRecord = target
                     ? (state[target] || []).find(item => item.local_id === related.local_id)
                     : null;
-                if (parent) parent.revision = Number(related.revision || parent.revision || 1);
+                if (relatedRecord) {
+                    relatedRecord.revision = Number(related.revision || relatedRecord.revision || 1);
+                }
             }
         }
 

@@ -13,6 +13,7 @@ use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationRecorder;
+use App\Support\Offline\SyncMutationRelatedIdentityResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -149,6 +150,11 @@ class OfflinePaymentPrecisionTest extends TestCase
             ],
         ]);
         $applier->apply($acceptance, ['quote_acceptance' => $handler]);
+        $relatedIdentities = app(SyncMutationRelatedIdentityResolver::class)->resolve($acceptance);
+        $this->assertEqualsCanonicalizing(
+            ['quote', 'job'],
+            array_column($relatedIdentities, 'entity_type'),
+        );
         $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
         $this->assertSame(2, (int) $eventIdentity->fresh()->revision);
         $this->assertSame('confirmed', $event->fresh()->status);

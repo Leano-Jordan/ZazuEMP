@@ -1204,6 +1204,12 @@ class OfflineSyncFoundationTest extends TestCase
         $applier = app(SyncMutationApplier::class);
         $first = $applier->apply($mutation, ['purchase_receipt' => $handler]);
         $second = $applier->apply($first, ['purchase_receipt' => $handler]);
+        $relatedIdentities = app(\App\Support\Offline\SyncMutationRelatedIdentityResolver::class)
+            ->resolve($first);
+        $this->assertEqualsCanonicalizing(
+            ['purchase_order', 'inventory_item'],
+            array_column($relatedIdentities, 'entity_type'),
+        );
 
         $this->assertSame('applied', $first->status);
         $this->assertSame($first->id, $second->id);
