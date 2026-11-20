@@ -16,14 +16,17 @@ class FounderSupportAccessTest extends TestCase
 
     private function founder(): User
     {
-        config(['zazu.platform_admin_email' => 'founder@example.test']);
+        $email = 'founder-'.Str::lower(Str::random(10)).'@example.test';
+        config(['zazu.platform_admin_email' => $email]);
 
-        return User::factory()->create(['email' => 'founder@example.test']);
+        return User::factory()->create(['email' => $email]);
     }
 
     private function business(): Business
     {
-        $owner = User::factory()->create(['email' => 'owner@example.test']);
+        $owner = User::factory()->create([
+            'email' => 'owner-'.Str::lower(Str::random(10)).'@example.test',
+        ]);
         $business = Business::create([
             'name' => 'Support Test Catering',
             'slug' => 'support-test-'.Str::lower(Str::random(8)),
@@ -180,7 +183,7 @@ class FounderSupportAccessTest extends TestCase
             'expires_at' => now()->addMinutes(15),
         ]);
 
-        $this->actingAs(User::factory()->create(['email' => 'founder@example.test']))
+        $this->actingAs($founder)
             ->post(route('admin.sentinel.support.end', $supportSession))
             ->assertForbidden();
 
