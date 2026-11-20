@@ -533,9 +533,15 @@ class SyncController extends Controller
         ];
     }
 
-    public function push(Request $request, SyncMutationPushProcessor $processor): JsonResponse
-    {
+    public function push(
+        Request $request,
+        SyncMutationRecorder $recorder,
+        SyncMutationApplier $applier,
+        OfflineDomainMutationHandler $handler,
+        SyncConflictRecorder $conflictRecorder,
+    ): JsonResponse {
         $device = $request->attributes->get('sync_device');
+        $processor = new SyncMutationPushProcessor($recorder, $applier, $handler, $conflictRecorder);
 
         $validated = $request->validate([
             'mutations' => ['required', 'array', 'min:1', 'max:100'],
