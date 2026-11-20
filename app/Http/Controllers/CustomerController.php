@@ -185,18 +185,32 @@ class CustomerController extends Controller
 
         try {
             DB::transaction(function () use ($customer, $validated): void {
-                $customer->update([
+                // Shared parent-first lock order: business, then aggregate.
+                // This serializes customer/contact edits with sync and other
+                // business-scoped writers before any child row is changed.
+                DB::table('businesses')
+                    ->where('id', $customer->business_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                $lockedCustomer = Customer::query()
+                    ->where('business_id', $customer->business_id)
+                    ->whereKey($customer->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $lockedCustomer->update([
                     'name' => trim($validated['name']),
                     'legal_name' => $validated['legal_name'] ?? null,
                     'registration_number' => $validated['registration_number'] ?? null,
                     'tax_number' => $validated['tax_number'] ?? null,
                     'vat_number' => $validated['vat_number'] ?? null,
                     'billing_address' => $validated['billing_address'] ?? null,
-                    'profile_photo_path' => $validated['profile_photo_path'] ?? $customer->profile_photo_path,
+                    'profile_photo_path' => $validated['profile_photo_path'] ?? $lockedCustomer->profile_photo_path,
                     'notes' => $validated['notes'] ?? null,
                 ]);
 
-                $primary = $customer->primaryContact()->first();
+                $primary = $lockedCustomer->primaryContact()->lockForUpdate()->first();
 
                 if ($primary) {
                     $primary->update([
@@ -205,7 +219,7 @@ class CustomerController extends Controller
                         'email' => $validated['primary_contact_email'] ?? null,
                     ]);
                 } else {
-                    $customer->contacts()->create([
+                    $lockedCustomer->contacts()->create([
                         'name' => trim($validated['primary_contact_name']),
                         'phone' => $validated['primary_contact_phone'] ?? null,
                         'email' => $validated['primary_contact_email'] ?? null,
