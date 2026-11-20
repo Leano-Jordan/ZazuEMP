@@ -62,7 +62,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         $target->users()->attach(auth()->id(), ['role' => 'owner']);
 
         $archivePath = app(BusinessArchiveService::class)->download($source);
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archivePath) === true);
         $zip->addFromString('untrusted/readme.txt', 'This entry is not part of the Zazu archive contract.');
         $zip->close();
@@ -71,7 +71,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->restore($archivePath, $target);
                 $this->fail('Unexpected ZIP entries must be rejected.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertSame(
                     'The business archive contains an unexpected ZIP entry.',
                     $exception->getMessage()
