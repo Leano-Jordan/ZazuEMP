@@ -127,6 +127,15 @@ Verify all of these in the restored installation:
 A CI round-trip is supporting evidence, not a substitute for this release-environment drill.
 
 
+## Business archive import validation — 2026-11-21
+
+Business-level `.zazu` restore treats the uploaded ZIP as a strict container, not a general-purpose archive. Restore accepts only:
+- `manifest.json`
+- `data.json`
+- file payload entries explicitly declared by `manifest.json`
+
+Undeclared payloads and all other ZIP entries are rejected. This check occurs before any target-workspace transaction or file write. Keep the export allowlist and restore contract in sync when adding a supported dataset or file type. This is structural validation, not a cryptographic signature: it does not authenticate the archive's creator or prove that its contents were not intentionally rebuilt.
+
 ## Multi-business safety restriction — 2026-11-04
 
 The business settings UI no longer exposes the installation-wide backup or restore commands. The previous controls implied that an owner was exporting/restoring only their business, while the commands snapshot or replace the entire installation database and private storage. This was an unsafe scope mismatch. The CLI commands remain available to the installation operator. Separately, tenant-scoped business archive export/restore is implemented through the owner's Export business data screen (`/exports`): the `.zazu` archive contains the explicit allowlisted linked records and referenced business files, excludes credentials, sessions, device pairing tokens, licence entitlements and the SARS TCS PIN, and restores only into an empty, unpaired workspace with record IDs remapped. Its round-trip and tenant-isolation regression is automated-verified in CI. This business archive is not a substitute for the installation-wide operator recovery drill.
