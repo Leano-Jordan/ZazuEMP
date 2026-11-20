@@ -27,6 +27,7 @@ use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationPushProcessor;
 use App\Support\Offline\SyncMutationProtocol;
+use App\Support\Offline\SyncMutationRecorder;
 use App\Support\Offline\SyncConflictRecorder;
 use App\Support\Offline\SyncConflictResolutionService;
 use App\Support\Offline\SyncBootstrapPayloadBuilder;
