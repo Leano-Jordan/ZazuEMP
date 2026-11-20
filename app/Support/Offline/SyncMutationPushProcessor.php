@@ -148,47 +148,8 @@ final class SyncMutationPushProcessor
      */
     private function relatedIdentityForMutation(SyncMutation $mutation): ?array
     {
-        $payload = $mutation->payload['record'] ?? [];
-        $parent = match ($mutation->entity_type) {
-            'quote_acceptance' => ['quote', $payload['quote_local_id'] ?? null],
-            'payment' => ['invoice', $payload['invoice_local_id'] ?? null],
-            'purchase_receipt' => ['purchase_order', $payload['purchase_order_local_id'] ?? null],
-            'inventory_movement' => ['inventory_item', $payload['inventory_item_local_id'] ?? null],
-            'asset_allocation' => ['asset', $payload['asset_local_id'] ?? null],
-            default => null,
-        };
-
-        if (! $parent) {
-            return null;
-        }
-
-        if ($parent[0] === 'asset' && (! is_string($parent[1]) || ! Str::isUuid($parent[1]))) {
-            $allocationIdentity = SyncEntityIdentity::query()
-                ->where('business_id', $mutation->business_id)
-                ->where('entity_type', 'asset_allocation')
-                ->where('entity_uuid', $mutation->entity_id)
-                ->first();
-            $allocation = $allocationIdentity?->record;
-            $assetId = $allocation instanceof \App\Models\AssetAllocation ? $allocation->asset_id : null;
-            $identity = is_numeric($assetId)
-                ? SyncEntityIdentity::query()
-                    ->where('business_id', $mutation->business_id)
-                    ->where('entity_type', 'asset')
-                    ->where('record_type', (new Asset)->getMorphClass())
-                    ->where('record_id', (int) $assetId)
-                    ->first()
-                : null;
-        } else {
-            if (! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
-                return null;
-            }
-
-            $identity = SyncEntityIdentity::query()
-                ->where('business_id', $mutation->business_id)
-                ->where('entity_type', $parent[0])
-                ->where('entity_uuid', Str::lower($parent[1]))
-                ->first();
-        }
+        $parent = $this->parentIdentityDescriptor($mutation);
+        $identity = $parent ? $this->findRelatedIdentity($mutation, $parent) : null;
 
         if (! $identity) {
             return null;
@@ -200,6 +161,64 @@ final class SyncMutationPushProcessor
             'server_id' => (int) $identity->record_id,
             'revision' => (int) $identity->revision,
         ];
+    }
+
+    /**
+     * @return array{0:string,1:mixed}|null
+     */
+    private function parentIdentityDescriptor(SyncMutation $mutation): ?array
+    {
+        $payload = $mutation->payload['record'] ?? [];
+
+        return match ($mutation->entity_type) {
+            'quote_acceptance' => ['quote', $payload['quote_local_id'] ?? null],
+            'payment' => ['invoice', $payload['invoice_local_id'] ?? null],
+            'purchase_receipt' => ['purchase_order', $payload['purchase_order_local_id'] ?? null],
+            'inventory_movement' => ['inventory_item', $payload['inventory_item_local_id'] ?? null],
+            'asset_allocation' => ['asset', $payload['asset_local_id'] ?? null],
+            default => null,
+        };
+    }
+
+    /**
+     * @param array{0:string,1:mixed} $parent
+     */
+    private function findRelatedIdentity(SyncMutation $mutation, array $parent): ?SyncEntityIdentity
+    {
+        if ($parent[0] === 'asset' && (! is_string($parent[1]) || ! Str::isUuid($parent[1]))) {
+            return $this->assetParentIdentityFromAllocation($mutation);
+        }
+
+        if (! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
+            return null;
+        }
+
+        return SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', $parent[0])
+            ->where('entity_uuid', Str::lower($parent[1]))
+            ->first();
+    }
+
+    private function assetParentIdentityFromAllocation(SyncMutation $mutation): ?SyncEntityIdentity
+    {
+        $allocationIdentity = SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', 'asset_allocation')
+            ->where('entity_uuid', $mutation->entity_id)
+            ->first();
+        $allocation = $allocationIdentity?->record;
+
+        if (! $allocation instanceof \App\Models\AssetAllocation) {
+            return null;
+        }
+
+        return SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', 'asset')
+            ->where('record_type', (new Asset)->getMorphClass())
+            ->where('record_id', $allocation->asset_id)
+            ->first();
     }
 
     /**
