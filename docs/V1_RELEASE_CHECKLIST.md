@@ -1,6 +1,7 @@
 # Zazu EMP — V1 Release Checklist
 
-Last verified application-code baseline: ae3d49cae7973c2db708d5ff88c3a3eb51c35b54
+Latest full application-code verification baseline: 526bdf38dab6ff540c143b0e57dfcee468006dc3.
+Current repository documentation head: 8090c9633f3309c1c4323da352942ccc44f64ef6 (documentation-only; not an application-code verification run).
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Open database incident — owner installation
@@ -91,7 +92,7 @@ Shared transport: `resources/js/app.js::setupZazuOfflineForms` and the local cus
 - PostgreSQL migration/recovery and desktop/mobile offline-browser acceptance: PASS on exact source HEAD 71c8fc5 (run 44152431508).
 - Zazu Quality: RED on GHSA-fc5q-39xc-vjpf / CVE-2026-112366. No patched version is published; no advisory suppression or breaking Vite downgrade applied.
 
-## Latest CI verification
+## Historical CI verification — fd82f6a (superseded by newer evidence recorded above)
 
 - Application-code baseline a5ead69: Laravel 526 passed / 1 skipped / 3,681 assertions; offline browser acceptance 45 desktop + 6 mobile-viewport + 1 phone-local attachment; PostgreSQL migration/registration/backup/private-file recovery passed.
 - Repository head fd82f6a changes only the Windows package workflow after that application-code baseline.
