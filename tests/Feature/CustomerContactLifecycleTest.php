@@ -145,6 +145,38 @@ class CustomerContactLifecycleTest extends TestCase
     }
 
 
+    public function test_repairing_multiple_primary_contacts_advances_customer_sync_revision_when_selected_contact_is_unchanged(): void
+    {
+        $customer = Customer::create(['name' => 'Duplicate Primary Revision Customer']);
+        $selected = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Selected Primary',
+            'is_primary' => true,
+        ]);
+        $other = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Duplicate Primary',
+            'is_primary' => true,
+        ]);
+        $identity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)
+            ->identify($customer, 'customer');
+        $revisionBefore = (int) $identity->revision;
+
+        $response = $this->put(route('customers.contacts.update', [$customer, $selected]), [
+            'name' => 'Selected Primary',
+            'phone' => null,
+            'email' => null,
+            'label' => null,
+            'is_primary' => true,
+        ]);
+
+        $response->assertRedirect(route('customers.show', $customer));
+        $this->assertFalse((bool) $other->fresh()->is_primary);
+        $this->assertSame(1, $customer->contacts()->where('is_primary', true)->count());
+        $this->assertGreaterThan($revisionBefore, (int) $identity->fresh()->revision);
+    }
+
+
     public function test_primary_contact_cannot_be_removed_without_replacement(): void
     {
         $customer = Customer::create(['name' => 'Primary Protection Customer']);

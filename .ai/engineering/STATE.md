@@ -650,3 +650,10 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Failure root cause: resolving the final open conflict caused `renderOfflineConflicts` to hide the entire section immediately after the local state event, so the success status was present in the DOM but inaccessible/hidden. The underlying discard operation and IndexedDB assertions were not reached by the failing visibility assertion; do not claim their browser acceptance from this run.
 - Correction on `main`: keep the conflict section visible while it contains a resolution/status message, even after the last open conflict is removed. The existing E2E journey already asserts the final server-version confirmation and local queue/record state.
 - Exact-head browser acceptance is pending for this correction. Release remains NOT READY; this is a user-feedback defect fix, not evidence of full sync parity or Android physical acceptance.
+
+
+## Online aggregate writer audit — customer-contact revision bypass corrected (2026-11-20)
+
+- Source audit found one real Eloquent-event bypass: promoting a contact used a relationship mass update to clear other primary contacts. If the selected contact was already primary and its attributes were unchanged, the selected model emitted no update event, so the customer aggregate revision could remain unchanged while another contact row changed.
+- Corrected the promotion path to lock and update only competing primary contacts through their Eloquent models. Their existing parent-revision listener now advances the customer snapshot revision. Added a feature regression for the unchanged-selected-contact / duplicate-primary case.
+- This is one confirmed writer correction, not completion of the writer audit. Continue checking indirect, query-builder and command-side writers. Exact-head Laravel/browser acceptance for this change is pending.

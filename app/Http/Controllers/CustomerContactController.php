@@ -89,9 +89,16 @@ class CustomerContactController extends Controller
             $makePrimary = $request->boolean('is_primary');
 
             if ($makePrimary) {
+                // Query-builder mass updates bypass Eloquent events. Update only
+                // competing primary rows through their models so the parent
+                // customer revision advances even when the selected contact is
+                // already primary and its own attributes are unchanged.
                 $lockedCustomer->contacts()
                     ->whereKeyNot($lockedContact->id)
-                    ->update(['is_primary' => false]);
+                    ->where('is_primary', true)
+                    ->lockForUpdate()
+                    ->get()
+                    ->each(fn (CustomerContact $otherContact) => $otherContact->update(['is_primary' => false]));
             }
 
             $lockedContact->update([
