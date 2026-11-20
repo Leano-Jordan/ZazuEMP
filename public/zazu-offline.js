@@ -1378,16 +1378,36 @@
             event_cost: 'costs',
         };
 
+        const findLocalRecord = (entityType, localId, mutation) => {
+            const target = identityTargets[entityType];
+            if (target) {
+                return (state[target] || []).find(item => item.local_id === localId) || null;
+            }
+
+            const payload = mutation.payload?.record || {};
+            if (entityType === 'inventory_movement') {
+                const inventoryItem = (state.inventory_items || []).find(item =>
+                    item.local_id === payload.inventory_item_local_id
+                );
+                return inventoryItem?.movements?.find(item => item.local_id === localId) || null;
+            }
+
+            if (entityType === 'asset_allocation') {
+                const asset = (state.assets || []).find(item => item.local_id === payload.asset_local_id);
+                return asset?.allocations?.find(item => item.local_id === localId) || null;
+            }
+
+            return null;
+        };
+
         for (const mutation of mutations) {
             const remote = recorded.get(mutation.id);
             const identity = remote?.identity;
-            const target = identity ? identityTargets[identity.entity_type] : null;
-            if (!target) continue;
+            if (!identity || remote.status !== 'applied') continue;
 
-            const list = state[target] || [];
             const localId = identity.local_id || mutation.payload?.local_id;
-            const record = list.find(item => item.local_id === localId);
-            if (record && remote.status === 'applied') {
+            const record = findLocalRecord(identity.entity_type, localId, mutation);
+            if (record) {
                 record.id = Number(identity.server_id);
                 record.server_id = Number(identity.server_id);
                 record.local_id = localId;
@@ -1399,9 +1419,8 @@
             const remote = recorded.get(mutation.id);
             if (!['applied', 'discarded'].includes(remote?.status)) continue;
 
-            const target = identityTargets[mutation.entity_type];
             const localId = mutation.payload?.local_id || mutation.entity_id;
-            if (!target || !localId) continue;
+            if (!localId) continue;
 
             const sameRecordStillPending = remainingMutations.some(item =>
                 item.entity_type === mutation.entity_type
@@ -1409,7 +1428,7 @@
             );
             if (sameRecordStillPending) continue;
 
-            const record = (state[target] || []).find(item => item.local_id === localId);
+            const record = findLocalRecord(mutation.entity_type, localId, mutation);
             if (record?.pending_sync === true) record.pending_sync = false;
         }
         state.local_dirty = remainingMutations.length > 0;
