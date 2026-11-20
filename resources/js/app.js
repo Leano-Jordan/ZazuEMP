@@ -3629,12 +3629,12 @@ function registerZazuServiceWorker() {
         // by the offline mutation queue. Prime them even when responsive navigation
         // or role-specific shortcuts do not expose links on the dashboard.
         const routes = [...new Set([
-            window.location.pathname,
             '/dashboard',
             '/customers',
-            '/customers/create',
             '/work',
+            '/customers/create',
             '/work/create',
+            window.location.pathname,
         ])];
 
         const target = navigator.serviceWorker.controller || registration.active;

@@ -5,7 +5,7 @@ let activeBusinessId = null;
 let activeUserGeneration = 0;
 let activePrimeController = null;
 const MAX_PRIME_ROUTES = 100;
-const PRIME_CONCURRENCY = 6;
+const PRIME_CONCURRENCY = 3;
 const MAX_PRIVATE_MEDIA_PRIME = 60;
 const ACTIVE_CONTEXT_STATE = new Request('/__zazu-active-context__');
 
@@ -441,7 +441,7 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         if (activePrimeController === controller) activePrimeController = null;
     }
 
-    const requiredOfflineRoutes = ['/dashboard', '/customers', '/work'];
+    const requiredOfflineRoutes = ['/dashboard', '/customers', '/customers/create', '/work', '/work/create'];
     return !controller.signal.aborted
         && requiredOfflineRoutes.every((path) => primedRoutes.has(path));
 }
