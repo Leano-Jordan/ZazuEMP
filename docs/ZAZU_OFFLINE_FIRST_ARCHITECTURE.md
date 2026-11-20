@@ -62,8 +62,9 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 
 - The only routes explicitly primed by the current bounded first-launch flow are `/customers`, `/customers/create`, `/work`, and `/work/create`.
 - The visible local directory renderer covers Customers and Work. Customer relationship details and supported edits are rendered in place from IndexedDB, including linked Work/quote summaries. Work has a local inspection view that assembles available operational and financial records from IndexedDB. Dashboard quote rows open a local detail panel showing the saved quote version, lines, linked invoice and payments; this is not a standalone quote register or route renderer. The panel exposes the existing quote-acceptance queue contract and updates local status optimistically, leaving final acceptance validation to the server during sync. The cached invoice-creation form hydrates newly accepted, server-backed quotes from IndexedDB so the existing invoice mutation can be queued against the local quote identity; the invoice register/detail remain server-route surfaces.
-- Other entity collections may be present in IndexedDB and their forms may queue writes, but no generic local list/detail renderer exists for them. Their server-rendered pages remain cache-dependent and may fall back to the cached dashboard shell.
-- Cached Laravel HTML is snapshot presentation, not a local route implementation. The current capability must therefore be described as a bounded device-local mutation queue with customer/Work directory visibility—not full offline business-data read parity.
+- The dashboard offline workspace also renders defined local collection lists and saved-detail panels for suppliers, catalogue, inventory items, assets, purchase orders, invoices, expenses and event costs. These are IndexedDB-backed local views, not cached Laravel records.
+- Disconnected top-level navigation now prefers the authenticated dashboard shell; route-aware workspace navigation selects the corresponding local collection panel for supported module routes. Work subroutes for quotes and costs/travel are mapped before the general Work route. The workspace navigation only exposes routes allowed by the current user's permissions.
+- This improves local list/detail reachability but does not make Laravel forms, every record detail route, or every workflow available offline. Cached Laravel HTML remains snapshot presentation, not a local route implementation.
 
 **Evidence source:** `resources/js/app.js` (`setupZazuOfflineForms`, `setupZazuOfflineDirectoryViews`), `public/zazu-offline.js`, `public/sw.js`, `resources/views/dashboard.blade.php`, and the focused offline Playwright suite on `main`.
 
@@ -81,7 +82,9 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 7. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
 
 
-No runtime code changed in the 2026-11-20 source audit or subsequent documentation reconciliation. The physical Android gate remains OPEN.
+**2026-11-20 implementation update:** `public/sw.js` now prefers the cached dashboard shell for disconnected top-level navigation while preserving cached Customer/Work creation forms. `resources/js/app.js` maps supported module paths to existing IndexedDB workspace panels, including Finance expenses and Work quote/cost subroutes. `resources/views/dashboard.blade.php` exposes permission-aware navigation to supported modules. Regression coverage was added to `tests/js/service-worker-auth-cache.test.js` and `tests/Feature/PwaOfflineFoundationTest.php`. Cache version: `zazu-static-v55`. Latest implementation commits: `5cd264e`, `743acf5`, `ae2bdec`, `f60fec9`, `73f50c6`, `a0acc1a`, `f3ccdcc`. CI on the latest commit has been queued but has not yet produced results. This is automated source-level progress, not physical Android acceptance.
+
+The physical Android gate remains OPEN.
 
 ---
 
