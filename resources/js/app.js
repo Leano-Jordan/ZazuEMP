@@ -3016,7 +3016,9 @@ function setupZazuOfflineForms() {
                         invoice.paid_amount = (currentPaid + amount).toFixed(2);
                         const total = Number.parseFloat(String(invoice.total || 0));
                         if (Number.isFinite(total)) {
-                            invoice.balance = Math.max(0, total - currentPaid - amount).toFixed(2);
+                            const nextBalance = Math.max(0, total - currentPaid - amount);
+                            invoice.balance = nextBalance.toFixed(2);
+                            if (nextBalance === 0) invoice.status = 'paid';
                         }
                     }
                 }
