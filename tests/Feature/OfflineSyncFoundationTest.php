@@ -1172,6 +1172,14 @@ class OfflineSyncFoundationTest extends TestCase
             'unit_price' => '50.00',
             'line_total' => '500.00',
         ]);
+        $inventoryItem = \App\Models\InventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Catering trays',
+            'unit' => 'units',
+            'reorder_level' => '0.00',
+        ]);
+        $inventoryIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($inventoryItem, 'inventory_item');
         $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
         $lineIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($line, 'purchase_order_item');
         $mutationId = (string) Str::uuid();
@@ -1208,6 +1216,9 @@ class OfflineSyncFoundationTest extends TestCase
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
             ->count());
+        $this->assertSame(2, (int) $orderIdentity->fresh()->revision);
+        $this->assertSame(2, (int) $inventoryIdentity->fresh()->revision);
+        $this->assertSame('4.00', $inventoryItem->fresh()->on_hand);
     }
 
     public function test_offline_purchase_order_rejects_reused_line_identity(): void

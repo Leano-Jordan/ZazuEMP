@@ -135,6 +135,7 @@ class OfflinePaymentPrecisionTest extends TestCase
 
         $registry = app(SyncEntityIdentityRegistry::class);
         $quoteIdentity = $registry->identify($quote, 'quote');
+        $eventIdentity = $registry->identify($event, 'job');
         $handler = app(OfflineDomainMutationHandler::class);
         $applier = app(SyncMutationApplier::class);
         $recorder = app(SyncMutationRecorder::class);
@@ -148,6 +149,9 @@ class OfflinePaymentPrecisionTest extends TestCase
             ],
         ]);
         $applier->apply($acceptance, ['quote_acceptance' => $handler]);
+        $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
+        $this->assertSame(2, (int) $eventIdentity->fresh()->revision);
+        $this->assertSame('confirmed', $event->fresh()->status);
 
         $invoiceId = (string) Str::uuid();
         $invoiceMutation = $recorder->record($device, 'invoice', $invoiceId, 'create', [
