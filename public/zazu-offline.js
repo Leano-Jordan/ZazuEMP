@@ -1142,6 +1142,22 @@
                             list[index].contact_name = primary.name || null;
                             list[index].phone = primary.phone || null;
                             list[index].email = primary.email || null;
+                        } else if (mutation.entity_type === 'job' && serverRecord.customer_id) {
+                            const linkedCustomer = (nextState.customers || []).find(item =>
+                                Number(item.server_id ?? item.id) === Number(serverRecord.customer_id)
+                            );
+                            list[index].customer_local_id = linkedCustomer?.local_id || null;
+                            list[index].customer_name = linkedCustomer?.name || serverRecord.customer_name || null;
+                        } else if (mutation.entity_type === 'quote' && serverRecord.event_id) {
+                            const linkedJob = (nextState.jobs || []).find(item =>
+                                Number(item.server_id ?? item.id) === Number(serverRecord.event_id)
+                            );
+                            list[index].event_local_id = linkedJob?.local_id || null;
+                        } else if (mutation.entity_type === 'purchase_order' && serverRecord.supplier_id) {
+                            const linkedSupplier = (nextState.suppliers || []).find(item =>
+                                Number(item.server_id ?? item.id) === Number(serverRecord.supplier_id)
+                            );
+                            list[index].supplier_local_id = linkedSupplier?.local_id || null;
                         }
                     } else if (retryWithNewMutationId) {
                         list[index] = { ...current, revision: remoteRevision };
