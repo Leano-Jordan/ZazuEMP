@@ -253,10 +253,10 @@
         </div>
         <nav class="zazu-action-group" aria-label="Offline workspace navigation">
             @can('customers.view')
-                <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Customers</a>
+                <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Open customers</a>
             @endcan
             @can('work.view')
-                <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Work</a>
+                <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Open work</a>
             @endcan
             @can('quotes.view')
                 <a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-secondary">Quotes</a>
@@ -287,7 +287,7 @@
             </div>
         </section>
         <section class="zazu-dash-surface" data-zazu-offline-view="jobs" aria-label="Jobs saved on this device">
-            <h3 class="zazu-dash-panel-heading">Jobs</h3>
+            <h3 class="zazu-dash-panel-heading">Event Operations</h3>
             <div class="zazu-ops-register zazu-card">
                 <div class="zazu-empty">No jobs saved on this device.</div>
             </div>
