@@ -172,7 +172,7 @@ class FounderSupportAccessTest extends TestCase
 
     public function test_founder_cannot_end_another_founders_support_session(): void
     {
-        $this->founder();
+        $founder = $this->founder();
         $business = $this->business();
         $otherFounder = User::factory()->create(['email' => 'other@example.test']);
         $supportSession = FounderSupportSession::query()->create([
