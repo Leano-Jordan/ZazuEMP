@@ -305,6 +305,138 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(result.pending.map(item => item.id)).toEqual([result.first.id, result.second.id]);
     });
 
+    test('reconciles every related record revision for identity-less offline commands', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Related aggregate acknowledgement contract runs once.');
+
+        await login(page);
+        await page.context().setOffline(true);
+        const queued = await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const businessId = Number(document.body.dataset.zazuBusinessId);
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'related-aggregate-ack-token',
+                device: { id: 998877, business_id: businessId },
+            };
+            state.jobs = [{
+                id: 730001,
+                server_id: 730001,
+                local_id: 'related-ack-work',
+                revision: 5,
+                status: 'confirmed',
+                name: 'Related acknowledgement Work',
+            }];
+            state.quotes = [{
+                id: 730002,
+                server_id: 730002,
+                local_id: 'related-ack-quote',
+                event_local_id: 'related-ack-work',
+                revision: 4,
+                status: 'accepted',
+                latest_version: { status: 'accepted' },
+            }];
+            state.purchase_orders = [{
+                id: 730003,
+                server_id: 730003,
+                local_id: 'related-ack-order',
+                revision: 7,
+                status: 'received',
+                items: [],
+            }];
+            state.inventory_items = [
+                { id: 730004, server_id: 730004, local_id: 'related-ack-stock-a', revision: 2, on_hand: 4 },
+                { id: 730005, server_id: 730005, local_id: 'related-ack-stock-b', revision: 10, on_hand: 8 },
+            ];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+
+            const acceptance = await window.ZazuOffline.queueMutation('quote_acceptance', 'create', {
+                local_id: 'related-ack-acceptance',
+                quote_local_id: 'related-ack-quote',
+                customer_name: 'Related acknowledgement customer',
+            });
+            const receipt = await window.ZazuOffline.queueMutation('purchase_receipt', 'create', {
+                local_id: 'related-ack-receipt',
+                purchase_order_local_id: 'related-ack-order',
+                received_quantities: {
+                    'related-ack-line-a': '1.00',
+                    'related-ack-line-b': '2.00',
+                },
+            });
+
+            return { acceptanceId: acceptance.id, receiptId: receipt.id };
+        });
+
+        const pushedTypes = [];
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/push') {
+                const body = route.request().postDataJSON();
+                const recorded = body.mutations.map(mutation => {
+                    pushedTypes.push(mutation.entity_type);
+                    const related = mutation.entity_type === 'quote_acceptance'
+                        ? [
+                            { entity_type: 'quote', local_id: 'related-ack-quote', server_id: 730002, revision: 5 },
+                            { entity_type: 'job', local_id: 'related-ack-work', server_id: 730001, revision: 6 },
+                        ]
+                        : [
+                            { entity_type: 'purchase_order', local_id: 'related-ack-order', server_id: 730003, revision: 8 },
+                            { entity_type: 'inventory_item', local_id: 'related-ack-stock-a', server_id: 730004, revision: 3 },
+                            { entity_type: 'inventory_item', local_id: 'related-ack-stock-b', server_id: 730005, revision: 11 },
+                        ];
+
+                    return {
+                        id: mutation.id,
+                        status: 'applied',
+                        applied: true,
+                        identity: null,
+                        related_identity: related[0],
+                        related_identities: related,
+                    };
+                });
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ recorded, applied: recorded.map(item => item.id) }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/pull') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/attachments') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+                return;
+            }
+            await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+        });
+
+        await page.context().setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => pushedTypes.length).toBe(2);
+
+        const state = await page.evaluate(async () => {
+            const current = window.ZazuOffline.getState();
+            return {
+                workRevision: current.jobs.find(item => item.local_id === 'related-ack-work')?.revision,
+                quoteRevision: current.quotes.find(item => item.local_id === 'related-ack-quote')?.revision,
+                purchaseOrderRevision: current.purchase_orders.find(item => item.local_id === 'related-ack-order')?.revision,
+                inventoryRevisions: current.inventory_items
+                    .filter(item => item.local_id.startsWith('related-ack-stock-'))
+                    .map(item => item.revision),
+                pending: (await window.ZazuOffline.pending()).length,
+            };
+        });
+
+        expect(state.workRevision).toBe(6);
+        expect(state.quoteRevision).toBe(5);
+        expect(state.purchaseOrderRevision).toBe(8);
+        expect(state.inventoryRevisions).toEqual([3, 11]);
+        expect(state.pending).toBe(0);
+    });
+
     test('retries queued mutations when an installed app resumes after reconnect', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Installed-app resume reconnect contract runs once.');
