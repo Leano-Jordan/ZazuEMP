@@ -8,6 +8,7 @@ use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -124,14 +125,25 @@ class BusinessCapabilityController extends Controller
 
         $request->merge(['currency' => strtoupper((string) $request->input('currency', $capability->currency ?? $business->currency ?? 'ZAR'))]);
         $validated = $this->validated($request, $capability->category);
-        $oldImagePath = $capability->image_path;
+        $oldImagePath = null;
         $newImagePath = $request->file('image')?->store('catalogue', 'public');
 
         try {
-            $capability->update($validated + [
-                'image_path' => $newImagePath ?: $capability->image_path,
-                'is_active' => $request->boolean('is_active'),
-            ]);
+            DB::transaction(function () use ($business, $capability, $validated, $newImagePath, $request, &$oldImagePath): void {
+                Business::query()->whereKey($business->id)->lockForUpdate()->firstOrFail();
+
+                $lockedCapability = BusinessCapability::query()
+                    ->where('business_id', $business->id)
+                    ->whereKey($capability->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $oldImagePath = $lockedCapability->image_path;
+                $lockedCapability->update($validated + [
+                    'image_path' => $newImagePath ?: $lockedCapability->image_path,
+                    'is_active' => $request->boolean('is_active'),
+                ]);
+            });
         } catch (\Throwable $e) {
             if ($newImagePath) {
                 Storage::disk('public')->delete($newImagePath);

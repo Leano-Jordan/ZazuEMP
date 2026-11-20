@@ -174,7 +174,7 @@ class CustomerController extends Controller
         $this->ensureBusiness($customer, $business);
 
         $validated = $this->validated($request, $customer, false, $business->id);
-        $oldPhotoPath = $customer->profile_photo_path;
+        $oldPhotoPath = null;
         $newPhotoPath = $request->file('profile_photo')?->store('profile-photos/customers', 'local');
 
         if ($newPhotoPath) {
@@ -184,19 +184,29 @@ class CustomerController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($customer, $validated): void {
-                $customer->update([
+            DB::transaction(function () use ($customer, $validated, $business, &$oldPhotoPath): void {
+                // Serialize the customer and nested-contact snapshot against sync.
+                Business::query()->whereKey($business->id)->lockForUpdate()->firstOrFail();
+
+                $lockedCustomer = Customer::query()
+                    ->where('business_id', $business->id)
+                    ->whereKey($customer->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $oldPhotoPath = $lockedCustomer->profile_photo_path;
+                $lockedCustomer->update([
                     'name' => trim($validated['name']),
                     'legal_name' => $validated['legal_name'] ?? null,
                     'registration_number' => $validated['registration_number'] ?? null,
                     'tax_number' => $validated['tax_number'] ?? null,
                     'vat_number' => $validated['vat_number'] ?? null,
                     'billing_address' => $validated['billing_address'] ?? null,
-                    'profile_photo_path' => $validated['profile_photo_path'] ?? $customer->profile_photo_path,
+                    'profile_photo_path' => $validated['profile_photo_path'] ?? $lockedCustomer->profile_photo_path,
                     'notes' => $validated['notes'] ?? null,
                 ]);
 
-                $primary = $customer->primaryContact()->first();
+                $primary = $lockedCustomer->primaryContact()->lockForUpdate()->first();
 
                 if ($primary) {
                     $primary->update([
@@ -205,7 +215,7 @@ class CustomerController extends Controller
                         'email' => $validated['primary_contact_email'] ?? null,
                     ]);
                 } else {
-                    $customer->contacts()->create([
+                    $lockedCustomer->contacts()->create([
                         'name' => trim($validated['primary_contact_name']),
                         'phone' => $validated['primary_contact_phone'] ?? null,
                         'email' => $validated['primary_contact_email'] ?? null,
