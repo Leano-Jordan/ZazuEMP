@@ -43,7 +43,7 @@ class FounderBusinessDirectoryTest extends TestCase
         $this->actingAs($founder)
             ->get(route('admin.sentinel'))
             ->assertOk()
-            ->assertSee('Platform business accounts')
+            ->assertSee('Business account directory')
             ->assertSee('North Catering')
             ->assertSee('South Events');
 
