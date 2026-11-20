@@ -2,8 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Asset;
 use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\Customer;
+use App\Models\Event;
+use App\Models\Supplier;
 use App\Models\SyncConflict;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
@@ -54,6 +58,55 @@ class SyncRevisionConcurrencyTest extends TestCase
         $customer->update(['name' => 'Changed on the owner PC']);
 
         $this->assertSame(2, (int) $identity->fresh()->revision);
+    }
+
+    public function test_work_supplier_service_and_asset_online_writes_advance_their_revisions(): void
+    {
+        [$business, $customer] = $this->customerFixture();
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'REV-WORK-001',
+            'name' => 'Revision Work',
+            'status' => 'confirmed',
+        ]);
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Revision Supplier',
+        ]);
+        $capability = BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Revision Service',
+            'capability_type' => 'service',
+            'pricing_basis' => 'per_person',
+            'default_unit' => 'guest',
+            'is_active' => true,
+        ]);
+        $asset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'REV-ASSET-001',
+            'name' => 'Revision Tent',
+            'status' => 'available',
+            'condition' => 'good',
+            'purchase_cost' => '1000.00',
+            'currency' => 'ZAR',
+        ]);
+
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $identities = [
+            'job' => $registry->identify($event, 'job'),
+            'supplier' => $registry->identify($supplier, 'supplier'),
+            'service' => $registry->identify($capability, 'service'),
+            'asset' => $registry->identify($asset, 'asset'),
+        ];
+
+        $event->update(['name' => 'Revision Work Updated']);
+        $supplier->update(['name' => 'Revision Supplier Updated']);
+        $capability->update(['name' => 'Revision Service Updated']);
+        $asset->update(['name' => 'Revision Tent Updated']);
+
+        foreach ($identities as $identity) {
+            $this->assertSame(2, (int) $identity->fresh()->revision);
+        }
     }
 
     public function test_nested_customer_contact_write_advances_the_parent_snapshot_revision(): void
