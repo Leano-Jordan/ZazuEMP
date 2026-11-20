@@ -972,6 +972,20 @@ test.describe('Zazu installed PWA offline shell', () => {
                 on_hand: 0,
                 movements: [],
             }];
+            state.assets = [{
+                local_id: 'local-asset-identity',
+                id: 98001,
+                server_id: 98001,
+                name: 'Offline event asset',
+                status: 'allocated',
+                allocations: [{
+                    local_id: 'local-asset-allocation-identity',
+                    id: null,
+                    server_id: null,
+                    status: 'allocated',
+                    pending_sync: true,
+                }],
+            }];
             state.local_dirty = false;
             await window.ZazuOffline.persist({ allowSessionChange: true });
         }, { activeBusinessId: businessId, serverItemId: itemId, name: itemName });
@@ -1004,6 +1018,75 @@ test.describe('Zazu installed PWA offline shell', () => {
         ]));
         expect(local.pending).toHaveLength(1);
         expect(local.pending[0].entity_type).toBe('inventory_movement');
+
+        const allocationMutation = await page.evaluate(() => window.ZazuOffline.queueMutation('asset_allocation', 'create', {
+            local_id: 'local-asset-allocation-identity',
+            asset_local_id: 'local-asset-identity',
+            event_local_id: 'local-asset-job-identity',
+            allocated_from: '2026-11-20',
+            allocated_until: '2026-11-21',
+            notes: 'Created while disconnected',
+        }));
+        const syncedTypes = [];
+        await page.route('**/api/sync/push', async route => {
+            const body = route.request().postDataJSON();
+            const recorded = body.mutations.map((mutation, index) => {
+                syncedTypes.push(mutation.entity_type);
+                return {
+                    id: mutation.id,
+                    sequence: index + 1,
+                    status: 'applied',
+                    applied: true,
+                    error: null,
+                    retryable: false,
+                    identity: {
+                        entity_type: mutation.entity_type,
+                        local_id: mutation.payload?.local_id || mutation.entity_id,
+                        server_id: mutation.entity_type === 'inventory_movement' ? 96001 : 96002,
+                    },
+                };
+            });
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ recorded, applied: recorded.map(item => item.id) }),
+            });
+        });
+        await page.route('**/api/sync/pull**', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ mutations: [] }),
+        }));
+        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ business: { id: businessId, name: 'Offline movement business', currency: 'ZAR' } }),
+        }));
+
+        await page.context().setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => syncedTypes.length).toBe(2);
+        await expect.poll(() => page.evaluate(() => {
+            const item = window.ZazuOffline.getState().inventory_items.find(record => record.local_id === 'local-inventory-item-' + document.querySelector('form[data-zazu-offline-item-id]')?.dataset.zazuOfflineItemId);
+            const asset = window.ZazuOffline.getState().assets.find(record => record.local_id === 'local-asset-identity');
+            const movement = item?.movements?.find(record => record.local_id);
+            const allocation = asset?.allocations?.find(record => record.local_id === 'local-asset-allocation-identity');
+            return {
+                movementId: item?.movements?.find(record => record.type === 'receipt')?.server_id ?? null,
+                movementPending: item?.movements?.find(record => record.type === 'receipt')?.pending_sync ?? null,
+                allocationId: allocation?.server_id ?? null,
+                allocationPending: allocation?.pending_sync ?? null,
+            };
+        })).toEqual({
+            movementId: 96001,
+            movementPending: false,
+            allocationId: 96002,
+            allocationPending: false,
+        });
+
+        const finalQueue = await page.evaluate(() => window.ZazuOffline.pending());
+        expect(finalQueue).toHaveLength(0);
+        expect(allocationMutation.entity_type).toBe('asset_allocation');
     });
 
     test('event-cost mutations receive their canonical server identity after sync', async ({ page }, testInfo) => {
