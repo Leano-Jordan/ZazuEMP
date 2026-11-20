@@ -1052,6 +1052,27 @@
             throw new Error('The server did not confirm whether this offline change should be retried or removed.');
         }
 
+        const remotePayload = result.conflict?.remote_payload || {};
+        const remoteRevision = Number(remotePayload.revision || 0);
+        if (retryWithNewMutationId && (!result.rebase?.new_mutation_id || remoteRevision < 1)) {
+            throw new Error('The latest server revision could not be confirmed. Keep the local change queued and retry conflict resolution.');
+        }
+
+        const identityTargets = {
+            customer: 'customers',
+            job: 'jobs',
+            quote: 'quotes',
+            preparation: 'preparations',
+            service: 'catalogue',
+            supplier: 'suppliers',
+            purchase_order: 'purchase_orders',
+            invoice: 'invoices',
+            expense: 'expenses',
+            inventory_item: 'inventory_items',
+            asset: 'assets',
+            event_cost: 'costs',
+        };
+
         const db = await openDb();
         await new Promise((resolve, reject) => {
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
@@ -1060,33 +1081,30 @@
             const all = store.getAll();
             const currentState = stateStore.get('current');
             let sessionMismatch = false;
+            let persistedState = null;
+            let allReady = false;
+            let stateReady = false;
 
-            currentState.onsuccess = () => {
-                if (sessionCleared || (currentState.result?.sync?.token || null) !== conflictSessionToken) {
-                    sessionMismatch = true;
-                    tx.abort();
-                }
-            };
-            currentState.onerror = () => tx.abort();
-
-            tx.oncomplete = resolve;
-            tx.onerror = () => reject(tx.error || new Error('Offline conflict resolution could not be saved locally.'));
-            tx.onabort = () => reject(sessionMismatch
-                ? new Error('The device session changed before conflict resolution could be saved.')
-                : (tx.error || new Error('Offline conflict resolution transaction was aborted.')));
-
-            all.onsuccess = () => {
-                if (sessionMismatch) return;
+            const finishResolution = () => {
+                if (!allReady || !stateReady || sessionMismatch) return;
                 const mutation = (all.result || []).find(item => Number(item.conflict_id) === id);
+                const nextState = {
+                    ...(persistedState || state || blank()),
+                    conflicts: [...((persistedState || state || blank()).conflicts || [])],
+                };
+
                 if (mutation && shouldRetry) {
                     const retry = { ...mutation, status: 'pending' };
                     if (retryWithNewMutationId) {
-                        // The server has permanently bound the old ID to a
-                        // different payload. Keep the edited work, but retry
-                        // it as a new immutable mutation.
-                        retry.id = crypto.randomUUID();
-                        retry.created_at = new Date().toISOString();
-                        store.delete(mutation.id);
+                        // The server permanently retires the original ID and
+                        // supplies its replacement. Preserve created_at so this
+                        // rebased mutation stays ahead of its causal successors.
+                        retry.id = result.rebase.new_mutation_id;
+                        retry.payload = {
+                            ...retry.payload,
+                            expected_revision: remoteRevision,
+                        };
+                        delete retry.payload.predecessor_mutation_id;
                     }
                     delete retry.conflict_id;
                     delete retry.server_sequence;
@@ -1097,16 +1115,44 @@
                     store.delete(mutation.id);
                 }
 
+                const target = identityTargets[mutation?.entity_type];
+                const localId = mutation?.payload?.local_id || mutation?.entity_id;
+                const list = target ? (nextState[target] || []) : [];
+                const index = list.findIndex(item => item.local_id === localId);
+                if (index >= 0 && remotePayload.record && typeof remotePayload.record === 'object') {
+                    const current = list[index];
+                    if (shouldDiscard) {
+                        const serverRecord = remotePayload.record;
+                        list[index] = {
+                            ...current,
+                            ...serverRecord,
+                            id: current.server_id ?? current.id ?? serverRecord.id,
+                            server_id: current.server_id ?? current.id ?? serverRecord.id,
+                            local_id: localId,
+                            revision: remoteRevision || current.revision || 1,
+                            pending_sync: false,
+                        };
+                        if (mutation.entity_type === 'customer' && Array.isArray(serverRecord.contacts)) {
+                            const primary = serverRecord.contacts.find(item => item.is_primary) || serverRecord.contacts[0] || {};
+                            list[index].contact_name = primary.name || null;
+                            list[index].phone = primary.phone || null;
+                            list[index].email = primary.email || null;
+                        }
+                    } else if (retryWithNewMutationId) {
+                        list[index] = { ...current, revision: remoteRevision };
+                    }
+                    nextState[target] = list;
+                }
+
                 const pendingCount = store.index('status').count('pending');
                 pendingCount.onsuccess = () => {
-                    const nextState = {
-                        ...state,
-                        conflicts: (state.conflicts || []).map(conflict =>
-                            Number(conflict.id) === id ? { ...conflict, status: 'resolved' } : conflict
-                        ),
-                        local_dirty: pendingCount.result > 0,
-                    };
-                    tx.objectStore(STATE).put(nextState, 'current');
+                    nextState.conflicts = nextState.conflicts.map(conflict =>
+                        Number(conflict.id) === id
+                            ? { ...conflict, status: 'resolved', remote_payload: remotePayload }
+                            : conflict
+                    );
+                    nextState.local_dirty = pendingCount.result > 0;
+                    stateStore.put(nextState, 'current');
                     tx.oncomplete = () => {
                         state = nextState;
                         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
@@ -1115,7 +1161,29 @@
                 };
                 pendingCount.onerror = () => tx.abort();
             };
+
+            currentState.onsuccess = () => {
+                persistedState = currentState.result || state || blank();
+                if (sessionCleared || (persistedState.sync?.token || null) !== conflictSessionToken) {
+                    sessionMismatch = true;
+                    tx.abort();
+                    return;
+                }
+                stateReady = true;
+                finishResolution();
+            };
+            currentState.onerror = () => tx.abort();
+            all.onsuccess = () => {
+                allReady = true;
+                finishResolution();
+            };
             all.onerror = () => tx.abort();
+
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error('Offline conflict resolution could not be saved locally.'));
+            tx.onabort = () => reject(sessionMismatch
+                ? new Error('The device session changed before conflict resolution could be saved.')
+                : (tx.error || new Error('Offline conflict resolution transaction was aborted.')));
         });
 
         if (shouldRetry) {
