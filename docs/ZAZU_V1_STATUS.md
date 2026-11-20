@@ -1,25 +1,23 @@
 ## Director execution checkpoint — 2026-11-21
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main`.  
-**Verified test head:** `0dd2cc3d9c0f95ea1249b7f31807f349e67099c9`.
+**Verified offline/session test head:** `1768de8b00ff0064b3b53cd757d4118fbfe04608`.  
+**Follow-up business-archive hardening head:** `0bb76a158e22b9671ce5dfc32b54a29c81cda72b`.
 
-### Targeted implementation delivered
-- Restored offline fallback for cached Customer/Work creation pages, invoice creation and numeric Work-detail pages while retaining dashboard-shell fallback for unsupported/unprimed routes.
-- Corrected offline workspace permission navigation to use Zazu's `PermissionService`. The previous Laravel `@can` directives did not evaluate Zazu's business-role permission model and hid the links.
-- Hardened the phone attachment client against session transitions: queued attachment writes, Work-ID reconciliation, list reads and local file retrieval now re-check the captured session generation.
+### Targeted implementations delivered
+- Offline navigation preserves cached Customer/Work creation, invoice creation and Work-detail pages while falling back to the authenticated dashboard shell for unsupported or unprimed routes.
+- Offline workspace navigation uses Zazu's active-business `PermissionService`, not Laravel `@can`.
+- Service-worker navigations propagate same-origin redirects after an expired web session and do not cache the final public login page as authenticated HTML.
+- Phone-local attachment queue writes, Work identity reconciliation, attachment listing and file retrieval are bound to the active offline session generation.
+- Business archive restore now rejects every ZIP entry except `manifest.json`, `data.json` and payload entries declared by the validated file manifest. Unexpected entries are rejected before transaction or target-workspace mutation.
 
 ### Exact-head automated evidence
-- Laravel: **627 passed / 1 skipped / 4,334 assertions**.
-- Offline-browser desktop Chromium: **57 passed**; one expired-session URL assertion was flaky on its first attempt and passed on retry.
-- Mobile-viewport Customer/Work acceptance: **7 passed**.
-- Dedicated phone-local attachment journey: **1 passed**.
-- PostgreSQL migrations, business/workspace registration and database/private-file recovery smoke: **PASS**.
-- Composer security audit, secret scan, PHPMD, JavaScript/TypeScript, Python and Actions analysis, application check and Director Health: **PASS**. Sonar analysis was skipped.
-- Windows V1 package build and PowerShell fresh-install/recovery verification: **PASS** on source commit `490100e2ae7a4793db3e06c37833cba7b2033fb9`.
+- Offline/session source head `1768de8`: Laravel **627 passed / 1 skipped / 4,334 assertions**; PostgreSQL migration/business/private-file recovery smoke **PASS**; desktop Chromium **58 passed**; mobile-viewport Customer/Work **7 passed**; phone-local attachment journey **1 passed**. All reported security, quality, application and health checks passed. Sonar analysis was skipped.
+- Archive hardening head `0bb76a1`: Laravel **628 passed / 1 skipped / 4,340 assertions**; PostgreSQL migration/recovery smoke **PASS**; desktop offline-browser check was still running at the time of this checkpoint. Other reported analysis, application, security and quality checks passed.
+- Windows package build and PowerShell fresh-install verification: **PASS** on source commit `490100e2ae7a4793db3e06c37833cba7b2033fb9`.
 
 ### Release gates — unchanged
-Offline code and CI evidence do not close the owner-side gates. **Still OPEN:** physical Android cold launch/restart/reconnect; intended customer-PC installation recovery drill; live-business commercial reconciliation; complete offline sync matrix; POPIA operational controls; ZAZU name clearance. **V1 remains NOT READY; no readiness-score uplift is claimed.**
-
+**Still OPEN:** physical Android cold launch/restart/reconnect; intended customer-PC installation recovery drill; live-business commercial reconciliation; complete offline sync matrix; POPIA operational controls; ZAZU name clearance. Automated browser/CI and Windows package smoke tests do not replace owner-side installation acceptance. **V1 remains NOT READY; no readiness-score uplift is claimed.**
 ---
 
 ## Director execution checkpoint — 2026-11-20
