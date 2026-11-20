@@ -1,25 +1,21 @@
-## Director update — 2026-11-20 (offline sync integrity audit)
+## Director execution checkpoint — 2026-11-20
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
-**Latest full application-code verification baseline:** `526bdf38dab6ff540c143b0e57dfcee468006dc3`.  
-**Latest completed repository workflows observed during this audit:** Rosscore Director Health, Zazu Quality, Director Contract Lint and Push-on-main passed on documentation head `91f41ec`; SonarCloud was skipped. Subsequent commits in this reconciliation changed documentation only; they are not a fresh application test run.
+**Verified code SHA:** `041314fd80147758dd2edb33c187b16328aea938`.  
+**Exact-head Laravel:** [44810699348](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699348) — **PASS**, 623 passed / 1 skipped / 4,283 assertions.  
+**PostgreSQL migration + registration + database/private-file recovery smoke:** **PASS**.  
+**Offline browser:** 57 desktop Chromium passed, 7 mobile-viewport passed, 1 dedicated Pixel 7-viewport Work-create/attachment/reconnect journey passed.  
+**PHPMD** [44810699344], **Zazu Quality** [44810699254], **Director Health** [44810699270], **Push-on-main** [44810699529]: **PASS**. SonarCloud was skipped.
 
-### Offline sync finding
-- Confirmed F1 data-integrity defect: existing-record offline updates do not carry an authoritative base revision. The server resolves the current record and applies a stale device payload without detecting an intervening online or other-device edit.
-- Registered as `CASE-ZAZU-0033` / `ENG-DATA-003`; regression control `REG-024`.
-- Scope includes update-capable handlers for customer (including contacts), Work/event (including requirements), preparation, quote/draft version, inventory item, event cost, asset, supplier, service/capability and purchase order.
-- The initial online/offline writer trace has confirmed customer/contact, Work/requirements, quote/version, preparation, supplier, capability, asset/allocation, invoice/payment, inventory movement and purchase-receipt paths. It remains explicitly PARTIAL; all aggregate writers and transaction/lock boundaries must be mapped before a safe revision implementation.
-- Lock review found concrete gaps: CustomerController update is transactional but has no shared business/customer row lock; BusinessCapabilityController update writes without a transaction/row lock; CustomerContactController locks customer/contact rows but not the common business row. Work, quote, supplier, asset, finance, inventory and purchasing paths use differing lock combinations. No post-save-only revision increment can safely close these races.
-- Required correction remains server-enforced monotonic revisions, same-device causal edit chaining and loss-preserving stale conflicts/rebase. No timestamps-only check, last-write-wins or mutation-ID reuse. Payment, receipt, stock and allocation idempotency must remain intact.
-- No application code was changed during this source audit. The revision defect remains OPEN; no fix or runtime reproduction is claimed.
+### Current gate interpretation
+- **Offline account/session transition — AUTOMATED PASS** on this exact SHA. Logout/session preservation, expired session re-authentication, owner/manager account transition, trusted-device revocation retry, cross-business pairing denial, stale response protection and pending-work preservation are covered. Physical-device/lost-device operational acceptance remains separate.
+- **Active Work attachments — AUTOMATED PASS** on this exact SHA. Offline file queueing, durable local storage, reconnect upload, retry/idempotency, server identity reconciliation, private download cache, cross-tab re-pair and late-response/logout protections pass. The dedicated Pixel 7-viewport Work-create/attach/reconnect journey also passes; this is not physical Android cold-restart proof.
+- **Revision-aware stale-write protocol — IMPLEMENTED; FULL SYNC MATRIX OPEN.** The command-parent revision regression passes for quote acceptance → Work, payment → invoice, purchase receipt → purchase order/inventory, inventory movement → inventory item and asset allocation → asset. Full replay/reconciliation across all supported offline operations remains open.
+- **Commercial workflow — SEEDED AUTOMATED PASS; LIVE RECORD RECONCILIATION OPEN.** The current test scenario reconciles R11,500 invoice including VAT, R3,450 deposit, R8,050 final payment, R10,000 net sales excluding VAT, R2,800 actual cost, R7,200 indicative contribution and 72% margin. This is not audited accounting profit or proof against live business records.
+- **DB-001 — DORMANT / MONITORING.** Founder reports no recent recurrence; root cause remains unproven and no fix is claimed. Do not resume active investigation unless it recurs or new evidence appears. Installation recovery is a separate OPEN gate.
+- **Still OPEN:** real Android cold launch/restart/reconnect; intended-PC installation recovery drill; real-business commercial reconciliation; POPIA operational controls; ZAZU name clearance. The complete offline sync matrix also remains OPEN.
 
-### Current release position
-- Offline sync reliability across the supported V1 matrix remains OPEN.
-- Physical Android standalone offline launch/restart/reconnect, installed-PC DB-001 diagnosis and recovery, populated commercial reconciliation, POPIA operational sign-off and ZAZU name clearance remain OPEN.
-- PC-to-phone pairing remains CLOSED by Founder confirmation.
-- V1 remains **NOT READY / NO-GO**. Evidence maturity remains 73/100 with no uplift.
-
-**Current living records:** `.ai/engineering/STATE.md`, `.ai/engineering/READINESS_REGISTER.md`, and `docs/V1_RELEASE_CHECKLIST.md`. Historical checkpoints below remain dated evidence, not current state.
+**V1 remains NOT READY. Evidence maturity remains 73/100; no score uplift is claimed.** No production deployment or live business data changed.
 
 ---
 
@@ -292,7 +288,7 @@ The exact-head automated test batch now passes for offline session transitions, 
 - **Offline account/session security — AUTOMATED PASS.** Chromium browser acceptance verifies interrupted logout preserves the signed-in session and queued work; switching from owner to manager in the same business preserves the trusted business workspace; expired web-session re-authentication preserves the pending offline mutation and device pairing. Business-switch installation-ID reuse is rejected with HTTP 409 without changing the original business's trusted device.
 - **Offline Work attachments — AUTOMATED PASS.** The active Work attachment workflow passes browser acceptance for local queueing, reconnect upload, server-ID reconciliation, duplicate retry, offline file reuse, cross-tab re-pair and stale asynchronous response protection. Do not count the dormant `public/offline-attachments.js` as the active implementation.
 - **Multi-customer sync — AUTOMATED PASS.** Two queued customer creates reconcile to distinct server IDs and replay without duplicates. The owner's actual existing IndexedDB customers remain unobserved by CI and must not be recreated.
-- **Commercial reconciliation — AUTOMATED PASS.** A seeded scenario validates the complete accepted quote → invoice → deposit → final payment → actual cost → event profit path. Values: R11,500 invoiced; R3,450 deposit; R8,050 final payment; R2,800 actual cost; R8,700 profit; 75.65% margin. This is not a claim that live customer records have been manually checked.
+- **Commercial reconciliation — AUTOMATED PASS.** A seeded scenario validates the complete accepted quote → invoice → deposit → final payment → actual cost → event profit path. Values: R11,500 invoiced including VAT; R3,450 deposit; R8,050 final payment; R10,000 net sales excluding VAT; R2,800 actual cost; R7,200 indicative contribution; 72.00% margin. This is not a claim that live customer records have been manually checked.
 - **Business data portability — IMPLEMENTED / AUTOMATED-VERIFIED.** Twenty-three business-scoped CSV datasets and the relationship-complete tenant-scoped `.zazu` archive/restore are available; customer CSV/XLSX import preview remains available separately. Real installed-environment recovery is a distinct open gate.
 - **Installation recovery — CI VERIFIED, OPERATOR DRILL OPEN.** The CLI backup/restore supports SQLite, MySQL and PostgreSQL; PostgreSQL database and private-file round-trip passes in CI. The controlled installed-environment recovery drill remains required.
 - **Physical acceptance — OWNER VERIFICATION REQUIRED.** Real secure-origin phone/tablet installation, disconnected workflow, local record and attachment persistence, force-close/reopen and reconnect sync remain unverified.
@@ -597,4 +593,4 @@ Backup compatibility coverage was extended after the initial integrity note: the
 
 ## Commercial document sharing checkpoint — 2026-11-18
 
-COM-01 is PARTIAL on `main`: signed public quote pages now support browser Print / Save as PDF; quote details hand off to the signed customer view through WhatsApp; issued/paid invoices have a seven-day signed, read-only customer view with WhatsApp handoff and browser Print / Save as PDF. Invoice-linked receipts now have the same signed print/share path. Full CI browser/mobile-viewport acceptance passes; physical-device acceptance and direct PDF-file attachment remain open. Consecutive invoice numbering is implemented as a business/month-scoped `INV-YYYYMM-000001` series across online issuance and offline sync; local offline records refresh to the canonical server number after sync. Legal/tax-adviser review remains open. DB-001 remains OPEN and the V1 release remains NOT READY.
+COM-01 is PARTIAL on `main`: signed public quote pages now support browser Print / Save as PDF; quote details hand off to the signed customer view through WhatsApp; issued/paid invoices have a seven-day signed, read-only customer view with WhatsApp handoff and browser Print / Save as PDF. Invoice-linked receipts now have the same signed print/share path. Full CI browser/mobile-viewport acceptance passes; physical-device acceptance and direct PDF-file attachment remain open. Consecutive invoice numbering is implemented as a business/month-scoped `INV-YYYYMM-000001` series across online issuance and offline sync; local offline records refresh to the canonical server number after sync. Legal/tax-adviser review remains open. DB-001 is DORMANT / MONITORING by current Founder report; the separate installation-recovery gate remains OPEN. V1 remains NOT READY.

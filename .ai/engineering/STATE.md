@@ -1,3 +1,31 @@
+## Director execution checkpoint — 2026-11-20
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
+**Verified code SHA:** `041314fd80147758dd2edb33c187b16328aea938`.  
+**Laravel run:** [44810699348](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699348) — **PASS**.  
+**PHPMD:** [44810699344](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699344) — **PASS**.  
+**Zazu Quality:** [44810699254](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699254) — **PASS**.  
+**Director Health:** [44810699270](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699270) — **PASS**.  
+**Push on main:** [44810699529](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699529) — **PASS**. SonarCloud [44810699192](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699192) was **SKIPPED**, not counted as a pass.
+
+### Exact-head evidence
+- Laravel: **623 passed / 1 skipped / 4,283 assertions**. This includes `SyncRevisionAggregateTrackingTest`, including the new command-parent revision regression.
+- PostgreSQL migration, registration, database backup/restore and private-file recovery smoke: **PASS**.
+- Offline desktop Chromium acceptance: **57 passed**; mobile-viewport acceptance: **7 passed**; dedicated phone-local Work-create/attachment/reconnect journey on Pixel 7 emulation: **1 passed**.
+- PHPMD, Zazu Quality (application, Composer security audit and secret scan), Director Health and Push-on-main: **PASS**.
+
+### Gate disposition
+- **Offline session/device transition — AUTOMATED ACCEPTANCE PASS.** The suite exercises failed/unreachable logout, session preservation, account re-entry, expired web-session reauthentication, trusted-device revocation retry, cross-business pairing denial, stale response protection and queue preservation. Physical-device and lost-device operational acceptance remain separate.
+- **Active Work attachments — AUTOMATED ACCEPTANCE PASS.** The suite exercises local file persistence, offline queueing, retry/idempotency, reconnect upload, server identity reconciliation, private download caching, cross-tab re-pair and late-response/logout protection. Pixel 7 emulation is not a physical phone restart test.
+- **Revision-aware sync — IMPLEMENTED; FULL MATRIX OPEN.** The new regression verifies quote acceptance → Work, payment → invoice, purchase receipt → purchase order and affected inventory, inventory movement → inventory item, and asset allocation → asset revision propagation. Full workflow replay/reconciliation across all supported entities and physical-device acceptance remain open.
+- **Commercial workflow — SEEDED AUTOMATED PASS; REAL-BUSINESS RECONCILIATION OPEN.** Current seeded proof: invoice R11,500 including VAT, deposit R3,450, final payment R8,050, net sales R10,000 excluding VAT, actual cost R2,800, indicative contribution R7,200 (72%). This is not audited accounting profit and does not verify live customer records.
+- **DB-001 — DORMANT / MONITORING** by current Founder report; no root cause or fix claimed. Do not chase unless it recurs or new evidence appears. **Installation recovery remains OPEN** pending the controlled drill on the intended installed PC.
+- Still owner-dependent: physical Android cold launch/restart/reconnect; intended-PC recovery drill; real-business commercial reconciliation; POPIA operational controls; ZAZU name clearance.
+
+**Release remains NOT READY. Evidence maturity remains 73/100 with no uplift.** No production deployment, live business data or device storage was changed. No branches were created.
+
+---
+
 ## Director update — 2026-11-20 (current main reconciliation)
 
 **Repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` only · **code commits:** `353ba56` (command-revision regression added), corrected in `98f5921` (inventory baseline captured before command effects). No branches created.

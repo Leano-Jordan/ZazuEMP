@@ -1,13 +1,17 @@
 ## Director disposition refresh — 2026-11-20
 
-- **DB-001: DORMANT / MONITORING, not an active release blocker.** The Founder reports no recent recurrence. The historical root cause remains unproven; do not claim that the error was fixed. Resume investigation only on recurrence or new evidence. Keep historical references and diagnostics. The **installation recovery gate remains OPEN** as a separate V1 requirement.
-- Revision-aware stale-write implementation is present on `main`; the old missing-base-revision implementation finding is superseded. Remaining sync acceptance is the full workflow matrix, command-side parent revision evidence, retries/replay/reconciliation and physical device checks.
-- Bounded online-writer source review has inspected root/nested model hooks and customer/contact, Work, service/capability, supplier, quote, finance, purchase, inventory and asset write paths. No additional confirmed aggregate revision bypass was found in the inspected paths. This is not a claim that runtime acceptance is complete.
-- Added `SyncRevisionAggregateTrackingTest::test_offline_commands_advance_every_related_aggregate_revision` on `main` at `98f5921`; exact-head CI is pending.
+- **Verified code SHA:** `041314fd80147758dd2edb33c187b16328aea938`. Exact-head Laravel [44810699348](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699348): 623 passed / 1 skipped / 4,283 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery smoke PASS; desktop offline browser 57 passed; mobile viewport 7 passed; dedicated phone-local Work attachment journey 1 passed. PHPMD [44810699344], Zazu Quality [44810699254], Director Health [44810699270] and Push-on-main [44810699529] PASS. SonarCloud skipped.
+- **Offline session/device transition: AUTOMATED ACCEPTANCE PASS** on this exact SHA. Real-device and operational lost-device checks remain separate.
+- **Active Work attachment flow: AUTOMATED ACCEPTANCE PASS** on this exact SHA, including the dedicated mobile-viewport Work-create/attachment/reconnect journey. Physical-phone force-close/restart and persistence remain OPEN.
+- **Revision-aware stale-write protection: IMPLEMENTED.** The command-parent regression passes for quote acceptance → Work, payment → invoice, purchase receipt → purchase order/inventory, inventory movement → inventory item and asset allocation → asset. Full V1 sync matrix and complete runtime replay/reconciliation acceptance remain OPEN.
+- **DB-001: DORMANT / MONITORING**, based on the Founder's report of no recent recurrence. Root cause remains unproven; do not claim a fix or use active engineering time unless it recurs/new evidence appears. **Installation recovery remains OPEN independently.**
+- **Commercial reconciliation:** seeded automated traversal is covered; real-business record reconciliation remains OPEN. Tested values are R11,500 invoice incl. VAT; R3,450 deposit; R8,050 final payment; R10,000 net sales excl. VAT; R2,800 actual cost; R7,200 indicative contribution (72%).
+- Bounded writer audit has inspected the relevant root/nested hooks and customer/contact, Work, service/capability, supplier, quote, finance, purchasing, inventory and asset write paths. No additional confirmed revision bypass found in those inspected paths; this is not exhaustive runtime proof.
+
 
 # Zazu EMP — V1 Readiness Register
 
-Last verified application-code baseline: 526bdf38dab6ff540c143b0e57dfcee468006dc3
+Last verified application-code baseline: 041314fd80147758dd2edb33c187b16328aea938
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
@@ -57,9 +61,12 @@ Historical record: the owner previously reported database errors on the installe
 ## Existing release gates
 | Gate | Disposition | Closure evidence |
 |---|---|---|
+| Offline session/device transition | AUTOMATED ACCEPTANCE PASS | Exact-head 041314f desktop session-transition and server revocation tests; actual phone/lost-device operational acceptance remains separate |
+| Active Work attachments | AUTOMATED ACCEPTANCE PASS | Exact-head 041314f desktop/mobile-viewport queue, retry, reconnect, idempotency, private-file and directory-row journey; physical phone cold restart remains open |
+| Offline sync reliability | IMPLEMENTED / FULL MATRIX OPEN | Exact-head command-parent revision regression passes; complete replay/reconciliation across every supported offline operation remains required |
 | Physical offline device | OPEN | Actual Android installed-app cold launch, disconnected restart, local continuity and reconnect |
 | Installation recovery | OPEN — CI supporting proof added | Windows V1 Package run 82 on fd82f6a passes Windows PowerShell first install and Windows-native SQLite + private-media backup/mutate/restore; still requires the controlled drill on the intended installed target, with representative data, media, authorization, audit and migrations |
-| Commercial reconciliation | OPEN | Populated real-business quote, invoice, payment, cost and profit reconciliation |
+| Commercial reconciliation | SEEDED AUTOMATED PASS / REAL-BUSINESS OPEN | Current test reconciles R11,500 invoice incl. VAT, R3,450 deposit, R8,050 final payment, R10,000 net sales excl. VAT, R2,800 actual cost, R7,200 indicative contribution (72%); live-business reconciliation still required |
 | POPIA operations | OPEN | Owner-approved privacy/retention, incident and operational controls |
 | Event scheduling & rental logistics | CLOSED — engineering/CI | Online/offline fields, setup/collection calendar coverage, clash warnings and rental allocation defaults implemented; Laravel, PostgreSQL migration/recovery and desktop/mobile offline-browser acceptance passed at 71c8fc5 in run 44152431508; physical Android remains a separate release gate |
 | Windows package | CLOSED for defined fresh-install candidate | Windows V1 Package run 82 at fd82f6a: production candidate build, PowerShell first-install smoke and Windows-native SQLite/private-media recovery pass; not an updater or hosted deployment |

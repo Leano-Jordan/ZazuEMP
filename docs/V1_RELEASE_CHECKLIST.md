@@ -1,9 +1,24 @@
 # Zazu EMP — V1 Release Checklist
 
-Latest full application-code verification baseline: 526bdf38dab6ff540c143b0e57dfcee468006dc3.
+Latest full application-code verification baseline: 041314fd80147758dd2edb33c187b16328aea938.
 Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
+
+## Exact-head automated acceptance — 2026-11-20
+
+- [x] Laravel [44810699348](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699348): 623 passed / 1 skipped / 4,283 assertions.
+- [x] PostgreSQL migration, registration, database backup/restore and private-file recovery smoke: PASS in the same run.
+- [x] Offline desktop Chromium: 57 passed; mobile viewport: 7 passed; dedicated Pixel 7-viewport Work-create/attachment/reconnect journey: 1 passed.
+- [x] PHPMD [44810699344], Zazu Quality [44810699254], Director Health [44810699270] and Push-on-main [44810699529]: PASS. SonarCloud skipped.
+- [x] Offline account/session transition automated acceptance: current-main desktop E2E + Laravel feature acceptance passed. Physical-device and operational lost-device testing remain distinct.
+- [x] Active Work attachment automated acceptance: current-main desktop and mobile-viewport E2E passed, including phone-local file creation, queueing and reconnect sync. Physical Android restart remains open.
+- [x] Command-side aggregate revision regression: quote acceptance → Work, payment → invoice, purchase receipt → purchase order/inventory, inventory movement → inventory item, asset allocation → asset passed in `SyncRevisionAggregateTrackingTest`.
+- [ ] Full offline sync workflow matrix, physical Android cold launch/restart/reconnect, intended-PC recovery drill, real-business commercial reconciliation, POPIA operations and ZAZU name clearance remain OPEN.
+
+DB-001 remains DORMANT / MONITORING by Founder report; its historical root cause is unproven and it is not an active release blocker. Installation recovery remains OPEN independently. V1 remains NOT READY; evidence maturity remains 73/100 with no uplift.
+
+---
 ## Dormant database incident — owner installation (status updated 2026-11-20)
 
 - **Disposition: DORMANT / MONITORING — not an active V1 blocker.** Founder reports DB-001 has not appeared recently.
@@ -183,8 +198,8 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Push acknowledgements expose all affected related identities; client reconciles them even when the command has no standalone identity.
 - [x] Regression coverage added for cross-device stale writes, same-device chains, conflict rebase/discard, cross-record command revisions and multi-aggregate browser acknowledgement.
 - [x] Service-worker cache v51 and matching test fixtures.
-- [ ] Exact-head offline browser acceptance including the new related-aggregate case.
+- [x] Exact-head offline browser acceptance including the new related-aggregate case — run 44810699348, SHA 041314f.
 - [ ] Final exhaustive inventory of indirect, queued and command-side writers.
 - [ ] Physical installed-device offline/restart/reconnect acceptance remains a separate owner-operated gate.
 
-Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality and Director Health passed on `7d5f861`; offline browser acceptance was still running when this checklist note was written. CASE-ZAZU-0033 remains OPEN and V1 remains NOT READY until the remaining gates are evidenced. This implementation increment does not uplift the readiness score.
+Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality, Director Health, Push-on-main and offline browser/mobile acceptance passed on `041314f` (run 44810699348). CASE-ZAZU-0033 remains OPEN and V1 remains NOT READY until the remaining gates are evidenced. This implementation increment does not uplift the readiness score.
