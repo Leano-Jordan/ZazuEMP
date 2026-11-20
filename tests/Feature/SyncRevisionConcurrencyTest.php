@@ -13,6 +13,7 @@ use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
 use App\Support\Offline\StaleSyncRevisionException;
+use App\Support\Offline\PendingSyncMutationPredecessorException;
 use App\Support\Offline\SyncConflictResolutionService;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
@@ -307,10 +308,13 @@ class SyncRevisionConcurrencyTest extends TestCase
 
         try {
             $applier->apply($second, ['customer' => $handler]);
-            $this->fail('A successor must not bypass its unresolved predecessor.');
-        } catch (StaleSyncRevisionException $exception) {
-            $this->assertSame(2, $exception->remotePayload()['revision']);
+            $this->fail('A successor must remain queued behind its unresolved predecessor.');
+        } catch (PendingSyncMutationPredecessorException $exception) {
+            $this->assertSame('This offline edit is waiting for an earlier edit to be resolved.', $exception->getMessage());
         }
+
+        $this->assertSame('Intervening server edit', $customer->fresh()->name);
+        $this->assertSame('pending', $second->fresh()->status);
 
         $conflict = SyncConflict::create([
             'business_id' => $business->id,

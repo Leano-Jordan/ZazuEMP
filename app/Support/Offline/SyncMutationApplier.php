@@ -228,6 +228,12 @@ class SyncMutationApplier
                     : null;
             }
 
+            if ($predecessor->status === 'pending') {
+                throw new PendingSyncMutationPredecessorException(
+                    'This offline edit is waiting for an earlier edit to be resolved.'
+                );
+            }
+
             if ($predecessor->status !== 'discarded') {
                 return null;
             }
@@ -239,6 +245,11 @@ class SyncMutationApplier
             }
 
             $predecessorId = $predecessor->superseded_by_mutation_id;
+            if (! $this->findPredecessorMutation($mutation, $predecessorId)) {
+                throw new PendingSyncMutationPredecessorException(
+                    'This offline edit is waiting for its earlier rebased edit to synchronize.'
+                );
+            }
         }
 
         return null;
