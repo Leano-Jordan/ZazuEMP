@@ -279,7 +279,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             }];
             state.capabilities = [{
                 id: 802, server_id: 802, local_id: identity('02'),
-                name: 'Offline Catering Service', capability_type: 'service', active: true,
+                name: 'Offline Catering Service', capability_type: 'service', is_active: false,
             }];
             state.inventory_items = [{
                 id: 803, server_id: 803, local_id: identity('03'),
@@ -333,6 +333,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         await workspace.getByRole('button', { name: 'View saved details' }).first().click();
         await expect(workspace.getByText('supplier@example.test')).toBeVisible();
         await expect(workspace.getByText('Soshanguve')).toBeVisible();
+        await workspace.getByRole('button', { name: 'View saved details' }).nth(1).click();
+        await expect(workspace.getByText('Inactive', { exact: true })).toBeVisible();
     });
 
     test('offline updates carry a base revision and preserve same-record queue order', async ({ page }) => {

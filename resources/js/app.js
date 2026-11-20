@@ -2346,10 +2346,10 @@ function setupZazuOfflineDirectoryViews() {
         capabilities: {
             entity: 'service',
             title: record => record.name || 'Unnamed service',
-            meta: record => [record.capability_type, record.active === false ? 'Inactive' : 'Active'].filter(Boolean).join(' · '),
+            meta: record => [record.capability_type, (record.is_active ?? record.active) === false ? 'Inactive' : 'Active'].filter(Boolean).join(' · '),
             fields: record => [
                 ['Type', record.capability_type], ['Description', record.description],
-                ['Availability', record.active === false ? 'Inactive' : 'Active'],
+                ['Availability', (record.is_active ?? record.active) === false ? 'Inactive' : 'Active'],
             ],
         },
         inventory_items: {
