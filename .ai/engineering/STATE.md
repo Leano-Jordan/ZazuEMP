@@ -1,6 +1,6 @@
 ## Director engineering update — 2026-11-20
 
-**Repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only. **Current engineering head at this update:** `a4b267f`. No branches created.
+**Repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only. **Current engineering head at this update:** `2b4d73b`. No branches created.
 
 ### Active engineering — CASE-ZAZU-0033, revision-aware offline sync
 
@@ -16,14 +16,15 @@ A substantial implementation slice is now committed directly to `main`:
 
 ### Regression coverage added
 
-`SyncRevisionConcurrencyTest` covers online revision advancement, stale-device rejection with remote snapshot, same-device sequential mutation chaining, an intervening external write, and explicit keep-local rebase with a new mutation ID. Existing offline update fixtures now supply expected revisions.
+`SyncRevisionConcurrencyTest` covers online revision advancement, stale-device rejection with remote snapshot, same-device sequential mutation chaining, an intervening external write, explicit keep-local rebase with a new mutation ID, application of the rebased mutation and a later successor still referencing the immutable original ID, plus use-server discard followed by a valid successor. Existing offline update fixtures now supply expected revisions.
+
+- Conflict rebase and presentation logic were split into `SyncConflictRebaseService` and `SyncConflictPresenter` to bring the resolver back within PHPMD complexity limits. A first PHPMD run exposed excessive resolver complexity; the refactor is awaiting exact-head CI confirmation.
 
 ### Verification status
 
-- PHPMD: PASS on `a4b267f`.
-- Zazu Quality: PASS on `a4b267f`.
-- Director Health: PASS on `a4b267f`.
-- Laravel unit/feature + PostgreSQL migration smoke: running at the time of this update.
+- PHPMD: pending exact-head rerun after conflict-service decomposition (the first run on the interim revision-protocol slice failed on resolver complexity).
+- Zazu Quality, Laravel unit/feature, PostgreSQL migration smoke, Psalm, Windows V1 package and populated upgrade/rollback: pending exact-head workflows on `2b4d73b`.
+- Director Health: passed on the prior revision-protocol head; exact-head run is queued.
 - Historical full application baseline `526bdf3` remains historical evidence only; it does not verify this revision-protocol code.
 - CASE-ZAZU-0033 remains OPEN pending exact-head Laravel/PostgreSQL/offline-browser acceptance and a final audit for online query-builder/bulk writers that may bypass Eloquent model events.
 
@@ -571,3 +572,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The wider lock slice is on `main`, including supplier, asset update/allocation/release, quote draft, Work create/update and the lifecycle/finance/inventory/purchasing paths already using business-first locks.
 - Exact-head evidence on `47aaa1a`: Laravel unit/feature tests passed; PostgreSQL migration, registration and backup/restore smoke passed; Windows V1 package passed; PHPMD, Zazu Quality, Psalm Security Scan, populated upgrade/rollback and Director Health passed. Offline browser acceptance was still running.
 - This closes only the prerequisite lock-normalization stage. CASE-ZAZU-0033 remains OPEN until monotonic revision advancement, expected-revision rejection, remote snapshot preservation, same-device causal chaining and safe rebase are implemented and tested.
+
+
+## CASE-ZAZU-0033 follow-through — conflict rebase chain and complexity correction — 2026-11-20
+
+- Added causal continuity after an explicit use-server discard: the discarded mutation records the latest server revision, and the next same-device mutation can use that result revision rather than being stranded behind a predecessor with no result.
+- Expanded regression coverage to prove both paths: a keep-local replacement mutation applies under its new immutable ID and a later edit can still follow the original mutation's supersession link; a use-server discard records the current revision and a later queued edit applies against it.
+- Split conflict rebase operations and conflict presentation/comparison out of the resolver to address the PHPMD complexity failure. Exact-head CI is pending; no test result is being inferred from the refactor.
+- Current head: `2b4d73b`. CASE-ZAZU-0033 remains OPEN.

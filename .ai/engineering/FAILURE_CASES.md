@@ -582,3 +582,6 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Stop condition:** CASE-ZAZU-0033 remains OPEN and release remains NOT READY until the complete writer audit and exact-head regression evidence pass. Do not uplift readiness from static source changes or CI subsets alone.
 
 **Commit trail:** revision metadata `009b7c4`; stale enforcement `d5d4098`; client queue/bootstrap `fd73afe`; conflict rebase `0533b60`; parent/nested tracking `1924588`; parent command revisions `08bef14`; push processor extraction `7a57c4c`; complexity corrections `7d07f06`, `3137b80`; cache v42 `8b85041`; revision concurrency tests `fa74ab7`, fixture updates `65a7a18`, `a4b267f`.
+
+
+**2026-11-20 follow-through:** same-device causal chains now have explicit regression coverage after both keep-local rebase and use-server discard. A discard stores the current remote revision on the terminal mutation so later queued edits are not stranded. Conflict rebase/presentation responsibilities were extracted into separate services after PHPMD identified excessive resolver complexity. The exact-head CI run for `2b4d73b` is pending; CASE-ZAZU-0033 remains OPEN and no verification status is uplifted.
