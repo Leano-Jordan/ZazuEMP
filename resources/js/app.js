@@ -2594,10 +2594,34 @@ function setupZazuOfflineDirectoryViews() {
         if (request !== workspaceVisibilityRequest || !workspace.isConnected) return;
 
         workspace.hidden = !hasPendingRecords && originAvailable;
+        applyOfflineRouteView();
     };
 
-    window.ZazuOffline.ready.then(render).catch(() => {});
+    const offlineRouteViews = [
+        [/^\/customers(?:\/|$)/, 'customers'], [/^\/work(?:\/|$)/, 'jobs'],
+        [/^\/quotes(?:\/|$)/, 'quotes'], [/^\/suppliers(?:\/|$)/, 'suppliers'],
+        [/^\/services(?:\/|$)/, 'catalogue'], [/^\/inventory(?:\/|$)/, 'inventory_items'],
+        [/^\/assets(?:\/|$)/, 'assets'], [/^\/(?:purchasing|purchase-orders)(?:\/|$)/, 'purchase_orders'],
+        [/^\/finance(?:\/|$)/, 'invoices'], [/^\/expenses(?:\/|$)/, 'expenses'],
+        [/^\/costs(?:\/|$)/, 'costs'],
+    ];
+
+    const applyOfflineRouteView = () => {
+        const workspace = document.querySelector('[data-zazu-offline-workspace]');
+        if (!workspace) return;
+        const route = offlineRouteViews.find(([pattern]) => pattern.test(window.location.pathname));
+        const activeView = route?.[1] || null;
+        workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => {
+            section.hidden = Boolean(activeView && section.dataset.zazuOfflineView !== activeView);
+        });
+        document.querySelectorAll('main#main-content > .zazu-dash-hero, main#main-content > .zazu-dash-overview, main#main-content > .zazu-dash-grid')
+            .forEach(section => { section.hidden = Boolean(activeView); });
+        workspace.dataset.zazuOfflineActiveView = activeView || 'overview';
+    };
+
+    window.ZazuOffline.ready.then(() => { applyOfflineRouteView(); render(); }).catch(() => {});
     window.addEventListener('zazu:offline-ready', render);
+    window.addEventListener('popstate', applyOfflineRouteView);
     window.addEventListener('zazu:offline-state-updated', render);
     window.addEventListener('zazu:offline-attachments-updated', refreshLocalAttachmentLists);
     window.addEventListener('online', render);
