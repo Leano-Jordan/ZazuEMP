@@ -236,13 +236,23 @@ class QuoteService
         string $depositPercent = '0.00'
     ): QuoteVersion {
         return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $replaceTax, $notes, $depositPercent): QuoteVersion {
-            $lockedQuote = Quote::query()
-                ->whereKey($quote->id)
+            [$businessId, $eventId] = $this->resolveQuoteRevisionContext($quote);
+
+            // All quote revisions follow the shared business → event → quote
+            // → version lock order used by the other commercial workflows.
+            Business::query()
+                ->whereKey($businessId)
                 ->lockForUpdate()
                 ->firstOrFail();
 
             $lockedEvent = Event::query()
-                ->whereKey($lockedQuote->event_id)
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($eventId);
+
+            $lockedQuote = Quote::query()
+                ->whereKey($quote->id)
+                ->where('event_id', $lockedEvent->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
