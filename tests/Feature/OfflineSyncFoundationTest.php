@@ -373,7 +373,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncMutationProtocol::class)->pull($authenticatedSnapshot);
             $this->fail('A stale authenticated device snapshot must not pull after revocation.');
-        } catch (\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
     }
@@ -410,7 +410,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncMutationProtocol::class)->acknowledgeThrough($authenticatedSnapshot, 1);
             $this->fail('A stale authenticated device snapshot must not acknowledge after revocation.');
-        } catch (\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
 
