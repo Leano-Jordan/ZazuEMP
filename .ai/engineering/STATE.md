@@ -616,3 +616,14 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Online write trace reviewed: customer/contact, import, Work/lifecycle, quote, capability, supplier, asset, event cost/preparation, invoice/payment/expense, inventory and purchasing controllers/services. The inspected updates to existing tracked roots use the business-first lock boundary and Eloquent revision events. The inspected raw/bulk operations either also update the aggregate root in the same transaction (e.g. quote status replacement) or restore into a newly-created empty business without existing sync identities. This is a broad source trace, not yet proof that no future or indirect writer can bypass the contract; keep the final writer audit gate open until the repository-wide write inventory is closed.
 - Exact-head evidence at `7d5f861`: Laravel unit/feature PASS, PostgreSQL migration smoke PASS, PHPMD PASS, Zazu Quality PASS, Director Health PASS. Offline browser acceptance, including the new multi-aggregate acknowledgement case, was still running when this state was written. SonarCloud is skipped by workflow configuration.
 - CASE-ZAZU-0033 remains OPEN until the exact-head browser result and remaining supported-aggregate writer audit pass. V1 readiness and the documented 73/100 evidence-maturity score are unchanged. Physical Android/PC acceptance, operator recovery drill, populated commercial reconciliation, DB-001 and legal/operational sign-off remain separate gates.
+
+
+## CASE-ZAZU-0033 — operator conflict-resolution acceptance added — 2026-11-20
+
+- Current write target remains `main`; no branches created.
+- Added `e2e/offline-conflict-resolution.spec.js` to exercise the Settings operator journey for two stale customer edits: compare local/server values, keep-local rebase to a new immutable mutation ID/current revision, and use-server restoration of the authoritative record.
+- Added the new spec to the Laravel workflow's Chromium offline-browser acceptance command. This closes a coverage omission: the Settings UI already exposed both actions, but the existing browser command did not exercise them.
+- Test fixture uses a disconnected local queue before reconnection, seeds failed mutations/conflicts in the business-scoped IndexedDB workspace, then mocks only the conflict API boundary. It asserts the old mutation is replaced on keep-local and the server record is restored on use-server.
+- Source implementation was not changed; this is acceptance coverage for the existing conflict protocol.
+- Commits: `c5ef89d`, `0a2ada0`, `a57108d`, `3a82905`, `e40878d`, `e43392e`.
+- Exact-head Laravel/browser and quality verification on `e43392e` is pending. Do not claim this test passes until its workflow reports success. CASE-ZAZU-0033 remains OPEN; V1 remains NOT READY.
