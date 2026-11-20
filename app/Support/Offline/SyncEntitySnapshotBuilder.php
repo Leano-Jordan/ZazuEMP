@@ -3,6 +3,7 @@
 namespace App\Support\Offline;
 
 use App\Models\Asset;
+use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\Invoice;
@@ -23,10 +24,49 @@ final class SyncEntitySnapshotBuilder
         $deleted = $record === null || (method_exists($record, 'trashed') && $record->trashed());
         $data = $this->aggregateData($record, $record?->toArray() ?? []);
 
+        $related = $this->relatedAggregateData($identity);
+
         return [
             'revision' => (int) $identity->revision,
             'deleted' => $deleted,
             'record' => $data,
+            'related' => $related,
+        ];
+    }
+
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function relatedAggregateData(SyncEntityIdentity $identity): array
+    {
+        if ($identity->entity_type !== 'asset_allocation') {
+            return [];
+        }
+
+        $allocation = DB::table('asset_allocations')
+            ->where('id', $identity->record_id)
+            ->first();
+
+        if (! $allocation) {
+            return [];
+        }
+
+        $assetIdentity = SyncEntityIdentity::query()
+            ->where('business_id', $identity->business_id)
+            ->where('entity_type', 'asset')
+            ->where('record_type', (new Asset)->getMorphClass())
+            ->where('record_id', $allocation->asset_id)
+            ->first();
+
+        if (! $assetIdentity) {
+            return [];
+        }
+
+        return [
+            'entity_type' => 'asset',
+            'local_id' => $assetIdentity->entity_uuid,
+            'revision' => (int) $assetIdentity->revision,
         ];
     }
 

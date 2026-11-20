@@ -1122,11 +1122,20 @@
 
                 const target = identityTargets[mutation?.entity_type];
                 const localId = mutation?.payload?.local_id || mutation?.entity_id;
-                const list = target ? (nextState[target] || []) : [];
+                const parentAsset = mutation?.entity_type === 'asset_allocation'
+                    ? (nextState.assets || []).find(asset => (asset.allocations || []).some(item => item.local_id === localId))
+                    : null;
+                const list = mutation?.entity_type === 'asset_allocation'
+                    ? (parentAsset?.allocations || [])
+                    : (target ? (nextState[target] || []) : []);
                 const index = list.findIndex(item => item.local_id === localId);
                 if (index >= 0 && shouldDiscard && remotePayload.deleted) {
                     list.splice(index, 1);
-                    nextState[target] = list;
+                    if (parentAsset) {
+                        parentAsset.allocations = list;
+                    } else if (target) {
+                        nextState[target] = list;
+                    }
                 } else if (index >= 0 && remotePayload.record && typeof remotePayload.record === 'object') {
                     const current = list[index];
                     if (shouldDiscard) {
@@ -1165,7 +1174,17 @@
                     } else if (retryWithNewMutationId) {
                         list[index] = { ...current, revision: remoteRevision };
                     }
-                    nextState[target] = list;
+                    if (parentAsset) {
+                        parentAsset.allocations = list;
+                    } else if (target) {
+                        nextState[target] = list;
+                    }
+                }
+
+                const relatedAsset = remotePayload.related;
+                if (relatedAsset?.entity_type === 'asset') {
+                    const asset = (nextState.assets || []).find(item => item.local_id === relatedAsset.local_id);
+                    if (asset) asset.revision = Number(relatedAsset.revision || asset.revision || 1);
                 }
 
                 const pendingCount = store.index('status').count('pending');
@@ -1283,6 +1302,12 @@
             event_cost: 'costs',
         };
         const collection = collections[entityType];
+        if (entityType === 'asset_allocation') {
+            const allocation = (workspace?.assets || [])
+                .flatMap(asset => asset.allocations || [])
+                .find(item => item.local_id === localId);
+            return Number(allocation?.revision || 1);
+        }
         const record = collection
             ? (workspace?.[collection] || []).find(item => item.local_id === localId)
             : null;
