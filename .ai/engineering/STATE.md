@@ -642,3 +642,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The new Settings conflict-journey test now reloads the browser after seeding failed mutations and conflict snapshots in the business-scoped IndexedDB database, then verifies the operator can still compare and resolve both records.
 - Sync pull/bootstrap/push endpoints are bounded by deterministic test routes so the test isolates local persistence and the conflict-resolution API contract rather than depending on unrelated sync timing.
 - Commit: `5b56a7c`. Exact-head Chromium acceptance remains pending.
+
+
+## Offline conflict resolution feedback correction — 2026-11-20
+
+- Exact CI evidence on `5b56a7c`: Laravel unit/feature tests and PostgreSQL migration/recovery passed; offline-browser acceptance had 56 passing tests and one failure in the new Settings stale-conflict journey.
+- Failure root cause: resolving the final open conflict caused `renderOfflineConflicts` to hide the entire section immediately after the local state event, so the success status was present in the DOM but inaccessible/hidden. The underlying discard operation and IndexedDB assertions were not reached by the failing visibility assertion; do not claim their browser acceptance from this run.
+- Correction on `main`: keep the conflict section visible while it contains a resolution/status message, even after the last open conflict is removed. The existing E2E journey already asserts the final server-version confirmation and local queue/record state.
+- Exact-head browser acceptance is pending for this correction. Release remains NOT READY; this is a user-feedback defect fix, not evidence of full sync parity or Android physical acceptance.

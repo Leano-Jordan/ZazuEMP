@@ -547,7 +547,8 @@
             }
 
             conflictList.replaceChildren();
-            conflictSection.hidden = !offline.isPaired() || conflicts.length === 0;
+            conflictSection.hidden = !offline.isPaired()
+                || (conflicts.length === 0 && !conflictStatus?.textContent?.trim());
             if (conflicts.length === 0) return;
 
             for (const conflict of conflicts) {
