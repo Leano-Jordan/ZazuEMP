@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Release Checklist
 
-Last verified application-code baseline: ba94b39e0460e4e57c560e98541808c762f50e25
+Last verified application-code baseline: 34124eff9622ab78ec5b80d65b5a8a9457464195
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Open database incident — owner installation
@@ -42,7 +42,11 @@ Offline synchronization is a separate V1 reliability target from phone pairing a
 - [ ] Run targeted server/client regression coverage and the full exact-head Laravel + browser acceptance suites; then verify representative sync journeys on the actual PC and phone.
 - [ ] Record every unsupported offline operation as online-only or otherwise explicitly limited. Do not imply full app-wide offline parity.
 
-**Current evidence:** latest main CI at 561ad304 is red: offline browser acceptance reports 43 passed / 2 failed, and its mobile customer/Work and phone-local attachment follow-on jobs were skipped after the desktop suite failed. Two failed fixtures still call the obsolete six-digit pairing contract or expect an obsolete cross-business error string; this does not close or reopen the Founder-confirmed physical pairing. Full sync quality remains unaccepted until the domain matrix above is verified.
+**Exact-head evidence — `34124eff9622ab78ec5b80d65b5a8a9457464195` (2026-11-20):** Laravel PASS — 607 passed / 1 skipped / 4,155 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery PASS; offline browser PASS — 48 desktop, 6 mobile-viewport and 1 phone-local Work/attachment journey; Zazu Quality, Director Health and CodeQL/Push-on-main PASS. SonarCloud skipped. PHPMD remains FAIL for complexity/length in two workspace-cleanup commands. A transient browser navigation failure recovered on retry; overall browser workflow passed.
+
+**Sync source corrections verified in this batch:** preserved failed/conflicted local records from bootstrap replacement; fixed canonical identity reconciliation for event costs, nested payments, inventory movements and asset allocations; applied disconnected stock receipts to local inventory balance/history; aligned final offline payment with paid invoice status; and scheduled retryable attachment failures through existing backoff while preserving idempotency. Targeted E2E coverage is included.
+
+**Still unaccepted:** complete sync coverage across all supported operations; stale concurrent-edit detection/base-version conflict handling; actual Android standalone offline launch/restart/reconnect. PC-to-phone pairing remains CLOSED. Overall V1 remains NOT READY.
 
 ## Release acceptance gates
 - [ ] Physical Android acceptance: secure-origin install, disconnected cold launch/restart, local records/attachments and reconnect sync on actual device.
