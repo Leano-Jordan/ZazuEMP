@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 
 final class SyncMutationCausalRevisionResolver
 {
+    private const MAX_SUPERSESSION_HOPS = 256;
+
     public function expectedRevision(SyncMutation $mutation): mixed
     {
         $predecessorId = $mutation->payload['predecessor_mutation_id'] ?? null;
@@ -17,72 +19,47 @@ final class SyncMutationCausalRevisionResolver
 
         $visited = [];
 
-        return $this->resolvePredecessor($mutation, $predecessorId, $visited, 0);
-    }
+        for ($hop = 0; $hop < self::MAX_SUPERSESSION_HOPS; $hop++) {
+            if (isset($visited[$predecessorId])) {
+                return null;
+            }
 
-    /**
-     * @param array<string, bool> $visited
-     */
-    private function resolvePredecessor(
-        SyncMutation $mutation,
-        string $predecessorId,
-        array &$visited,
-        int $depth,
-    ): ?int {
-        if ($depth >= 8 || isset($visited[$predecessorId])) {
-            return null;
+            $visited[$predecessorId] = true;
+            $predecessor = $this->findPredecessorMutation($mutation, $predecessorId);
+
+            if (! $this->matchesAggregate($mutation, $predecessor)) {
+                return null;
+            }
+
+            if ($predecessor->status === 'applied') {
+                return is_numeric($predecessor->result_revision)
+                    ? (int) $predecessor->result_revision
+                    : null;
+            }
+
+            if ($predecessor->status === 'pending') {
+                throw new PendingSyncMutationPredecessorException(
+                    'This offline edit is waiting for an earlier edit to be resolved.'
+                );
+            }
+
+            if ($predecessor->status !== 'discarded') {
+                return null;
+            }
+
+            $successorId = $predecessor->superseded_by_mutation_id;
+            if (! is_string($successorId)) {
+                return is_numeric($predecessor->result_revision)
+                    ? (int) $predecessor->result_revision
+                    : null;
+            }
+
+            $predecessorId = $successorId;
         }
 
-        $visited[$predecessorId] = true;
-        $predecessor = $this->findPredecessorMutation($mutation, $predecessorId);
-
-        if (! $this->matchesAggregate($mutation, $predecessor)) {
-            return null;
-        }
-
-        if ($predecessor->status === 'applied') {
-            return is_numeric($predecessor->result_revision)
-                ? (int) $predecessor->result_revision
-                : null;
-        }
-
-        if ($predecessor->status === 'pending') {
-            throw new PendingSyncMutationPredecessorException(
-                'This offline edit is waiting for an earlier edit to be resolved.'
-            );
-        }
-
-        if ($predecessor->status !== 'discarded') {
-            return null;
-        }
-
-        return $this->resolveDiscardedPredecessor($mutation, $predecessor, $visited, $depth);
-    }
-
-    /**
-     * @param array<string, bool> $visited
-     */
-    private function resolveDiscardedPredecessor(
-        SyncMutation $mutation,
-        SyncMutation $predecessor,
-        array &$visited,
-        int $depth,
-    ): ?int {
-        $successorId = $predecessor->superseded_by_mutation_id;
-
-        if (! is_string($successorId)) {
-            return is_numeric($predecessor->result_revision)
-                ? (int) $predecessor->result_revision
-                : null;
-        }
-
-        if (! $this->findPredecessorMutation($mutation, $successorId)) {
-            throw new PendingSyncMutationPredecessorException(
-                'This offline edit is waiting for its earlier rebased edit to synchronize.'
-            );
-        }
-
-        return $this->resolvePredecessor($mutation, $successorId, $visited, $depth + 1);
+        // A bounded traversal protects the sync transaction from pathological
+        // chains while supporting repeated, legitimate keep-local rebases.
+        return null;
     }
 
     private function findPredecessorMutation(SyncMutation $mutation, string $predecessorId): ?SyncMutation
