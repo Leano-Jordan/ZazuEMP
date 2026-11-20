@@ -131,7 +131,34 @@ class SyncRevisionAggregateTrackingTest extends TestCase
     public function test_offline_commands_advance_every_related_aggregate_revision(): void
     {
         [$business, $customer, $device] = $this->customerFixtureWithDevice();
+        $fixture = $this->commandRevisionFixture($business, $customer);
 
+        $this->applyCommand($device, 'quote_acceptance', [
+            'quote_local_id' => $fixture['quote']->entity_uuid,
+        ]);
+        $this->assertSame(2, (int) $fixture['quote']->fresh()->revision);
+        $this->assertSame(2, (int) $fixture['job']->fresh()->revision);
+
+        $this->applyCommand($device, 'payment', [
+            'invoice_local_id' => $fixture['invoice']->entity_uuid,
+        ]);
+        $this->assertSame(2, (int) $fixture['invoice']->fresh()->revision);
+
+        $this->applyCommand($device, 'purchase_receipt', [
+            'purchase_order_local_id' => $fixture['order']->entity_uuid,
+            'received_quantities' => [$fixture['line']->id => '1.00'],
+        ]);
+        $this->assertSame(2, (int) $fixture['order']->fresh()->revision);
+        $this->assertSame(3, (int) $fixture['inventory']->fresh()->revision);
+
+        $this->applyCommand($device, 'inventory_movement', [
+            'inventory_item_local_id' => $fixture['inventory']->entity_uuid,
+        ]);
+        $this->assertSame(4, (int) $fixture['inventory']->fresh()->revision);
+    }
+
+    private function commandRevisionFixture(Business $business, Customer $customer): array
+    {
         $event = Event::create([
             'business_id' => $business->id,
             'customer_id' => $customer->id,
@@ -199,53 +226,33 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'movement_date' => now()->toDateString(),
         ]);
 
-        $jobIdentity = $registry->identify($event, 'job');
-        $quoteIdentity = $registry->identify($quote, 'quote');
-        $invoiceIdentity = $registry->identify($invoice, 'invoice');
-        $orderIdentity = $registry->identify($order, 'purchase_order');
+        return [
+            'job' => $registry->identify($event, 'job'),
+            'quote' => $registry->identify($quote, 'quote'),
+            'invoice' => $registry->identify($invoice, 'invoice'),
+            'order' => $registry->identify($order, 'purchase_order'),
+            'inventory' => $inventoryIdentity,
+            'line' => $line,
+        ];
+    }
 
+    private function applyCommand(SyncDevice $device, string $entityType, array $record): void
+    {
         $handler = new class implements SyncMutationHandler {
             public function apply(SyncMutation $mutation): void
             {
-                // The command's domain outcome is covered by its lifecycle tests.
-                // This isolates the applier's parent-revision propagation contract.
+                // Domain outcomes are tested by the command lifecycle suite.
             }
         };
-        $recorder = app(SyncMutationRecorder::class);
-        $applier = app(SyncMutationApplier::class);
-        $applyCommand = function (string $entityType, array $record) use ($device, $handler, $recorder, $applier): void {
-            $mutation = $recorder->record(
-                $device,
-                $entityType,
-                (string) Str::uuid(),
-                'create',
-                ['record' => $record],
-            );
-            $applier->apply($mutation, [$entityType => $handler]);
-        };
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            $entityType,
+            (string) Str::uuid(),
+            'create',
+            ['record' => $record],
+        );
 
-        $applyCommand('quote_acceptance', [
-            'quote_local_id' => $quoteIdentity->entity_uuid,
-        ]);
-        $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
-        $this->assertSame(2, (int) $jobIdentity->fresh()->revision);
-
-        $applyCommand('payment', [
-            'invoice_local_id' => $invoiceIdentity->entity_uuid,
-        ]);
-        $this->assertSame(2, (int) $invoiceIdentity->fresh()->revision);
-
-        $applyCommand('purchase_receipt', [
-            'purchase_order_local_id' => $orderIdentity->entity_uuid,
-            'received_quantities' => [$line->id => '1.00'],
-        ]);
-        $this->assertSame(2, (int) $orderIdentity->fresh()->revision);
-        $this->assertSame(3, (int) $inventoryIdentity->fresh()->revision);
-
-        $applyCommand('inventory_movement', [
-            'inventory_item_local_id' => $inventoryIdentity->entity_uuid,
-        ]);
-        $this->assertSame(4, (int) $inventoryIdentity->fresh()->revision);
+        app(SyncMutationApplier::class)->apply($mutation, [$entityType => $handler]);
     }
 
     private function customerFixture(): array
