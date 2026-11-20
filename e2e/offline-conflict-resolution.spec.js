@@ -23,6 +23,7 @@ test('Settings resolves stale offline edits without losing either version', asyn
     const businessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
     expect(businessId).toBeGreaterThan(0);
 
+    await page.context().setOffline(true);
     const fixtures = await page.evaluate(async () => {
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
@@ -105,7 +106,7 @@ test('Settings resolves stale offline edits without losing either version', asyn
 
     const resolutionRequests = [];
     await page.route('**/api/sync/push', route => route.abort());
-    await page.route('**/api/sync/conflicts?status=open', route => route.fulfill({
+    await page.route(/\\/api\\/sync\\/conflicts\\?status=open$/, route => route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
@@ -162,6 +163,7 @@ test('Settings resolves stale offline edits without losing either version', asyn
         });
     });
 
+    await page.context().setOffline(false);
     await page.goto('/settings', { waitUntil: 'domcontentloaded' });
     const section = page.locator('[data-zazu-offline-conflicts]');
     await expect(section).toBeVisible();
@@ -172,7 +174,7 @@ test('Settings resolves stale offline edits without losing either version', asyn
     await section.getByRole('button', { name: 'Keep my changes' }).first().click();
     await expect(section.getByText(/rebased onto the latest server version/i)).toBeVisible();
 
-    const rebased = await page.evaluate(async () => {
+    const rebased = await page.evaluate(async oldMutationId => {
         const db = await new Promise((resolve, reject) => {
             const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
             request.onsuccess = () => resolve(request.result);
@@ -187,11 +189,11 @@ test('Settings resolves stale offline edits without losing either version', asyn
         });
         db.close();
         return {
-            oldMutationExists: result.queue.some(item => item.id === 'PLACEHOLDER'),
+            oldMutationExists: result.queue.some(item => item.id === oldMutationId),
             replacement: result.queue.find(item => item.id === 'rebased-conflict-mutation-987711'),
             keepConflictStatus: result.state.conflicts.find(item => item.id === 987711)?.status,
         };
-    });
+    }, fixtures.keepId);
     expect(rebased.oldMutationExists).toBe(false);
     expect(rebased.replacement).toMatchObject({
         id: 'rebased-conflict-mutation-987711',
