@@ -2495,16 +2495,20 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
         await context.setOffline(true);
 
-        for (const [path, heading] of [
-            ['/customers', 'Customers'],
-            ['/customers/create', 'New customer'],
-            ['/work', 'Event Operations'],
-            ['/work/create', 'New job'],
-        ]) {
-            const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
-            expect(response?.ok(), path + ' must be available from the authenticated offline cache').toBe(true);
-            await expect(page.getByRole('heading', { name: heading })).toBeVisible();
-            await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+        try {
+            for (const [path, heading] of [
+                ['/customers', 'Customers'],
+                ['/customers/create', 'New customer'],
+                ['/work', 'Event Operations'],
+                ['/work/create', 'New job'],
+            ]) {
+                const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+                expect(response?.ok(), path + ' must be available from the authenticated offline cache').toBe(true);
+                await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+                await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+            }
+        } finally {
+            await context.setOffline(false);
         }
     });
 
