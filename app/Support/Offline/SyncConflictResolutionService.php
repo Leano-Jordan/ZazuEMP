@@ -39,9 +39,19 @@ final class SyncConflictResolutionService
         $mutation = $this->lockConflictMutation($lockedConflict, $device);
 
         if ($lockedConflict->status !== 'open') {
+            $mutationStatus = $this->resolvedConflictMutationStatus($lockedConflict, $mutation);
+            $rebase = $lockedConflict->conflict_type === 'stale_record_version'
+                && $mutationStatus === 'new_mutation_required'
+                ? [
+                    'new_mutation_id' => $mutation?->superseded_by_mutation_id,
+                    'expected_revision' => (int) ($lockedConflict->remote_payload['revision'] ?? 0),
+                ]
+                : null;
+
             return response()->json([
                 'conflict' => $this->payload($lockedConflict),
-                'mutation_status' => $this->resolvedConflictMutationStatus($lockedConflict, $mutation),
+                'mutation_status' => $mutationStatus,
+                'rebase' => $rebase,
             ]);
         }
 
@@ -175,7 +185,7 @@ final class SyncConflictResolutionService
         $note = $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.');
 
         if (
-            $conflict->conflict_type === 'mutation_identity_mismatch'
+            in_array($conflict->conflict_type, ['mutation_identity_mismatch', 'stale_record_version'], true)
             && $validated['action'] === 'retry'
         ) {
             return '[retry-new-mutation-id] '.$note;
@@ -188,6 +198,10 @@ final class SyncConflictResolutionService
         SyncConflict $conflict,
         ?SyncMutation $mutation
     ): ?string {
+        if ($conflict->conflict_type === 'stale_record_version' && $mutation?->superseded_by_mutation_id) {
+            return 'new_mutation_required';
+        }
+
         if (
             $conflict->conflict_type === 'mutation_identity_mismatch'
             && str_starts_with((string) $conflict->resolution_note, '[retry-new-mutation-id]')

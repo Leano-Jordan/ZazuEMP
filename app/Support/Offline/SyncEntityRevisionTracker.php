@@ -19,6 +19,7 @@ final class SyncEntityRevisionTracker
             self::$trackingSuspended--;
         }
     }
+
     public function touch(Model $record, string $entityType): void
     {
         if (self::$trackingSuspended > 0 || ! $record->exists || ! is_numeric($record->getKey())) {
@@ -26,32 +27,6 @@ final class SyncEntityRevisionTracker
         }
 
         $businessId = $record->getAttribute('business_id');
-        if (! is_numeric($businessId)) {
-            foreach (['event', 'customer', 'quote', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
-                if (! method_exists($record, $relation)) {
-                    continue;
-                }
-
-                $businessId = $record->{$relation}()->value('business_id');
-                if (is_numeric($businessId)) {
-                    break;
-                }
-            }
-        }
-
-        if (! is_numeric($businessId)) {
-            foreach (['event', 'customer', 'quote', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
-                if (! method_exists($record, $relation)) {
-                    continue;
-                }
-
-                $businessId = $record->{$relation}()->value('business_id');
-                if (is_numeric($businessId)) {
-                    break;
-                }
-            }
-        }
-
         if (! is_numeric($businessId)) {
             foreach (['event', 'customer', 'quote', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
                 if (! method_exists($record, $relation)) {
