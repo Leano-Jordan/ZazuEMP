@@ -19,50 +19,54 @@ class SyncMutationProtocol
     {
         $this->assertDeviceContext($device, $stream);
 
-        $cursor = SyncCursor::query()->firstOrCreate(
-            [
-                'business_id' => $device->business_id,
-                'sync_device_id' => $device->id,
-                'stream' => $stream,
-            ],
-            ['last_acknowledged_sequence' => 0],
-        );
+        return DB::transaction(function () use ($device, $stream, $limit): Collection {
+            $this->lockActiveDevice($device);
 
-        $deliveries = SyncDelivery::query()
-            ->where('business_id', $device->business_id)
-            ->where('destination_device_id', $device->id)
-            ->where('stream', $stream)
-            ->where('delivery_sequence', '>', $cursor->last_acknowledged_sequence)
-            ->with('mutation')
-            ->orderBy('delivery_sequence')
-            ->limit(max(1, min($limit, 500)))
-            ->get();
+            $cursor = SyncCursor::query()->firstOrCreate(
+                [
+                    'business_id' => $device->business_id,
+                    'sync_device_id' => $device->id,
+                    'stream' => $stream,
+                ],
+                ['last_acknowledged_sequence' => 0],
+            );
 
-        // Never expose mutations beyond a failed, applied, or missing delivery.
-        // The client acknowledges a contiguous prefix; returning later rows
-        // would make the whole batch impossible to acknowledge safely.
-        $expectedSequence = $cursor->last_acknowledged_sequence + 1;
-        $mutations = collect();
+            $deliveries = SyncDelivery::query()
+                ->where('business_id', $device->business_id)
+                ->where('destination_device_id', $device->id)
+                ->where('stream', $stream)
+                ->where('delivery_sequence', '>', $cursor->last_acknowledged_sequence)
+                ->with('mutation')
+                ->orderBy('delivery_sequence')
+                ->limit(max(1, min($limit, 500)))
+                ->get();
 
-        foreach ($deliveries as $delivery) {
-            if ($delivery->delivery_sequence !== $expectedSequence || $delivery->status !== 'pending') {
-                break;
+            // Never expose mutations beyond a failed, applied, or missing delivery.
+            // The client acknowledges a contiguous prefix; returning later rows
+            // would make the whole batch impossible to acknowledge safely.
+            $expectedSequence = $cursor->last_acknowledged_sequence + 1;
+            $mutations = collect();
+
+            foreach ($deliveries as $delivery) {
+                if ((int) $delivery->delivery_sequence !== $expectedSequence || $delivery->status !== 'pending') {
+                    break;
+                }
+
+                $mutation = $delivery->mutation;
+
+                if (! $mutation) {
+                    break;
+                }
+
+                // Mutation sequence is business-wide; delivery sequence is
+                // receiver-specific. The client must acknowledge the latter.
+                $mutation->setAttribute('delivery_sequence', (int) $delivery->delivery_sequence);
+                $mutations->push($mutation);
+                $expectedSequence++;
             }
 
-            $mutation = $delivery->mutation;
-
-            if (! $mutation) {
-                break;
-            }
-
-            // Mutation sequence is business-wide; delivery sequence is
-            // receiver-specific. The client must acknowledge the latter.
-            $mutation->setAttribute('delivery_sequence', (int) $delivery->delivery_sequence);
-            $mutations->push($mutation);
-            $expectedSequence++;
-        }
-
-        return $mutations;
+            return $mutations;
+        });
     }
 
     public function acknowledgeThrough(
@@ -79,6 +83,8 @@ class SyncMutationProtocol
         }
 
         return DB::transaction(function () use ($device, $stream, $sequence): SyncCursor {
+            $this->lockActiveDevice($device);
+
             $cursor = SyncCursor::query()
                 ->where('business_id', $device->business_id)
                 ->where('sync_device_id', $device->id)
@@ -132,6 +138,36 @@ class SyncMutationProtocol
 
             return $cursor->fresh();
         });
+    }
+
+    /**
+     * Revalidate and serialize sync work against concurrent device revocation
+     * or credential replacement. Middleware authentication is only a snapshot.
+     */
+    private function lockActiveDevice(SyncDevice $device): void
+    {
+        DB::table('businesses')
+            ->where('id', $device->business_id)
+            ->lockForUpdate()
+            ->first();
+
+        $lockedDevice = SyncDevice::query()
+            ->where('business_id', $device->business_id)
+            ->whereKey($device->id)
+            ->active()
+            ->lockForUpdate()
+            ->first();
+
+        abort_unless($lockedDevice, 401, 'This sync device is no longer active.');
+
+        $expectedTokenHash = (string) (($device->metadata ?? [])['sync_token_hash'] ?? '');
+        $currentTokenHash = (string) (($lockedDevice->metadata ?? [])['sync_token_hash'] ?? '');
+
+        abort_unless(
+            $expectedTokenHash === $currentTokenHash,
+            401,
+            'This sync device credential has been replaced.',
+        );
     }
 
     private function assertDeviceContext(SyncDevice $device, string $stream): void
