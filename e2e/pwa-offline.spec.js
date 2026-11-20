@@ -426,6 +426,22 @@ test.describe('Zazu installed PWA offline shell', () => {
                 status: 'received',
                 items: [],
             }];
+            state.invoices = [{
+                id: 730006,
+                server_id: 730006,
+                local_id: 'related-ack-invoice',
+                revision: 1,
+                status: 'issued',
+                total: '100.00',
+            }];
+            state.assets = [{
+                id: 730007,
+                server_id: 730007,
+                local_id: 'related-ack-asset',
+                revision: 1,
+                status: 'available',
+                name: 'Related acknowledgement asset',
+            }];
             state.inventory_items = [
                 { id: 730004, server_id: 730004, local_id: 'related-ack-stock-a', revision: 2, on_hand: 4 },
                 { id: 730005, server_id: 730005, local_id: 'related-ack-stock-b', revision: 10, on_hand: 8 },
@@ -443,11 +459,30 @@ test.describe('Zazu installed PWA offline shell', () => {
                 purchase_order_local_id: 'related-ack-order',
                 received_quantities: {
                     'related-ack-line-a': '1.00',
-                    'related-ack-line-b': '2.00',
                 },
             });
+            const payment = await window.ZazuOffline.queueMutation('payment', 'create', {
+                local_id: 'related-ack-payment',
+                invoice_local_id: 'related-ack-invoice',
+                amount: '25.00',
+            });
+            const movement = await window.ZazuOffline.queueMutation('inventory_movement', 'create', {
+                local_id: 'related-ack-movement',
+                inventory_item_local_id: 'related-ack-stock-a',
+                quantity: '1.00',
+            });
+            const allocation = await window.ZazuOffline.queueMutation('asset_allocation', 'create', {
+                local_id: 'related-ack-allocation',
+                asset_local_id: 'related-ack-asset',
+            });
 
-            return { acceptanceId: acceptance.id, receiptId: receipt.id };
+            return {
+                acceptanceId: acceptance.id,
+                receiptId: receipt.id,
+                paymentId: payment.id,
+                movementId: movement.id,
+                allocationId: allocation.id,
+            };
         });
 
         const pushedTypes = [];
@@ -457,16 +492,27 @@ test.describe('Zazu installed PWA offline shell', () => {
                 const body = route.request().postDataJSON();
                 const recorded = body.mutations.map(mutation => {
                     pushedTypes.push(mutation.entity_type);
-                    const related = mutation.entity_type === 'quote_acceptance'
-                        ? [
+                    const relatedByType = {
+                        quote_acceptance: [
                             { entity_type: 'quote', local_id: 'related-ack-quote', server_id: 730002, revision: 5 },
                             { entity_type: 'job', local_id: 'related-ack-work', server_id: 730001, revision: 6 },
-                        ]
-                        : [
+                        ],
+                        purchase_receipt: [
                             { entity_type: 'purchase_order', local_id: 'related-ack-order', server_id: 730003, revision: 8 },
+                            // Only line A was received. Line B must not be advanced.
                             { entity_type: 'inventory_item', local_id: 'related-ack-stock-a', server_id: 730004, revision: 3 },
-                            { entity_type: 'inventory_item', local_id: 'related-ack-stock-b', server_id: 730005, revision: 11 },
-                        ];
+                        ],
+                        payment: [
+                            { entity_type: 'invoice', local_id: 'related-ack-invoice', server_id: 730006, revision: 2 },
+                        ],
+                        inventory_movement: [
+                            { entity_type: 'inventory_item', local_id: 'related-ack-stock-a', server_id: 730004, revision: 4 },
+                        ],
+                        asset_allocation: [
+                            { entity_type: 'asset', local_id: 'related-ack-asset', server_id: 730007, revision: 2 },
+                        ],
+                    };
+                    const related = relatedByType[mutation.entity_type] || [];
 
                     return {
                         id: mutation.id,
@@ -497,7 +543,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await page.context().setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
-        await expect.poll(() => pushedTypes.length).toBe(2);
+        await expect.poll(() => pushedTypes.length).toBe(5);
         // The online event may have started the first sync before the explicit
         // call above. Wait for the durable queue/ack transaction to finish before
         // inspecting the state that it reconciles.
@@ -512,6 +558,8 @@ test.describe('Zazu installed PWA offline shell', () => {
                 workRevision: current.jobs.find(item => item.local_id === 'related-ack-work')?.revision,
                 quoteRevision: current.quotes.find(item => item.local_id === 'related-ack-quote')?.revision,
                 purchaseOrderRevision: current.purchase_orders.find(item => item.local_id === 'related-ack-order')?.revision,
+                invoiceRevision: current.invoices.find(item => item.local_id === 'related-ack-invoice')?.revision,
+                assetRevision: current.assets.find(item => item.local_id === 'related-ack-asset')?.revision,
                 inventoryRevisions: current.inventory_items
                     .filter(item => item.local_id.startsWith('related-ack-stock-'))
                     .map(item => item.revision),
@@ -522,7 +570,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(state.workRevision).toBe(6);
         expect(state.quoteRevision).toBe(5);
         expect(state.purchaseOrderRevision).toBe(8);
-        expect(state.inventoryRevisions).toEqual([3, 11]);
+        expect(state.invoiceRevision).toBe(2);
+        expect(state.assetRevision).toBe(2);
+        expect(state.inventoryRevisions).toEqual([4, 10]);
         expect(state.pending).toBe(0);
     });
 
