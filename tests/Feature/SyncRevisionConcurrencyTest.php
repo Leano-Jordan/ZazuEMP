@@ -26,6 +26,9 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SyncRevisionConcurrencyTest extends TestCase
 {
     use RefreshDatabase;
