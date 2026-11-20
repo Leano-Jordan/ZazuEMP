@@ -54,6 +54,7 @@ final class SyncMutationPushProcessor
     {
         $conflictId = null;
         $conflictType = null;
+        $conflictDetails = null;
         $identity = null;
         $retryable = false;
 
@@ -79,6 +80,7 @@ final class SyncMutationPushProcessor
             $conflict = $this->recordDomainConflict($device, $mutation, $exception, $error);
             $conflictId = $conflict['id'];
             $conflictType = $conflict['type'];
+            $conflictDetails = $conflict['details'] ?? null;
             $retryable = $conflict['retryable'] ?? $retryable;
         }
 
@@ -90,6 +92,7 @@ final class SyncMutationPushProcessor
             'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
             'conflict_id' => $conflictId,
             'conflict_type' => $conflictType,
+            'conflict' => $conflictDetails,
             'retryable' => $retryable,
             'identity' => $identity ? [
                 'entity_type' => $identity->entity_type,
@@ -123,7 +126,12 @@ final class SyncMutationPushProcessor
                 $exception->remotePayload(),
             );
 
-            return ['id' => $conflict->id, 'type' => 'stale_record_version', 'retryable' => false];
+            return [
+                'id' => $conflict->id,
+                'type' => 'stale_record_version',
+                'details' => app(SyncConflictResolutionService::class)->payload($conflict),
+                'retryable' => false,
+            ];
         }
 
         if ($exception instanceof ValidationException) {
@@ -137,7 +145,11 @@ final class SyncMutationPushProcessor
                 ['message' => $error],
             );
 
-            return ['id' => $conflict->id, 'type' => 'domain_rejection'];
+            return [
+                'id' => $conflict->id,
+                'type' => 'domain_rejection',
+                'details' => app(SyncConflictResolutionService::class)->payload($conflict),
+            ];
         }
 
         return ['id' => null, 'type' => null];
@@ -264,6 +276,7 @@ final class SyncMutationPushProcessor
             'error' => mb_substr($message, 0, 1000),
             'conflict_id' => $conflict->id,
             'conflict_type' => 'mutation_identity_mismatch',
+            'conflict' => app(SyncConflictResolutionService::class)->payload($conflict),
             'retryable' => false,
             'identity' => null,
             'related_identity' => null,
