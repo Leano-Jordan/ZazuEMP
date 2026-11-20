@@ -217,6 +217,12 @@ test('workspace switching submits the selected business and preserves each busin
     expect(secondBusinessId).toBeGreaterThan(0);
     expect(secondBusinessId).not.toBe(firstBusinessId);
 
+    const userId = Number(await page.locator('body').getAttribute('data-zazu-user-id'));
+    const firstBusinessCache = await page.evaluate(({ user, business }) => caches.keys().then(keys =>
+        keys.filter(name => name.includes('-user-' + user + '-business-' + business))
+    ), { user: userId, business: firstBusinessId });
+    expect(firstBusinessCache.length).toBeGreaterThan(0);
+
     const firstMutationId = await page.evaluate(async businessId => {
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
@@ -259,7 +265,11 @@ test('workspace switching submits the selected business and preserves each busin
         paired: false,
     });
 
-    const userId = Number(await page.locator('body').getAttribute('data-zazu-user-id'));
+    const secondBusinessCache = await page.evaluate(({ user, business }) => caches.keys().then(keys =>
+        keys.filter(name => name.includes('-user-' + user + '-business-' + business))
+    ), { user: userId, business: secondBusinessId });
+    expect(secondBusinessCache.length).toBeGreaterThan(0);
+
     const oldBusinessCache = await page.evaluate(({ user, business }) => caches.keys().then(keys =>
         keys.filter(name => name.includes('-user-' + user + '-business-' + business))
     ), { user: userId, business: firstBusinessId });
@@ -275,6 +285,11 @@ test('workspace switching submits the selected business and preserves each busin
     expect(restoredFirstWorkspace.businessId).toBe(firstBusinessId);
     expect(restoredFirstWorkspace.pending).toContain(firstMutationId);
     expect(restoredFirstWorkspace.paired).toBe(true);
+
+    const restoredFirstCache = await page.evaluate(({ user, business }) => caches.keys().then(keys =>
+        keys.filter(name => name.includes('-user-' + user + '-business-' + business))
+    ), { user: userId, business: firstBusinessId });
+    expect(restoredFirstCache.length).toBeGreaterThan(0);
 });
 
 test('expired web session requires sign-in without erasing the trusted offline workspace', async ({ page }, testInfo) => {
