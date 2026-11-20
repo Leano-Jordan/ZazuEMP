@@ -1191,6 +1191,135 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
+    test('offline payment receives its canonical server identity inside the invoice', async ({ page }, testInfo) => {
+        test.setTimeout(45_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Nested payment identity reconciliation runs once in Chromium.');
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/finance/payments/create', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(businessId).toBeGreaterThan(0);
+
+        await page.evaluate(async activeBusinessId => {
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'offline-payment-identity-token',
+                device: { id: 987664, business_id: activeBusinessId },
+            };
+            state.invoices = [{
+                local_id: 'offline-payment-invoice-identity',
+                id: 98401,
+                server_id: 98401,
+                number: 'INV-OFFLINE-PAY-001',
+                status: 'issued',
+                currency: 'ZAR',
+                total: '250.00',
+                paid_amount: '0.00',
+                balance: '250.00',
+                payments: [],
+            }];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        }, businessId);
+
+        const invoiceSelect = page.locator('select[name="invoice_id"]');
+        await invoiceSelect.evaluate(select => {
+            select.add(new Option('INV-OFFLINE-PAY-001 · ZAR 250.00 outstanding', '98401'));
+            select.value = '98401';
+        });
+
+        await page.locator('input[name="amount"]').fill('100.00');
+        await page.locator('select[name="method"]').selectOption('bank_transfer');
+        await page.locator('input[name="paid_at"]').fill('2026-11-20');
+        await page.context().setOffline(true);
+        const paymentForm = page.locator('form[data-zazu-offline-entity="payment"]');
+        await paymentForm.getByRole('button', { name: 'Record payment' }).click();
+        await expect(paymentForm.getByRole('status')).toContainText('Saved on this device');
+
+        const local = await page.evaluate(async () => {
+            const invoice = window.ZazuOffline.getState().invoices.find(item => item.local_id === 'offline-payment-invoice-identity');
+            return {
+                invoice: {
+                    paidAmount: invoice?.paid_amount,
+                    balance: invoice?.balance,
+                    payments: invoice?.payments || [],
+                },
+                pending: await window.ZazuOffline.pending(),
+            };
+        });
+        expect(local.invoice.paidAmount).toBe('100.00');
+        expect(local.invoice.balance).toBe('150.00');
+        expect(local.invoice.payments).toHaveLength(1);
+        expect(local.invoice.payments[0]).toMatchObject({
+            invoice_id: 98401,
+            amount: '100.00',
+            method: 'bank_transfer',
+            pending_sync: true,
+            id: null,
+            server_id: null,
+        });
+        expect(local.pending).toHaveLength(1);
+        expect(local.pending[0].entity_type).toBe('payment');
+
+        let pushedPaymentLocalId = null;
+        await page.route('**/api/sync/push', async route => {
+            const body = route.request().postDataJSON();
+            const mutation = body.mutations.find(item => item.entity_type === 'payment');
+            pushedPaymentLocalId = mutation?.payload?.local_id || null;
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    recorded: [{
+                        id: mutation.id,
+                        sequence: 1,
+                        status: 'applied',
+                        applied: true,
+                        error: null,
+                        retryable: false,
+                        identity: {
+                            entity_type: 'payment',
+                            local_id: pushedPaymentLocalId,
+                            server_id: 98501,
+                        },
+                    }],
+                    applied: [mutation.id],
+                }),
+            });
+        });
+        await page.route('**/api/sync/pull**', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ mutations: [] }),
+        }));
+        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                business: { id: businessId, name: 'Offline payment identity business', currency: 'ZAR' },
+            }),
+        }));
+
+        await page.context().setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => pushedPaymentLocalId).toBe(local.invoice.payments[0].local_id);
+        await expect.poll(() => page.evaluate(() => {
+            const invoice = window.ZazuOffline.getState().invoices.find(item => item.local_id === 'offline-payment-invoice-identity');
+            const payment = invoice?.payments?.[0];
+            return {
+                id: payment?.id ?? null,
+                serverId: payment?.server_id ?? null,
+                pendingSync: payment?.pending_sync ?? null,
+            };
+        })).toEqual({ id: 98501, serverId: 98501, pendingSync: false });
+
+        expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
+    });
+
     test('paired device can retry or discard a failed offline sync change', async ({ page }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Sync conflict controls run once; responsive layouts are covered by the settings suite.');
