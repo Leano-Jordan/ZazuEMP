@@ -102,6 +102,8 @@ class PlatformAdminTest extends TestCase
         $founder = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
+        $this->withoutExceptionHandling();
+
         $this->actingAs($founder)
             ->get(route('admin.sentinel'))
             ->assertOk()
