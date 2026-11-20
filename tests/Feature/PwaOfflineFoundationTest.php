@@ -304,6 +304,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('data-zazu-server-attachment-ids', $attachmentView);
         $this->assertStringContainsString('setupZazuOfflineAttachments();', $app);
         $this->assertStringContainsString('client.queueAttachments(eventId, files,', $app);
+        $this->assertStringContainsString('const queueSessionGeneration = sessionGeneration;', $client);
+        $this->assertStringContainsString('sessionGeneration !== queueSessionGeneration', $client);
+        $this->assertStringContainsString('The device session changed before these attachments could be saved.', $client);
         $this->assertStringContainsString('client.loadAttachments(eventId)', $app);
         $this->assertStringContainsString('client.getAttachmentFile(record.idempotency_key)', $app);
         $this->assertStringContainsString("fetch('/api/sync/revoke'", $client);
