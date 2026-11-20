@@ -331,7 +331,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         }
 
         await workspace.getByRole('button', { name: 'View saved details' }).first().click();
-        await expect(workspace.getByText('supplier@example.test')).toBeVisible();
+        await expect(workspace.getByText('supplier@example.test', { exact: true })).toBeVisible();
         await expect(workspace.getByText('Soshanguve')).toBeVisible();
         await workspace.getByRole('button', { name: 'View saved details' }).nth(1).click();
         await expect(workspace.getByText('Inactive', { exact: true })).toBeVisible();
