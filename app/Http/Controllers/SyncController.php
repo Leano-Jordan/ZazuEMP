@@ -616,6 +616,10 @@ class SyncController extends Controller
                 }
             }
 
+            $relatedIdentity = $mutation->status === 'applied'
+                ? $this->relatedIdentityForMutation($mutation)
+                : null;
+
             $recorded[] = [
                 'id' => $mutation->mutation_id,
                 'sequence' => $mutation->sequence,
@@ -631,6 +635,7 @@ class SyncController extends Controller
                     'server_id' => $identity->record_id,
                     'revision' => (int) $identity->revision,
                 ] : null,
+                'related_identity' => $relatedIdentity,
             ];
         }
 
@@ -641,6 +646,47 @@ class SyncController extends Controller
             'applied' => $applied,
             'message' => 'Supported offline mutations are applied idempotently; unsupported or rejected mutations remain queued with an error for later handling.',
         ]);
+    }
+
+
+    /**
+     * Return the parent aggregate revision when a synced child operation
+     * changes a snapshot that is stored inside its parent on other devices.
+     *
+     * @return array{entity_type:string,local_id:string,server_id:int,revision:int}|null
+     */
+    private function relatedIdentityForMutation(SyncMutation $mutation): ?array
+    {
+        $payload = $mutation->payload['record'] ?? [];
+        $parent = match ($mutation->entity_type) {
+            'quote_acceptance' => ['quote', $payload['quote_local_id'] ?? null],
+            'payment' => ['invoice', $payload['invoice_local_id'] ?? null],
+            'purchase_receipt' => ['purchase_order', $payload['purchase_order_local_id'] ?? null],
+            'inventory_movement' => ['inventory_item', $payload['inventory_item_local_id'] ?? null],
+            'asset_allocation' => ['asset', $payload['asset_local_id'] ?? null],
+            default => null,
+        };
+
+        if (! $parent || ! is_string($parent[1]) || ! Str::isUuid($parent[1])) {
+            return null;
+        }
+
+        $identity = SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', $parent[0])
+            ->where('entity_uuid', Str::lower($parent[1]))
+            ->first();
+
+        if (! $identity) {
+            return null;
+        }
+
+        return [
+            'entity_type' => $identity->entity_type,
+            'local_id' => $identity->entity_uuid,
+            'server_id' => (int) $identity->record_id,
+            'revision' => (int) $identity->revision,
+        ];
     }
 
     /**

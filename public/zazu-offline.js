@@ -1061,6 +1061,7 @@
 
         const identityTargets = {
             customer: 'customers',
+            service: 'catalogue',
             job: 'jobs',
             quote: 'quotes',
             preparation: 'preparations',
@@ -1566,6 +1567,15 @@
                 record.server_id = Number(identity.server_id);
                 record.local_id = localId;
                 record.revision = Number(identity.revision || record.revision || 1);
+            }
+
+            const related = remote?.related_identity;
+            if (related) {
+                const target = identityTargets[related.entity_type];
+                const parent = target
+                    ? (state[target] || []).find(item => item.local_id === related.local_id)
+                    : null;
+                if (parent) parent.revision = Number(related.revision || parent.revision || 1);
             }
         }
 
