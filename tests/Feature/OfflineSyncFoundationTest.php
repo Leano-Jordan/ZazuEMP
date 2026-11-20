@@ -2471,6 +2471,8 @@ class OfflineSyncFoundationTest extends TestCase
         $conflict = \App\Models\SyncConflict::query()->findOrFail($recorded['conflict_id']);
 
         $this->assertSame('mutation_identity_mismatch', $recorded['conflict_type']);
+        $this->assertNull($recorded['related_identity']);
+        $this->assertSame([], $recorded['related_identities']);
         $this->assertSame('pending', $recorded['status']);
         $this->assertSame('Edited customer', $conflict->local_payload['payload']['record']['name']);
         $this->assertSame('Original customer', $conflict->remote_payload['payload']['record']['name']);
