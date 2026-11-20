@@ -151,7 +151,7 @@ class SyncBootstrapPayloadBuilder
     {
         return Invoice::query()
             ->where('business_id', $business->id)
-            ->with(['items', 'payments'])
+            ->with(['items', 'payments', 'quoteVersion'])
             ->latest('id')
             ->limit(500)
             ->get()
@@ -161,6 +161,9 @@ class SyncBootstrapPayloadBuilder
                 'record' => array_merge($invoice->toArray(), [
                     'paid_amount' => $invoice->paid_amount,
                     'balance' => $invoice->balance,
+                    'deposit_required' => (string) ($invoice->quoteVersion?->deposit_amount ?? '0.00'),
+                    'deposit_paid_amount' => $invoice->deposit_paid_amount,
+                    'deposit_balance' => $invoice->deposit_balance,
                     'items' => $invoice->items->map(fn ($item) => $item->toArray())->values(),
                     'payments' => $invoice->payments->map(fn (Payment $payment) => [
                         'local_id' => $registry->identify($payment, 'payment')->entity_uuid,
