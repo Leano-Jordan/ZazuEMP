@@ -1,3 +1,16 @@
+## Founder-directed target addition — offline sync reliability across V1 (2026-11-20)
+
+- The Founder has explicitly added **offline sync reliability across the full supported V1 workflow matrix** as an active release target. Sync quality is not currently at the required standard across the board.
+- Track this separately from standalone phone-local offline launch and separately from PC-to-phone pairing. **PC-to-phone pairing is CLOSED by Founder confirmation and must not be reopened.**
+- Acceptance must cover the complete declared UI → IndexedDB → durable mutation queue → server handler → stable entity identity → acknowledgement/pull/bootstrap → reconciled UI path for every supported offline operation.
+- Required checks include restart durability; retries after offline, timeout and partial responses; duplicate/reordered delivery idempotency; parent/child references; cursor/pagination and bootstrap consistency; device/business isolation; explicit conflict preservation and resolution; attachment bytes/metadata/linkage; and domain rules for financial, inventory, purchasing, scheduling and asset mutations.
+- No new offline engine, duplicate queue, cache-only workaround, relaxed isolation or idempotency assertion, or blanket offline claim. Inspect and extend the existing architecture only where evidence requires it.
+- Release checklist: `docs/V1_RELEASE_CHECKLIST.md`; sole readiness register: `.ai/engineering/READINESS_REGISTER.md`; canonical offline policy: `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_OFFLINE_FIRST_STANDARD.md`.
+- Current observed CI at code head `561ad304`: Laravel 595 passed / 11 failed / 1 skipped; offline browser 43 passed / 2 failed, with mobile customer/Work and phone-local attachment follow-on jobs skipped; PostgreSQL migration/registration/backup/private-file recovery passed; Zazu quality passed; PHPMD failed. Stale pairing fixtures and obsolete expected error text are test-contract findings, not a reason to reopen physical pairing. Current broad sync acceptance remains OPEN.
+- No application source changed in this documentation update. Keep release NO-GO; no readiness uplift.
+
+---
+
 ## Phone pairing discoverability and eight-digit contract correction — 2026-11-19
 
 - Root cause confirmed from current source: owner settings generated an eight-digit code and `SyncController::provision` required eight digits, but `public/zazu-offline.js` silently truncated the phone submission to six digits. The phone entry itself was only exposed through a hidden query-string prompt.
