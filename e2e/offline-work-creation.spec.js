@@ -489,3 +489,43 @@ test('an existing customer can be edited locally while disconnected and synced o
     expect(customerResponse.ok()).toBe(true);
     expect(await customerResponse.text()).toContain(updatedName);
 });
+
+test('offline workspace appears when the Zazu host is unreachable but the browser remains online', async ({ page }) => {
+    const runId = randomUUID().slice(0, 8);
+    const customerName = 'Host outage cached customer ' + runId;
+    let healthProbeAttempts = 0;
+
+    await login(page);
+    await expect.poll(() => page.evaluate(() => Boolean(window.ZazuOffline?.ready))).toBe(true);
+    await page.evaluate(() => window.ZazuOffline.ready);
+
+    // Keep navigator.onLine true to reproduce the common LAN case: Wi-Fi is
+    // connected, but the PC hosting Zazu has stopped or become unreachable.
+    await page.route('**/up', async route => {
+        healthProbeAttempts++;
+        await route.abort();
+    });
+
+    await page.evaluate(async name => {
+        const state = window.ZazuOffline.getState();
+        state.customers.push({
+            local_id: crypto.randomUUID(),
+            server_id: 7654391,
+            id: 7654391,
+            revision: 4,
+            name,
+            contact_name: 'Saved contact',
+            phone: '0123456789',
+        });
+        await window.ZazuOffline.persist();
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    }, customerName);
+
+    const workspace = page.locator('[data-zazu-offline-workspace]');
+    await expect.poll(() => healthProbeAttempts, {
+        message: 'offline workspace visibility must probe the Zazu origin, not trust navigator.onLine alone',
+    }).toBeGreaterThan(0);
+    await expect.poll(() => page.evaluate(() => navigator.onLine)).toBe(true);
+    await expect(workspace).toBeVisible();
+    await expect(workspace.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+});
