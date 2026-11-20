@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v52';
+const CACHE_NAME = 'zazu-static-v53';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -123,11 +123,17 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
-async function cachedAppPage(request) {
+async function cachedAppPage(request, preferShell = false) {
     const cache = await dynamicCache();
     const cachedPage = cache ? await cache.match(new Request(request.url)) : null;
     const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;
-    return cachedPage || offlineShell || Response.error();
+
+    // A restored Android tab can resume on a route whose cached HTML is only
+    // an old server snapshot. On a disconnected top-level launch, prefer the
+    // dashboard: it boots the local IndexedDB workspace and exposes the
+    // device-local directory/record panels instead of trapping the user on
+    // the last server-rendered page. Keep exact-route fallback for subrequests.
+    return (preferShell && offlineShell) || cachedPage || offlineShell || Response.error();
 }
 
 async function cacheRenderedPage(request, response, requestGeneration) {
@@ -535,7 +541,7 @@ self.addEventListener('fetch', (event) => {
             // attempting the unreachable Laravel host. Resolve the authenticated
             // page from its user/business cache immediately instead.
             if (self.navigator?.onLine === false) {
-                return cachedAppPage(request);
+                return cachedAppPage(request, request.mode === 'navigate');
             }
 
             try {
