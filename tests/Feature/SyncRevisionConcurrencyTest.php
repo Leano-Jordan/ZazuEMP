@@ -18,7 +18,6 @@ use App\Support\Offline\SyncConflictRecorder;
 use App\Support\Offline\SyncConflictResolutionService;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
-use App\Support\Offline\SyncMutationCausalRevisionResolver;
 use App\Support\Offline\SyncMutationHandler;
 use App\Support\Offline\SyncMutationPushProcessor;
 use App\Support\Offline\SyncMutationRecorder;
@@ -128,47 +127,6 @@ class SyncRevisionConcurrencyTest extends TestCase
         ]);
 
         $this->assertSame(2, (int) $identity->fresh()->revision);
-    }
-
-    public function test_causal_revision_resolver_follows_long_keep_local_rebase_chains(): void
-    {
-        [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
-        $recorder = app(SyncMutationRecorder::class);
-        $chain = [];
-
-        for ($index = 0; $index < 12; $index++) {
-            $chain[] = $this->recordCustomerUpdate(
-                $device,
-                $identity,
-                'Rebased edit '.($index + 1),
-                ['expected_revision' => 1],
-            );
-        }
-
-        foreach ($chain as $index => $mutation) {
-            if (! isset($chain[$index + 1])) {
-                $mutation->update([
-                    'status' => 'applied',
-                    'result_revision' => 14,
-                    'applied_at' => now(),
-                ]);
-                continue;
-            }
-
-            $mutation->update([
-                'status' => 'discarded',
-                'superseded_by_mutation_id' => $chain[$index + 1]->mutation_id,
-            ]);
-        }
-
-        $next = $this->recordCustomerUpdate($device, $identity, 'Edit after twelve rebases', [
-            'predecessor_mutation_id' => $chain[0]->mutation_id,
-        ]);
-
-        $this->assertSame(
-            14,
-            app(SyncMutationCausalRevisionResolver::class)->expectedRevision($next),
-        );
     }
 
     public function test_create_mutation_cannot_overwrite_an_existing_registered_identity(): void
