@@ -258,67 +258,67 @@
         <span class="zazu-chip zazu-chip-neutral">Device local</span>
     </header>
     <div class="zazu-dash-grid">
-        <section class="zazu-dash-surface" aria-label="Customers saved on this device">
+        <section class="zazu-dash-surface" data-zazu-offline-view="customers" aria-label="Customers saved on this device">
             <h3 class="zazu-dash-panel-heading">Customers</h3>
             <div class="zazu-customer-directory zazu-list">
                 <div class="zazu-empty">No customer records saved on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Jobs saved on this device">
+        <section class="zazu-dash-surface" data-zazu-offline-view="jobs" aria-label="Jobs saved on this device">
             <h3 class="zazu-dash-panel-heading">Jobs</h3>
             <div class="zazu-ops-register zazu-card">
                 <div class="zazu-empty">No jobs saved on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Quotes saved on this device">
+        <section class="zazu-dash-surface" data-zazu-offline-view="quotes" aria-label="Quotes saved on this device">
             <h3 class="zazu-dash-panel-heading">Quotes</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-local-quotes>
                 <div class="zazu-empty">No quote records available on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Suppliers saved on this device" data-zazu-offline-collection="suppliers">
+        <section class="zazu-dash-surface" aria-label="Suppliers saved on this device" data-zazu-offline-collection="suppliers" data-zazu-offline-view="suppliers">
             <h3 class="zazu-dash-panel-heading">Suppliers</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="suppliers">
                 <div class="zazu-empty">No supplier records stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Services and catalogue saved on this device" data-zazu-offline-collection="catalogue">
+        <section class="zazu-dash-surface" aria-label="Services and catalogue saved on this device" data-zazu-offline-collection="catalogue" data-zazu-offline-view="catalogue">
             <h3 class="zazu-dash-panel-heading">Services &amp; catalogue</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="catalogue">
                 <div class="zazu-empty">No service records stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Inventory saved on this device" data-zazu-offline-collection="inventory_items">
+        <section class="zazu-dash-surface" aria-label="Inventory saved on this device" data-zazu-offline-collection="inventory_items" data-zazu-offline-view="inventory_items">
             <h3 class="zazu-dash-panel-heading">Inventory</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="inventory_items">
                 <div class="zazu-empty">No inventory records stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Assets saved on this device" data-zazu-offline-collection="assets">
+        <section class="zazu-dash-surface" aria-label="Assets saved on this device" data-zazu-offline-collection="assets" data-zazu-offline-view="assets">
             <h3 class="zazu-dash-panel-heading">Assets</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="assets">
                 <div class="zazu-empty">No asset records stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Purchase orders saved on this device" data-zazu-offline-collection="purchase_orders">
+        <section class="zazu-dash-surface" aria-label="Purchase orders saved on this device" data-zazu-offline-collection="purchase_orders" data-zazu-offline-view="purchase_orders">
             <h3 class="zazu-dash-panel-heading">Purchase orders</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="purchase_orders">
                 <div class="zazu-empty">No purchase orders stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Invoices saved on this device" data-zazu-offline-collection="invoices">
+        <section class="zazu-dash-surface" aria-label="Invoices saved on this device" data-zazu-offline-collection="invoices" data-zazu-offline-view="invoices">
             <h3 class="zazu-dash-panel-heading">Invoices</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="invoices">
                 <div class="zazu-empty">No invoices stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Expenses saved on this device" data-zazu-offline-collection="expenses">
+        <section class="zazu-dash-surface" aria-label="Expenses saved on this device" data-zazu-offline-collection="expenses" data-zazu-offline-view="expenses">
             <h3 class="zazu-dash-panel-heading">Expenses</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="expenses">
                 <div class="zazu-empty">No expenses stored on this device.</div>
             </div>
         </section>
-        <section class="zazu-dash-surface" aria-label="Event costs saved on this device" data-zazu-offline-collection="costs">
+        <section class="zazu-dash-surface" aria-label="Event costs saved on this device" data-zazu-offline-collection="costs" data-zazu-offline-view="costs">
             <h3 class="zazu-dash-panel-heading">Event costs</h3>
             <div class="zazu-customer-directory zazu-list" data-zazu-offline-collection-list="costs">
                 <div class="zazu-empty">No event costs stored on this device.</div>
