@@ -400,6 +400,9 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                     });
                     const response = await fetch(request, { signal: controller.signal });
                     if (!response.ok) return;
+                    const requestedUrl = new URL(path, self.location.origin);
+                    const responseUrl = response.url ? new URL(response.url) : requestedUrl;
+                    if (responseUrl.origin !== self.location.origin || responseUrl.pathname !== requestedUrl.pathname) return;
                     const contentType = response.headers.get('content-type') || '';
                     if (!contentType.includes('text/html')) return;
 
