@@ -246,6 +246,8 @@ Examples:
 
 Financial, inventory and permission state must never be silently overwritten by a stale device.
 
+**Implementation audit note — 2026-11-20:** the current sync protocol provides mutation idempotency, business/device-scoped delivery sequences and contiguous acknowledgement. However, ordinary existing-record updates currently do not carry a base record version or equivalent precondition. Several domain handlers load the current server model through the identity registry and update it without checking whether a second device changed it after the first device's snapshot. Validation conflicts and mutation-ID payload mismatches do not protect against this stale-snapshot case. Do not describe the conflict policy as fully implemented until version-aware stale-write detection, local/remote preservation, explicit resolution and same-device sequential-edit rebase behaviour are covered by regression tests.
+
 ## 8. Idempotency
 
 The current application already uses idempotency and business-scoped uniqueness in important commercial mutations.
