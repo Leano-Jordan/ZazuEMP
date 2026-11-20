@@ -22,6 +22,28 @@ class SyncRevisionConcurrencyTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_new_identities_start_at_one_and_pre_revision_identity_rows_start_at_two(): void
+    {
+        [$business, $customer] = $this->customerFixture();
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $newIdentity = $registry->identify($customer, 'customer');
+
+        $legacyCustomer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Pre-revision identity customer',
+        ]);
+        $legacyIdentity = SyncEntityIdentity::create([
+            'business_id' => $business->id,
+            'entity_type' => 'customer',
+            'entity_uuid' => (string) Str::uuid(),
+            'record_type' => $legacyCustomer->getMorphClass(),
+            'record_id' => $legacyCustomer->id,
+        ]);
+
+        $this->assertSame(1, (int) $newIdentity->revision);
+        $this->assertSame(2, (int) $legacyIdentity->revision);
+    }
+
     public function test_online_customer_write_advances_the_registered_aggregate_revision(): void
     {
         [$business, $customer] = $this->customerFixture();
