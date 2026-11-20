@@ -1934,7 +1934,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.locator('[data-zazu-offline-conflict-list] article[data-conflict-id="987652"]')
             .getByRole('button', { name: 'Discard change' }).click();
         await expect.poll(() => resolutions.length).toBe(2);
-        await expect.poll(() => page.locator('[data-zazu-offline-conflicts]').isVisible()).toBe(false);
+        // Keep the panel visible long enough for assistive technology and the
+        // operator to receive the final resolution confirmation.
+        await expect(page.locator('[data-zazu-offline-conflicts]')).toBeVisible();
+        await expect(page.locator('[data-zazu-offline-conflict-status]')).toHaveText('Saved change discarded.');
 
         const remaining = await page.evaluate(async () => {
             const db = await new Promise((resolve, reject) => {
