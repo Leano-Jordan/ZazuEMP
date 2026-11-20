@@ -60,6 +60,9 @@ class SupplierController extends Controller
         $data = $this->validated($request);
 
         DB::transaction(function () use ($supplier, $businessId, $data): void {
+            // Business-first lock order matches the sync mutation transaction.
+            DB::table('businesses')->where('id', $businessId)->lockForUpdate()->first();
+
             $lockedSupplier = Supplier::query()
                 ->where('business_id', $businessId)
                 ->lockForUpdate()

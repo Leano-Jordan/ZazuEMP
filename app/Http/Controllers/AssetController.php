@@ -82,7 +82,11 @@ class AssetController extends Controller
         }
 
         DB::transaction(function () use ($asset, $businessId, $data): void {
+            // Keep online asset writes on the same parent-first boundary as sync.
+            DB::table('businesses')->where('id', $businessId)->lockForUpdate()->first();
+
             $lockedAsset = Asset::query()
+                ->where('business_id', $businessId)
                 ->where('business_id', $businessId)
                 ->lockForUpdate()
                 ->findOrFail($asset->id);
