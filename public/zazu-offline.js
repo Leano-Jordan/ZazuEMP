@@ -447,8 +447,21 @@
             }
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                if (expectedSessionGeneration !== null
+                    && (sessionCleared || sessionGeneration !== expectedSessionGeneration)) {
+                    tx.abort();
+                    reject(new Error('The device session changed before the local attachment could be saved.'));
+                    return;
+                }
                 tx.objectStore(ATTACHMENT_STORE).put(record);
-                tx.oncomplete = resolve;
+                tx.oncomplete = () => {
+                    if (expectedSessionGeneration !== null
+                        && (sessionCleared || sessionGeneration !== expectedSessionGeneration)) {
+                        reject(new Error('The device session changed while the local attachment was being saved.'));
+                        return;
+                    }
+                    resolve();
+                };
                 tx.onerror = () => reject(tx.error || new Error('The local attachment could not be saved.'));
                 tx.onabort = () => reject(tx.error || new Error('The local attachment save was aborted.'));
             });
@@ -557,10 +570,12 @@
         return record;
     }
     async function reconcileAttachmentEventIds() {
+        const reconciliationGeneration = sessionGeneration;
         const jobs = Array.isArray(state?.jobs) ? state.jobs : [];
         if (!jobs.length || sessionCleared || ACTIVE_BUSINESS_ID < 1) return 0;
 
         const records = await readAttachmentRecords();
+        if (sessionCleared || sessionGeneration !== reconciliationGeneration) return 0;
         const updates = [];
 
         for (const record of records) {
@@ -584,11 +599,23 @@
 
         const db = await openAttachmentDb();
         try {
+            if (sessionCleared || sessionGeneration !== reconciliationGeneration) return 0;
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                if (sessionCleared || sessionGeneration !== reconciliationGeneration) {
+                    tx.abort();
+                    reject(new Error('The device session changed before attachment links could be reconciled.'));
+                    return;
+                }
                 const store = tx.objectStore(ATTACHMENT_STORE);
                 for (const record of updates) store.put(record);
-                tx.oncomplete = resolve;
+                tx.oncomplete = () => {
+                    if (sessionCleared || sessionGeneration !== reconciliationGeneration) {
+                        reject(new Error('The device session changed while attachment links were being reconciled.'));
+                        return;
+                    }
+                    resolve();
+                };
                 tx.onerror = () => reject(tx.error || new Error('Offline attachment job links could not be updated.'));
                 tx.onabort = () => reject(tx.error || new Error('Offline attachment job-link update was aborted.'));
             });
@@ -596,7 +623,7 @@
             db.close();
         }
 
-        return updates.length;
+        return sessionCleared || sessionGeneration !== reconciliationGeneration ? 0 : updates.length;
     }
 
     let attachmentSyncing = false;
@@ -725,39 +752,30 @@
 
     async function loadAttachments(eventId, localEventId = null) {
         await ready;
+        const readSessionGeneration = sessionGeneration;
+        const readSessionToken = state?.sync?.token || null;
         const targetEventId = Number(eventId);
         const targetLocalEventId = String(localEventId || '').trim();
         const hasServerIdentity = Number.isSafeInteger(targetEventId) && targetEventId > 0;
         if (!hasServerIdentity && !/^[a-zA-Z0-9_-]{1,120}$/.test(targetLocalEventId)) return [];
 
-        if (hasServerIdentity && navigator.onLine && state?.sync?.token && !sessionCleared) {
-            const readSessionGeneration = sessionGeneration;
-            const readSessionToken = state.sync.token;
+        if (hasServerIdentity && navigator.onLine && readSessionToken && !sessionCleared) {
             try {
                 await syncAttachments();
                 if (sessionCleared || sessionGeneration !== readSessionGeneration
                     || state?.sync?.token !== readSessionToken) {
-                    return (await readAttachmentRecords()).filter(record =>
-                        Number(record.business_id) === ACTIVE_BUSINESS_ID
-                        && Number(record.event_id) === targetEventId
-                    );
+                    return [];
                 }
                 const response = await api('/api/sync/attachments?event_id=' + encodeURIComponent(targetEventId));
                 if (sessionCleared || sessionGeneration !== readSessionGeneration
                     || state?.sync?.token !== readSessionToken) {
-                    return (await readAttachmentRecords()).filter(record =>
-                        Number(record.business_id) === ACTIVE_BUSINESS_ID
-                        && Number(record.event_id) === targetEventId
-                    );
+                    return [];
                 }
                 if (response.ok) {
                     const result = await response.json();
                     if (sessionCleared || sessionGeneration !== readSessionGeneration
                         || state?.sync?.token !== readSessionToken) {
-                        return (await readAttachmentRecords()).filter(record =>
-                            Number(record.business_id) === ACTIVE_BUSINESS_ID
-                            && Number(record.event_id) === targetEventId
-                        );
+                        return [];
                     }
                     for (const attachment of result.attachments || []) {
                         if (sessionCleared || sessionGeneration !== readSessionGeneration
@@ -826,7 +844,10 @@
             }
         }
 
-        return (await readAttachmentRecords()).filter(record =>
+        const attachmentRecords = await readAttachmentRecords();
+        if (sessionCleared || sessionGeneration !== readSessionGeneration) return [];
+
+        return attachmentRecords.filter(record =>
             Number(record.business_id) === ACTIVE_BUSINESS_ID
             && (hasServerIdentity
                 ? Number(record.event_id) === targetEventId
@@ -835,7 +856,12 @@
     }
 
     async function getAttachmentFile(idempotencyKey) {
+        const readGeneration = sessionGeneration;
+        if (sessionCleared) throw new Error('The local device session has ended. Reload Zazu before opening attachments.');
         const record = await readAttachmentRecord(String(idempotencyKey || ''));
+        if (sessionCleared || sessionGeneration !== readGeneration) {
+            throw new Error('The device session changed while this file was opening. Reload Zazu before continuing.');
+        }
         if (!record || Number(record.business_id) !== ACTIVE_BUSINESS_ID || !(record.file instanceof Blob)) {
             throw new Error('This file is not available in the local phone copy.');
         }
