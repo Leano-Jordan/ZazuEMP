@@ -87,7 +87,6 @@ class AssetController extends Controller
 
             $lockedAsset = Asset::query()
                 ->where('business_id', $businessId)
-                ->where('business_id', $businessId)
                 ->lockForUpdate()
                 ->findOrFail($asset->id);
 
@@ -172,6 +171,9 @@ class AssetController extends Controller
         $data = $request->validate(['allocation_id' => ['nullable', 'integer']]);
 
         return DB::transaction(function () use ($asset, $businessId, $data): RedirectResponse {
+            // Releases mutate the same asset aggregate as allocation and sync.
+            DB::table('businesses')->where('id', $businessId)->lockForUpdate()->first();
+
             $lockedAsset = Asset::query()->where('business_id', $businessId)->lockForUpdate()->findOrFail($asset->id);
             $allocationQuery = $lockedAsset->allocations()->where('status', 'allocated');
 
