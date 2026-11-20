@@ -1803,6 +1803,11 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
+
+        $receivingDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
         $event = \App\Models\Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-COMM-001',
@@ -1901,6 +1906,32 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('1000.00', $invoice->total);
         $this->assertSame('250.00', $invoice->paid_amount);
         $this->assertSame('accepted', \App\Models\Quote::query()->whereKey($invoice->quote_id)->value('status'));
+
+        // Verify that a second paired installation receives the committed
+        // commercial chain, reconciles nested payment data, and acknowledges
+        // only its contiguous delivery prefix.
+        $protocol = app(\\App\\Support\\Offline\\SyncMutationProtocol::class);
+        $delivered = $protocol->pull($receivingDevice, 'business', 100);
+        $this->assertCount(4, $delivered);
+        $this->assertSame([1, 2, 3, 4], $delivered->pluck('delivery_sequence')->all());
+        $this->assertSame(
+            ['quote', 'quote_acceptance', 'invoice', 'payment'],
+            $delivered->pluck('entity_type')->all(),
+        );
+
+        $remoteSnapshot = app(\\App\\Support\\Offline\\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
+        $remoteInvoice = collect($remoteSnapshot['invoices'])->first(
+            fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $invoice->id,
+        );
+        $this->assertNotNull($remoteInvoice);
+        $this->assertSame('1000.00', $remoteInvoice['record']['total']);
+        $this->assertSame('250.00', $remoteInvoice['record']['paid_amount']);
+        $this->assertCount(1, $remoteInvoice['record']['payments']);
+        $this->assertSame('250.00', $remoteInvoice['record']['payments'][0]['record']['amount']);
+
+        $cursor = $protocol->acknowledgeThrough($receivingDevice, 4, 'business');
+        $this->assertSame(4, (int) $cursor->last_acknowledged_sequence);
+        $this->assertCount(0, $protocol->pull($receivingDevice, 'business', 100));
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
