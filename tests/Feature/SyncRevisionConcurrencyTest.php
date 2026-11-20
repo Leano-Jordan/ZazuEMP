@@ -34,6 +34,21 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertSame(2, (int) $identity->fresh()->revision);
     }
 
+    public function test_nested_customer_contact_write_advances_the_parent_snapshot_revision(): void
+    {
+        [$business, $customer] = $this->customerFixture();
+        $identity = app(SyncEntityIdentityRegistry::class)->identify($customer, 'customer');
+
+        $customer->contacts()->create([
+            'name' => 'Primary contact',
+            'phone' => '0123456789',
+            'email' => 'primary@example.test',
+            'is_primary' => true,
+        ]);
+
+        $this->assertSame(2, (int) $identity->fresh()->revision);
+    }
+
     public function test_stale_device_update_is_rejected_and_returns_the_current_remote_snapshot(): void
     {
         [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
@@ -123,12 +138,42 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertSame(2, $response['rebase']['expected_revision']);
         $this->assertNotSame($mutation->mutation_id, $response['rebase']['new_mutation_id']);
         $this->assertSame($response['rebase']['new_mutation_id'], $mutation->fresh()->superseded_by_mutation_id);
+        $this->assertSame('Keep this phone edit', $mutation->fresh()->payload['record']['name']);
         $this->assertSame('discarded', $mutation->fresh()->status);
         $this->assertSame('Latest server edit', $response['conflict']['remote_payload']['record']['name']);
 
         // A retry after a lost response must return the same replacement ID.
         $again = $service->resolve($device, $conflict->fresh(), ['action' => 'retry'])->getData(true);
         $this->assertSame($response['rebase']['new_mutation_id'], $again['rebase']['new_mutation_id']);
+    }
+
+    public function test_stale_conflict_discard_returns_latest_server_snapshot(): void
+    {
+        [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
+        $mutation = $this->recordCustomerUpdate($device, $identity, 'Discard this phone edit', [
+            'expected_revision' => 1,
+        ]);
+        $conflict = SyncConflict::create([
+            'business_id' => $business->id,
+            'sync_device_id' => $device->id,
+            'mutation_id' => $mutation->mutation_id,
+            'entity_type' => 'customer',
+            'entity_id' => $identity->entity_uuid,
+            'conflict_type' => 'stale_record_version',
+            'status' => 'open',
+            'local_payload' => $mutation->payload,
+            'remote_payload' => ['revision' => 1, 'record' => ['name' => 'Old snapshot']],
+        ]);
+
+        $customer->update(['name' => 'Keep server version']);
+        $response = app(SyncConflictResolutionService::class)
+            ->resolve($device, $conflict, ['action' => 'discard'])
+            ->getData(true);
+
+        $this->assertSame('discarded', $response['mutation_status']);
+        $this->assertSame(2, $response['conflict']['remote_payload']['revision']);
+        $this->assertSame('Keep server version', $response['conflict']['remote_payload']['record']['name']);
+        $this->assertSame('discarded', $mutation->fresh()->status);
     }
 
     private function customerFixture(): array
