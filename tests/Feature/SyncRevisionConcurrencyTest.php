@@ -128,9 +128,7 @@ class SyncRevisionConcurrencyTest extends TestCase
 
     public function test_create_mutation_cannot_overwrite_an_existing_registered_identity(): void
     {
-        [$business, $customer] = $this->customerFixture();
-        $identity = app(SyncEntityIdentityRegistry::class)->identify($customer, 'customer');
-        $device = $this->device($business);
+        [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
             'customer',
