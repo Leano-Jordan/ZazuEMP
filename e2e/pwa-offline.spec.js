@@ -263,6 +263,78 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(() => window.ZazuOffline.getState().sync?.token)).toBe('registration-retry-test-token');
     });
 
+    test('offline workspace exposes locally saved supplier, service, stock, asset and finance records', async ({ page }, testInfo) => {
+        test.skip(testInfo.project.name !== 'chromium', 'Local workspace collection rendering runs once.');
+        await login(page);
+        await page.context().setOffline(true);
+
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            const identity = suffix => '00000000-0000-4000-8000-0000000000'+suffix;
+            state.suppliers = [{
+                id: 801, server_id: 801, local_id: identity('01'),
+                name: 'Offline Supplier Proof', phone: '0123456789', email: 'supplier@example.test',
+                address: 'Soshanguve',
+            }];
+            state.capabilities = [{
+                id: 802, server_id: 802, local_id: identity('02'),
+                name: 'Offline Catering Service', capability_type: 'service', active: true,
+            }];
+            state.inventory_items = [{
+                id: 803, server_id: 803, local_id: identity('03'),
+                name: 'Offline Stock Proof', sku: 'OFF-003', unit: 'box', on_hand: '12.00',
+                reorder_level: '3.00', movements: [{ type: 'receipt', quantity: '12.00', movement_date: '2026-11-20' }],
+            }];
+            state.assets = [{
+                id: 804, server_id: 804, local_id: identity('04'),
+                name: 'Offline Marquee', asset_tag: 'OFF-A04', status: 'available', condition: 'good',
+                allocations: [],
+            }];
+            state.purchase_orders = [{
+                id: 805, server_id: 805, local_id: identity('05'),
+                reference: 'PO-OFF-005', supplier_name: 'Offline Supplier Proof', status: 'part_received',
+                total_amount: '1250.00', currency: 'ZAR', items: [{ description: 'Table linen', quantity: '10', received_quantity: '5', line_total: '1250.00' }],
+            }];
+            state.invoices = [{
+                id: 806, server_id: 806, local_id: identity('06'),
+                number: 'INV-OFF-006', status: 'part_paid', total: '2500.00', paid_amount: '1000.00',
+                balance: '1500.00', currency: 'ZAR', payments: [{ reference: 'EFT-01', amount: '1000.00', paid_at: '2026-11-20' }],
+            }];
+            state.expenses = [{
+                id: 807, server_id: 807, local_id: identity('07'),
+                description: 'Offline fuel expense', amount: '350.00', currency: 'ZAR', status: 'recorded',
+                expense_date: '2026-11-20',
+            }];
+            state.costs = [{
+                id: 808, server_id: 808, local_id: identity('08'),
+                description: 'Offline venue cost', category: 'Venue', status: 'incurred',
+                projected_amount: '900.00', actual_amount: '950.00', currency: 'ZAR',
+            }];
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        });
+
+        const workspace = page.locator('[data-zazu-offline-workspace]');
+        await expect(workspace).toBeVisible();
+        for (const label of [
+            'Offline Supplier Proof',
+            'Offline Catering Service',
+            'Offline Stock Proof',
+            'Offline Marquee',
+            'PO-OFF-005',
+            'INV-OFF-006',
+            'Offline fuel expense',
+            'Offline venue cost',
+        ]) {
+            await expect(workspace.getByText(label, { exact: false }).first()).toBeVisible();
+        }
+
+        await workspace.getByRole('button', { name: 'View saved details' }).first().click();
+        await expect(workspace.getByText('supplier@example.test')).toBeVisible();
+        await expect(workspace.getByText('Soshanguve')).toBeVisible();
+    });
+
     test('offline updates carry a base revision and preserve same-record queue order', async ({ page }) => {
         await login(page);
         await page.context().setOffline(true);

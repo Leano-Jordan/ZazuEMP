@@ -2333,11 +2333,221 @@ function setupZazuOfflineDirectoryViews() {
         if (empty) empty.hidden = quotes.length > 0;
     };
 
+    const offlineCollectionDefinitions = {
+        suppliers: {
+            entity: 'supplier',
+            title: record => record.name || 'Unnamed supplier',
+            meta: record => [record.phone, record.email].filter(Boolean).join(' · ') || 'Contact details not recorded',
+            fields: record => [
+                ['Contact', record.contact_name], ['Phone', record.phone], ['Email', record.email],
+                ['Address', record.address], ['Notes', record.notes],
+            ],
+        },
+        capabilities: {
+            entity: 'service',
+            title: record => record.name || 'Unnamed service',
+            meta: record => [record.capability_type, record.active === false ? 'Inactive' : 'Active'].filter(Boolean).join(' · '),
+            fields: record => [
+                ['Type', record.capability_type], ['Description', record.description],
+                ['Availability', record.active === false ? 'Inactive' : 'Active'],
+            ],
+        },
+        inventory_items: {
+            entity: 'inventory_item',
+            title: record => record.name || 'Inventory item',
+            meta: record => [record.sku ? 'SKU '+record.sku : '', record.on_hand !== undefined ? String(record.on_hand)+' '+(record.unit || 'units')+' on hand' : ''].filter(Boolean).join(' · '),
+            fields: record => [
+                ['SKU', record.sku], ['On hand', record.on_hand !== undefined ? String(record.on_hand)+' '+(record.unit || 'units') : null],
+                ['Reorder level', record.reorder_level], ['Movements', Array.isArray(record.movements) ? record.movements.length : null],
+            ],
+            children: record => [{
+                label: 'Recent stock movements',
+                records: (record.movements || []).slice(-8).reverse(),
+                title: item => item.type || 'Stock movement',
+                meta: item => [item.quantity, item.movement_date, item.reference].filter(Boolean).join(' · '),
+            }],
+        },
+        assets: {
+            entity: 'asset',
+            title: record => record.name || record.asset_tag || 'Asset',
+            meta: record => [record.asset_tag, record.status, record.condition].filter(Boolean).join(' · '),
+            fields: record => [
+                ['Asset tag', record.asset_tag], ['Status', record.status], ['Condition', record.condition],
+                ['Location', record.location], ['Acquired', record.acquired_at],
+                ['Purchase cost', record.purchase_cost !== undefined ? String(record.currency || 'ZAR')+' '+String(record.purchase_cost) : null],
+            ],
+            children: record => [{
+                label: 'Current allocations',
+                records: record.allocations || [],
+                title: item => item.event_name || (item.event_id ? 'Work #'+item.event_id : 'Asset allocation'),
+                meta: item => [item.allocated_from, item.allocated_until, item.status].filter(Boolean).join(' · '),
+            }],
+        },
+        purchase_orders: {
+            entity: 'purchase_order',
+            title: record => record.reference || 'Purchase order',
+            meta: record => [record.supplier_name, record.status, record.total_amount !== undefined ? String(record.currency || 'ZAR')+' '+String(record.total_amount) : ''].filter(Boolean).join(' · '),
+            fields: record => [
+                ['Supplier', record.supplier_name || (record.supplier_id ? 'Supplier #'+record.supplier_id : null)],
+                ['Status', record.status], ['Expected', record.expected_at], ['Total', record.total_amount],
+                ['Lines', Array.isArray(record.items) ? record.items.length : null], ['Notes', record.notes],
+            ],
+            children: record => [{
+                label: 'Order lines',
+                records: record.items || [],
+                title: item => item.description || 'Order line',
+                meta: item => [item.quantity ? String(item.quantity)+' '+(item.unit || '') : '', item.received_quantity !== undefined ? 'Received '+String(item.received_quantity) : '', item.line_total !== undefined ? String(record.currency || 'ZAR')+' '+String(item.line_total) : ''].filter(Boolean).join(' · '),
+            }],
+        },
+        invoices: {
+            entity: 'invoice',
+            title: record => record.number || 'Invoice',
+            meta: record => [record.status, record.total !== undefined ? String(record.currency || 'ZAR')+' '+String(record.total) : '', record.balance !== undefined ? 'Balance '+String(record.currency || 'ZAR')+' '+String(record.balance) : ''].filter(Boolean).join(' · '),
+            fields: record => [
+                ['Status', record.status], ['Issued', record.issued_at], ['Due', record.due_at],
+                ['Total', record.total !== undefined ? String(record.currency || 'ZAR')+' '+String(record.total) : null],
+                ['Paid', record.paid_amount !== undefined ? String(record.currency || 'ZAR')+' '+String(record.paid_amount) : null],
+                ['Balance', record.balance !== undefined ? String(record.currency || 'ZAR')+' '+String(record.balance) : null],
+            ],
+            children: record => [
+                { label: 'Invoice lines', records: record.items || [], title: item => item.description || 'Invoice line', meta: item => [item.quantity ? String(item.quantity)+' '+(item.unit || '') : '', item.line_total !== undefined ? String(record.currency || 'ZAR')+' '+String(item.line_total) : ''].filter(Boolean).join(' · ') },
+                { label: 'Payments', records: record.payments || [], title: item => item.reference || item.method || 'Payment', meta: item => [item.amount !== undefined ? String(item.currency || record.currency || 'ZAR')+' '+String(item.amount) : '', item.paid_at].filter(Boolean).join(' · ') },
+            ],
+        },
+        expenses: {
+            entity: 'expense',
+            title: record => record.description || record.reference || 'Expense',
+            meta: record => [record.amount !== undefined ? String(record.currency || 'ZAR')+' '+String(record.amount) : '', record.expense_date, record.status].filter(Boolean).join(' · '),
+            fields: record => [
+                ['Reference', record.reference], ['Date', record.expense_date], ['Status', record.status],
+                ['Amount', record.amount !== undefined ? String(record.currency || 'ZAR')+' '+String(record.amount) : null],
+                ['Notes', record.notes],
+            ],
+        },
+        costs: {
+            entity: 'event_cost',
+            title: record => record.description || record.category || 'Event cost',
+            meta: record => [record.event_name, record.category, record.status].filter(Boolean).join(' · '),
+            fields: record => [
+                ['Work', record.event_name || (record.event_id ? 'Work #'+record.event_id : null)],
+                ['Category', record.category], ['Status', record.status],
+                ['Projected', record.projected_amount !== undefined ? String(record.currency || 'ZAR')+' '+String(record.projected_amount) : null],
+                ['Actual', record.actual_amount !== undefined ? String(record.currency || 'ZAR')+' '+String(record.actual_amount) : null],
+                ['Notes', record.notes],
+            ],
+        },
+    };
+
+    const renderOfflineCollections = (state) => {
+        document.querySelectorAll('[data-zazu-offline-collection]').forEach(section => {
+            const collection = section.dataset.zazuOfflineCollection;
+            const definition = offlineCollectionDefinitions[collection];
+            const directory = section.querySelector('[data-zazu-offline-collection-list]');
+            if (!definition || !directory) return;
+
+            directory.querySelectorAll('[data-zazu-local-record]').forEach(node => {
+                const detail = node.nextElementSibling;
+                if (detail?.matches('[data-zazu-offline-record-detail]')) detail.remove();
+                node.remove();
+            });
+
+            const records = (state?.[collection] || []).filter(record => record?.local_id);
+            const empty = directory.querySelector('.zazu-empty');
+            for (const record of records) {
+                const row = document.createElement('article');
+                row.className = 'zazu-list-item';
+                row.dataset.zazuLocalRecord = collection;
+                row.dataset.zazuLocalId = record.local_id;
+
+                const main = document.createElement('div');
+                main.className = 'zazu-list-main min-w-0 flex-1';
+                main.append(text('div', 'zazu-list-title', definition.title(record)));
+                const meta = definition.meta(record);
+                if (meta) main.append(text('div', 'zazu-list-meta', meta));
+
+                const actions = document.createElement('div');
+                actions.className = 'zazu-action-group';
+                const syncStatus = localSyncStatus(state, definition.entity, record.local_id, record.server_id ?? record.id, record.pending_sync === true);
+                const chip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
+                chip.title = syncStatus.title;
+                chip.setAttribute('aria-label', syncStatus.label+'. '+syncStatus.title);
+                actions.append(chip);
+
+                const detailButton = document.createElement('button');
+                detailButton.type = 'button';
+                detailButton.className = 'zazu-btn zazu-btn-ghost';
+                detailButton.textContent = 'View saved details';
+                detailButton.setAttribute('aria-expanded', 'false');
+                detailButton.addEventListener('click', () => {
+                    let panel = row.nextElementSibling;
+                    if (!panel?.matches('[data-zazu-offline-record-detail]')) {
+                        panel = document.createElement('section');
+                        panel.className = 'zazu-panel mt-2';
+                        panel.dataset.zazuOfflineRecordDetail = '1';
+                        panel.setAttribute('role', 'region');
+                        panel.setAttribute('aria-label', definition.title(record)+' saved details');
+                        row.insertAdjacentElement('afterend', panel);
+                    }
+                    const opening = panel.hidden || panel.childElementCount === 0;
+                    panel.hidden = !opening;
+                    detailButton.setAttribute('aria-expanded', opening ? 'true' : 'false');
+                    if (!opening) return;
+
+                    panel.replaceChildren();
+                    const current = (window.ZazuOffline?.getState()?.[collection] || [])
+                        .find(item => item.local_id === record.local_id) || record;
+                    const fields = (definition.fields?.(current) || [])
+                        .filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '');
+                    if (fields.length) {
+                        const details = document.createElement('div');
+                        details.className = 'zazu-detail-rows';
+                        for (const [label, value] of fields) {
+                            const item = document.createElement('div');
+                            item.className = 'zazu-detail-row';
+                            item.append(text('div', 'zazu-detail-label', label), text('div', 'zazu-detail-value', value));
+                            details.append(item);
+                        }
+                        panel.append(details);
+                    }
+
+                    for (const child of definition.children?.(current) || []) {
+                        const group = document.createElement('section');
+                        group.className = 'mt-3';
+                        group.append(text('div', 'zazu-panel-title', child.label+' ('+child.records.length+')'));
+                        const list = document.createElement('div');
+                        list.className = 'zazu-list mt-2';
+                        for (const item of child.records) {
+                            const childRow = document.createElement('div');
+                            childRow.className = 'zazu-list-item';
+                            childRow.append(
+                                text('div', 'zazu-list-title', child.title(item)),
+                                text('div', 'zazu-list-meta', child.meta(item)),
+                            );
+                            list.append(childRow);
+                        }
+                        if (!child.records.length) list.append(text('p', 'zazu-panel-copy', 'No '+child.label.toLowerCase()+' stored on this device.'));
+                        group.append(list);
+                        panel.append(group);
+                    }
+
+                    panel.append(text('p', 'zazu-panel-copy mt-3', 'This is the last synchronised and locally saved version on this device. Reconnect to refresh it.'));
+                });
+                actions.append(detailButton);
+                row.append(main, actions);
+                if (empty?.parentNode === directory) directory.insertBefore(row, empty);
+                else directory.append(row);
+            }
+
+            if (empty) empty.hidden = records.length > 0;
+        });
+    };
+
     const render = () => {
         const state = window.ZazuOffline.getState();
         renderCustomers(state);
         renderJobs(state);
         renderQuotes(state);
+        renderOfflineCollections(state);
         refreshOfflineWorkspaceVisibility(state);
         refreshLocalAttachmentLists();
     };
