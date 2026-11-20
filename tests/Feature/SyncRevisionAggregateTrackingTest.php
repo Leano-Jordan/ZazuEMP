@@ -243,8 +243,8 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'quote' => $quote,
             'invoice' => $invoice,
             'order' => $order,
-            'line' => $this->commandPurchaseOrderLine($business, $order, 'Revision command stock', '5.00', '10.00'),
-            'unreceived_line' => $this->commandPurchaseOrderLine($business, $order, 'Unreceived command stock', '3.00', '5.00'),
+            'line' => $this->commandPurchaseOrderLine($business, $order, 'Revision command stock', '5.00', '10.00', '50.00'),
+            'unreceived_line' => $this->commandPurchaseOrderLine($business, $order, 'Unreceived command stock', '3.00', '5.00', '15.00'),
         ];
     }
 
@@ -254,6 +254,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         string $description,
         string $quantity,
         string $unitPrice,
+        string $lineTotal,
     ): PurchaseOrderItem {
         return PurchaseOrderItem::create([
             'business_id' => $business->id,
@@ -263,7 +264,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'received_quantity' => '0.00',
             'unit' => 'unit',
             'unit_price' => $unitPrice,
-            'line_total' => bcmul($quantity, $unitPrice, 2),
+            'line_total' => $lineTotal,
         ]);
     }
 
