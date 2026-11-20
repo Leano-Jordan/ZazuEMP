@@ -108,8 +108,8 @@ class DatabaseSchemaIntegrityTest extends TestCase
     public function test_platform_support_and_audit_records_are_global_but_business_attributable(): void
     {
         foreach ([
-            \\App\\Models\\FounderSupportSession::class,
-            \\App\\Models\\PlatformAuditLog::class,
+            \App\Models\FounderSupportSession::class,
+            \App\Models\PlatformAuditLog::class,
         ] as $className) {
             $model = new $className();
             $this->assertTrue(Schema::hasColumn($model->getTable(), 'business_id'));
