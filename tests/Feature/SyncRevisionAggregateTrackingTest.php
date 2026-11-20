@@ -138,7 +138,94 @@ class SyncRevisionAggregateTrackingTest extends TestCase
 
 
 
-    public function test_online_snapshot_children_and_remaining_roots_advance_registered_revisions(): void
+    public function test_online_snapshot_child_writes_advance_parent_revisions(): void
+    {
+        $fixture = $this->onlineRevisionMatrixFixture();
+
+        $requirement = EventRequirement::create([
+            'event_id' => $fixture['event']->id,
+            'description' => 'Vegetarian meal option',
+            'category' => 'dietary',
+            'quantity' => '1.00',
+            'unit' => 'person',
+            'status' => 'open',
+        ]);
+        $this->assertSame(2, (int) $fixture['job_identity']->fresh()->revision);
+        $requirement->update(['notes' => 'Confirm ingredients with supplier']);
+        $this->assertSame(3, (int) $fixture['job_identity']->fresh()->revision);
+
+        $invoiceItem = InvoiceItem::create([
+            'invoice_id' => $fixture['invoice']->id,
+            'description' => 'Catering service',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'unit_price' => '100.00',
+            'line_total' => '100.00',
+        ]);
+        $this->assertSame(2, (int) $fixture['invoice_identity']->fresh()->revision);
+        $invoiceItem->update(['description' => 'Updated catering service']);
+        $this->assertSame(3, (int) $fixture['invoice_identity']->fresh()->revision);
+
+        Payment::create([
+            'business_id' => $fixture['business']->id,
+            'invoice_id' => $fixture['invoice']->id,
+            'event_id' => $fixture['event']->id,
+            'type' => 'deposit',
+            'idempotency_key' => (string) Str::uuid(),
+            'amount' => '25.00',
+            'currency' => 'ZAR',
+            'method' => 'cash',
+            'paid_at' => now()->toDateString(),
+        ]);
+        $this->assertSame(4, (int) $fixture['invoice_identity']->fresh()->revision);
+
+        $orderItem = PurchaseOrderItem::create([
+            'business_id' => $fixture['business']->id,
+            'purchase_order_id' => $fixture['order']->id,
+            'description' => 'Disposable plates',
+            'quantity' => '2.00',
+            'received_quantity' => '0.00',
+            'unit' => 'pack',
+            'unit_price' => '10.00',
+            'line_total' => '20.00',
+        ]);
+        $this->assertSame(2, (int) $fixture['order_identity']->fresh()->revision);
+        $orderItem->update(['description' => 'Compostable plates']);
+        $this->assertSame(3, (int) $fixture['order_identity']->fresh()->revision);
+
+        PurchaseOrderReceipt::create([
+            'business_id' => $fixture['business']->id,
+            'purchase_order_id' => $fixture['order']->id,
+            'idempotency_key' => (string) Str::uuid(),
+        ]);
+        $this->assertSame(4, (int) $fixture['order_identity']->fresh()->revision);
+
+        $allocation = AssetAllocation::create([
+            'business_id' => $fixture['business']->id,
+            'asset_id' => $fixture['asset']->id,
+            'event_id' => $fixture['event']->id,
+            'allocated_from' => now()->toDateString(),
+            'status' => 'allocated',
+        ]);
+        $this->assertSame(2, (int) $fixture['asset_identity']->fresh()->revision);
+        $allocation->update(['notes' => 'Loaded for event']);
+        $this->assertSame(3, (int) $fixture['asset_identity']->fresh()->revision);
+    }
+
+    public function test_online_preparation_expense_and_event_cost_revisions_advance(): void
+    {
+        $fixture = $this->onlineRevisionMatrixFixture();
+
+        $fixture['preparation']->update(['notes' => 'Packed and checked']);
+        $fixture['expense']->update(['notes' => 'Receipt recorded']);
+        $fixture['cost']->update(['actual_amount' => '180.00', 'status' => 'incurred']);
+
+        $this->assertSame(2, (int) $fixture['preparation_identity']->fresh()->revision);
+        $this->assertSame(2, (int) $fixture['expense_identity']->fresh()->revision);
+        $this->assertSame(2, (int) $fixture['cost_identity']->fresh()->revision);
+    }
+
+    private function onlineRevisionMatrixFixture(): array
     {
         [$business, $customer] = $this->customerFixture();
         $event = Event::create([
@@ -209,92 +296,24 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         ]);
 
         $registry = app(SyncEntityIdentityRegistry::class);
-        $identities = [
-            'job' => $registry->identify($event, 'job'),
-            'invoice' => $registry->identify($invoice, 'invoice'),
-            'purchase_order' => $registry->identify($order, 'purchase_order'),
-            'asset' => $registry->identify($asset, 'asset'),
-            'preparation' => $registry->identify($preparation, 'preparation'),
-            'expense' => $registry->identify($expense, 'expense'),
-            'event_cost' => $registry->identify($cost, 'event_cost'),
+
+        return [
+            'business' => $business,
+            'event' => $event,
+            'invoice' => $invoice,
+            'order' => $order,
+            'asset' => $asset,
+            'preparation' => $preparation,
+            'expense' => $expense,
+            'cost' => $cost,
+            'job_identity' => $registry->identify($event, 'job'),
+            'invoice_identity' => $registry->identify($invoice, 'invoice'),
+            'order_identity' => $registry->identify($order, 'purchase_order'),
+            'asset_identity' => $registry->identify($asset, 'asset'),
+            'preparation_identity' => $registry->identify($preparation, 'preparation'),
+            'expense_identity' => $registry->identify($expense, 'expense'),
+            'cost_identity' => $registry->identify($cost, 'event_cost'),
         ];
-
-        $requirement = EventRequirement::create([
-            'event_id' => $event->id,
-            'description' => 'Vegetarian meal option',
-            'category' => 'dietary',
-            'quantity' => '1.00',
-            'unit' => 'person',
-            'status' => 'open',
-        ]);
-        $this->assertSame(2, (int) $identities['job']->fresh()->revision);
-        $requirement->update(['notes' => 'Confirm ingredients with supplier']);
-        $this->assertSame(3, (int) $identities['job']->fresh()->revision);
-
-        $invoiceItem = InvoiceItem::create([
-            'invoice_id' => $invoice->id,
-            'description' => 'Catering service',
-            'quantity' => '1.00',
-            'unit' => 'service',
-            'unit_price' => '100.00',
-            'line_total' => '100.00',
-        ]);
-        $this->assertSame(2, (int) $identities['invoice']->fresh()->revision);
-        $invoiceItem->update(['description' => 'Updated catering service']);
-        $this->assertSame(3, (int) $identities['invoice']->fresh()->revision);
-
-        Payment::create([
-            'business_id' => $business->id,
-            'invoice_id' => $invoice->id,
-            'event_id' => $event->id,
-            'type' => 'deposit',
-            'idempotency_key' => (string) Str::uuid(),
-            'amount' => '25.00',
-            'currency' => 'ZAR',
-            'method' => 'cash',
-            'paid_at' => now()->toDateString(),
-        ]);
-        $this->assertSame(4, (int) $identities['invoice']->fresh()->revision);
-
-        $orderItem = PurchaseOrderItem::create([
-            'business_id' => $business->id,
-            'purchase_order_id' => $order->id,
-            'description' => 'Disposable plates',
-            'quantity' => '2.00',
-            'received_quantity' => '0.00',
-            'unit' => 'pack',
-            'unit_price' => '10.00',
-            'line_total' => '20.00',
-        ]);
-        $this->assertSame(2, (int) $identities['purchase_order']->fresh()->revision);
-        $orderItem->update(['description' => 'Compostable plates']);
-        $this->assertSame(3, (int) $identities['purchase_order']->fresh()->revision);
-
-        PurchaseOrderReceipt::create([
-            'business_id' => $business->id,
-            'purchase_order_id' => $order->id,
-            'idempotency_key' => (string) Str::uuid(),
-        ]);
-        $this->assertSame(4, (int) $identities['purchase_order']->fresh()->revision);
-
-        $allocation = AssetAllocation::create([
-            'business_id' => $business->id,
-            'asset_id' => $asset->id,
-            'event_id' => $event->id,
-            'allocated_from' => now()->toDateString(),
-            'status' => 'allocated',
-        ]);
-        $this->assertSame(2, (int) $identities['asset']->fresh()->revision);
-        $allocation->update(['notes' => 'Loaded for event']);
-        $this->assertSame(3, (int) $identities['asset']->fresh()->revision);
-
-        $preparation->update(['notes' => 'Packed and checked']);
-        $expense->update(['notes' => 'Receipt recorded']);
-        $cost->update(['actual_amount' => '180.00', 'status' => 'incurred']);
-
-        $this->assertSame(2, (int) $identities['preparation']->fresh()->revision);
-        $this->assertSame(2, (int) $identities['expense']->fresh()->revision);
-        $this->assertSame(2, (int) $identities['event_cost']->fresh()->revision);
     }
 
     public function test_offline_commands_advance_every_related_aggregate_revision(): void
