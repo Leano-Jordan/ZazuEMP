@@ -214,6 +214,6 @@ The offline authenticated-page cache/business-context control was previously ass
 
 An offline mutation may be based on an older business-record snapshot than the server currently holds. Stable entity identity, ordered mutation delivery and idempotent replay do not detect that the record itself changed after bootstrap.
 
-**Control:** every supported existing-record offline update carries an authoritative server revision. Relevant online and offline writes advance that revision transactionally. The server checks the expected revision under lock and preserves stale local and current remote values in a conflict. Same-device queued edits chain revisions; an intervening external write breaks the chain. Conflict retry uses a new mutation ID and an explicitly reviewed latest base revision.
+**Control:** every existing-record offline update accepted by a server domain handler carries an authoritative server revision. Relevant online and offline writes advance that revision transactionally. The server checks the expected revision under lock and preserves stale local and current remote values in a conflict. Same-device queued edits chain revisions; an intervening external write breaks the chain. Conflict retry uses a new mutation ID and an explicitly reviewed latest base revision.
 
 **Status:** CONTROL REQUIRED — implementation and regression evidence OPEN. See CASE-ZAZU-0033 / ENG-DATA-003.
