@@ -165,11 +165,19 @@ class PwaOfflineFoundationTest extends TestCase
     public function test_disconnected_top_level_navigation_prefers_the_local_dashboard_over_a_stale_route_snapshot(): void
     {
         $worker = File::get(public_path('sw.js'));
+        $dashboard = File::get(resource_path('views/dashboard.blade.php'));
+        $app = File::get(resource_path('js/app.js'));
 
         $this->assertStringContainsString('async function cachedAppPage(request, preferShell = false)', $worker);
         $this->assertStringContainsString('(preferShell && offlineShell) || cachedPage || offlineShell || Response.error()', $worker);
         $this->assertStringContainsString('cachedAppPage(request, request.mode === \'navigate\')', $worker);
         $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v55\';', $worker);
+        foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
+            $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $dashboard);
+        }
+        $this->assertStringContainsString('const offlineRouteViews = [', $app);
+        $this->assertStringContainsString('workspace.dataset.zazuOfflineActiveView = activeView || \'overview\';', $app);
+        $this->assertStringContainsString('window.addEventListener(\'popstate\', applyOfflineRouteView);', $app);
     }
 
     public function test_insecure_network_origins_explain_the_offline_installation_requirement(): void
