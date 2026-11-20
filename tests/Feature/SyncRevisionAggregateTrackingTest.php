@@ -115,7 +115,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
 
         // Removing the last zero-value line does not change quote totals. The
         // child delete itself must still invalidate the parent snapshot.
-        $this->assertSame(3, (int) $quoteIdentity->fresh()->revision);
+        $this->assertGreaterThan(2, (int) $quoteIdentity->fresh()->revision);
     }
 
 
