@@ -158,7 +158,7 @@ class CustomerContactLifecycleTest extends TestCase
             'name' => 'Duplicate Primary',
             'is_primary' => true,
         ]);
-        $identity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
             ->identify($customer, 'customer');
         $revisionBefore = (int) $identity->revision;
 
