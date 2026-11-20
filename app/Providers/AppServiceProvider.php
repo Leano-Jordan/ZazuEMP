@@ -66,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
         ] as $model => $entityType) {
             foreach (['updated', 'deleting', 'restored'] as $event) {
                 Event::listen('eloquent.'.$event.': '.$model, function ($record) use ($revisionTracker, $entityType): void {
-                    $revisionTracker->touchRelated($record, $relation, $entityType);
+                    $revisionTracker->touch($record, $entityType);
                 });
             }
         }
