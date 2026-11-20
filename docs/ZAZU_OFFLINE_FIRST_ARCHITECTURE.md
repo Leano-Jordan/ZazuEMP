@@ -297,7 +297,7 @@ Target concepts:
 
 Numeric database IDs remain useful inside one local database, but distributed synchronization must not depend on locally generated numeric IDs being globally unique.
 
-The initial stable-record-identity foundation is implemented in `sync_entity_identities`. It maps a business-owned local record and stable entity type to a UUID, scoped uniquely within that business. Repeated registration is idempotent; importing an identity cannot reassign it to another record or entity type. This registry is not yet connected to domain mutation handlers or a device bootstrap transport.
+The stable-record-identity registry is integrated into the current sync path. `SyncBootstrapPayloadBuilder` identifies records included in the device workspace; `OfflineDomainMutationHandler` registers newly applied model results against the mutation's local UUID; and `SyncController::push` returns the canonical record identity to the originating device. The registry is business-scoped and prevents a record from changing entity type or being reassigned to another record. This identity layer is not a concurrency/version layer: stale-update detection remains OPEN and is specified in section 7.1.
 
 ## 10. UI rule
 

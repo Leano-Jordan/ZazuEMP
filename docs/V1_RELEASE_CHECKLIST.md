@@ -32,7 +32,34 @@ Offline synchronization is a separate V1 reliability target from phone pairing a
 
 **Verified narrow correction (2026-11-20):** Offline forms now prevent duplicate submission until the user changes the saved fields; a changed receipt quantity or payment amount can be deliberately submitted as a new local mutation. The precached service-worker static cache is v41. The exact-head browser suite verifies the repeat partial-receipt and paid-invoice validation journeys. This does not close stale-update detection or the broader sync matrix. The Founder reports that sync is not yet up to standard across the supported workflows. Treat the full declared offline workflow matrix as in scope; do not infer that one successful customer/job or attachment journey proves the rest.
 
-- [ ] Map each currently declared offline entity/operation from UI action → IndexedDB state → mutation queue → server handler → identity mapping → acknowledgement/pull/bootstrap → visible reconciled state.
+- [x] Complete a static source trace for every currently declared offline entity/operation from UI action → IndexedDB state → mutation queue → server handler → identity mapping → acknowledgement/pull/bootstrap → visible reconciled state. This closes the inventory task only; runtime acceptance remains open.
+
+**Source-level sync path map — verified against `main` on 2026-11-20**
+
+Shared transport: `resources/js/app.js::setupZazuOfflineForms` and the local customer/Work editors build the supported payloads. `public/zazu-offline.js::queueMutation` persists each mutation alongside the business-scoped workspace in IndexedDB; `pending` orders the queue by creation time and `push` sends batches to `SyncController::push`. The server records mutation identity/sequence, applies it under the business → device → mutation transaction/lock order, and publishes receiver deliveries atomically. `OfflineDomainMutationHandler::apply` dispatches the entity-specific handler. Model results are registered through `SyncEntityIdentityRegistry` and returned as canonical IDs; command effects without their own model identity are reconciled through their owning records. On the receiving device, `SyncMutationProtocol::pull` returns only a contiguous delivery prefix; the client fetches the authoritative bootstrap snapshot, applies it only when its local queue/conflicts are clear, then acknowledges the contiguous delivery sequence.
+
+| Entity / operation | User-facing offline entry | Local state target | Server handler | Identity / reconciliation |
+|---|---|---|---|---|
+| Customer — create/update | `customers/create`, `customers/edit`; local customer relationship editor | `customers` | `customer` | Customer identity; canonical server ID returned and refreshed from bootstrap |
+| Job — create/update | `work/create`; local Work inspector editor | `jobs` | `event` | Job identity; requirement children reconcile inside the job snapshot |
+| Quote — create | `work/quotes/create` | `quotes` | `quote` | Quote identity; quote version/lines are part of the refreshed quote snapshot |
+| Quote acceptance — command | Dashboard quote panel and `quotes/show` acceptance form | Existing quote status/version | `quoteAcceptance` | No separate command identity; accepted quote state is confirmed by bootstrap |
+| Supplier — create/update | `suppliers/create` (create/edit form) | `suppliers` | `supplier` | Supplier identity and canonical ID |
+| Service/capability — create/update | `capabilities/create`, `capabilities/edit` | `catalogue` | `capability` | Service identity and canonical ID |
+| Inventory item — create | `inventory/create` | `inventory_items` | `inventoryItem` | Inventory-item identity and canonical ID |
+| Asset — create/update | `assets/create` (create/edit form) | `assets` | `asset` | Asset identity; allocations are nested in the asset snapshot |
+| Expense — create | `finance/expense-create` | `expenses` | `expense` | Expense identity and canonical ID |
+| Payment — create | `finance/payment-create` | `invoices[].payments` | `payment` | Nested payment identity; client resolves it through its parent invoice |
+| Preparation — create | `preparation/create` | `preparations` | `preparation` | Preparation identity and canonical ID |
+| Event cost — create | `costs/create` | `costs` | `eventCost` | Event-cost identity and canonical ID |
+| Inventory movement — create | Inventory movement forms on `inventory/index` | `inventory_items[].movements` and on-hand quantity | `inventoryMovement` | Nested movement identity; client resolves through the inventory item |
+| Purchase receipt — command | Receive form on `purchasing/show` | Purchase-order items and inventory/movement state | `purchaseReceipt` | No separate receipt identity; receipt effect is reconciled through purchase order and inventory snapshots |
+| Invoice — create | `finance/invoice-create` | `invoices` | `invoice` | Invoice identity and canonical ID |
+| Asset allocation — create/return | Allocation/release forms on `assets/index` | `assets[].allocations` and asset status | `assetAllocation` | Nested allocation identity; client resolves through the asset |
+| Purchase order — create | `purchasing/create` | `purchase_orders` | `purchaseOrder` | Purchase-order identity; items are nested under the order |
+
+**Coverage boundary recorded from source:** the UI currently exposes offline update forms for customers, Work, suppliers, services/capabilities and assets. Several other server handlers accept update/upsert operations, but their current offline UI entry is create-only. The local list/detail renderer remains concentrated on Customers, Work and the dashboard quote panel; for other entities, an IndexedDB record or queued handler does not prove an offline directory/detail screen. Quote acceptance and purchase receipt are commands whose effects are reflected through their parent records, not standalone synced records.
+
 - [ ] Verify every supported mutation is durable across reload, force-close and restart, and remains visibly pending until the server confirms it.
 - [ ] Verify safe retries for transient/offline/timeout/partial responses; duplicate and reordered delivery must not duplicate consequential records or lose queued work.
 - [ ] Verify stable local identities, parent/child references, business scoping, idempotency and server canonical IDs across create → update → related mutation sequences.

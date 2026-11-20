@@ -4,6 +4,15 @@ Last verified application-code baseline: ae3d49cae7973c2db708d5ff88c3a3eb51c35b5
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
+## Director source audit refresh — 2026-11-20
+
+Repository HEAD `0bd468f222fc4dab87b725a99d913e2fb514b2f8` has passing Zazu Quality, Director Contract Lint and Push-on-main workflows. The exact-head quality workflow covers locked npm audit, service-worker auth/cache-race checks, Composer security audit and secret scanning; it is not the Laravel/offline acceptance suite. Latest full app test evidence remains on application-code baseline `526bdf3` (Laravel 607/1 skipped/4,158 assertions; PostgreSQL recovery; offline browser 51 desktop + 6 mobile + 1 phone-local attachment journey).
+
+The source-level path map for all 17 offline entity types is now recorded in `docs/V1_RELEASE_CHECKLIST.md`. Static mapping is complete; runtime replay/reconciliation acceptance remains OPEN.
+
+The stale-update finding is confirmed in the implementation: update-capable domain handlers resolve the latest record through the stable identity registry and update it without a server-enforced base version. The existing conflict route records validation/domain rejection and mutation identity mismatch, and exposes retry/discard; it does not detect stale snapshots or provide a safe rebase. The sync reliability gate remains OPEN and release remains NO-GO. Do not solve this with timestamps-only or last-write-wins.
+
+
 ## Owner-approved V1 scheduling addition — 2026-11-17
 Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `71c8fc5c7aeba392b95e26aee694945b286f2c8e`; Laravel 532/1 skipped/3,714 assertions and PHPMD pass. Windows package + PowerShell install/recovery pass on 2ef2a0b; PostgreSQL migration/recovery and offline-browser acceptance PASS at exact application-code baseline 71c8fc5 in run 44152431508.
 
