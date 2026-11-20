@@ -150,12 +150,8 @@ class OfflinePaymentPrecisionTest extends TestCase
             ],
         ]);
         $applier->apply($acceptance, ['quote_acceptance' => $handler]);
-        $this->assertContains(
-            'job',
-            array_column(app(SyncMutationRelatedIdentityResolver::class)->resolve($acceptance), 'entity_type'),
-        );
-        $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
-        $this->assertSame(2, (int) $eventIdentity->fresh()->revision);
+        $this->assertContains('job', array_column(app(SyncMutationRelatedIdentityResolver::class)->resolve($acceptance), 'entity_type'));
+        $this->assertSame([2, 2], [(int) $quoteIdentity->fresh()->revision, (int) $eventIdentity->fresh()->revision]);
         $this->assertSame('confirmed', $event->fresh()->status);
 
         $invoiceId = (string) Str::uuid();
