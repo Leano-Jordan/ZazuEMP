@@ -3021,6 +3021,39 @@ function setupZazuOfflineForms() {
                 }
             }
 
+            if (entity === 'inventory_movement') {
+                const inventoryItem = state.inventory_items?.find(item =>
+                    item.local_id === payload.inventory_item_local_id
+                );
+
+                if (inventoryItem) {
+                    const quantity = Number.parseFloat(String(payload.quantity ?? ''));
+                    const currentOnHand = Number.parseFloat(String(inventoryItem.on_hand ?? 0));
+                    if (Number.isFinite(quantity) && quantity > 0 && Number.isFinite(currentOnHand)) {
+                        const increasesStock = ['receipt', 'return', 'adjustment_in'].includes(payload.type);
+                        const nextOnHand = currentOnHand + (increasesStock ? quantity : -quantity);
+                        inventoryItem.on_hand = Number(nextOnHand.toFixed(2));
+                    }
+
+                    const event = state.jobs?.find(item => item.local_id === payload.event_local_id);
+                    inventoryItem.movements = inventoryItem.movements || [];
+                    inventoryItem.movements.push({
+                        local_id: payload.local_id,
+                        server_id: null,
+                        id: null,
+                        inventory_item_id: inventoryItem.server_id ?? inventoryItem.id ?? null,
+                        event_id: event?.server_id ?? event?.id ?? null,
+                        type: payload.type,
+                        quantity: payload.quantity,
+                        unit_cost: payload.unit_cost,
+                        movement_date: payload.movement_date,
+                        reference: payload.reference || null,
+                        notes: payload.notes || null,
+                        pending_sync: true,
+                    });
+                }
+            }
+
             if (entity === 'purchase_receipt') {
                 const order = state.purchase_orders?.find(item => item.local_id === payload.purchase_order_local_id);
                 if (order?.items) {
