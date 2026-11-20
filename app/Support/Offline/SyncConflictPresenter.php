@@ -25,33 +25,30 @@ final class SyncConflictPresenter
     {
         $localRecord = $this->recordFromPayload($conflict->local_payload ?? []);
         $remoteRecord = $this->recordFromPayload($conflict->remote_payload ?? []);
+
+        return array_slice([
+            ...$this->compareScalarFields($localRecord, $remoteRecord),
+            ...$this->compareCollectionCounts($localRecord, $remoteRecord),
+        ], 0, 12);
+    }
+
+    /**
+     * @param array<string, mixed> $localRecord
+     * @param array<string, mixed> $remoteRecord
+     * @return array<int, array{field:string,local:string,remote:string}>
+     */
+    private function compareScalarFields(array $localRecord, array $remoteRecord): array
+    {
         $fields = [
-            'name' => 'Name',
-            'description' => 'Description',
-            'status' => 'Status',
-            'category' => 'Category',
-            'quantity' => 'Quantity',
-            'unit' => 'Unit',
-            'contact_name' => 'Contact',
-            'phone' => 'Phone',
-            'email' => 'Email',
-            'event_type' => 'Work type',
-            'reference' => 'Reference',
-            'notes' => 'Notes',
-            'amount' => 'Amount',
-            'total_amount' => 'Total',
-            'projected_amount' => 'Projected cost',
-            'actual_amount' => 'Actual cost',
-            'sku' => 'SKU',
-            'asset_tag' => 'Asset tag',
-            'location' => 'Location',
-            'condition' => 'Condition',
-            'currency' => 'Currency',
-            'paid_amount' => 'Paid',
-            'balance' => 'Balance',
-            'expected_at' => 'Expected date',
-            'allocated_from' => 'Allocation start',
-            'allocated_until' => 'Allocation end',
+            'name' => 'Name', 'description' => 'Description', 'status' => 'Status',
+            'category' => 'Category', 'quantity' => 'Quantity', 'unit' => 'Unit',
+            'contact_name' => 'Contact', 'phone' => 'Phone', 'email' => 'Email',
+            'event_type' => 'Work type', 'reference' => 'Reference', 'notes' => 'Notes',
+            'amount' => 'Amount', 'total_amount' => 'Total', 'projected_amount' => 'Projected cost',
+            'actual_amount' => 'Actual cost', 'sku' => 'SKU', 'asset_tag' => 'Asset tag',
+            'location' => 'Location', 'condition' => 'Condition', 'currency' => 'Currency',
+            'paid_amount' => 'Paid', 'balance' => 'Balance', 'expected_at' => 'Expected date',
+            'allocated_from' => 'Allocation start', 'allocated_until' => 'Allocation end',
         ];
 
         $rows = [];
@@ -69,21 +66,37 @@ final class SyncConflictPresenter
             ];
         }
 
-        foreach (['contacts' => 'Contacts', 'requirements' => 'Requirements', 'items' => 'Line items', 'payments' => 'Payments', 'movements' => 'Movements', 'allocations' => 'Allocations'] as $key => $label) {
-            if (! is_array($localRecord[$key] ?? null) || ! is_array($remoteRecord[$key] ?? null)) {
+        return $rows;
+    }
+
+    /**
+     * @param array<string, mixed> $localRecord
+     * @param array<string, mixed> $remoteRecord
+     * @return array<int, array{field:string,local:string,remote:string}>
+     */
+    private function compareCollectionCounts(array $localRecord, array $remoteRecord): array
+    {
+        $collections = [
+            'contacts' => 'Contacts', 'requirements' => 'Requirements', 'items' => 'Line items',
+            'payments' => 'Payments', 'movements' => 'Movements', 'allocations' => 'Allocations',
+        ];
+        $rows = [];
+
+        foreach ($collections as $key => $label) {
+            $local = $localRecord[$key] ?? null;
+            $remote = $remoteRecord[$key] ?? null;
+            if (! is_array($local) || ! is_array($remote) || count($local) === count($remote)) {
                 continue;
             }
-            if (count($localRecord[$key]) === count($remoteRecord[$key])) {
-                continue;
-            }
+
             $rows[] = [
                 'field' => $label,
-                'local' => (string) count($localRecord[$key]),
-                'remote' => (string) count($remoteRecord[$key]),
+                'local' => (string) count($local),
+                'remote' => (string) count($remote),
             ];
         }
 
-        return array_slice($rows, 0, 12);
+        return $rows;
     }
 
     /**
