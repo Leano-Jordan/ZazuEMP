@@ -1464,7 +1464,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await page.context().setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
-        await expect.poll(() => pushedPaymentLocalId).toBe(local.invoice.payments[0].local_id);
+        await expect.poll(() => pushedPaymentLocalId).toBe(local.pending[0].payload.local_id);
         await expect.poll(() => page.evaluate(localId => {
             const invoice = window.ZazuOffline.getState().invoices.find(item => item.local_id === 'offline-payment-invoice-identity');
             const payment = invoice?.payments?.find(item => item.local_id === localId);
