@@ -149,11 +149,7 @@ class SyncMutationApplier
 
     private function expectedRevision(SyncMutation $mutation): mixed
     {
-        $predecessorId = $mutation->payload['predecessor_mutation_id'] ?? null;
-
-        return is_string($predecessorId) && Str::isUuid($predecessorId)
-            ? $this->predecessorResultRevision($mutation, $predecessorId)
-            : ($mutation->payload['expected_revision'] ?? null);
+        return app(SyncMutationCausalRevisionResolver::class)->expectedRevision($mutation);
     }
 
     private function revisionMatches(mixed $expectedRevision, SyncEntityIdentity $identity): bool
@@ -208,68 +204,5 @@ class SyncMutationApplier
         $identity?->increment('revision');
     }
 
-    private function predecessorResultRevision(SyncMutation $mutation, string $predecessorId): ?int
-    {
-        $visited = [];
-        for ($depth = 0; $depth < 8; $depth++) {
-            if (isset($visited[$predecessorId])) {
-                return null;
-            }
-            $visited[$predecessorId] = true;
 
-            $predecessor = $this->findPredecessorMutation($mutation, $predecessorId);
-            if (! $predecessor) {
-                return null;
-            }
-
-            if ($predecessor->status === 'applied') {
-                return is_numeric($predecessor->result_revision)
-                    ? (int) $predecessor->result_revision
-                    : null;
-            }
-
-            if ($predecessor->status === 'pending') {
-                throw new PendingSyncMutationPredecessorException(
-                    'This offline edit is waiting for an earlier edit to be resolved.'
-                );
-            }
-
-            if ($predecessor->status !== 'discarded') {
-                return null;
-            }
-
-            if (! is_string($predecessor->superseded_by_mutation_id)) {
-                return is_numeric($predecessor->result_revision)
-                    ? (int) $predecessor->result_revision
-                    : null;
-            }
-
-            $predecessorId = $predecessor->superseded_by_mutation_id;
-            if (! $this->findPredecessorMutation($mutation, $predecessorId)) {
-                throw new PendingSyncMutationPredecessorException(
-                    'This offline edit is waiting for its earlier rebased edit to synchronize.'
-                );
-            }
-        }
-
-        return null;
-    }
-
-    private function findPredecessorMutation(SyncMutation $mutation, string $predecessorId): ?SyncMutation
-    {
-        $predecessor = SyncMutation::query()
-            ->where('business_id', $mutation->business_id)
-            ->where('sync_device_id', $mutation->sync_device_id)
-            ->where('mutation_id', $predecessorId)
-            ->lockForUpdate()
-            ->first();
-
-        if (! $predecessor
-            || $predecessor->entity_type !== $mutation->entity_type
-            || $predecessor->entity_id !== $mutation->entity_id) {
-            return null;
-        }
-
-        return $predecessor;
-    }
 }
