@@ -26,6 +26,23 @@ Implementation baseline: `71c8fc5c7aeba392b95e26aee694945b286f2c8e` on `main`.
 - [x] Asset booking defaults use the event setup/collection window; existing overlap and independent-return protections remain intact.
 - [x] Exact-head PostgreSQL migration/recovery and desktop/mobile offline-browser regression pass (run 44152431508).
 
+## Offline sync reliability — owner-directed active target (2026-11-20)
+
+Offline synchronization is a separate V1 reliability target from phone pairing and from standalone phone-local launch. The Founder reports that sync is not yet up to standard across the supported workflows. Treat the full declared offline workflow matrix as in scope; do not infer that one successful customer/job or attachment journey proves the rest.
+
+- [ ] Map each currently declared offline entity/operation from UI action → IndexedDB state → mutation queue → server handler → identity mapping → acknowledgement/pull/bootstrap → visible reconciled state.
+- [ ] Verify every supported mutation is durable across reload, force-close and restart, and remains visibly pending until the server confirms it.
+- [ ] Verify safe retries for transient/offline/timeout/partial responses; duplicate and reordered delivery must not duplicate consequential records or lose queued work.
+- [ ] Verify stable local identities, parent/child references, business scoping, idempotency and server canonical IDs across create → update → related mutation sequences.
+- [ ] Verify pull cursors, pagination, acknowledgements and bootstrap/re-bootstrap do not skip or replay changes across devices and businesses.
+- [ ] Verify conflict detection and retry/discard handling preserve both authoritative and local data; consequential conflicts must not be silently overwritten.
+- [ ] Verify attachment bytes, metadata, job linkage, checksums/idempotency, retry and download/open behavior, including the supported offline-created Work linkage path.
+- [ ] Verify supported financial, inventory, purchase/receipt, schedule and asset mutations preserve server validation, money/date precision and lifecycle rules.
+- [ ] Run targeted server/client regression coverage and the full exact-head Laravel + browser acceptance suites; then verify representative sync journeys on the actual PC and phone.
+- [ ] Record every unsupported offline operation as online-only or otherwise explicitly limited. Do not imply full app-wide offline parity.
+
+**Current evidence:** latest main CI at 561ad304 is red: offline browser acceptance reports 43 passed / 2 failed, and its mobile customer/Work and phone-local attachment follow-on jobs were skipped after the desktop suite failed. Two failed fixtures still call the obsolete six-digit pairing contract or expect an obsolete cross-business error string; this does not close or reopen the Founder-confirmed physical pairing. Full sync quality remains unaccepted until the domain matrix above is verified.
+
 ## Release acceptance gates
 - [ ] Physical Android acceptance: secure-origin install, disconnected cold launch/restart, local records/attachments and reconnect sync on actual device.
 - [ ] Installed-target recovery: controlled database + private-media backup/restore on intended Windows installation.
