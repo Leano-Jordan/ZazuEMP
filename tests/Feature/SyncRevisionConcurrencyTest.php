@@ -14,10 +14,12 @@ use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
 use App\Support\Offline\StaleSyncRevisionException;
 use App\Support\Offline\PendingSyncMutationPredecessorException;
+use App\Support\Offline\SyncConflictRecorder;
 use App\Support\Offline\SyncConflictResolutionService;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationHandler;
+use App\Support\Offline\SyncMutationPushProcessor;
 use App\Support\Offline\SyncMutationRecorder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -295,38 +297,41 @@ class SyncRevisionConcurrencyTest extends TestCase
         ]);
         $customer->update(['name' => 'Intervening server edit']);
 
-        try {
-            $applier->apply($first, ['customer' => $handler]);
-            $this->fail('The first mutation must be rejected against the newer server revision.');
-        } catch (StaleSyncRevisionException $exception) {
-            $this->assertSame(2, $exception->remotePayload()['revision']);
-        }
+        $processor = new SyncMutationPushProcessor(
+            $recorder,
+            $applier,
+            $handler,
+            app(SyncConflictRecorder::class),
+        );
+        $firstResult = $processor->process($device, [
+            'id' => $first->mutation_id,
+            'entity_type' => $first->entity_type,
+            'entity_id' => $first->entity_id,
+            'operation' => $first->operation,
+            'payload' => $first->payload,
+        ]);
+
+        $this->assertSame('stale_record_version', $firstResult['conflict_type']);
+        $this->assertNotNull($firstResult['conflict_id']);
 
         $second = $this->recordCustomerUpdate($device, $identity, 'Second phone edit', [
             'predecessor_mutation_id' => $first->mutation_id,
         ]);
-
-        try {
-            $applier->apply($second, ['customer' => $handler]);
-            $this->fail('A successor must remain queued behind its unresolved predecessor.');
-        } catch (PendingSyncMutationPredecessorException $exception) {
-            $this->assertSame('This offline edit is waiting for an earlier edit to be resolved.', $exception->getMessage());
-        }
-
-        $this->assertSame('Intervening server edit', $customer->fresh()->name);
-        $this->assertSame('pending', $second->fresh()->status);
-
-        $conflict = SyncConflict::create([
-            'business_id' => $business->id,
-            'sync_device_id' => $device->id,
-            'mutation_id' => $first->mutation_id,
-            'entity_type' => 'customer',
-            'entity_id' => $identity->entity_uuid,
-            'conflict_type' => 'stale_record_version',
-            'status' => 'open',
-            'local_payload' => $first->payload,
-            'remote_payload' => ['revision' => 1, 'record' => ['name' => 'Old snapshot']],
+        $secondResult = $processor->process($device, [
+            'id' => $second->mutation_id,
+            'entity_type' => $second->entity_type,
+            'entity_id' => $second->entity_id,
+            'operation' => $second->operation,
+            'payload' => $second->payload,
         ]);
+
+        $this->assertTrue($secondResult['retryable']);
+        $this->assertNull($secondResult['conflict_id']);
+        $this->assertSame('pending', $secondResult['status']);
+        $this->assertSame('pending', $second->fresh()->status);
+        $this->assertSame('Intervening server edit', $customer->fresh()->name);
+
+        $conflict = SyncConflict::query()->findOrFail($firstResult['conflict_id']);
 
         $resolution = app(SyncConflictResolutionService::class)
             ->resolve($device, $conflict, ['action' => 'retry'])
