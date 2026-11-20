@@ -17,6 +17,7 @@ use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncDevice;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class SyncBootstrapPayloadBuilder
@@ -33,35 +34,43 @@ class SyncBootstrapPayloadBuilder
 
     public function build(SyncDevice $device): array
     {
-        $business = Business::query()->findOrFail($device->business_id);
-        $registry = app(SyncEntityIdentityRegistry::class);
+        return DB::transaction(function () use ($device): array {
+            // The snapshot and its revisions must describe one serialized
+            // business state. Every online aggregate writer takes this same
+            // business lock before changing records and advancing revisions.
+            $business = Business::query()
+                ->whereKey($device->business_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $registry = app(SyncEntityIdentityRegistry::class);
 
-        return [
-            'version' => 1,
-            'business' => [
-                'id' => $business->id,
-                'name' => $business->name,
-                'currency' => $business->currency,
-                'email' => $business->email,
-                'phone' => $business->phone,
-                'address' => $business->address,
-                'website' => $business->website,
-                'tax_number' => $business->tax_number,
-            ],
-            'catalogue' => $this->bootstrapCatalogue($business, $registry),
-            'suppliers' => $this->bootstrapSuppliers($business, $registry),
-            'purchase_orders' => $this->bootstrapPurchaseOrders($business, $registry),
-            'invoices' => $this->bootstrapInvoices($business, $registry),
-            'expenses' => $this->bootstrapExpenses($business, $registry),
-            'inventory_items' => $this->bootstrapInventoryItems($business, $registry),
-            'assets' => $this->bootstrapAssets($business, $registry),
-            'costs' => $this->bootstrapCosts($business, $registry),
-            'selected' => $this->bootstrapSelectedRecords($device, $business, $registry),
-            'device' => [
-                'id' => $device->id,
-                'installation_id' => $device->installation_id,
-            ],
-        ];
+            return [
+                'version' => 1,
+                'business' => [
+                    'id' => $business->id,
+                    'name' => $business->name,
+                    'currency' => $business->currency,
+                    'email' => $business->email,
+                    'phone' => $business->phone,
+                    'address' => $business->address,
+                    'website' => $business->website,
+                    'tax_number' => $business->tax_number,
+                ],
+                'catalogue' => $this->bootstrapCatalogue($business, $registry),
+                'suppliers' => $this->bootstrapSuppliers($business, $registry),
+                'purchase_orders' => $this->bootstrapPurchaseOrders($business, $registry),
+                'invoices' => $this->bootstrapInvoices($business, $registry),
+                'expenses' => $this->bootstrapExpenses($business, $registry),
+                'inventory_items' => $this->bootstrapInventoryItems($business, $registry),
+                'assets' => $this->bootstrapAssets($business, $registry),
+                'costs' => $this->bootstrapCosts($business, $registry),
+                'selected' => $this->bootstrapSelectedRecords($device, $business, $registry),
+                'device' => [
+                    'id' => $device->id,
+                    'installation_id' => $device->installation_id,
+                ],
+            ];
+        });
     }
 
     /**
