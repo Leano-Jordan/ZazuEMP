@@ -27,6 +27,12 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
+# Laravel-generated runtime state (never commit compiled Blade/cache/session files)
+/storage/framework/cache/data/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+
 # Local development databases and runtime logs
 /database/*.sqlite
 /database/*.sqlite-journal
