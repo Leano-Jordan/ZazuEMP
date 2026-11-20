@@ -48,13 +48,13 @@ async function migratePreviousCaches() {
             && key !== CACHE_NAME
             && !key.startsWith(CACHE_NAME + '-user-'))
         .sort((a, b) => {
-            const version = (name) => Number(name.match(/^zazu-static-v(\\d+)/)?.[1] || 0);
+            const version = (name) => Number(name.match(/^zazu-static-v(\d+)/)?.[1] || 0);
             return version(b) - version(a);
         });
 
     for (const oldName of previous) {
         const source = await caches.open(oldName);
-        const userSuffix = oldName.match(/-user-\\d+-business-\\d+$/)?.[0] || '';
+        const userSuffix = oldName.match(/-user-\d+-business-\d+$/)?.[0] || '';
         const target = await caches.open(CACHE_NAME + userSuffix);
 
         // Preserve authenticated page snapshots, private media, active identity
