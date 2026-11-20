@@ -548,36 +548,37 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0033
 
-**Status:** OPEN — confirmed source-level data-integrity defect; runtime reproduction and correction pending.  
+**Status:** OPEN — implementation committed; exact-head acceptance and exhaustive writer audit still pending.  
 **Engineering diagnostic code:** ENG-DATA-003.  
 **First observed:** 2026-11-20.  
-**Target:** Existing-record offline updates accepted by the current server domain handlers: customer, Work/job, preparation, quote/draft version, inventory item, event cost, asset, supplier, service/capability and purchase order. The currently exposed edit forms cover a narrower subset (customer, Work/job, supplier, service/capability and asset); server update/upsert handlers remain part of the protocol contract and must not bypass concurrency protection.
+**Target:** Existing-record offline updates accepted by the current server domain handlers: customer, Work/job, preparation, quote/draft version, inventory item, event cost, asset, supplier, service/capability and purchase order. Command mutations that alter a parent snapshot (payment, quote acceptance, purchase receipt, stock movement and asset allocation) must advance the affected parent revision without weakening idempotency.
 
-**Failure fingerprint:** Two paired devices bootstrap the same business record. Device B updates the record online or through sync. Device A later pushes an offline update based on its older snapshot. The server resolves the stable business-scoped identity to the current row and applies A's payload without checking the revision A originally observed. The older payload can therefore replace B's newer values.
+**Failure fingerprint:** Two paired devices bootstrap the same business record. Device B updates it online or through sync. Device A later pushes an offline update based on its older snapshot. Without a revision precondition, A's older payload can replace B's newer values.
 
-**Classification:** F1 — application data-integrity/concurrency defect. This is not a queue-order or mutation-idempotency failure. The client queue is ordered by creation time and the server has transactional mutation sequencing; neither establishes that the record snapshot is current.
+**Implemented source correction on `main` (current head `a4b267f`):**
+- `sync_entity_identities.revision` is a server-owned monotonic counter. The migration seeds pre-existing identity rows at revision 2; the identity registry explicitly creates new identities at revision 1. This invalidates old local snapshots that normalize to revision 1.
+- `sync_mutations.result_revision` records the exact revision produced by an applied mutation. `superseded_by_mutation_id` records immutable rebase successors.
+- `SyncEntityRevisionTracker` advances registered aggregate revisions for online Eloquent updates/deletes and nested snapshot children. Business-first transaction locking was normalized in the inspected customer/contact, capability, supplier, asset, quote and Work writers; finance, inventory and purchasing command paths already used business-first locks.
+- `SyncMutationApplier` checks expected revisions before domain mutation. Same-device successors reference their predecessor; the server compares the current revision with that predecessor's actual `result_revision`, not an assumed +1.
+- Offline handlers run with automatic model tracking suspended; the applier advances the edited aggregate once and explicitly advances parent snapshots affected by quote acceptance, payment, purchase receipt, inventory movement and asset allocation.
+- Bootstrap includes revisions; the browser queue records an expected revision for the first edit and a predecessor ID for later edits. The static service-worker cache advanced to v42.
+- `stale_record_version` conflicts preserve local payload and a full remote aggregate snapshot. Keep-local resolution generates a new mutation ID and current expected revision; use-server resolution discards the local mutation and refreshes the local record. Causal successors cannot be rebased ahead of unresolved predecessors.
+- The push processing logic was extracted into `SyncMutationPushProcessor` to keep controller and method complexity within the repository's PHPMD limits.
 
-**Observed source evidence:**
-- `public/zazu-offline.js::queueMutation` persists `local_id`, `server_id` and `record`, but no base revision or causal revision token.
-- `SyncEntityIdentity` stores business/entity/record identity only; it has no monotonic revision.
-- `OfflineDomainMutationHandler::existing` resolves the current row through the identity registry. Existing customer, Work, supplier, service and asset handlers then call model `update()` without comparing the device's observed revision.
-- `SyncController::push` records validation/domain conflicts and mutation-ID payload mismatches. It has no stale-record-version conflict classification or remote-record snapshot for this case.
-- **Online writer lock boundaries were not uniform; normalization is now partially implemented:** `CustomerController::update` locks business → customer → primary contact; `CustomerContactController` mutations lock business → customer → contact; `BusinessCapabilityController::update` locks business → capability transactionally; `SupplierController::update` and `AssetController::update/release` lock business before their aggregates; `QuoteService::updateDraft` locks business → event → quote → version; and `WorkController` create/update reload customer/contact snapshots under the shared business lock. Existing lifecycle, finance, inventory and purchasing command paths also acquire the business lock first. Commits: `2be54cb`, `0e1c878`, `d8df68d`, `d58fde5`, `e8d5b84`, `652ca0d`, `48bb171`, `acba664`, `47aaa1a`. The previously missed CustomerController, CustomerContactController and BusinessCapabilityController changes were corrected and verified in `47aaa1a`. This is only the shared-lock foundation; no monotonic revisions, expected-revision checks, stale conflict snapshots or causal rebase have been implemented. Indirect command effects and all writer coverage still require the revision implementation to account for parent aggregates and nested records.
-- Existing regression coverage exercises idempotency, dependency ordering, business/device isolation and domain invariants, but no two-device stale-snapshot test or same-device sequential-edit revision chain exists. The update-capable handlers also include preparation, quote/draft version, inventory item, event cost and purchase order, even where the current form entry is create-only.
+**Regression coverage added:**
+- Online customer write advances its registered revision.
+- A stale device update is rejected and returns the current remote record.
+- Two same-device updates chain through actual predecessor result revisions.
+- An online write between queued edits breaks the chain and creates a stale conflict.
+- Keep-local resolution creates a new immutable mutation ID and returns the latest revision.
+- Existing offline update fixtures now provide expected revisions.
 
-**Required correction contract:** Introduce a server-generated monotonic revision for each update-capable synchronised aggregate. Every relevant online and offline write must advance it transactionally. Every offline update must carry the revision it expects. Under the existing business/device/mutation lock order, the server compares and rejects a stale revision before domain mutation. Preserve the original local payload and current remote snapshot in a `stale_record_version` conflict. A user-directed keep-local resolution must create a new immutable mutation ID based on the latest server revision; use-server resolution must discard the local mutation and refresh. Same-device queued edits must chain revisions in causal order; an intervening external write must break that chain and create a conflict.
+**Remaining audit requirement:** the event-based online revision tracker must be checked against every route/service that changes these aggregate tables, especially raw query-builder bulk updates/deletes and command-side effects. Any bypass must be brought under the same business-first transaction boundary and revision advancement. The current source trace is broad but not yet a proven exhaustive writer inventory.
 
-**Guardrails:** no `updated_at`-only comparison, browser-clock comparison, last-write-wins, silent payload replacement, mutation-ID reuse with changed payload, or weakening of payment/receipt/stock/allocation idempotency. Include customer contacts and Work requirements in the aggregate revision because they are represented in those offline snapshots.
+**Guardrails:** no `updated_at`-only comparison, browser-clock comparison, last-write-wins, silent payload replacement, mutation-ID reuse with changed payload, or weakening of payment/receipt/stock/allocation idempotency. Customer contacts and Work requirements are part of their parent aggregate snapshots.
 
-**Verification required:** two-device stale update; same-device two/three queued edits; external write between queued edits; first mutation rejected then later mutation; rebase with a new mutation ID; preservation of both payloads; online update revision bump; business isolation; representative customer/Work/supplier/service/asset paths; full Laravel, PostgreSQL and offline-browser regression.
+**Verification required before closing:** exact-head Laravel + PostgreSQL migration tests; desktop and mobile offline-browser regression; two-device stale update; two/three same-device queued edits; external write between queued edits; first mutation rejected then later mutation; new-ID rebase; both payloads preserved; representative customer/Work/supplier/service/asset paths; parent revision propagation for payment, receipt, stock movement and allocation; business/device isolation.
 
-**Stop condition:** do not ship partial protection that increments revisions only for offline writes or only for a subset of ordinary online writers. Until the complete writer map is covered, keep the sync reliability gate OPEN and release NOT READY.
+**Stop condition:** CASE-ZAZU-0033 remains OPEN and release remains NOT READY until the complete writer audit and exact-head regression evidence pass. Do not uplift readiness from static source changes or CI subsets alone.
 
-
-**Implementation progress — 2026-11-20:** The first online-writer lock-normalization slice is committed directly to `main` (`2be54cb`, `0e1c878`, `d8df68d`). It closes the three specifically identified lock gaps for customer aggregate updates, customer contacts and business capabilities. Exact-head workflows are running/pending. CASE-ZAZU-0033 remains OPEN; do not advance readiness until the full writer map, revision protocol and conflict/rebase lifecycle are implemented and verified.
-
-
-**Lock-foundation progress — 2026-11-20:** The online writer normalization slice is committed directly to `main`. PHPMD, Zazu Quality, Psalm Security Scan, populated upgrade/rollback and Director Health passed on `acba664`; Laravel and Windows V1 Package were still running at the time of recording. CASE-ZAZU-0033 remains OPEN and the v1 release gate remains NOT READY.
-
-
-**Verification update — 2026-11-20, `47aaa1a`:** Laravel unit/feature tests passed; PostgreSQL migration/registration/backup-restore smoke passed; Windows V1 package passed; PHPMD, Zazu Quality, Psalm Security Scan, populated upgrade/rollback and Director Health passed. Offline browser acceptance was still in progress. CASE-ZAZU-0033 remains OPEN.
+**Commit trail:** revision metadata `009b7c4`; stale enforcement `d5d4098`; client queue/bootstrap `fd73afe`; conflict rebase `0533b60`; parent/nested tracking `1924588`; parent command revisions `08bef14`; push processor extraction `7a57c4c`; complexity corrections `7d07f06`, `3137b80`; cache v42 `8b85041`; revision concurrency tests `fa74ab7`, fixture updates `65a7a18`, `a4b267f`.
