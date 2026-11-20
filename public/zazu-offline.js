@@ -1106,8 +1106,6 @@
                                 expected_revision: remoteRevision,
                             };
                             delete retry.payload.predecessor_mutation_id;
-                        } else {
-                            retry.created_at = new Date().toISOString();
                         }
                     }
                     if (retry.id !== mutation.id) {
