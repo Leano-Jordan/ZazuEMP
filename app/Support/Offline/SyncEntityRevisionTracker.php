@@ -28,7 +28,7 @@ final class SyncEntityRevisionTracker
 
         $businessId = $record->getAttribute('business_id');
         if (! is_numeric($businessId)) {
-            foreach (['event', 'customer', 'quote', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
+            foreach (['event', 'customer', 'quote', 'quoteVersion', 'invoice', 'purchaseOrder', 'inventoryItem', 'asset'] as $relation) {
                 if (! method_exists($record, $relation)) {
                     continue;
                 }

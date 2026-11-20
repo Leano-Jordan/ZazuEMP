@@ -263,19 +263,7 @@ final class SyncConflictResolutionService
             return $conflict->remote_payload ?? [];
         }
 
-        $record = $identity->record;
-        $payload = [
-            'revision' => (int) $identity->revision,
-            'record' => $record?->toArray() ?? [],
-        ];
-
-        if ($record instanceof \App\Models\Customer) {
-            $payload['record']['contacts'] = $record->contacts()->get()->toArray();
-        } elseif ($record instanceof \App\Models\Event) {
-            $payload['record']['requirements'] = $record->requirements()->get()->toArray();
-        }
-
-        return $payload;
+        return app(SyncEntitySnapshotBuilder::class)->build($identity);
     }
 
     public function payload(SyncConflict $conflict): array

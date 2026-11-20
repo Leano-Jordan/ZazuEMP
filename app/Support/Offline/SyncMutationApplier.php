@@ -128,17 +128,7 @@ class SyncMutationApplier
         if (! is_numeric($expectedRevision)
             || (int) $expectedRevision < 1
             || (int) $expectedRevision !== (int) $identity->revision) {
-            $record = $identity->record;
-            $remote = [
-                'revision' => (int) $identity->revision,
-                'record' => $record?->toArray() ?? [],
-            ];
-
-            if ($record instanceof Customer) {
-                $remote['record']['contacts'] = $record->contacts()->get()->toArray();
-            } elseif ($record instanceof Event) {
-                $remote['record']['requirements'] = $record->requirements()->get()->toArray();
-            }
+            $remote = app(SyncEntitySnapshotBuilder::class)->build($identity);
 
             throw new StaleSyncRevisionException(
                 'This record changed on another device. Review the latest server version before keeping your local edit.',

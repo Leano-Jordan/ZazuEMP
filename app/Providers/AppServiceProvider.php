@@ -76,7 +76,7 @@ class AppServiceProvider extends ServiceProvider
             CustomerContact::class => ['customer', 'customer'],
             EventRequirement::class => ['event', 'job'],
             QuoteVersion::class => ['quote', 'quote'],
-            QuoteItem::class => ['quote', 'quote'],
+            QuoteItem::class => ['quoteVersion', 'quote'],
             InvoiceItem::class => ['invoice', 'invoice'],
             Payment::class => ['invoice', 'invoice'],
             PurchaseOrderItem::class => ['purchaseOrder', 'purchase_order'],
