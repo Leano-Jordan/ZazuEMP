@@ -931,6 +931,122 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(persisted.state.local_dirty).toBe(false);
     });
 
+    test('offline purchase receipts preserve partial quantities and match catalogue stock safely', async ({ page }, testInfo) => {
+        test.setTimeout(45_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Purchase receipt reconciliation runs once in Chromium.');
+
+        await login(page);
+        await page.goto('/purchasing', { waitUntil: 'domcontentloaded' });
+
+        const orderLink = page.locator('a.zazu-list-item').filter({ hasText: 'PO-ZAZU-DEMO-002' }).first();
+        await expect(orderLink).toBeVisible();
+
+        const orderId = await orderLink.getAttribute('href').then(value => Number(value?.split('/').pop()));
+        expect(orderId).toBeGreaterThan(0);
+        await expect.poll(() => page.evaluate(async id => {
+            await window.ZazuOffline.ready;
+            return window.ZazuOffline.getState().purchase_orders.find(order => Number(order.server_id ?? order.id) === id)?.status ?? null;
+        }, orderId)).toBe('ordered');
+
+        await orderLink.click();
+        const receiptForm = page.locator('form[data-zazu-offline-entity="purchase_receipt"]');
+        await expect(receiptForm).toBeVisible();
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        const line = await page.evaluate(async id => {
+            const order = window.ZazuOffline.getState().purchase_orders.find(item => Number(item.server_id ?? item.id) === id);
+            const item = order?.items?.[0];
+            return item ? {
+                localId: item.local_id,
+                serverId: Number(item.server_id ?? item.id),
+                description: item.description,
+                capabilityId: item.capability_id,
+                ordered: item.quantity,
+                received: item.received_quantity,
+            } : null;
+        }, orderId);
+        expect(businessId).toBeGreaterThan(0);
+        expect(line?.localId).toBeTruthy();
+        expect(line?.serverId).toBeGreaterThan(0);
+        expect(Number(line?.capabilityId)).toBeGreaterThan(0);
+        expect(line?.ordered).toBe('1.00');
+        expect(line?.received).toBe('0.00');
+
+        await page.evaluate(async ({ description, capabilityId }) => {
+            const state = window.ZazuOffline.getState();
+            state.inventory_items = [
+                {
+                    local_id: 'wrong-catalogue-stock-item',
+                    id: 99101,
+                    server_id: 99101,
+                    name: description,
+                    capability_id: Number(capabilityId) + 999,
+                    on_hand: '10.00',
+                    movements: [],
+                },
+                {
+                    local_id: 'correct-catalogue-stock-item',
+                    id: 99102,
+                    server_id: 99102,
+                    name: description,
+                    capability_id: Number(capabilityId),
+                    on_hand: '2.10',
+                    movements: [],
+                },
+                ...(state.inventory_items || []),
+            ];
+            await window.ZazuOffline.persist();
+        }, { description: line.description, capabilityId: line.capabilityId });
+
+        await page.context().setOffline(true);
+        const quantityInput = receiptForm.locator(`input[name="received_quantity[${line.serverId}]"]`);
+        await quantityInput.fill('0.10');
+        await receiptForm.getByRole('button', { name: 'Record receipt' }).click();
+        await expect(receiptForm.getByRole('status')).toContainText('Saved on this device');
+
+        await quantityInput.fill('0.20');
+        await receiptForm.getByRole('button', { name: 'Record receipt' }).click();
+        await expect(receiptForm.getByRole('status')).toContainText('Saved on this device');
+
+        let overReceiptMessage = null;
+        page.once('dialog', async dialog => {
+            overReceiptMessage = dialog.message();
+            await dialog.dismiss();
+        });
+        await quantityInput.fill('0.80');
+        await receiptForm.getByRole('button', { name: 'Record receipt' }).click();
+        await expect.poll(() => overReceiptMessage).toContain('exceeds the remaining ordered quantity');
+
+        const local = await page.evaluate(async orderServerId => {
+            const state = window.ZazuOffline.getState();
+            const order = state.purchase_orders.find(item => Number(item.server_id ?? item.id) === orderServerId);
+            const wrongItem = state.inventory_items.find(item => item.local_id === 'wrong-catalogue-stock-item');
+            const correctItem = state.inventory_items.find(item => item.local_id === 'correct-catalogue-stock-item');
+            return {
+                orderStatus: order?.status,
+                orderPending: order?.pending_sync,
+                receivedQuantity: order?.items?.[0]?.received_quantity,
+                linePending: order?.items?.[0]?.pending_sync,
+                wrongOnHand: wrongItem?.on_hand,
+                correctOnHand: correctItem?.on_hand,
+                correctMovementCount: correctItem?.movements?.length || 0,
+                correctMovementsPending: (correctItem?.movements || []).every(item => item.pending_sync === true),
+                receiptMutations: (await window.ZazuOffline.pending()).filter(item => item.entity_type === 'purchase_receipt').length,
+            };
+        }, orderId);
+
+        expect(local).toEqual({
+            orderStatus: 'ordered',
+            orderPending: true,
+            receivedQuantity: '0.30',
+            linePending: true,
+            wrongOnHand: '10.00',
+            correctOnHand: 2.4,
+            correctMovementCount: 2,
+            correctMovementsPending: true,
+            receiptMutations: 2,
+        });
+    });
+
     test('a disconnected stock receipt updates the local balance and movement history', async ({ page }, testInfo) => {
         test.setTimeout(45_000);
         test.skip(testInfo.project.name !== 'chromium', 'Inventory movement UI acceptance runs once in Chromium.');
