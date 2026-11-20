@@ -11,6 +11,8 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await page.getByLabel('Username or email').fill(email);
     await page.locator('#auth_password').fill(password);
     await page.locator('[data-auth-submit]').click();
+    await page.waitForURL(url => url.pathname !== '/' && url.pathname !== '/login');
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
