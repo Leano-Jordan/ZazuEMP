@@ -24,6 +24,13 @@ async function waitForOfflineRuntime(page) {
     ).toBe(true);
 }
 
+async function waitForOfflinePagesPrimed(page) {
+    await expect.poll(
+        () => page.locator('html').getAttribute('data-zazu-offline-pages-primed'),
+        { message: 'the authenticated page cache must be primed before changing business context' },
+    ).toBe('true');
+}
+
 async function openPublicNavigation(page) {
     const toggle = page.getByRole('button', { name: 'Open navigation' });
     if (await toggle.isVisible()) await toggle.click();
@@ -199,9 +206,9 @@ test('workspace switching submits the selected business and preserves each busin
 
     await login(page);
     await waitForOfflineRuntime(page);
+    await waitForOfflinePagesPrimed(page);
 
     const firstBusinessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
-    const firstBusinessName = await page.locator('title').textContent();
     expect(firstBusinessId).toBeGreaterThan(0);
 
     const secondBusinessId = Number(await page.locator('[data-business-switch] option').filter({
@@ -236,6 +243,7 @@ test('workspace switching submits the selected business and preserves each busin
             { message: 'the workspace selector must submit the selected business context' },
         ).toBe(String(businessId));
         await waitForOfflineRuntime(page);
+        await waitForOfflinePagesPrimed(page);
     };
 
     await switchWorkspace(secondBusinessId);
@@ -259,7 +267,7 @@ test('workspace switching submits the selected business and preserves each busin
 
     await switchWorkspace(firstBusinessId);
 
-    const restoredFirstWorkspace = await page.evaluate(async mutationId => ({
+    const restoredFirstWorkspace = await page.evaluate(async () => ({
         businessId: Number(document.body.dataset.zazuBusinessId),
         pending: (await window.ZazuOffline.pending()).map(item => item.id),
         paired: window.ZazuOffline.isPaired(),
