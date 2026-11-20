@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v42';
+const CACHE_NAME = 'zazu-static-v43';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;

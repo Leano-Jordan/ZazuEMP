@@ -332,7 +332,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString("slice(0, 6)", $client);
         $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString("zazu-static-v42", $worker);
+        $this->assertStringContainsString("zazu-static-v43", $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
