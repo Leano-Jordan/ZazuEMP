@@ -153,6 +153,10 @@ class SyncRevisionConcurrencyTest extends TestCase
         $device = SyncDevice::create([
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
+            'device_name' => 'Revision test phone',
+            'device_type' => 'phone',
+            'metadata' => ['sync_token_hash' => hash('sha256', 'revision-test-token')],
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
         ]);
         $identity = app(SyncEntityIdentityRegistry::class)->identify($customer, 'customer');
 
