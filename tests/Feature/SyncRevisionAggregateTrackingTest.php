@@ -178,6 +178,29 @@ class SyncRevisionAggregateTrackingTest extends TestCase
 
     private function commandRevisionFixture(Business $business, Customer $customer): array
     {
+        $commercial = $this->commandRevisionCommercialRecords($business, $customer);
+        $stock = $this->commandRevisionStockRecords(
+            $business,
+            $commercial['order'],
+            $commercial['line'],
+            $commercial['unreceived_line'],
+        );
+        $registry = app(SyncEntityIdentityRegistry::class);
+
+        return [
+            'job' => $registry->identify($commercial['event'], 'job'),
+            'quote' => $registry->identify($commercial['quote'], 'quote'),
+            'invoice' => $registry->identify($commercial['invoice'], 'invoice'),
+            'order' => $registry->identify($commercial['order'], 'purchase_order'),
+            'inventory' => $stock['inventory'],
+            'unreceived_inventory' => $stock['unreceived_inventory'],
+            'asset' => $stock['asset'],
+            'line' => $commercial['line'],
+        ];
+    }
+
+    private function commandRevisionCommercialRecords(Business $business, Customer $customer): array
+    {
         $event = Event::create([
             'business_id' => $business->id,
             'customer_id' => $customer->id,
@@ -214,31 +237,47 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'currency' => 'ZAR',
             'total_amount' => '50.00',
         ]);
-        $line = PurchaseOrderItem::create([
+
+        return [
+            'event' => $event,
+            'quote' => $quote,
+            'invoice' => $invoice,
+            'order' => $order,
+            'line' => $this->commandPurchaseOrderLine($business, $order, 'Revision command stock', '5.00', '10.00'),
+            'unreceived_line' => $this->commandPurchaseOrderLine($business, $order, 'Unreceived command stock', '3.00', '5.00'),
+        ];
+    }
+
+    private function commandPurchaseOrderLine(
+        Business $business,
+        PurchaseOrder $order,
+        string $description,
+        string $quantity,
+        string $unitPrice,
+    ): PurchaseOrderItem {
+        return PurchaseOrderItem::create([
             'business_id' => $business->id,
             'purchase_order_id' => $order->id,
-            'description' => 'Revision command stock',
-            'quantity' => '5.00',
+            'description' => $description,
+            'quantity' => $quantity,
             'received_quantity' => '0.00',
             'unit' => 'unit',
-            'unit_price' => '10.00',
-            'line_total' => '50.00',
+            'unit_price' => $unitPrice,
+            'line_total' => bcmul($quantity, $unitPrice, 2),
         ]);
+    }
+
+    private function commandRevisionStockRecords(
+        Business $business,
+        PurchaseOrder $order,
+        PurchaseOrderItem $line,
+        PurchaseOrderItem $unreceivedLine,
+    ): array {
         $inventory = InventoryItem::create([
             'business_id' => $business->id,
             'name' => 'Revision command stock',
             'unit' => 'unit',
             'reorder_level' => '1.00',
-        ]);
-        $unreceivedLine = PurchaseOrderItem::create([
-            'business_id' => $business->id,
-            'purchase_order_id' => $order->id,
-            'description' => 'Unreceived command stock',
-            'quantity' => '3.00',
-            'received_quantity' => '0.00',
-            'unit' => 'unit',
-            'unit_price' => '5.00',
-            'line_total' => '15.00',
         ]);
         $unreceivedInventory = InventoryItem::create([
             'business_id' => $business->id,
@@ -259,6 +298,23 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         $inventoryIdentity = $registry->identify($inventory, 'inventory_item');
         $unreceivedInventoryIdentity = $registry->identify($unreceivedInventory, 'inventory_item');
 
+        $this->recordPurchaseMovement($business, $order, $line, $inventory, '10.00');
+        $this->recordPurchaseMovement($business, $order, $unreceivedLine, $unreceivedInventory, '5.00');
+
+        return [
+            'inventory' => $inventoryIdentity,
+            'unreceived_inventory' => $unreceivedInventoryIdentity,
+            'asset' => $registry->identify($asset, 'asset'),
+        ];
+    }
+
+    private function recordPurchaseMovement(
+        Business $business,
+        PurchaseOrder $order,
+        PurchaseOrderItem $line,
+        InventoryItem $inventory,
+        string $unitCost,
+    ): void {
         InventoryMovement::create([
             'business_id' => $business->id,
             'inventory_item_id' => $inventory->id,
@@ -267,32 +323,9 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'idempotency_key' => (string) Str::uuid(),
             'type' => 'receipt',
             'quantity' => '1.00',
-            'unit_cost' => '10.00',
+            'unit_cost' => $unitCost,
             'movement_date' => now()->toDateString(),
         ]);
-
-        InventoryMovement::create([
-            'business_id' => $business->id,
-            'inventory_item_id' => $unreceivedInventory->id,
-            'purchase_order_id' => $order->id,
-            'purchase_order_item_id' => $unreceivedLine->id,
-            'idempotency_key' => (string) Str::uuid(),
-            'type' => 'receipt',
-            'quantity' => '1.00',
-            'unit_cost' => '5.00',
-            'movement_date' => now()->toDateString(),
-        ]);
-
-        return [
-            'job' => $registry->identify($event, 'job'),
-            'quote' => $registry->identify($quote, 'quote'),
-            'invoice' => $registry->identify($invoice, 'invoice'),
-            'order' => $registry->identify($order, 'purchase_order'),
-            'inventory' => $inventoryIdentity,
-            'unreceived_inventory' => $unreceivedInventoryIdentity,
-            'asset' => $registry->identify($asset, 'asset'),
-            'line' => $line,
-        ];
     }
 
     private function applyCommand(SyncDevice $device, string $entityType, array $record): SyncMutation
