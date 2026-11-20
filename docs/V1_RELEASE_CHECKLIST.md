@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Release Checklist
 
-Last verified application-code baseline: 34124eff9622ab78ec5b80d65b5a8a9457464195
+Last verified application-code baseline: ae3d49cae7973c2db708d5ff88c3a3eb51c35b54
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Open database incident — owner installation
@@ -28,7 +28,9 @@ Implementation baseline: `71c8fc5c7aeba392b95e26aee694945b286f2c8e` on `main`.
 
 ## Offline sync reliability — owner-directed active target (2026-11-20)
 
-Offline synchronization is a separate V1 reliability target from phone pairing and from standalone phone-local launch. The Founder reports that sync is not yet up to standard across the supported workflows. Treat the full declared offline workflow matrix as in scope; do not infer that one successful customer/job or attachment journey proves the rest.
+Offline synchronization is a separate V1 reliability target from phone pairing and from standalone phone-local launch.
+
+**Verified narrow correction (2026-11-20):** Offline forms now prevent duplicate submission until the user changes the saved fields; a changed receipt quantity or payment amount can be deliberately submitted as a new local mutation. The precached service-worker static cache is v41. The exact-head browser suite verifies the repeat partial-receipt and paid-invoice validation journeys. This does not close stale-update detection or the broader sync matrix. The Founder reports that sync is not yet up to standard across the supported workflows. Treat the full declared offline workflow matrix as in scope; do not infer that one successful customer/job or attachment journey proves the rest.
 
 - [ ] Map each currently declared offline entity/operation from UI action → IndexedDB state → mutation queue → server handler → identity mapping → acknowledgement/pull/bootstrap → visible reconciled state.
 - [ ] Verify every supported mutation is durable across reload, force-close and restart, and remains visibly pending until the server confirms it.
@@ -42,7 +44,7 @@ Offline synchronization is a separate V1 reliability target from phone pairing a
 - [ ] Run targeted server/client regression coverage and the full exact-head Laravel + browser acceptance suites; then verify representative sync journeys on the actual PC and phone.
 - [ ] Record every unsupported offline operation as online-only or otherwise explicitly limited. Do not imply full app-wide offline parity.
 
-**Exact-head evidence — `34124eff9622ab78ec5b80d65b5a8a9457464195` (2026-11-20):** Laravel PASS — 607 passed / 1 skipped / 4,155 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery PASS; offline browser PASS — 48 desktop, 6 mobile-viewport and 1 phone-local Work/attachment journey; Zazu Quality, Director Health and CodeQL/Push-on-main PASS. SonarCloud skipped. PHPMD remains FAIL for complexity/length in two workspace-cleanup commands. A transient browser navigation failure recovered on retry; overall browser workflow passed.
+**Exact-head evidence — `ae3d49cae7973c2db708d5ff88c3a3eb51c35b54` (2026-11-20):** Laravel PASS — 607 passed / 1 skipped / 4,158 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery PASS; offline browser PASS — 51 desktop, 6 mobile-viewport and 1 phone-local Work/attachment journey; Zazu Quality and Push-on-main PASS. SonarCloud skipped. PHPMD, Psalm, Windows V1 package and populated upgrade/rollback PASS on application-equivalent parent `30e70e9` (the later head changes only an E2E assertion).
 
 **Sync source corrections verified in this batch:** preserved failed/conflicted local records from bootstrap replacement; fixed canonical identity reconciliation for event costs, nested payments, inventory movements and asset allocations; applied disconnected stock receipts to local inventory balance/history; aligned final offline payment with paid invoice status; and scheduled retryable attachment failures through existing backoff while preserving idempotency. Targeted E2E coverage is included.
 

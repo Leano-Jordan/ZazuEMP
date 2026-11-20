@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Readiness Register
 
-Last verified application-code baseline: 34124eff9622ab78ec5b80d65b5a8a9457464195
+Last verified application-code baseline: ae3d49cae7973c2db708d5ff88c3a3eb51c35b54
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
@@ -15,7 +15,7 @@ The Founder has explicitly added end-to-end offline sync quality across the supp
 
 **Additional integrity gap confirmed by source inspection (2026-11-20):** ordinary offline update mutations do not currently carry a base record version/precondition. Several handlers resolve the latest server record through `existing()` and then call `update()` without detecting that another trusted device changed it after the local snapshot. The conflict pipeline handles validation/domain rejections and changed-payload mutation IDs, but this is not equivalent to stale-record conflict detection. Treat concurrent same-record edits as OPEN until version-aware conflict behaviour is designed and tested, including safe rebasing of multiple sequential local edits from the same device. Do not patch this with an unreviewed last-write-wins rule.
 
-**Exact-head evidence — `34124eff9622ab78ec5b80d65b5a8a9457464195` (2026-11-20):** Laravel PASS — 607 passed / 1 skipped / 4,155 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery PASS; offline browser PASS — 48 desktop tests, 6 mobile-viewport tests and 1 phone-local Work/attachment journey; Zazu Quality, Director Health and CodeQL/Push-on-main PASS. SonarCloud skipped. PHPMD remains FAIL for complexity/length in the two workspace-cleanup commands. Playwright recorded a transient cross-account navigation failure and recovered on retry; the overall browser workflow passed.
+**Exact-head evidence — `ae3d49cae7973c2db708d5ff88c3a3eb51c35b54` (2026-11-20):** Laravel PASS — 607 passed / 1 skipped / 4,158 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery PASS; offline browser PASS — 51 desktop Chromium tests, 6 mobile-viewport tests and 1 phone-local Work/attachment journey; Zazu Quality and Push-on-main PASS. SonarCloud skipped. PHPMD, Psalm, Windows V1 package and populated upgrade/rollback PASS on application-equivalent parent `30e70e9` (later `ae3d49c` changes only an E2E assertion).
 
 **Verified sync changes:** failed mutations/open conflicts now block destructive bootstrap replacement; canonical IDs reconcile for `event_cost`, nested `payment`, `inventory_movement` and `asset_allocation`; disconnected stock receipts update local inventory balance/history; a final offline invoice payment marks the local invoice paid; retryable attachment failures are included in the existing backoff scheduler while preserving the idempotency key. Targeted browser regressions cover these paths.
 
