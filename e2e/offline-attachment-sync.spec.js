@@ -696,12 +696,16 @@ test('operator creates an offline Work job, attaches a file from its directory r
         });
     });
 
-    await page.context().setOffline(false);
+    // The local Work record has no server identity yet. Verify that an
+    // attachment cannot upload while the browser is still disconnected.
     const unresolvedSync = await page.evaluate(() => window.ZazuOffline.syncAttachments());
     expect(unresolvedSync.uploaded).toBe(0);
     expect(unresolvedSync.pending).toBe(1);
     expect(uploaded.count).toBe(0);
 
+    // Reconnect only after the pending/local-only state is proven. The normal
+    // sync cycle must push the Work record, reconcile its server ID, then upload.
+    await page.context().setOffline(false);
     await page.evaluate(() => window.ZazuOffline.sync());
     await expect.poll(() => uploaded.count).toBe(1);
     expect(pushed.customer?.server_id).toBe(9900);
