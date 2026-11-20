@@ -1375,7 +1375,7 @@
             expense: 'expenses',
             inventory_item: 'inventory_items',
             asset: 'assets',
-            cost: 'costs',
+            event_cost: 'costs',
         };
 
         for (const mutation of mutations) {
