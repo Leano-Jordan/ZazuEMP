@@ -460,6 +460,7 @@
 
     async function queueAttachments(eventId, files, description = '', localEventId = null) {
         await ready;
+        const queueSessionGeneration = sessionGeneration;
         if (sessionCleared) throw new Error('The local device session has ended. Reload Zazu before saving attachments.');
         if (ACTIVE_BUSINESS_ID < 1) throw new Error('Choose a business workspace before saving attachments.');
 
@@ -507,16 +508,34 @@
 
         const db = await openAttachmentDb();
         try {
+            if (sessionCleared || sessionGeneration !== queueSessionGeneration) {
+                throw new Error('The device session changed before these attachments could be saved. Reload Zazu and try again.');
+            }
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                if (sessionCleared || sessionGeneration !== queueSessionGeneration) {
+                    tx.abort();
+                    reject(new Error('The device session changed before these attachments could be saved. Reload Zazu and try again.'));
+                    return;
+                }
                 const store = tx.objectStore(ATTACHMENT_STORE);
                 for (const record of records) store.put(record);
-                tx.oncomplete = resolve;
+                tx.oncomplete = () => {
+                    if (sessionCleared || sessionGeneration !== queueSessionGeneration) {
+                        reject(new Error('The device session changed while these attachments were being saved. Reload Zazu before continuing.'));
+                        return;
+                    }
+                    resolve();
+                };
                 tx.onerror = () => reject(tx.error || new Error('The complete attachment batch could not be saved.'));
                 tx.onabort = () => reject(tx.error || new Error('The attachment batch save was aborted.'));
             });
         } finally {
             db.close();
+        }
+
+        if (sessionCleared || sessionGeneration !== queueSessionGeneration) {
+            throw new Error('The device session changed while these attachments were being saved. Reload Zazu before continuing.');
         }
 
         window.dispatchEvent(new CustomEvent('zazu:offline-attachments-updated', {
