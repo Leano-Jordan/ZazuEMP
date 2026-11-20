@@ -80,6 +80,7 @@
         .sentinel-account{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(13rem,1fr) auto;gap:1.1rem;align-items:center;padding:1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
         .sentinel-account-meta{display:flex;gap:.45rem;flex-wrap:wrap;font-size:.78rem;color:var(--zazu-muted,#687386)}
         .sentinel-account-users{font-size:.82rem;color:var(--zazu-muted,#687386);line-height:1.55;overflow-wrap:anywhere}
+        .sentinel-business-email{font-size:.82rem;overflow-wrap:anywhere}
         .sentinel-account-users strong{color:var(--zazu-text,#263445)}
         .sentinel-account-created{font-size:.76rem;color:var(--zazu-muted,#687386);margin-top:.45rem}
         .sentinel-account .sentinel-button{white-space:nowrap;text-align:center;min-width:9.5rem}
@@ -149,7 +150,7 @@
                         <div>
                             <strong>{{ $platformBusiness->name }}</strong>
                             @if($platformBusiness->email)
-                                <div class="sentinel-muted" style="font-size:.82rem;overflow-wrap:anywhere">{{ $platformBusiness->email }}</div>
+                                <div class="sentinel-muted sentinel-business-email">{{ $platformBusiness->email }}</div>
                             @endif
                             <div class="sentinel-account-created">Created {{ $platformBusiness->created_at?->format('d M Y · H:i') ?? 'Date unavailable' }}</div>
                             <div class="sentinel-account-meta">
