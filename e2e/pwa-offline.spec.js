@@ -1335,9 +1335,20 @@ test.describe('Zazu installed PWA offline shell', () => {
                 status: 'issued',
                 currency: 'ZAR',
                 total: '250.00',
-                paid_amount: '0.00',
-                balance: '250.00',
-                payments: [],
+                paid_amount: '50.00',
+                balance: '200.00',
+                deposit_required: '75.00',
+                deposit_paid_amount: '0.00',
+                deposit_balance: '75.00',
+                payments: [{
+                    local_id: 'existing-invoice-payment',
+                    id: 98499,
+                    server_id: 98499,
+                    type: 'payment',
+                    amount: '50.00',
+                    method: 'cash',
+                    currency: 'ZAR',
+                }],
             }];
             state.local_dirty = false;
             await window.ZazuOffline.persist({ allowSessionChange: true });
@@ -1345,15 +1356,33 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const invoiceSelect = page.locator('select[name="invoice_id"]');
         await invoiceSelect.evaluate(select => {
-            select.add(new Option('INV-OFFLINE-PAY-001 · ZAR 250.00 outstanding', '98401'));
+            select.add(new Option('INV-OFFLINE-PAY-001 · ZAR 200.00 outstanding', '98401'));
             select.value = '98401';
         });
 
-        await page.locator('input[name="amount"]').fill('250.00');
+        await page.locator('select[name="type"]').selectOption('payment');
         await page.locator('select[name="method"]').selectOption('bank_transfer');
         await page.locator('input[name="paid_at"]').fill('2026-11-20');
         await page.context().setOffline(true);
         const paymentForm = page.locator('form[data-zazu-offline-entity="payment"]');
+
+        let overpaymentMessage = null;
+        page.once('dialog', async dialog => {
+            overpaymentMessage = dialog.message();
+            await dialog.dismiss();
+        });
+        await page.locator('input[name="amount"]').fill('200.01');
+        await paymentForm.getByRole('button', { name: 'Record payment' }).click();
+        await expect.poll(() => overpaymentMessage).toContain('Payment cannot exceed the outstanding invoice balance.');
+        expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
+
+        const unchanged = await page.evaluate(() => {
+            const invoice = window.ZazuOffline.getState().invoices.find(item => item.local_id === 'offline-payment-invoice-identity');
+            return { status: invoice?.status, paid: invoice?.paid_amount, balance: invoice?.balance, payments: invoice?.payments?.length };
+        });
+        expect(unchanged).toEqual({ status: 'issued', paid: '50.00', balance: '200.00', payments: 1 });
+
+        await page.locator('input[name="amount"]').fill('200.00');
         await paymentForm.getByRole('button', { name: 'Record payment' }).click();
         await expect(paymentForm.getByRole('status')).toContainText('Saved on this device');
 
@@ -1372,10 +1401,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(local.invoice.status).toBe('paid');
         expect(local.invoice.paidAmount).toBe('250.00');
         expect(local.invoice.balance).toBe('0.00');
-        expect(local.invoice.payments).toHaveLength(1);
-        expect(local.invoice.payments[0]).toMatchObject({
+        expect(local.invoice.payments).toHaveLength(2);
+        expect(local.invoice.payments[1]).toMatchObject({
             invoice_id: 98401,
-            amount: '250.00',
+            amount: '200.00',
             method: 'bank_transfer',
             pending_sync: true,
             id: null,
@@ -1383,6 +1412,16 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
         expect(local.pending).toHaveLength(1);
         expect(local.pending[0].entity_type).toBe('payment');
+
+        let paidInvoiceMessage = null;
+        page.once('dialog', async dialog => {
+            paidInvoiceMessage = dialog.message();
+            await dialog.dismiss();
+        });
+        await page.locator('input[name="amount"]').fill('0.01');
+        await paymentForm.getByRole('button', { name: 'Record payment' }).click();
+        await expect.poll(() => paidInvoiceMessage).toContain('Only issued invoices can accept payments.');
+        expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(1);
 
         let pushedPaymentLocalId = null;
         await page.route('**/api/sync/push', async route => {
@@ -1426,15 +1465,15 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.context().setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
         await expect.poll(() => pushedPaymentLocalId).toBe(local.invoice.payments[0].local_id);
-        await expect.poll(() => page.evaluate(() => {
+        await expect.poll(() => page.evaluate(localId => {
             const invoice = window.ZazuOffline.getState().invoices.find(item => item.local_id === 'offline-payment-invoice-identity');
-            const payment = invoice?.payments?.[0];
+            const payment = invoice?.payments?.find(item => item.local_id === localId);
             return {
                 id: payment?.id ?? null,
                 serverId: payment?.server_id ?? null,
                 pendingSync: payment?.pending_sync ?? null,
             };
-        })).toEqual({ id: 98501, serverId: 98501, pendingSync: false });
+        }, pushedPaymentLocalId)).toEqual({ id: 98501, serverId: 98501, pendingSync: false });
 
         expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
     });
