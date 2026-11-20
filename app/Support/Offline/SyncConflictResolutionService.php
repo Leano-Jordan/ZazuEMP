@@ -58,6 +58,7 @@ final class SyncConflictResolutionService
 
         if ($lockedConflict->conflict_type === 'mutation_identity_mismatch' && $validated['action'] === 'retry') {
             abort_unless($mutation, 404);
+            $this->assertCausalPredecessorApplied($mutation, $device);
             $newMutationId = (string) Str::uuid();
             $mutation->update([
                 'status' => 'discarded',
@@ -83,6 +84,8 @@ final class SyncConflictResolutionService
 
             if ($validated['action'] === 'retry') {
                 abort_unless($mutation, 404);
+                $this->assertCausalPredecessorApplied($mutation, $device);
+                abort_unless((int) ($remotePayload['revision'] ?? 0) > 0, 409, 'The latest server revision is unavailable. Refresh the workspace before rebasing.');
                 $newMutationId = (string) Str::uuid();
                 $mutation->update([
                     'status' => 'discarded',
@@ -246,6 +249,50 @@ final class SyncConflictResolutionService
         return $action === 'retry' ? 'new_mutation_required' : 'discarded';
     }
 
+
+
+    private function assertCausalPredecessorApplied(SyncMutation $mutation, SyncDevice $device): void
+    {
+        $predecessorId = $mutation->payload['predecessor_mutation_id'] ?? null;
+        if (! is_string($predecessorId) || ! Str::isUuid($predecessorId)) {
+            return;
+        }
+
+        $visited = [];
+        for ($depth = 0; $depth < 8; $depth++) {
+            if (isset($visited[$predecessorId])) {
+                abort(409, 'The earlier offline change has a broken causal chain.');
+            }
+            $visited[$predecessorId] = true;
+
+            $predecessor = SyncMutation::query()
+                ->where('business_id', $device->business_id)
+                ->where('sync_device_id', $device->id)
+                ->where('mutation_id', $predecessorId)
+                ->lockForUpdate()
+                ->first();
+
+            abort_unless(
+                $predecessor
+                    && $predecessor->entity_type === $mutation->entity_type
+                    && $predecessor->entity_id === $mutation->entity_id,
+                409,
+                'Resolve the earlier offline change before rebasing this edit.'
+            );
+
+            if ($predecessor->status === 'applied' && is_numeric($predecessor->result_revision)) {
+                return;
+            }
+
+            if ($predecessor->status !== 'discarded' || ! is_string($predecessor->superseded_by_mutation_id)) {
+                abort(409, 'Resolve the earlier offline change before rebasing this edit.');
+            }
+
+            $predecessorId = $predecessor->superseded_by_mutation_id;
+        }
+
+        abort(409, 'The earlier offline change has too many rebase links.');
+    }
 
     /**
      * @return array<string, mixed>
