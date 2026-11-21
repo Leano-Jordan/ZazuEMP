@@ -2575,26 +2575,29 @@ function setupZazuOfflineDirectoryViews() {
     };
 
     let workspaceVisibilityRequest = 0;
-    const refreshOfflineWorkspaceVisibility = async (state) => {
+    const refreshOfflineWorkspaceVisibility = async (state, knownOriginAvailability = null) => {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
-        if (!workspace) return;
-
         const hasPendingRecords = ['customers', 'jobs', 'quotes'].some(collection =>
             (state?.[collection] || []).some(record =>
                 record?.local_id && !(record.server_id ?? record.id)
             )
         );
         const request = ++workspaceVisibilityRequest;
-        let originAvailable = navigator.onLine;
+        let originAvailable = knownOriginAvailability ?? navigator.onLine;
 
         // navigator.onLine only reports the network interface. The server may
         // be unavailable while Wi-Fi remains connected, so check Zazu itself
         // before hiding the device-local workspace.
-        if (originAvailable) originAvailable = await canReachZazuOrigin();
-        if (request !== workspaceVisibilityRequest || !workspace.isConnected) return;
+        if (originAvailable && knownOriginAvailability === null) {
+            originAvailable = await canReachZazuOrigin();
+        }
+        if (request !== workspaceVisibilityRequest) return originAvailable;
+        if (workspace?.isConnected) {
+            workspace.hidden = !hasPendingRecords && originAvailable;
+            applyOfflineRouteView();
+        }
 
-        workspace.hidden = !hasPendingRecords && originAvailable;
-        applyOfflineRouteView();
+        return originAvailable;
     };
 
     const offlineRouteViews = [
@@ -2624,6 +2627,57 @@ function setupZazuOfflineDirectoryViews() {
         workspace.dataset.zazuOfflineActiveView = activeView || 'overview';
     };
 
+    const setupOriginAvailabilityMonitor = () => {
+        const main = document.querySelector('main#main-content');
+        if (!main || main.querySelector('[data-zazu-origin-offline-notice]')) return;
+
+        const notice = document.createElement('aside');
+        notice.className = 'zazu-origin-offline-notice';
+        notice.dataset.zazuOriginOfflineNotice = '1';
+        notice.hidden = true;
+        notice.setAttribute('role', 'status');
+        notice.setAttribute('aria-live', 'polite');
+
+        const message = document.createElement('div');
+        message.append(
+            text('strong', '', 'Zazu server is unavailable'),
+            text('p', '', 'Your last saved records remain on this device. Only supported offline screens can be used until the server reconnects.')
+        );
+        const action = document.createElement('a');
+        action.className = 'zazu-origin-offline-action';
+        action.href = '/dashboard';
+        action.textContent = 'Open offline workspace';
+        notice.append(message, action);
+
+        const topbar = main.querySelector(':scope > .zazu-topbar');
+        if (topbar) topbar.insertAdjacentElement('afterend', notice);
+        else main.prepend(notice);
+
+        let checking = false;
+        const refreshOriginAvailability = async () => {
+            if (checking) return;
+            checking = true;
+            try {
+                const originAvailable = navigator.onLine && await canReachZazuOrigin();
+                notice.hidden = originAvailable;
+                await refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState(), originAvailable);
+            } finally {
+                checking = false;
+            }
+        };
+
+        window.addEventListener('online', refreshOriginAvailability);
+        window.addEventListener('offline', refreshOriginAvailability);
+        window.addEventListener('focus', refreshOriginAvailability);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refreshOriginAvailability();
+        });
+        const monitor = window.setInterval(refreshOriginAvailability, 10000);
+        window.addEventListener('pagehide', () => window.clearInterval(monitor), { once: true });
+        refreshOriginAvailability();
+    };
+
+    setupOriginAvailabilityMonitor();
     window.ZazuOffline.ready.then(() => { applyOfflineRouteView(); render(); }).catch(() => {});
     window.addEventListener('zazu:offline-ready', render);
     window.addEventListener('popstate', applyOfflineRouteView);
