@@ -637,3 +637,20 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** The Laravel stale-snapshot tests for revocation and bearer-token replacement passed within 632 passed / 1 skipped / 4,388 assertions. PostgreSQL recovery, desktop/mobile offline-browser acceptance, PHPMD, Zazu Quality, Director Health, Push-on-main, secret scan and Composer audit also passed on the same source head. SonarCloud was skipped.
 
 **Loop prevention:** Bootstrap is an authenticated data-read endpoint and must have the same durable device-state revalidation as pull/acknowledge. Never rely solely on a middleware model snapshot for an operation that returns business-scoped offline data.
+
+
+### CASE-ZAZU-0036
+
+**Status:** CLOSED — test contract corrected on main; exact-head browser verification pending.  
+**First observed:** 2026-11-21.  
+**Target:** `e2e/pwa-offline.spec.js` — disconnected quote acceptance regression.
+
+**Failure fingerprint:** The acceptance action queues a local mutation and dispatches `zazu:offline-state-updated`. The offline workspace listener then rebuilds the quote register, replacing the row and its detail panel. The test asserted a transient status node inside the old detail panel after that intentional render, so the locator no longer existed even though the queue operation and state transition had completed.
+
+**Classification:** F2 — test assertion targeted ephemeral DOM rather than the durable post-render workflow contract.
+
+**Correction:** Assert that the rebuilt local quote row shows `accepted`, then verify exactly one pending mutation and inspect the persisted quote, version, linked Work status and `quote_acceptance` queue payload. No application code or product behaviour was changed.
+
+**Verification:** The corrected test and regression family must pass on the exact main commit before this case is fully accepted. The 59 other tests passed in the reported run; that does not substitute for the corrected test's execution.
+
+**Loop prevention:** For offline actions that dispatch a state-updated event, assert durable state after the resulting render. Only assert transient status content when the UI explicitly preserves that node across render.
