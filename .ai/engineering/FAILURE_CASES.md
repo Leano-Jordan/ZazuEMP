@@ -15,6 +15,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 | CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | OPEN | No authoritative record revision is carried or checked; a second device can overwrite an intervening write | Revision contract + two-device and same-device causal-chain tests |
 | CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | OPEN — implementation committed; exact-head CI pending | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
+| CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | OPEN — lock/revalidation correction committed; exact-head CI pending | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -625,3 +626,27 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** Exact-head Laravel, PostgreSQL, offline-browser, PHPMD and quality evidence is pending for the final implementation head. Source inspection alone is not closure evidence.
 
 **Loop prevention:** Never acknowledge a delivery batch solely because a generic bootstrap returned 200. The snapshot must demonstrably include all primary and related aggregates changed by the exact receiver delivery prefix. Do not remove collection bounds or broaden a device's data scope as a workaround.
+
+### CASE-ZAZU-0035
+
+**Status:** OPEN — correction and regression tests committed on `main`; exact-head CI verification pending.  
+**Engineering diagnostic code:** ENG-AUTH-001.  
+**First observed:** 2026-11-21.  
+**Target:** `SyncController::bootstrap` → `bootstrapPayload` → `SyncBootstrapPayloadBuilder`.
+
+**Failure fingerprint:** Authentication middleware attaches a SyncDevice model to the request. If the device is revoked or its bearer-token hash is replaced after that lookup but before the bootstrap snapshot is generated, the old controller path could still return business data using the stale model. The old last-seen update also occurred before the builder acquired the business lock, unlike the canonical business → device → mutation lock order.
+
+**Classification:** F1/F7 — authorization race and lock-order contract gap.
+
+**Correction on main:**
+- Bootstrap now starts a database transaction and acquires the business lock first.
+- It re-reads the exact device row under the active scope and row lock.
+- It compares the persisted token hash to the middleware-authenticated snapshot; a revoked device or replaced token receives HTTP 401.
+- Last-seen activity is updated while the device row is locked.
+- The authoritative bootstrap snapshot is built inside that same business/device lock boundary before the transaction releases.
+
+**Regression coverage:** two stale-snapshot cases: revoke the device after authentication lookup, and replace the token hash after authentication lookup. Both must return 401 before a bootstrap payload is returned. Existing pull and acknowledgement revalidation regressions remain unchanged.
+
+**Verification:** Exact-head Laravel, PostgreSQL, offline-browser, PHPMD and quality results are pending for the source head containing this correction.
+
+**Loop prevention:** Bootstrap is an authenticated data-read endpoint and must have the same durable device-state revalidation as pull/acknowledge. Never rely solely on a middleware model snapshot for an operation that returns business-scoped offline data.
