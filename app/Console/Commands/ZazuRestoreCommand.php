@@ -119,6 +119,17 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
+            $declaredContents = $manifest['contents'] ?? null;
+            if ($formatVersion >= 2 && (
+                !is_array($declaredContents)
+                || !in_array('database', $declaredContents, true)
+                || !in_array('private_storage', $declaredContents, true)
+            )) {
+                $zip->close();
+                $this->error('The backup contents manifest is incomplete.');
+                return self::FAILURE;
+            }
+
             $driver = config('database.default');
             if (($manifest['database_driver'] ?? null) !== $driver) {
                 $zip->close();
@@ -128,7 +139,7 @@ class ZazuRestoreCommand extends Command
 
             $databaseEntry = $driver === 'sqlite' ? 'database.sqlite' : 'database.sql';
             $privateEntryPrefix = 'storage/private/';
-            $hasPrivateStorage = false;
+            $hasPrivateStorage = is_array($declaredContents) && in_array('private_storage', $declaredContents, true);
             $seen = [];
             $archiveFiles = [];
             $uncompressedBytes = 0;
@@ -288,6 +299,14 @@ class ZazuRestoreCommand extends Command
 
             $storedPrivate = $work.'/storage/private';
             $privateTarget = storage_path('app/private');
+            if ($hasPrivateStorage && !is_dir($storedPrivate)) {
+                // Empty private storage is still part of a complete backup and
+                // must replace stale files from the installation being restored.
+                File::ensureDirectoryExists($storedPrivate);
+                if (!is_dir($storedPrivate)) {
+                    throw new \\RuntimeException('Could not stage the empty private-storage restore directory.');
+                }
+            }
 
             // Preflight all target-specific requirements before mutating the installation.
             if ($driver === 'sqlite') {
@@ -352,7 +371,7 @@ class ZazuRestoreCommand extends Command
 
             // Stage private storage only after every required database rollback point exists.
             // Every mutation after this point either completes or throws so catch can recover.
-            if ($hasPrivateStorage && is_dir($storedPrivate)) {
+            if ($hasPrivateStorage) {
                 $privateRollback = storage_path('app/.zazu-private-rollback-'.Str::ulid());
 
                 if (is_dir($privateTarget) && !rename($privateTarget, $privateRollback)) {
