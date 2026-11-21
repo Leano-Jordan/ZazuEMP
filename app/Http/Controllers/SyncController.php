@@ -229,13 +229,11 @@ class SyncController extends Controller
     {
         /** @var SyncDevice $authenticatedDevice */
         $authenticatedDevice = $request->attributes->get('sync_device');
-        $deviceId = (int) $authenticatedDevice->getKey();
 
-        return DB::transaction(function () use ($deviceId): JsonResponse {
-            $device = SyncDevice::query()
-                ->whereKey($deviceId)
-                ->lockForUpdate()
-                ->firstOrFail();
+        return DB::transaction(function () use ($authenticatedDevice): JsonResponse {
+            // A stale token must not revoke a replacement credential registered
+            // for the same installation after this request passed middleware.
+            $device = app(SyncDeviceAccessGuard::class)->lockActive($authenticatedDevice);
 
             $metadata = $device->metadata ?? [];
             $alreadyRevoked = $device->status === 'revoked'
@@ -343,7 +341,9 @@ class SyncController extends Controller
 
     public function uploadAttachment(Request $request): JsonResponse
     {
+        return DB::transaction(function () use ($request): JsonResponse {
         $device = $request->attributes->get('sync_device');
+        app(SyncDeviceAccessGuard::class)->lockActive($device);
         $validated = $request->validate([
             'event_id' => ['required', 'integer', 'min:1'],
             'idempotency_key' => ['required', 'uuid'],
@@ -407,6 +407,7 @@ class SyncController extends Controller
             'attachment' => $this->attachmentPayload($attachment),
             'duplicate' => false,
         ], 201);
+            });
     }
 
     /**
@@ -503,7 +504,9 @@ class SyncController extends Controller
 
     public function listAttachments(Request $request): JsonResponse
     {
+        return DB::transaction(function () use ($request): JsonResponse {
         $device = $request->attributes->get('sync_device');
+        app(SyncDeviceAccessGuard::class)->lockActive($device);
         $eventId = $request->query('event_id');
 
         $query = EventAttachment::query()
@@ -520,15 +523,19 @@ class SyncController extends Controller
         return response()->json([
             'attachments' => $query->get()->map(fn (EventAttachment $attachment) => $this->attachmentPayload($attachment))->values(),
         ]);
+            });
     }
 
     public function downloadAttachment(Request $request, EventAttachment $attachment)
     {
+        return DB::transaction(function () use ($request, $attachment) {
         $device = $request->attributes->get('sync_device');
+        app(SyncDeviceAccessGuard::class)->lockActive($device);
         abort_unless((int) $attachment->business_id === (int) $device->business_id, 404);
         abort_unless(Storage::disk($attachment->disk)->exists($attachment->path), 404);
 
         return Storage::disk($attachment->disk)->download($attachment->path, $attachment->original_name);
+            });
     }
 
     private function attachmentPayload(EventAttachment $attachment): array
