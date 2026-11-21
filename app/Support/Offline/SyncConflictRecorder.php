@@ -34,13 +34,13 @@ class SyncConflictRecorder
             $localPayload,
             $remotePayload,
         ): SyncConflict {
-            $lockedDevice = SyncDevice::query()
-                ->whereKey($device->id)
-                ->lockForUpdate()
-                ->firstOrFail();
+            // Conflict writes are request-originated too. Revalidate the
+            // middleware snapshot's credential under the same business/device
+            // lock order used by mutation recording and application.
+            $lockedDevice = app(SyncDeviceAccessGuard::class)->lockActive($device);
 
-            if ((int) $lockedDevice->business_id !== (int) $device->business_id || ! $lockedDevice->isActive()) {
-                throw new \LogicException('Cannot record a conflict for an inactive or mismatched sync device.');
+            if ((int) $lockedDevice->business_id !== (int) $device->business_id) {
+                throw new \\LogicException('Cannot record a conflict for a mismatched sync device.');
             }
 
             $existing = SyncConflict::query()
