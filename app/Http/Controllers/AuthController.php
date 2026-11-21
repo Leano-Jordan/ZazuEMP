@@ -163,7 +163,7 @@ class AuthController extends Controller
                     }
                 },
             ],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:10', 'confirmed'],
         ]);
 
         if (!Schema::hasColumn('users', 'username')

@@ -53,7 +53,7 @@
                     <div class="zazu-field">
                         <label for="password">Password</label>
                         <div class="zazu-login-password">
-                            <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+                            <input id="password" name="password" type="password" autocomplete="new-password" minlength="10" required>
                             <button type="button" class="zazu-login-password-toggle" data-password-toggle aria-controls="password" aria-label="Show password">Show</button>
                         </div>
                         @error('password') <div class="zazu-field-error">{{ $message }}</div> @enderror
@@ -62,7 +62,7 @@
                     <div class="zazu-field">
                         <label for="password_confirmation">Confirm password</label>
                         <div class="zazu-login-password">
-                            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required>
+                            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="10" required>
                             <button type="button" class="zazu-login-password-toggle" data-password-toggle="password_confirmation" aria-controls="password_confirmation" aria-label="Show password">Show</button>
                         </div>
                         @error('password_confirmation') <div class="zazu-field-error">{{ $message }}</div> @enderror

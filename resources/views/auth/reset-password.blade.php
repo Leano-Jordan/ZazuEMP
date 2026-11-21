@@ -55,7 +55,7 @@
                             name="password"
                             type="password"
                             autocomplete="new-password"
-                            minlength="8"
+                            minlength="10"
                             required
                         >
                         <button type="button" class="zazu-login-password-toggle" data-password-toggle aria-controls="password" aria-label="Show password">Show</button>
@@ -73,7 +73,7 @@
                             name="password_confirmation"
                             type="password"
                             autocomplete="new-password"
-                            minlength="8"
+                            minlength="10"
                             required
                         >
                         <button type="button" class="zazu-login-password-toggle" data-password-toggle="password_confirmation" aria-controls="password_confirmation" aria-label="Show password">Show</button>

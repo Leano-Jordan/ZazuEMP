@@ -572,7 +572,7 @@
                     <div class="auth-modal-field">
                         <label for="auth_register_password">Password</label>
                         <div class="auth-modal-password">
-                            <input id="auth_register_password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+                            <input id="auth_register_password" name="password" type="password" autocomplete="new-password" minlength="10" required>
                             <button type="button" data-auth-password-toggle data-target="auth_register_password" aria-label="Show password">Show</button>
                         </div>
                         @error('password')<p class="auth-modal-error">{{ $message }}</p>@enderror
@@ -580,7 +580,7 @@
                     <div class="auth-modal-field">
                         <label for="auth_password_confirmation">Confirm password</label>
                         <div class="auth-modal-password">
-                            <input id="auth_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required>
+                            <input id="auth_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="10" required>
                             <button type="button" data-auth-password-toggle data-target="auth_password_confirmation" aria-label="Show password">Show</button>
                         </div>
                         @error('password_confirmation')<p class="auth-modal-error">{{ $message }}</p>@enderror
