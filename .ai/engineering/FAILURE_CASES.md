@@ -616,6 +616,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 - The controller validates positive integer values and caps the request at 100 sequence values.
 - `SyncBootstrapDeliveryTargetResolver` looks up only deliveries for the same business, destination device and business stream, then resolves primary and related aggregates.
 - The builder includes those exact target aggregates beyond the normal bounded window, including command-side related records.
+- Delivery-driven customer, Work, quote and preparation entries respect an explicit pinned pairing selection; they do not silently expand a restricted local workspace.
 - The normal 500-record collections are selected by latest sync-identity update time (fallback to record `updated_at`) while preserving existing display order.
 - The browser persists the snapshot before acknowledging the contiguous prefix. The worker cache advances to `zazu-static-v58` to ship the updated precached client.
 
