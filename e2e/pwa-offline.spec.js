@@ -2173,7 +2173,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(reconciled).toEqual({
             id: 99201,
             serverId: 99201,
-            pendingSync: false,
+            pendingSync: null,
             eventLocalId: jobLocalId,
             supplierLocalId,
             orderLocalId,
