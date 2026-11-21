@@ -1,3 +1,21 @@
+## Director execution checkpoint — event-cost offline reconciliation — 2026-11-21
+
+**Current documentation head:** `3f41be195c76b0af4932f8410ce7759604de9f3f` on `main`.  
+**Application/test source:** `764f53682123481579a276303dc5da45c7c6038b` + `aa77c2677b8e32a9e232075182332103b43e9af8`.
+
+- Reviewed the last event-cost tenant-isolation work and its exact-head CI. The foreign-business job identity is rejected by business-scoped identity and Event lookups; the Laravel isolation regression passed.
+- The exact-head browser run on the preceding code exposed a real client-state defect: event-cost records were created without `pending_sync: true`, so the generic acknowledgement path could assign the canonical server identity and drain the queue while leaving the local sync flag null.
+- Fixed the event-cost form to set the pending flag and strengthened the existing browser regression to assert pending before reconnect and synced after canonical identity reconciliation.
+- Updated `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md` with the defect, root cause and evidence status.
+
+**Verification on the application/test source:** Laravel **656 passed / 1 skipped / 4,516 assertions**; PostgreSQL migration/recovery **PASS**; Zazu Quality, Composer security audit, secret scan, Windows V1 package/fresh-install verification, Director Contract Lint and Push-on-main **PASS**. SonarCloud **SKIPPED**. The full offline-browser acceptance job is still running; do not mark the event-cost correction verified until it completes.
+
+**Evidence maturity:** **77/100, unchanged**. No score uplift. V1 remains **NOT READY**.
+
+**Next engineering target after browser closure:** continue adversarial review of offline tenant boundaries and linked-record ownership, then converge the remaining physical-device, owner-PC recovery, commercial workflow and POPIA acceptance gates.
+
+---
+
 ## Director execution checkpoint — event-cost offline bootstrap correction — 2026-11-21
 
 **Application/test code head:** `86f03861cd640aaefa2a6b08f022d0a5b1f17e45` on `main`.  
