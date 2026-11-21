@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\BackupArchiveLimits;
 use App\Support\PostgresBackupSupport;
 
 use Illuminate\Console\Command;
@@ -15,8 +16,8 @@ use ZipArchive;
 class ZazuRestoreCommand extends Command
 {
     private const FORMAT_VERSION = 2;
-    private const MAX_ARCHIVE_ENTRIES = 50000;
-    private const MAX_UNCOMPRESSED_BYTES = 2147483648;
+    private const MAX_ARCHIVE_ENTRIES = BackupArchiveLimits::MAX_ARCHIVE_ENTRIES;
+    private const MAX_UNCOMPRESSED_BYTES = BackupArchiveLimits::MAX_UNCOMPRESSED_BYTES;
 
     protected $signature = 'zazu:restore {archive : Path to a Zazu backup ZIP} {--force : Skip the interactive confirmation}';
     protected $description = 'Restore a Zazu database and private storage from a verified backup archive';
