@@ -67,7 +67,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 ### CASE-ZAZU-0015
 
-**Status:** CORRECTED — exact-head browser verification pending.
+**Status:** CLOSED — exact-head browser, Laravel, PostgreSQL and quality checks passed.
 
 **Target/workflow:** Dark-mode primary form-control regression in `e2e/ui-theme.spec.ts`.
 
@@ -669,6 +669,6 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Correction:** Capture the actual `local_id` from the queued offline invoice mutation, use that same ID in the mocked acknowledgement, and inspect the same created invoice after reconciliation. Keep the pre-existing bootstrap invoice on its own fixed fixture identity. Restore the independent Work test's own invoice identity after isolating the variable scope. No production source changed.
 
-**Verification:** Exact-head browser, Laravel, PostgreSQL, quality and analysis checks are pending on commit `36a2f605481e3985b647dda710ead7bef157b70f`. Do not close this case until the browser acceptance test passes on that exact head.
+**Verification:** Exact-head source/test commit `36a2f605481e3985b647dda710ead7bef157b70f`: offline browser **60 passed**, mobile viewport **7 passed**, phone-local attachment journey **1 passed**; Laravel **649 passed / 1 skipped / 4,456 assertions**; PostgreSQL migration/registration/backup/restore/private-file recovery **PASS**. Zazu Quality, Composer audit, secret scan, application and Actions/Python/JavaScript analysis passed. Documentation-head runs also passed Zazu Quality, Director Health, Director Contract Lint and Push-on-main. The corrected invoice reconciliation test passed without retry.
 
 **Loop prevention:** A sync identity acknowledgement must reference the local ID carried by the mutation under test. Never reuse a bootstrap fixture's identity for a newly created local record. Keep fixture identities scoped to their individual test.
