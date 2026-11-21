@@ -1907,11 +1907,47 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function existing(SyncMutation $mutation): ?Model
     {
-        return SyncEntityIdentity::query()
+        $identity = SyncEntityIdentity::query()
             ->where('business_id', $mutation->business_id)
             ->where('entity_type', $mutation->entity_type)
             ->where('entity_uuid', $this->entityUuid($mutation))
-            ->first()?->record;
+            ->first();
+
+        if (! $identity) {
+            return null;
+        }
+
+        $record = $identity->record;
+        $recordBusinessId = $record instanceof Model
+            ? $this->recordBusinessId($record)
+            : null;
+
+        if (
+            ! $record instanceof Model
+            || ! is_numeric($recordBusinessId)
+            || (int) $recordBusinessId !== (int) $mutation->business_id
+        ) {
+            throw ValidationException::withMessages([
+                'entity_id' => 'The offline synchronization identity does not belong to this business.',
+            ]);
+        }
+
+        return $record;
+    }
+
+    private function recordBusinessId(Model $record): mixed
+    {
+        $businessId = $record->getAttribute('business_id');
+
+        if ($businessId !== null) {
+            return $businessId;
+        }
+
+        if (method_exists($record, 'event')) {
+            return $record->event()->withTrashed()->value('business_id');
+        }
+
+        return null;
     }
 
     private function recordPayload(SyncMutation $mutation): array
