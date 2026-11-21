@@ -29,6 +29,15 @@ jobs:
       - name: Audit locked npm dependencies
         run: node scripts/audit-npm.mjs
 
+      - name: Validate installation, security and recovery documentation
+        run: npm run check:docs
+
+      - name: Build production frontend assets
+        run: npm run build
+
+      - name: Enforce compressed frontend asset budgets
+        run: npm run check:performance
+
       - name: Test service-worker authentication cache races
         run: npm run test:service-worker
 
