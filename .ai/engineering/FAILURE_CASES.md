@@ -13,7 +13,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 ## Case index
 
-| CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | OPEN | No authoritative record revision is carried or checked; a second device can overwrite an intervening write | Revision contract + two-device and same-device causal-chain tests |
+| CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | CLOSED — exact-head CI PASS | Revision preconditions, causal chains and conflict preservation verified across paired devices | Broader offline workflow matrix tracked separately |
 | CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | CLOSED — exact-head CI PASS | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
 | CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | CLOSED — exact-head CI PASS | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
 
@@ -550,59 +550,43 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0033
 
-**2026-11-21 source-audit increment:** a second primary-contact revision bypass was found in `CustomerContactController::store` (the create-primary route; the edit-primary route had already been corrected). Replaced the relationship mass update with locked per-model updates and added a regression asserting Customer revision advancement. Exact-head Laravel on `51a75eb` passed **634 / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD passed; desktop/mobile browser acceptance remains in progress. A second paired-device regression now proves a stale revision-1 mutation cannot overwrite the revision-2 result committed by the other device, while preserving the stale local payload. This closes only the identified writer defect; CASE-ZAZU-0033 remains OPEN for the complete indirect/bulk writer inventory and sync matrix.
-
-
-**Status:** OPEN — implementation committed; exact-head acceptance and exhaustive writer audit still pending.  
+**Status:** CLOSED — exact-head Laravel, PostgreSQL, desktop/mobile browser and quality checks passed on source/test head `51a75eb1d06017211bd7808093d1863c930b6d71`.  
 **Engineering diagnostic code:** ENG-DATA-003.  
 **First observed:** 2026-11-20.  
-**Target:** Existing-record offline updates accepted by the current server domain handlers: customer, Work/job, preparation, quote/draft version, inventory item, event cost, asset, supplier, service/capability and purchase order. Command mutations that alter a parent snapshot (payment, quote acceptance, purchase receipt, stock movement and asset allocation) must advance the affected parent revision without weakening idempotency.
+**Closed:** 2026-11-21.  
+**Target:** Existing-record offline updates accepted by the supported server domain handlers and command mutations that advance parent aggregate snapshots.
 
-**Failure fingerprint:** Two paired devices bootstrap the same business record. Device B updates it online or through sync. Device A later pushes an offline update based on its older snapshot. Without a revision precondition, A's older payload can replace B's newer values.
+**Failure fingerprint:** Two paired devices bootstrap the same business record. Device B commits a newer version. Device A later pushes an update based on its older snapshot. Without a revision precondition, A's stale payload can replace B's newer values.
 
-**Implemented source correction on `main` (current head `a4b267f`):**
-- `sync_entity_identities.revision` is a server-owned monotonic counter. The migration seeds pre-existing identity rows at revision 2; the identity registry explicitly creates new identities at revision 1. This invalidates old local snapshots that normalize to revision 1.
-- `sync_mutations.result_revision` records the exact revision produced by an applied mutation. `superseded_by_mutation_id` records immutable rebase successors.
-- `SyncEntityRevisionTracker` advances registered aggregate revisions for online Eloquent updates/deletes and nested snapshot children. Business-first transaction locking was normalized in the inspected customer/contact, capability, supplier, asset, quote and Work writers; finance, inventory and purchasing command paths already used business-first locks.
-- `SyncMutationApplier` checks expected revisions before domain mutation. Same-device successors reference their predecessor; the server compares the current revision with that predecessor's actual `result_revision`, not an assumed +1.
-- Offline handlers run with automatic model tracking suspended; the applier advances the edited aggregate once and explicitly advances parent snapshots affected by quote acceptance, payment, purchase receipt, inventory movement and asset allocation.
-- Bootstrap includes revisions; the browser queue records an expected revision for the first edit and a predecessor ID for later edits. The static service-worker cache advanced to v42.
-- `stale_record_version` conflicts preserve local payload and a full remote aggregate snapshot. Keep-local resolution generates a new mutation ID and current expected revision; use-server resolution discards the local mutation and refreshes the local record. Causal successors cannot be rebased ahead of unresolved predecessors.
-- The push processing logic was extracted into `SyncMutationPushProcessor` to keep controller and method complexity within the repository's PHPMD limits.
+**Verified implementation:**
+- Server-owned monotonic aggregate revisions and immutable mutation result revisions.
+- Expected-revision checks under business/device/mutation/aggregate lock order; stale updates are rejected before domain mutation.
+- Same-device causal successors are checked against the actual result revision of their predecessor.
+- Conflict payloads preserve both local and authoritative remote state. Keep-local rebase uses a new immutable mutation ID; use-server restores the remote record.
+- Parent snapshot revisions advance for quote acceptance, payment, purchase receipt, inventory movement and asset allocation; nested customer, Work, quote, invoice, purchasing, inventory and asset writes advance their parent aggregates.
+- The browser records first-edit revisions and same-device predecessor links, and does not silently discard unresolved local edits.
+- The final online writer inventory found a remaining mass-update bypass in primary-contact creation. That path now updates locked contact models individually, and a regression proves the parent Customer revision advances. The other identified bulk operations either update a tracked parent in the same transaction or operate on restore/protocol records outside pre-existing domain identities.
 
-**Regression coverage added:**
-- Online customer write advances its registered revision.
-- A stale device update is rejected and returns the current remote record.
-- Two same-device updates chain through actual predecessor result revisions.
-- An online write between queued edits breaks the chain and creates a stale conflict.
-- Keep-local resolution creates a new immutable mutation ID and returns the latest revision.
-- Existing offline update fixtures now provide expected revisions.
+**Closure regression coverage:**
+- Two paired devices: device B commits revision 2; device A's revision-1 mutation is rejected with revision-2 remote snapshot and its local payload preserved.
+- Same-device two/three-edit causal chains, external write between edits, rejected first mutation followed by rebase and successor.
+- New-ID keep-local rebase, immutable original mutation payload, use-server discard and retry idempotency.
+- Online customer, Work, supplier, service/capability and asset revision advancement.
+- Parent revision propagation for quote acceptance, payment, purchase receipt/inventory, inventory movement and asset allocation.
+- Cross-business entity identity rejection and business/device-scoped receiver delivery.
+- Primary-contact create/edit paths both preserve exactly one primary contact and advance Customer revision.
 
-**Remaining audit requirement:** the event-based online revision tracker must be checked against every route/service that changes these aggregate tables, especially raw query-builder bulk updates/deletes and command-side effects. Any bypass must be brought under the same business-first transaction boundary and revision advancement. The current source trace is broad but not yet a proven exhaustive writer inventory.
+**Exact-head evidence — `51a75eb`:**
+- Laravel: **634 passed / 1 skipped / 4,399 assertions**.
+- PostgreSQL migration/recovery smoke: **PASS**.
+- Offline browser: **59 desktop Chromium + 7 mobile-viewport + 1 phone-local Work/attachment/reconnect passed**.
+- PHPMD, Zazu Quality, Composer security audit, secret scan, application and analysis checks: **PASS**. SonarCloud: **SKIPPED**, not counted.
+- [Exact-head workflow](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44881431689).
 
-**Guardrails:** no `updated_at`-only comparison, browser-clock comparison, last-write-wins, silent payload replacement, mutation-ID reuse with changed payload, or weakening of payment/receipt/stock/allocation idempotency. Customer contacts and Work requirements are part of their parent aggregate snapshots.
+**Disposition:** CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED. The full offline sync workflow matrix is a separate OPEN V1 gate; closing this stale-write case does not certify every offline entity/operation or physical-device behavior.
 
-**Verification required before closing:** exact-head Laravel + PostgreSQL migration tests; desktop and mobile offline-browser regression; two-device stale update; two/three same-device queued edits; external write between queued edits; first mutation rejected then later mutation; new-ID rebase; both payloads preserved; representative customer/Work/supplier/service/asset paths; parent revision propagation for payment, receipt, stock movement and allocation; business/device isolation.
+**Commit trail:** revision metadata `009b7c4`; stale enforcement `d5d4098`; client queue/bootstrap `fd73afe`; conflict rebase `0533b60`; parent/nested tracking `1924588`; parent command revisions `08bef14`; push processor extraction `7a57c4c`; complexity corrections `7d07f06`, `3137b80`; later exact-head regressions and contact writer correction through `51a75eb`.
 
-**Stop condition:** CASE-ZAZU-0033 remains OPEN and release remains NOT READY until the complete writer audit and exact-head regression evidence pass. Do not uplift readiness from static source changes or CI subsets alone.
-
-**Commit trail:** revision metadata `009b7c4`; stale enforcement `d5d4098`; client queue/bootstrap `fd73afe`; conflict rebase `0533b60`; parent/nested tracking `1924588`; parent command revisions `08bef14`; push processor extraction `7a57c4c`; complexity corrections `7d07f06`, `3137b80`; cache v42 `8b85041`; revision concurrency tests `fa74ab7`, fixture updates `65a7a18`, `a4b267f`.
-
-
-**2026-11-20 follow-through:** same-device causal chains now have explicit regression coverage after both keep-local rebase and use-server discard. A discard stores the current remote revision on the terminal mutation so later queued edits are not stranded. Conflict rebase/presentation responsibilities were extracted into separate services after PHPMD identified excessive resolver complexity. The exact-head CI run for `2b4d73b` is pending; CASE-ZAZU-0033 remains OPEN and no verification status is uplifted.
-
-
-**Verification update — `7343a8f`:** Laravel unit/feature suite passed (615 passed, 1 skipped, 4,198 assertions), as did PHPMD, Zazu Quality and Director Health. PostgreSQL migration smoke and offline browser acceptance were still running. The first Laravel run exposed a model-level legacy identity default issue (revision read as zero in the SQLite test database); explicit model default 2 now complements the migration default, while registry-created identities explicitly start at 1. Regression coverage now includes Work, supplier, service and asset online revision advancement, conflict field comparison, and causal successors after both keep-local rebase and use-server discard. CASE-ZAZU-0033 remains OPEN.
-
-
-**Bootstrap and UI verification — 2026-11-20:** bootstrap snapshot construction is now transactionally serialized under the business row lock, with a regression asserting the transaction boundary. The 51-test offline browser run on `7343a8f` exposed an undefined `offlineConflictsRefreshed` variable in settings conflict rendering; the resulting exception hid both offline conflict controls and the re-pair warning. Commit `1d746d9` initializes the flag before rendering. Browser rerun is pending; CASE-ZAZU-0033 remains OPEN.
-
-
-**Related aggregate acknowledgement — 2026-11-20:** command mutations can change multiple synchronised aggregates without owning a normal entity row. The push response now retains `related_identity` for older clients and adds `related_identities` for every affected aggregate that the server can resolve. Quote acceptance reports Quote + Work; purchase receiving reports Purchase Order + affected inventory items; payment, stock movement and asset allocation retain their relevant parent identities. The browser reconciles this array even when `identity` is null. Quote acceptance optimistically mirrors the conditional Work draft → confirmed transition. A browser regression covers multiple affected roots for both identity-less commands.
-
-**Online writer source trace — 2026-11-20:** reviewed the relevant controllers and services for customers/contacts/import, Work/lifecycle, quotes, catalogue services, suppliers, assets, event costs/preparation, invoices/payments/expenses, inventory and purchasing. Inspected existing-record writes use the shared business-first lock boundary and model revision tracking. Query-builder operations found in the reviewed flows are accompanied by a tracked parent update in the same transaction or are part of restoring into an empty target business with no pre-existing sync identities. This does not yet certify every indirect/console/future writer; keep the final exhaustive writer inventory as a release gate.
-
-**Exact-head evidence — `7d5f861`:** Laravel unit/feature, PostgreSQL migration smoke, PHPMD, Zazu Quality and Director Health passed. Offline-browser acceptance, including the new related-aggregate regression, remained in progress when recorded. CASE-ZAZU-0033 remains OPEN until the browser result and final writer inventory pass.
 
 ### CASE-ZAZU-0034
 
