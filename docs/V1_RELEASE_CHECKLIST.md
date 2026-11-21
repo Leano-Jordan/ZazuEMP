@@ -1,3 +1,19 @@
+## Offline mutation operation validation — exact-head Laravel / PHPMD / PostgreSQL PASS — 2026-11-21
+
+**Application code/test head:** [e95dd5c](https://github.com/Leano-Jordan/ZazuEMP/commit/e95dd5cd8966c7457de70e9a4bc882709db7d30b).
+
+- Closed CASE-ZAZU-0041: customer, job and service offline handlers now explicitly allow only `create`, `upsert` and `update`.
+- Unsupported `delete` mutations are rejected before domain writes; delete support has not been added.
+- Added `OfflineMutationOperationValidationTest`: all three unsupported operations remain pending with zero attempts and create no domain records.
+- Laravel: **676 passed / 1 skipped / 4,593 assertions**.
+- PHPMD: **PASS** [run 44947482711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482711).
+- PostgreSQL migration, registration and backup/restore/private-file recovery smoke: **PASS** in [Laravel workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
+- The full offline-browser job in that workflow was still running at this checkpoint and is not counted as passed.
+
+**Release disposition:** V1 remains **NOT READY**. This targeted server-side integrity closure does not close the full offline sync matrix or any owner-operated physical acceptance gate.
+
+---
+
 ## Windows backup scheduler and runner — runtime CI PASS — 2026-11-21
 
 - Windows PowerShell 5.1 CI registers a temporary Task Scheduler task and verifies S4U/limited privileges, daily 02:00 trigger, missed-run catch-up, wake-to-run and IgnoreNew overlap behaviour.
