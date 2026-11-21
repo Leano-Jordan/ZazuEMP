@@ -11,8 +11,8 @@ CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has pa
 # Zazu EMP — Offline-First Architecture Contract
 
 **Status:** ACTIVE ARCHITECTURE DIRECTION  
-**Director update:** 2026-11-20  
-**Current repository branch:** `main` · **latest full application-code verification baseline:** `526bdf38dab6ff540c143b0e57dfcee468006dc3`
+**Director update:** 2026-11-21  
+**Current repository branch:** `main` · **latest full application-code verification baseline:** `51a75eb1d06017211bd7808093d1863c930b6d71`
 
 ## Director source audit — 2026-11-20
 
@@ -262,11 +262,11 @@ Examples:
 
 Financial, inventory and permission state must never be silently overwritten by a stale device.
 
-**Implementation audit note — 2026-11-20:** a revision-aware sync implementation is now committed on `main`. The server stores monotonic aggregate revisions, rejects stale updates before mutation, preserves local and remote snapshots in `stale_record_version` conflicts, and supports new-ID keep-local rebases. Same-device mutations chain against the exact result revision of their predecessor. The implementation remains under verification: CASE-ZAZU-0033 stays OPEN until exact-head Laravel/PostgreSQL/offline-browser acceptance and an exhaustive audit of Eloquent and query-builder online writers are complete.
+**Implementation audit note — 2026-11-20:** a revision-aware sync implementation is now committed on `main`. The server stores monotonic aggregate revisions, rejects stale updates before mutation, preserves local and remote snapshots in `stale_record_version` conflicts, and supports new-ID keep-local rebases. Same-device mutations chain against the exact result revision of their predecessor. The stale-write protection case is now CLOSED as CASE-ZAZU-0033 / ENG-DATA-003 on exact source/test head `51a75eb`: Laravel 634 passed / 1 skipped / 4,399 assertions, PostgreSQL migration/recovery, PHPMD and desktop/mobile offline-browser acceptance passed. The final online-writer review found and corrected the remaining primary-contact create mass-update bypass. The complete supported offline workflow matrix remains a separate OPEN V1 gate.
 
 ### 7.1 Required stale-update protection before V1 release
 
-This is an acceptance/design requirement, not a claim that version-aware conflict handling is already implemented.
+The stale-write contract below is implemented and exact-head regression verified for existing-record updates. It remains an acceptance requirement across every supported offline workflow; it is not a claim that the entire V1 product is offline-complete.
 
 **Existing-record update contract**
 
