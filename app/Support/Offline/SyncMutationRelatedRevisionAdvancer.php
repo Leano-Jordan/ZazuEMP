@@ -175,6 +175,7 @@ final class SyncMutationRelatedRevisionAdvancer
     {
         $model = match ($entityType) {
             'job' => Event::class,
+            'inventory_item' => InventoryItem::class,
             'quote' => Quote::class,
             'purchase_order' => PurchaseOrder::class,
             'purchase_order_item' => PurchaseOrderItem::class,
@@ -198,6 +199,8 @@ final class SyncMutationRelatedRevisionAdvancer
             ->lockForUpdate()
             ->first();
 
-        $identity?->increment('revision');
+        if ($identity && $this->safeRecord($identity)) {
+            $identity->increment('revision');
+        }
     }
 }
