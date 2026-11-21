@@ -5,7 +5,9 @@
 - Added a real server-side sync regression that creates a second business, registers that business's event identity, and submits it in an event-cost mutation from the first business's trusted device.
 - The first test run exposed that the shared resolver reported this rejection under the generic `payload` validation key, not `event_local_id`. The rejection was correct; the test had assumed the wrong validation contract.
 - Replaced purchase-order-specific wording in the shared event resolver with domain-neutral offline-job messages, then made the regression assert the exact message, pending mutation state and absence of an event-cost row in the receiving business.
-- The resolver remains business-scoped at both the identity lookup and Event lookup. Exact-head Laravel/quality/browser verification is pending.
+- The resolver remains business-scoped at both the identity lookup and Event lookup.
+- Exact-source Laravel: **656 passed / 1 skipped / 4,516 assertions** ([run 44915419865](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44915419865); Laravel and PostgreSQL jobs passed; offline browser job is still running).
+- Zazu Quality ([44915419870](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44915419870)), PHPMD ([44915419646](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44915419646)) and Director Health ([44915419671](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44915419671)) passed on the exact source head.
 
 **Evidence disposition:** this is targeted tenant-isolation regression coverage, not a full penetration test or a release-readiness score increase. Evidence maturity remains **77/100**; V1 remains **NOT READY**.
 
