@@ -3538,7 +3538,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(detail.getByText('1150.00')).toBeVisible();
 
         await detail.getByRole('button', { name: 'Accept quote offline' }).click();
-        await expect(detail.getByRole('status')).toContainText('Acceptance saved on this device');
+        // queueMutation emits zazu:offline-state-updated, which rebuilds the local
+        // quote register and its detail panel. Assert the durable post-render state,
+        // not transient DOM that is intentionally replaced by that render.
+        await expect(quoteRow).toContainText('accepted');
         await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
 
         const result = await page.evaluate(async ({ quoteLocalId, jobLocalId }) => {
