@@ -1,3 +1,25 @@
+## Director execution checkpoint — offline host detection + recovery archive hardening — 2026-11-21
+
+**Current source/test head:** [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc) on main.
+
+### Verified
+- Laravel: **673 passed / 1 skipped / 4,575 assertions**. This includes shared backup/restore limit boundary tests and the empty-private-storage restore integration test. [Exact-head Laravel run 44937037910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937037910)
+- PostgreSQL migration/recovery smoke: **PASS**.
+- PHPMD, Zazu Quality, Composer security audit, secret scan and Director Health: **PASS**.
+- Last completed desktop/mobile offline acceptance on runtime-identical head [7df9d7c](https://github.com/Leano-Jordan/ZazuEMP/commit/7df9d7c176cb5fe931bf62617d2908cc74e8d041): **63 desktop Chromium + 7 mobile viewport + 1 Pixel 7 host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries. The exact d716 browser job is still running.
+- Windows V1 package/fresh-install and populated upgrade/rollback passed on runtime code head [84dba32](https://github.com/Leano-Jordan/ZazuEMP/commit/84dba32ae96ececf6c1dd71034d79d0b93070b7e).
+- CASE-ZAZU-0037 (LAN host outage UI), CASE-ZAZU-0038 (backup/restore archive limit drift) and CASE-ZAZU-0039 (empty private-storage restore retaining stale files) are closed at code/automated-test level.
+
+### Remaining release gates — still NOT READY
+- Physical Android installed-app cold launch, stop-host while Wi-Fi remains connected, disconnected work, force-close/restart and reconnect.
+- Actual owner-PC off-disk backup and controlled full installation restore, including representative private media.
+- Populated live-business quote-to-payment-to-profit reconciliation.
+- POPIA operational sign-off and ZAZU name clearance.
+
+**Evidence maturity remains 77/100. No score uplift is claimed from simulated mobile or code-only evidence.** SonarCloud is skipped and is not counted as a pass.
+
+---
+
 ## Director execution checkpoint — event-cost offline bootstrap correction — 2026-11-21
 
 **Application/test code head:** `86f03861cd640aaefa2a6b08f022d0a5b1f17e45` on `main`.  
