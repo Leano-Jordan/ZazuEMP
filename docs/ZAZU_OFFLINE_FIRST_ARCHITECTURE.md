@@ -1,3 +1,12 @@
+### Bootstrap resolver complexity correction — 2026-11-21
+
+**Refactor:** [438d322](https://github.com/Leano-Jordan/ZazuEMP/commit/438d3220be5eb02078ed7e5f690c38161b612e25) + [e587bc0](https://github.com/Leano-Jordan/ZazuEMP/commit/e587bc078f1dba9ad4ac50141f021fbdb0207bbc).
+
+- PHPMD initially rejected the new bootstrap fallback because identitiesForMutation crossed the configured cyclomatic and NPath thresholds.
+- Split safe fallback resolution and business ownership verification into focused methods; replaced the branching model match with a lookup map.
+- No PHPMD suppression or threshold relaxation was introduced.
+- Verification: PHPMD [44922161649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161649) and Laravel [44922141643](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922141643) are pending.
+
 ### Primary mutation acknowledgement identity guard — 2026-11-21
 
 **Implementation:** [80f509d](https://github.com/Leano-Jordan/ZazuEMP/commit/80f509d6a910715aa1656650ba3625c72647e309) + [1c2d5e1](https://github.com/Leano-Jordan/ZazuEMP/commit/1c2d5e13d27d08fece18c878bcfb847a77b302f1) + [6b27c41](https://github.com/Leano-Jordan/ZazuEMP/commit/6b27c41912f5a4fe98f50e4bbf78f73c4dca422e).  
