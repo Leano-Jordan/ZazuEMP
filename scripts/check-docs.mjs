@@ -48,6 +48,7 @@ const required = [
     ['docs/V1_PACKAGE_INSTALLATION.md', ['Host requirements', 'Fresh installation', 'Data safety and updates']],
     ['docs/LOCAL_PC_HOST_DEPLOYMENT.md', ['HTTPS', 'backup']],
     ['docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md', ['backup', 'restore']],
+    ['docs/QUALITY_GATES.md', ['Frontend performance baseline', 'Accessibility', 'Database compatibility', 'Release integrity']],
     ['SECURITY.md', ['report', 'security']],
 ];
 for (const [file, headings] of required) {
