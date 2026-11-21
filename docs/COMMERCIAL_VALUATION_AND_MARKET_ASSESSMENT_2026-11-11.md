@@ -124,29 +124,27 @@ Build a bottom-up market list:
 
 The first meaningful market metric is not a national market-size estimate. It is the number of reachable, qualified operators and the percentage willing to pay after a working demonstration.
 
-## 6. Recommended launch pricing — hypothesis to validate
+## 6. Founder-approved tier structure and pricing status
 
-All prices below are proposed ZAR monthly prices, not current Zazu prices or proven willingness to pay. They should be tested with prospects before being committed to the public pricing page.
+**Owner decision recorded 2026-11-21 (DEC-027):** Zazu EMP has exactly three commercial workspace tiers:
 
-| Plan | Proposed price | Intended customer | Commercial boundary |
-|---|---:|---|---|
-| Starter | R499/month | Sole operator or very small team | Core customer/job/quote workflow and a modest user allowance |
-| Team | R899/month | Active multi-service operator | More users, operational coordination and connected purchasing/resources |
-| Business | R1,499/month | Established operator with staff and higher workflow complexity | Higher user/storage allowances, stronger reporting and priority support |
+| Canonical tier | Commercial status | Pricing status |
+|---|---|---|
+| Basic | Permanent Free tier | No charge |
+| Intermediate | Paid tier | Monthly rand price not yet approved |
+| Advanced | Paid tier | Monthly rand price not yet approved |
 
-Additional commercial hypotheses:
-- Optional onboarding/data setup: R1,500–R3,500 once-off, only where real migration/training work is required and clearly scoped.
-- Annual payment: test a 10% discount only after monthly retention is understood.
-- Early adopter offer: first 10–20 qualified pilot businesses may receive a fixed founding price in exchange for structured feedback and permission to use a testimonial only if they independently agree.
-- Use a 14-day guided trial or a scheduled demonstration. Avoid a free-forever tier that creates support obligations without revenue.
-- Do not charge separately for the core offline capability. Offline continuity is part of the product promise, within its explicitly supported workflows.
-- Keep all plan boundaries tied to implemented and verified features. Do not advertise functionality that is only planned.
+These are also the canonical experience-level labels and signed entitlement identifiers (basic, intermediate, advanced). An eligible new workspace retains the existing 30-day Advanced trial, then falls back to Basic Free unless a valid paid entitlement is installed. Expiry or revocation must not lock the workspace or remove/withhold customer-owned data.
 
-### Pricing judgement
+**No exact paid prices have been approved.** The former Starter R499 / Team R899 / Business R1,499 table is withdrawn as an unapproved historical hypothesis. It must not be quoted, used in revenue projections as adopted plan pricing, or published as Zazu's price list. The earlier four-tier DEC-016 price hypothesis is likewise superseded by the Founder-approved three-tier structure. Neither this decision nor the tier names approve feature restrictions, user/storage/event quotas, or module gates.
 
-The proposed R499–R1,499 range positions Zazu below EventSync's published converted tiers while remaining above commodity accounting tools at the entry point. This is a deliberate test position, not proof that Zazu is worth more or better. Rentflo's pricing is quote-based, so a true price comparison requires a sales quote.
+### Pricing research still required
 
-Do not underprice support. If onboarding and ongoing support consume substantial founder time, a R499 account can become unprofitable quickly. Track support minutes per account, infrastructure cost per account and gross margin from the first pilot.
+The 2026-11-11 competitor observations and price anchors remain research inputs, not a Zazu price decision. Validate willingness to pay with real target operators before proposing monthly prices. Any future pricing proposal must map to the three approved names, distinguish verified product capability from proposed entitlement, show ZAR/month, and return to the Founder for approval before publication or enforcement.
+
+### Commercial judgement
+
+Do not claim that Zazu is cheaper than competitors based on the withdrawn R499/R899/R1,499 proposal. Competitive positioning can be assessed against the published competitor prices in Section 4, but Zazu's price/value position remains undetermined until paid-tier prices and their actual capability boundaries are approved and tested with prospects.
 
 ## 7. Three-year illustrative revenue model
 
@@ -272,7 +270,7 @@ The next commercial work should be:
 2. finish physical offline and recovery acceptance;
 3. select one launch segment (recommended: catering + equipment hire combinations);
 4. conduct 10 operator interviews and 5 demonstrations;
-5. test R499 / R899 / R1,499 pricing;
+5. propose and validate prices for the Founder-approved Basic / Intermediate / Advanced tiers, then obtain explicit approval;
 6. secure 3 paid pilots;
 7. measure retention and support economics before increasing acquisition spend.
 
