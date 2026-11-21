@@ -6,7 +6,9 @@ use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Models\Invoice;
 use App\Models\Quote;
+use App\Models\QuoteVersion;
 use App\Models\SyncDevice;
 use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -71,6 +73,72 @@ class OfflineBootstrapRelationshipIsolationTest extends TestCase
         $this->assertNull($quoteRecord['event']['customer']);
         $this->assertNull($preparationRecord['event']['customer']);
         $this->assertStringNotContainsString('FOREIGN CUSTOMER SECRET', json_encode($selected));
+    }
+
+    public function test_invoice_bootstrap_omits_a_quote_version_owned_by_another_business(): void
+    {
+        $business = $this->business('Invoice bootstrap owner');
+        $foreignBusiness = $this->business('Foreign quote version owner');
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'INVOICE-BOOTSTRAP-001',
+            'name' => 'Local invoice event',
+            'event_type' => 'Other',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+        $foreignCustomer = Customer::create([
+            'business_id' => $foreignBusiness->id,
+            'name' => 'Foreign quote customer',
+        ]);
+        $foreignEvent = Event::create([
+            'business_id' => $foreignBusiness->id,
+            'customer_id' => $foreignCustomer->id,
+            'reference' => 'FOREIGN-QUOTE-EVENT-001',
+            'name' => 'Foreign quote event',
+            'event_type' => 'Other',
+            'event_date' => now()->addDays(12)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+        $foreignQuote = Quote::create([
+            'event_id' => $foreignEvent->id,
+            'reference' => 'FOREIGN-QUOTE-001',
+            'status' => 'sent',
+            'currency' => 'ZAR',
+        ]);
+        $foreignVersion = QuoteVersion::create([
+            'quote_id' => $foreignQuote->id,
+            'version' => 1,
+            'status' => 'sent',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'deposit_percent' => '50.00',
+            'deposit_amount' => '50.00',
+        ]);
+        $invoice = Invoice::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'quote_id' => null,
+            'quote_version_id' => $foreignVersion->id,
+            'number' => 'INV-BOOTSTRAP-001',
+            'status' => 'draft',
+            'currency' => 'ZAR',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $payload = app(SyncBootstrapPayloadBuilder::class)->build($device);
+        $record = collect($payload['invoices'])->firstWhere('server_id', $invoice->id)['record'];
+
+        $this->assertNull($record['quote_version']);
+        $this->assertSame('0.00', $record['deposit_required']);
+        $this->assertStringNotContainsString('Foreign quote event', json_encode($record));
     }
 
     private function business(string $name): Business
