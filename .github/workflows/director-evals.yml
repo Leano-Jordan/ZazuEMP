@@ -33,7 +33,7 @@ jobs:
     name: Director contract lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check control-plane formatting
         run: python3 .agents/evals/check_control_plane_format.py
       - name: Validate Director eval definitions and fixtures
