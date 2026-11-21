@@ -208,15 +208,19 @@ The repeated failure was:
 
 `e2e/pwa-offline.spec.js` — `event cost form saves locally and reconciles its job identity after reconnect`, failing at the assertion that a locally cached server-backed job exists.
 
-Initial failure hypothesis (not yet confirmed):
-- The test sets `window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true` before page boot.
-- The offline runtime resolves readiness from IndexedDB before network activity and, by design, suppresses automatic initial synchronization/device registration under that flag.
-- The test then reads `state.jobs` and expects a server-backed demo event to be available locally.
-- This suggested a missing test precondition: trusted-device registration and workspace bootstrap.
+**Confirmed root cause — test precondition, not a production bootstrap defect established by this failure:**
 
-However, the first correction explicitly trusted the device and invoked synchronization, yet the same job assertion still failed. Therefore it is not yet proven that this is solely a test-fixture defect. The remaining possibilities include active-business selection, an empty/incorrect bootstrap selection, bootstrap response/application mapping, or local-state preservation preventing hydration. The diagnostic follow-up records the business context, pairing state, local-dirty flag, cached jobs and pending queue so the next correction is evidence-led.
+- The failing event-cost test sets `window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true` before page boot.
+- It then logs in, waits only for local IndexedDB readiness, and immediately reads `state.jobs`.
+- It neither trusts the browser device nor explicitly starts workspace synchronization before requiring a server-backed Work record.
+- With initial sync deliberately deferred, local readiness correctly does not imply that server-backed Work records have been bootstrapped.
+- The failing assertion is therefore premature. The event-cost mutation itself has not yet been exercised by this failing run.
 
-The failure occurs before the cost form is submitted. It does not yet establish a defect in the event-cost mutation/reconciliation path, but neither can a production bootstrap defect be ruled out.
+The earlier correction `1f658f4` added trust/sync/wait logic to a different test (`a rejected sync mutation and its recovery conflict persist together` around line 1194), not the failing event-cost test (around line 1804). The diagnostic commit `4272f71` instrumented that same unrelated test, so its printed workspace snapshot was not evidence about the failing event-cost scenario. This explains why those attempts did not move the actual failure.
+
+**Corrective implementation:** commit [4971ce1](https://github.com/Leano-Jordan/ZazuEMP/commit/4971ce12c7c968edf5fcdae4d269f4c0bb079aa2) now explicitly trusts the device, calls `ZazuOffline.sync()`, and waits for a server-backed job in the event-cost test before selecting the job. The misplaced diagnostic logging was removed in [86f0386](https://github.com/Leano-Jordan/ZazuEMP/commit/86f03861cd640aaefa2a6b08f022d0a5b1f17e45).
+
+**Verification status:** the correction is committed on `main`, but no GitHub Actions run or commit status was available for `4971ce1` at the time of this audit update. The original business acceptance assertion remains intact. Do not mark this failure closed or claim the test passes until the exact-head offline browser acceptance executes successfully.
 
 **First attempted correction (not accepted as fixed):** `1f658f4abb98dbe47325255caa330c6057594927`. It explicitly trusted the device, invoked synchronization and waited for a server-backed job, while retaining the assertion. Exact-head run [44907862242](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862242) still failed at the same missing-job assertion. Therefore this change did not close the failure and must not be reported as a successful fix.
 
