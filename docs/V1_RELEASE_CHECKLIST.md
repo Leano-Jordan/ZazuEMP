@@ -1,9 +1,9 @@
 # Zazu EMP — V1 Release Checklist
 
-Latest full application-code verification baseline: 041314fd80147758dd2edb33c187b16328aea938.
-Latest receiver-sync and bootstrap-auth hardening source head: 559e66b87de8617f967b722b55b0fbfd9b116495 (backend gates pass; offline-browser acceptance still running).
+Latest full application-code verification baseline: 559e66b87de8617f967b722b55b0fbfd9b116495.
+Latest receiver-sync and bootstrap-auth hardening source head: 559e66b87de8617f967b722b55b0fbfd9b116495 (all automated gates passed).
 Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
-Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
+Disposition: NOT READY · Evidence maturity: 75/100 (+2 for verified receiver reconciliation and bootstrap authorization).
 
 
 ## Receiver reconciliation and bootstrap authorization — 2026-11-21
@@ -17,10 +17,10 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [x] Normal bounded collections promote recently revised aggregates while retaining display order.
 - [x] Explicit Customer/Work/Quote/Preparation pairing selections remain pinned; targeted delivery cannot silently broaden them.
 - [x] Bootstrap revalidates active device status and token hash under business-first locks; revocation and credential-replacement regressions pass.
-- [ ] Offline-browser pull → targeted bootstrap → local persist → acknowledgement sequence; workflow is still running.
-- [ ] Full sync matrix and physical-device cold launch/restart/reconnect remain open. CASE-ZAZU-0034 and CASE-ZAZU-0035 remain open until the browser run passes on this source head.
+- [x] Offline-browser acceptance: 59 desktop Chromium passed; 7 mobile-viewport passed; 1 phone-local Work/attachment/reconnect journey passed.
+- [ ] Full sync matrix and physical-device cold launch/restart/reconnect remain open. CASE-ZAZU-0034 and CASE-ZAZU-0035 are CLOSED on this exact head.
 
-Evidence maturity remains 73/100 until the browser acceptance completes. No uplift is claimed from partial CI.
+Evidence maturity is 75/100 (+2) after exact-head backend, PostgreSQL and desktop/mobile browser verification. This does not close broader V1 readiness.
 
 ---
 ## Exact-head automated acceptance — 2026-11-20
@@ -34,7 +34,7 @@ Evidence maturity remains 73/100 until the browser acceptance completes. No upli
 - [x] Command-side aggregate revision regression: quote acceptance → Work, payment → invoice, purchase receipt → purchase order/inventory, inventory movement → inventory item, asset allocation → asset passed in `SyncRevisionAggregateTrackingTest`.
 - [ ] Full offline sync workflow matrix, physical Android cold launch/restart/reconnect, intended-PC recovery drill, real-business commercial reconciliation, POPIA operations and ZAZU name clearance remain OPEN.
 
-DB-001 remains DORMANT / MONITORING by Founder report; its historical root cause is unproven and it is not an active release blocker. Installation recovery remains OPEN independently. V1 remains NOT READY; evidence maturity remains 73/100 with no uplift.
+DB-001 remains DORMANT / MONITORING by Founder report; its historical root cause is unproven and it is not an active release blocker. Installation recovery remains OPEN independently. V1 remains NOT READY; evidence maturity is 75/100, with physical Android, intended-PC recovery, real-business reconciliation and POPIA operations still open.
 
 ---
 ## Dormant database incident — owner installation (status updated 2026-11-20)
