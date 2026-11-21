@@ -1,3 +1,32 @@
+## Director execution checkpoint — 2026-11-21 (receiver sync completeness)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
+**Application/test source head:** `472e301065a5301c80f0ffbb97f82b61c24575ba`.  
+**Verification disposition:** Laravel, PostgreSQL, offline-browser, PHPMD and quality workflows have been queued for this head; results are not yet reconciled. Do not claim this change is verified until every relevant workflow finishes on this source head.
+
+### Confirmed defect and correction
+- The receiver pulled an ordered delivery prefix, then applied the ordinary bounded bootstrap and acknowledged the prefix. A delivered aggregate outside a capped 500-record collection or a selected-record window could be omitted from the stored snapshot while the receiver's cursor advanced.
+- Ordinary online changes had a second freshness issue: capped collections sorted by display name or creation order could continue to omit an older aggregate with a newer server revision.
+- The client now includes the exact `delivery_sequences[]` returned by receiver pull when requesting bootstrap. The controller validates at most 100 positive integer values.
+- `SyncBootstrapDeliveryTargetResolver` resolves only delivery rows belonging to that business, destination device and business stream. It resolves command primary/related aggregate identities as well as ordinary mutation identities.
+- The bootstrap builder unions delivered targets into the normal bounded record sets/selected records, without widening another device's scope or removing the 500-record limit.
+- The ordinary bounded collections now select their working set by latest sync-identity update time (fallback to record `updated_at`) and retain their existing display order.
+- The client only acknowledges after the complete bootstrap snapshot has been applied locally. The service-worker static cache is `zazu-static-v58` so installed clients fetch the updated cache-first offline client.
+
+### Added regression coverage
+- A supplier outside the default 500-record alphabetical window is promoted after an online revision update.
+- When the identity timestamp is made older, the delivered sequence still forces that supplier into the intended receiving device's snapshot.
+- A different device cannot use the same numeric delivery sequence to include that record.
+- Cross-device quote → acceptance → invoice → payment reconciliation checks ordered deliveries, invoice/payment values and contiguous acknowledgement.
+- Purchase receipt reconciliation asserts both the purchase-order state and every affected inventory aggregate.
+- Browser acceptance asserts pull → targeted bootstrap → acknowledgement ordering and the exact sequence query value.
+
+**Failure record:** CASE-ZAZU-0034 / ENG-DATA-004, registered as an F1/F7 receiver-reconciliation defect. CASE-ZAZU-0033 (stale-write preconditions and full writer audit) remains separate and OPEN.
+
+**V1 disposition:** NOT READY. Evidence maturity remains **73/100** pending exact-head verification and broader owner acceptance. Physical Android cold launch/restart/reconnect, intended-installation recovery drill, live-business commercial reconciliation and POPIA operational sign-off remain independent gates. ZAZU name clearance remains deferred by owner direction. No production data was changed and no branches were created.
+
+---
+
 ## Director execution checkpoint — 2026-11-20
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
