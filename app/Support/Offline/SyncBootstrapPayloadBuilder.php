@@ -36,7 +36,7 @@ class SyncBootstrapPayloadBuilder
 
     public function build(SyncDevice $device, array $deliverySequences = []): array
     {
-        return DB::transaction(function () use ($device): array {
+        return DB::transaction(function () use ($device, $deliverySequences): array {
             // The snapshot and its revisions must describe one serialized
             // business state. Every online aggregate writer takes this same
             // business lock before changing records and advancing revisions.
