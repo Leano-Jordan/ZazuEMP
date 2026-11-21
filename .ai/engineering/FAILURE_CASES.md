@@ -783,6 +783,6 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 - Unsupported operations now raise a field-level validation error before payload processing or domain writes.
 - Added `OfflineMutationOperationValidationTest`, which submits a `delete` operation for each entity and verifies that the mutation remains pending, attempts remain zero, and no customer, event or business capability is created.
 
-**Verification:** Laravel `676 passed / 1 skipped / 4,593 assertions`; PHPMD PASS; PostgreSQL migration/registration/backup/restore smoke PASS. The full offline-browser job was still running at the time this case was documented and is not claimed as passed here.
+**Verification:** Laravel `676 passed / 1 skipped / 4,593 assertions`; PHPMD PASS; PostgreSQL migration/registration/backup/restore smoke PASS; offline browser **63 desktop + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, with no failures. Exact application-code workflow [44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
 
 **Scope:** This closes the unsupported-operation acceptance defect for these three handlers. It does not implement deletion support; delete remains unsupported. The broader offline sync matrix remains OPEN.
