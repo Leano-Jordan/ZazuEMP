@@ -550,6 +550,9 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0033
 
+**2026-11-21 source-audit increment:** a second primary-contact revision bypass was found in `CustomerContactController::store` (the create-primary route; the edit-primary route had already been corrected). Replaced the relationship mass update with locked per-model updates and added a regression asserting Customer revision advancement. Exact-head verification is pending on `5f8dd6b`. This closes only the identified writer defect; CASE-ZAZU-0033 remains OPEN for the complete indirect/bulk writer inventory and sync matrix.
+
+
 **Status:** OPEN — implementation committed; exact-head acceptance and exhaustive writer audit still pending.  
 **Engineering diagnostic code:** ENG-DATA-003.  
 **First observed:** 2026-11-20.  
