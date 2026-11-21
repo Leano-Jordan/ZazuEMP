@@ -450,17 +450,17 @@ class OfflinePurchasePrecisionTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \App\Models\\Event::create([
+        $event = \App\Models\Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-EXPENSE-RECONCILIATION',
             'name' => 'Offline expense job',
             'status' => 'confirmed',
         ]);
-        $supplier = \App\Models\\Supplier::create([
+        $supplier = \App\Models\Supplier::create([
             'business_id' => $business->id,
             'name' => 'Offline expense supplier',
         ]);
-        $order = \App\Models\\PurchaseOrder::create([
+        $order = \App\Models\PurchaseOrder::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
             'supplier_id' => $supplier->id,
@@ -471,7 +471,7 @@ class OfflinePurchasePrecisionTest extends TestCase
             'total_amount' => '450.00',
         ]);
 
-        $registry = app(\App\Support\\Offline\\SyncEntityIdentityRegistry::class);
+        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
         $eventIdentity = $registry->identify($event, 'job');
         $supplierIdentity = $registry->identify($supplier, 'supplier');
         $orderIdentity = $registry->identify($order, 'purchase_order');
@@ -497,15 +497,15 @@ class OfflinePurchasePrecisionTest extends TestCase
             ],
         );
 
-        $handler = app(\App\Support\\Offline\\OfflineDomainMutationHandler::class);
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
         $applier = app(SyncMutationApplier::class);
         $applied = $applier->apply($mutation, ['expense' => $handler]);
 
-        $expense = \App\Models\\FinanceExpense::query()
+        $expense = \App\Models\FinanceExpense::query()
             ->where('business_id', $business->id)
             ->where('idempotency_key', $mutation->mutation_id)
             ->firstOrFail();
-        $identity = \App\Models\\SyncEntityIdentity::query()
+        $identity = \App\Models\SyncEntityIdentity::query()
             ->where('business_id', $business->id)
             ->where('entity_type', 'expense')
             ->where('entity_uuid', $localId)
@@ -530,8 +530,8 @@ class OfflinePurchasePrecisionTest extends TestCase
         // An applied mutation replay is a no-op: no duplicate expense or audit.
         $applier->apply($applied, ['expense' => $handler]);
 
-        $this->assertSame(1, \App\Models\\FinanceExpense::query()->where('business_id', $business->id)->count());
-        $this->assertSame(1, \App\Models\\AuditLog::query()
+        $this->assertSame(1, \App\Models\FinanceExpense::query()->where('business_id', $business->id)->count());
+        $this->assertSame(1, \App\Models\AuditLog::query()
             ->where('business_id', $business->id)
             ->where('action', 'finance.expense.recorded')
             ->count());
