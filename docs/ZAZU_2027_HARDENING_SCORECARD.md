@@ -8,15 +8,15 @@
 - SonarCloud [44880113403]: **SKIPPED**, not counted.
 - Offline-browser acceptance in Laravel run [44880113367]: **still running** at this checkpoint; do not claim the cross-device browser contract has passed yet.
 
-### Corrections now under exact-head verification
+### Verified corrections
 - Receiver pull now sends the exact delivery prefix to bootstrap. Server resolves primary and related aggregates only for the authenticated business/device, includes those aggregates beyond the regular 500-record window and prioritizes recently revised records for the normal bounded refresh.
 - Explicit pairing selections remain pinned; delivery-driven Customer/Work/Quote/Preparation records cannot silently expand an explicitly restricted workspace.
 - Bootstrap now locks business before device, rechecks active status and the current bearer-token hash against the authenticated model, updates last-seen and builds the data snapshot under the same lock boundary. A revoked/replaced device cannot receive a stale bootstrap response.
 - Service-worker cache is `zazu-static-v58`.
 
-**Failure records:** CASE-ZAZU-0034 / ENG-DATA-004 (bounded receiver snapshot omission) and CASE-ZAZU-0035 / ENG-AUTH-001 (stale device authorization during bootstrap). Both are implemented with feature/browser regressions; CASE-ZAZU-0035's direct revocation and credential replacement regressions passed in Laravel.
+**Failure records:** CASE-ZAZU-0034 / ENG-DATA-004 (bounded receiver snapshot omission) and CASE-ZAZU-0035 / ENG-AUTH-001 (stale device authorization during bootstrap). Both defects are **CLOSED** on the exact source head; server-side and browser regressions passed.
 
-**Readiness:** remains **73/100** for now; no uplift until offline-browser acceptance finishes on this source head. V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational controls remain open. ZAZU name clearance remains deferred. No production deployment or live business data changed.
+**Readiness: 75/100 (+2)**. The uplift reflects exact-head verification of receiver snapshot completeness/device isolation and bootstrap revocation/credential revalidation, including backend and browser acceptance. It does not close V1 release readiness. V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational controls remain open. ZAZU name clearance remains deferred. No production deployment or live business data changed.
 
 ---
 
