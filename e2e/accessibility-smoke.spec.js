@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 async function expectNoSeriousAccessibilityViolations(page, surface) {
-    // Axe must inspect settled colors, not intermediate frames of the landing page's intentional CSS transitions.
-    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
+    // Axe must inspect settled colors, not intermediate frames of intentional CSS transitions.
+    await page.waitForTimeout(300);
     const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
