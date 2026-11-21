@@ -1,14 +1,14 @@
 ## Director execution checkpoint — transactional trusted-device authorization — 2026-11-21
 
-**Implementation:** [9245670](https://github.com/Leano-Jordan/ZazuEMP/commit/9245670978a41c78fd54b46654f9746cf4d3ef5d).  
-**Regression coverage:** [0f01244](https://github.com/Leano-Jordan/ZazuEMP/commit/0f01244229d1fc12b2adead728bd903f91e54b1c).
+**Current code head:** [7d4b097](https://github.com/Leano-Jordan/ZazuEMP/commit/7d4b097a13d02f3d5369bf8e75e2dc85c361beb7).  
+**Regression coverage:** [01e0b4b](https://github.com/Leano-Jordan/ZazuEMP/commit/01e0b4bc771d25f537779c0e5c17cfc9e619420a).
 
 - Added a shared business-first/device-row authorization guard that revalidates active status and the persisted token hash inside the caller's transaction.
 - Applied it to conflict listing/resolution, attachment upload/list/download and device revocation. This serializes these operations with revocation and rejects stale middleware snapshots.
 - A stale credential can no longer revoke a replacement credential registered for the same installation.
 - Added five regression tests for revoked-device conflict listing/resolution, attachment upload, attachment listing and stale-token revocation.
 - Existing bootstrap, pull and acknowledgement revalidation remains in place; this correction does not reopen those already-covered paths.
-- **Verification:** exact-head CI/test result is pending. The new tests have been committed but are not represented as passed. No readiness score change.
+- **Verification on code head `7d4b097`:** Laravel **670 passed / 1 skipped / 4,552 assertions** and PostgreSQL migration/recovery smoke passed in [run 44931555043](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555043). PHPMD [44931555002](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555002), Psalm [44931555131](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555131), populated upgrade/rollback [44931555044](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555044) and Director Health [44931554979](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931554979) passed. Offline-browser acceptance and Windows package acceptance were still running when this checkpoint was written; SonarCloud is skipped. No readiness score change.
 
 **Next:** inspect the current exact-head Actions results, correct any failures, then continue the remaining V1 gates. Main only; no branches.
 
