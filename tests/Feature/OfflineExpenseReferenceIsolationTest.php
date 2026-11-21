@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Customer;
 use App\Models\Event;
 use App\Models\FinanceExpense;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\SyncDevice;
+use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
 use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncEntityIdentityRegistry;
