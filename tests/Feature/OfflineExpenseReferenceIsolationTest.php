@@ -297,13 +297,15 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         ]);
         $invoiceUuid = (string) Str::uuid();
 
-        SyncEntityIdentity::create([
+        $identity = SyncEntityIdentity::create([
             'business_id' => $business->id,
             'entity_type' => 'invoice',
             'entity_uuid' => $invoiceUuid,
             'record_type' => $customer->getMorphClass(),
             'record_id' => $customer->id,
         ]);
+
+        $this->assertFalse(app(SyncMutationRelatedIdentityResolver::class)->isSafeIdentity($identity));
 
         $mutationId = (string) Str::uuid();
         $paymentUuid = (string) Str::uuid();
