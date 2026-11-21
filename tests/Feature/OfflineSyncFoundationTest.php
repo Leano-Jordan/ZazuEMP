@@ -2817,7 +2817,11 @@ class OfflineSyncFoundationTest extends TestCase
             $deliveries->pluck('entity_type')->all(),
         );
 
-        $snapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
+        $deliverySequences = $deliveries->pluck('delivery_sequence')
+            ->map(static fn ($sequence): int => (int) $sequence)
+            ->all();
+        $snapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)
+            ->build($receivingDevice, $deliverySequences);
         $remoteOrder = collect($snapshot['purchase_orders'])->first(
             fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $order->id,
         );
@@ -2826,6 +2830,21 @@ class OfflineSyncFoundationTest extends TestCase
             ['10.00', '8.00'],
             collect($remoteOrder['items'])->pluck('record.received_quantity')->all(),
         );
+
+        $receivedInventoryIds = DB::table('inventory_movements')
+            ->where('business_id', $order->business_id)
+            ->where('purchase_order_id', $order->id)
+            ->distinct()
+            ->pluck('inventory_item_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $snapshotInventoryIds = collect($snapshot['inventory_items'])
+            ->pluck('server_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        foreach ($receivedInventoryIds as $inventoryId) {
+            $this->assertContains($inventoryId, $snapshotInventoryIds, 'Receipt delivery must include each affected inventory aggregate.');
+        }
 
         $cursor = $protocol->acknowledgeThrough($receivingDevice, 3, 'business');
         $this->assertSame(3, (int) $cursor->last_acknowledged_sequence);
