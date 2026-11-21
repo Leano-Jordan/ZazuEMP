@@ -9,6 +9,7 @@ use App\Models\PurchaseOrderItem;
 use App\Models\Quote;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -110,7 +111,7 @@ final class SyncMutationRelatedRevisionAdvancer
                 $identity = SyncEntityIdentity::query()
                     ->where('business_id', $businessId)
                     ->where('entity_type', 'purchase_order_item')
-                    ->where('record_type', (new \\App\\Models\\PurchaseOrderItem)->getMorphClass())
+                    ->where('record_type', (new PurchaseOrderItem)->getMorphClass())
                     ->where('entity_uuid', Str::lower($lineIdentityOrId))
                     ->first();
                 if ($identity) {
@@ -149,14 +150,14 @@ final class SyncMutationRelatedRevisionAdvancer
             ->first();
     }
 
-    private function safeRecord(SyncEntityIdentity $identity): ?\\Illuminate\\Database\\Eloquent\\Model
+    private function safeRecord(SyncEntityIdentity $identity): ?Model
     {
         if ($identity->record_type !== $this->expectedMorphType($identity->entity_type)) {
             return null;
         }
 
         $record = $identity->record;
-        if (! $record instanceof \\Illuminate\\Database\\Eloquent\\Model) {
+        if (! $record instanceof Model) {
             return null;
         }
 
@@ -176,7 +177,7 @@ final class SyncMutationRelatedRevisionAdvancer
             'job' => Event::class,
             'quote' => Quote::class,
             'purchase_order' => PurchaseOrder::class,
-            'purchase_order_item' => \\App\\Models\\PurchaseOrderItem::class,
+            'purchase_order_item' => PurchaseOrderItem::class,
             default => null,
         };
 
