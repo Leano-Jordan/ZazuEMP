@@ -421,6 +421,51 @@ class OfflineSyncFoundationTest extends TestCase
             ->value('status'));
     }
 
+    public function test_sync_bootstrap_revalidates_device_revocation_and_credential_replacement(): void
+    {
+        $business = Business::create([
+            'name' => 'Bootstrap Device Revalidation Business',
+            'slug' => 'bootstrap-device-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $revokedDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'metadata' => ['sync_token_hash' => hash('sha256', 'bootstrap-revoked-token')],
+        ]);
+        $revokedSnapshot = $revokedDevice->fresh();
+        $revokedDevice->update(['status' => 'revoked', 'revoked_at' => now()]);
+
+        $revokedRequest = Request::create('/api/sync/bootstrap', 'GET');
+        $revokedRequest->attributes->set('sync_device', $revokedSnapshot);
+        try {
+            app(SyncController::class)->bootstrap($revokedRequest);
+            $this->fail('A stale bootstrap authentication snapshot must not disclose business data after revocation.');
+        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+
+        $replacedDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'metadata' => ['sync_token_hash' => hash('sha256', 'bootstrap-old-token')],
+        ]);
+        $replacedSnapshot = $replacedDevice->fresh();
+        $replacedDevice->update([
+            'metadata' => ['sync_token_hash' => hash('sha256', 'bootstrap-new-token')],
+        ]);
+
+        $replacedRequest = Request::create('/api/sync/bootstrap', 'GET');
+        $replacedRequest->attributes->set('sync_device', $replacedSnapshot);
+        try {
+            app(SyncController::class)->bootstrap($replacedRequest);
+            $this->fail('A bootstrap request authenticated with a replaced credential must be rejected.');
+        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+    }
+
     public function test_sync_pull_exposes_receiver_delivery_sequence_for_acknowledgement(): void
     {
         $business = Business::create([
