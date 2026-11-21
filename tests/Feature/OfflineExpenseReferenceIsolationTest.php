@@ -300,7 +300,7 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             'record_id' => $foreignCustomer->id,
         ]);
 
-        $snapshot = app(\\App\\Support\\Offline\\SyncEntitySnapshotBuilder::class)->build($identity);
+        $snapshot = app(\App\Support\Offline\SyncEntitySnapshotBuilder::class)->build($identity);
 
         $this->assertTrue($snapshot['deleted']);
         $this->assertSame([], $snapshot['record']);
