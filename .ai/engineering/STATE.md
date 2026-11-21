@@ -1,3 +1,13 @@
+## Director closure checkpoint — 2026-11-21 (CASE-ZAZU-0033 stale-write protection)
+
+**Verified source/test head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`. Laravel **634 passed / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery **PASS**; offline browser **59 desktop + 7 mobile + 1 phone-local Work/attachment/reconnect passed**; PHPMD, Zazu Quality, Composer audit, secret scan and application checks **PASS**. [Exact-head workflow] (https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44881431689).
+
+CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has paired-device rejection, same-device causal chains, conflict/rebase payload preservation, parent-revision propagation and business-isolation evidence. The final online writer review found and corrected the remaining primary-contact creation mass-update bypass; other identified bulk operations are paired with tracked parent updates or are restore/protocol writes outside existing domain identities.
+
+**The full offline sync workflow matrix remains OPEN and separate.** Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain OPEN. Evidence maturity remains **75/100**; no unsupported score uplift. V1 remains **NOT READY**.
+
+---
+
 ## Director deep-audit increment — 2026-11-21 (customer-contact create revision bypass)
 
 **Source/test head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`. Laravel **634 passed / 1 skipped / 4,399 assertions**, PostgreSQL migration/recovery smoke **PASS**, PHPMD **PASS**; desktop/mobile browser acceptance is still running. Added an explicit two-paired-device stale-write regression: device B commits revision 2, device A's revision-1 edit is rejected with the authoritative remote snapshot and its local payload preserved.
@@ -5,7 +15,7 @@
 - The repository-wide online-writer review found a second primary-contact mass-update bypass in `CustomerContactController::store`. The update-contact path had already been converted to per-model writes, but creating a replacement primary still used a relationship query-builder update that skipped `CustomerContact` model events and therefore left the registered Customer aggregate revision unchanged.
 - Replaced that mass update with a locked collection of currently-primary contact models and per-model updates. Each affected contact now emits the nested-model event that advances the parent Customer revision.
 - Added `CustomerContactLifecycleTest::test_adding_a_primary_contact_advances_customer_sync_revision`, asserting the former primary is demoted, exactly one primary remains, and the customer revision advances.
-- This is a confirmed writer correction, not closure of CASE-ZAZU-0033. Continue the exhaustive inventory across all indirect, bulk, console and transaction-boundary writers; verify exact-head Laravel, PostgreSQL and browser suites before changing status.
+- The writer correction and paired-device regression are now verified on exact source/test head 51a75eb. CASE-ZAZU-0033 is CLOSED; the complete offline sync workflow matrix remains a separate OPEN gate.
 - No schema changes, production data changes or branches. V1 remains NOT READY; evidence maturity remains 75/100 pending broader sync-matrix and owner acceptance.
 
 ## Director execution checkpoint — 2026-11-21 (receiver sync completeness)
