@@ -283,6 +283,43 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertSame('Customer behind mismatched identity', $customer->fresh()->name);
     }
 
+    public function test_related_sync_acknowledgement_rejects_identity_with_wrong_morph_type(): void
+    {
+        $business = $this->business('Related identity type business');
+        $device = $this->device($business);
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Not an invoice',
+        ]);
+        $invoiceUuid = (string) Str::uuid();
+
+        SyncEntityIdentity::create([
+            'business_id' => $business->id,
+            'entity_type' => 'invoice',
+            'entity_uuid' => $invoiceUuid,
+            'record_type' => $customer->getMorphClass(),
+            'record_id' => $customer->id,
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'payment',
+            (string) Str::uuid(),
+            'create',
+            [
+                'local_id' => (string) Str::uuid(),
+                'record' => ['invoice_local_id' => $invoiceUuid],
+            ],
+            $mutationId,
+        );
+
+        $related = app(\\App\\Support\\Offline\\SyncMutationRelatedIdentityResolver::class)
+            ->resolve($mutation);
+
+        $this->assertSame([], $related);
+    }
+
     public function test_sync_snapshot_does_not_serialize_a_foreign_business_record(): void
     {
         $business = $this->business('Snapshot identity business');
