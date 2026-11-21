@@ -1,7 +1,7 @@
 ## Director execution checkpoint — 2026-11-21 (receiver sync completeness)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
-**Application/test source head:** `472e301065a5301c80f0ffbb97f82b61c24575ba`.  
+**Application/test source head:** `a31d3545b709d2a9395c1112ef8f0292d8517447`.  
 **Verification disposition:** Laravel, PostgreSQL, offline-browser, PHPMD and quality workflows have been queued for this head; results are not yet reconciled. Do not claim this change is verified until every relevant workflow finishes on this source head.
 
 ### Confirmed defect and correction
@@ -10,6 +10,7 @@
 - The client now includes the exact `delivery_sequences[]` returned by receiver pull when requesting bootstrap. The controller validates at most 100 positive integer values.
 - `SyncBootstrapDeliveryTargetResolver` resolves only delivery rows belonging to that business, destination device and business stream. It resolves command primary/related aggregate identities as well as ordinary mutation identities.
 - The bootstrap builder unions delivered targets into the normal bounded record sets/selected records, without widening another device's scope or removing the 500-record limit.
+- Explicit pairing selections remain pinned: delivery-driven customer, Work, quote and preparation records are included only when the owner had already selected them.
 - The ordinary bounded collections now select their working set by latest sync-identity update time (fallback to record `updated_at`) and retain their existing display order.
 - The client only acknowledges after the complete bootstrap snapshot has been applied locally. The service-worker static cache is `zazu-static-v58` so installed clients fetch the updated cache-first offline client.
 
