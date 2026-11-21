@@ -9,6 +9,17 @@
 - This is defense in depth against stale, corrupted, or incorrectly imported identity mappings. It is not evidence that a normal authenticated client can write identity rows directly, and should not be described as a demonstrated remote exploit.
 - Exact-head CI for these new commits is pending; do not count this hardening as verified until Laravel and quality checks pass.
 
+### Offline linked-identity morph-type validation — 2026-11-21
+
+**Implementation:** [57c4888](https://github.com/Leano-Jordan/ZazuEMP/commit/57c48885459c956906abebb13782722d1eb7e383).  
+**Regression:** [3713553](https://github.com/Leano-Jordan/ZazuEMP/commit/37135539e9de7e4548f67c972fced14138911d95).
+
+- Every polymorphic identity lookup used for offline linked records now requires the stored `record_type` to match the expected Eloquent model morph class before resolving the numeric record ID.
+- Applied to customer/job/quote/invoice and other shared identity resolution, plus direct event, supplier, purchase-order and purchase-order-item lookups in the mutation handler.
+- Added an adversarial same-business ID-collision regression: a UUID marked as a customer but carrying the Event morph type must not resolve to a Customer merely because the numeric IDs coincide.
+- This closes an identity type-confusion path separately from the cross-business ownership check above.
+- Exact-head Laravel and quality verification remains pending.
+
 ## Offline event-cost local sync-state reconciliation — 2026-11-21
 
 **Implementation:** `764f53682123481579a276303dc5da45c7c6038b` on `main`.  
