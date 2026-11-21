@@ -304,7 +304,7 @@ class ZazuRestoreCommand extends Command
                 // must replace stale files from the installation being restored.
                 File::ensureDirectoryExists($storedPrivate);
                 if (!is_dir($storedPrivate)) {
-                    throw new \\RuntimeException('Could not stage the empty private-storage restore directory.');
+                    throw new \RuntimeException('Could not stage the empty private-storage restore directory.');
                 }
             }
 
