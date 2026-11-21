@@ -240,6 +240,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         Route::post('/settings/licence', [OfflineLicenseController::class, 'store'])->middleware('throttle:10,1')->name('settings.license.store');
         Route::post('/settings/sync/pairing', [SyncController::class, 'createPairing'])->middleware('throttle:20,1')->name('settings.sync.pairing');
         Route::post('/settings/sync/devices/revoke-installation', [BusinessSettingsController::class, 'revokeSyncDeviceByInstallation'])->middleware('throttle:30,1')->name('settings.sync.devices.revoke-installation');
+        Route::post('/settings/sync/devices/{device}/reapprove', [BusinessSettingsController::class, 'reapproveSyncDevice'])->name('settings.sync.devices.reapprove');
         Route::post('/settings/sync/devices/{device}/revoke', [BusinessSettingsController::class, 'revokeSyncDevice'])->name('settings.sync.devices.revoke');
         Route::get('/settings/audit', [AuditLogController::class, 'index'])->name('settings.audit');
         Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');

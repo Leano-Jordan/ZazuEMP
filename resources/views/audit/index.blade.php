@@ -22,7 +22,18 @@
                 <div class="zazu-list-main">
                     <div class="zazu-list-title">{{ $log->action }}</div>
                     <div class="zazu-list-meta">
-                        {{ $log->user?->name ?? 'System' }}
+                        @if (($log->metadata['actor_source'] ?? null) === 'owner_approved_sync_device')
+                            Via trusted device
+                            @if (!empty($log->metadata['sync_device_type']))
+                                ({{ ucfirst($log->metadata['sync_device_type']) }})
+                            @endif
+                            @if (!empty($log->metadata['sync_device_name']))
+                                · {{ $log->metadata['sync_device_name'] }}
+                            @endif
+                            approved by {{ $log->user?->name ?? 'approver not recorded (legacy device)' }}
+                        @else
+                            {{ $log->user?->name ?? 'System' }}
+                        @endif
                         · {{ $log->created_at?->format('d M Y H:i:s') }}
                         @if($log->subject_type && $log->subject_id)
                             · {{ class_basename($log->subject_type) }} #{{ $log->subject_id }}

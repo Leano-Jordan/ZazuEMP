@@ -402,6 +402,12 @@
                                 · Approved by {{ $device->approvedBy?->name ?? 'Approver not recorded (legacy device)' }}
                             </p>
                         </div>
+                        @if ($device->status !== 'revoked' && $device->revoked_at === null && $device->approved_by_user_id === null)
+                            <form method="POST" action="{{ route('settings.sync.devices.reapprove', $device) }}" data-zazu-confirm="Record your account as the approving owner for future sync changes from this legacy device? Historical activity will remain unattributed." data-zazu-confirm-title="Record approving owner?" data-zazu-confirm-action="Record approval">
+                                @csrf
+                                <button type="submit" class="zazu-btn zazu-btn-secondary">Record approving owner</button>
+                            </form>
+                        @endif
                         @if ($device->status !== 'revoked' && $device->revoked_at === null)
                             <form method="POST" action="{{ route('settings.sync.devices.revoke', $device) }}" data-zazu-confirm="Revoke this device's access to business sync?" data-zazu-confirm-title="Revoke trusted device?" data-zazu-confirm-action="Revoke access">
                                 @csrf

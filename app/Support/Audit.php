@@ -26,6 +26,8 @@ class Audit
             $metadata = array_merge($metadata, [
                 'actor_source' => 'owner_approved_sync_device',
                 'sync_device_id' => (int) $syncDevice->getKey(),
+                'sync_device_name' => $syncDevice->device_name,
+                'sync_device_type' => $syncDevice->device_type,
             ]);
         }
 

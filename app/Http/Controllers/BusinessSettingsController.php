@@ -44,6 +44,39 @@ class BusinessSettingsController extends Controller
     }
 
 
+
+    public function reapproveSyncDevice(Request $request, SyncDevice $device): RedirectResponse
+    {
+        $business = app(CurrentBusiness::class)->model($request->user());
+        abort_unless((int) $device->business_id === (int) $business->id, 404);
+
+        DB::transaction(function () use ($device, $business, $request): void {
+            $lockedDevice = SyncDevice::query()
+                ->where('business_id', $business->id)
+                ->whereKey($device->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_unless($lockedDevice->isActive(), 409, 'Only an active trusted device can have its approving owner recorded.');
+            abort_if($lockedDevice->approved_by_user_id !== null, 409, 'This device already has an approving owner.');
+
+            $approverId = (int) $request->user()->getAuthIdentifier();
+            $lockedDevice->forceFill(['approved_by_user_id' => $approverId])->save();
+
+            Audit::record('sync.device.approver.recorded', $lockedDevice, [
+                'sync_device_id' => (int) $lockedDevice->id,
+                'sync_device_name' => $lockedDevice->device_name,
+                'sync_device_type' => $lockedDevice->device_type,
+                'attribution_scope' => 'future_sync_mutations_only',
+            ], $business->id);
+        });
+
+        return redirect()->route('settings.index')->with(
+            'success',
+            'Approving owner recorded. Future sync changes will be attributed to you; historical activity remains unattributed.'
+        );
+    }
+
     public function revokeSyncDevice(Request $request, SyncDevice $device): RedirectResponse
     {
         $business = app(CurrentBusiness::class)->model($request->user());
