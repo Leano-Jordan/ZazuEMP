@@ -2,6 +2,7 @@
 
 namespace App\Support\Offline;
 
+use App\Models\Asset;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
@@ -140,7 +141,7 @@ final class SyncBootstrapDeliveryTargetResolver
             'expense' => FinanceExpense::class,
             'inventory_item' => InventoryItem::class,
             'event_cost' => EventCost::class,
-            'asset' => \\App\\Models\\Asset::class,
+            'asset' => Asset::class,
             default => null,
         };
     }
@@ -163,7 +164,7 @@ final class SyncBootstrapDeliveryTargetResolver
             'invoice' => 'invoice',
             'expense' => 'expense',
             'inventory_item' => 'inventory_item',
-            'asset' => 'asset',
+            'asset' => Asset::class,
             'event_cost' => 'event_cost',
             default => null,
         };
