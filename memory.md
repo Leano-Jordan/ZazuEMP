@@ -44,7 +44,7 @@ Zazu is a reusable commercial event-management platform for catering, event equi
 
 ## Current verified position
 
-Current repository head: fb2c31467d548dfb3dfb3a0ea55d786cc13206f2 on main. Latest application/test source head: d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb; latest Windows host-operations source: f589d2acecf775df2b69846aea45abd16709a33b.
+Latest code/operations verification head: fb2c31467d548dfb3dfb3a0ea55d786cc13206f2 on main; subsequent documentation reconciliation is docs-only. Latest application/test source head: d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb; latest Windows host-operations source: f589d2acecf775df2b69846aea45abd16709a33b.
 Exact-head Laravel: **643 passed / 1 skipped / 4,424 assertions**. PostgreSQL migration/recovery smoke passed. Offline browser: **59 desktop Chromium + 7 mobile-viewport + 1 phone-local Work/attachment/reconnect passed**. PHPMD, Psalm, Zazu Quality and populated upgrade/rollback passed; SonarCloud was skipped. Windows package and Windows Ops script checks passed. See .ai/engineering/STATE.md and docs/V1_RELEASE_CHECKLIST.md for workflow evidence.
 
 **Operational reliability work implemented:** daily 02:00 owner-PC backup task with 14-archive retention, startup and Founder Control Centre backup-age warnings, protected local backup directory, and a documented off-disk USB/cloud copy step. The actual PC task execution, off-disk copy and controlled restore drill remain OPEN.

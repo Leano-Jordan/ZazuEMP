@@ -1,6 +1,6 @@
 ## Director operational reliability checkpoint — 2026-11-21
 
-**Current repository head:** fb2c31467d548dfb3dfb3a0ea55d786cc13206f2 on main.  
+**Latest code/operations verification head:** fb2c31467d548dfb3dfb3a0ea55d786cc13206f2 on main; subsequent documentation reconciliation is docs-only.  
 **Application/test source head:** d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb. **Windows host-operations source head:** f589d2acecf775df2b69846aea45abd16709a33b.
 
 - Laravel: **643 passed / 1 skipped / 4,424 assertions**. [Run 44885232020](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44885232020)
