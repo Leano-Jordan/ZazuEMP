@@ -74,6 +74,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-FIXTURE-004 | CASE-ZAZU-0029 | Offline sync browser tests race boot-time registration and retry scheduling | F2/F3 | CLOSED — exact-head browser and Laravel verification passed |
 | ENG-FIXTURE-005 | CASE-ZAZU-0030 | Offline startup readiness test accesses ZazuOffline before runtime exposure | F2/F3/F8 | CORRECTED — exact-head rerun pending |
 | ENG-FIXTURE-006 | CASE-ZAZU-0031 | Offline customer edit fixture coupled to seeded/cached directory assumptions | F2/F3 | CLOSED — exact-head browser and supporting CI passed |
+| ENG-FIXTURE-007 | CASE-ZAZU-0037 | Offline invoice sync acknowledgement targets the seeded invoice instead of the newly created local invoice | F2/F3 | CLOSED — exact-head browser/Laravel/PostgreSQL/quality verification passed |
 
 
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
@@ -133,4 +134,3 @@ When a confirmed mechanism has no existing code:
 ## Runtime catalog boundary
 
 The runtime catalog remains authoritative for safe operator-facing errors. Engineering codes belong in internal diagnostics and repository records unless a deliberate product decision exposes them.
-| ENG-FIXTURE-007 | CASE-ZAZU-0037 | Offline invoice sync acknowledgement targets the seeded invoice instead of the newly created local invoice | F2/F3 | CORRECTED — exact-head browser verification pending |
