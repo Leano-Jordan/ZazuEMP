@@ -1,3 +1,16 @@
+## Windows recovery acceptance — 2026-11-21
+
+The Windows V1 package workflow now exercises two installation-wide recovery cases on Windows PowerShell:
+
+- a populated SQLite record plus private-media file is backed up, mutated and restored;
+- an archive whose manifest declares private storage but contains zero private files is restored over a target containing a stale private file; the stale file must be removed and the private directory left empty.
+
+Both cases, the candidate package build and fresh PowerShell installation passed on [workflow 44937732880](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937732880), using runtime source [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc).
+
+This is Windows CI evidence. It does not replace the operator's controlled backup, off-disk copy and restore drill on the intended owner PC.
+
+---
+
 # Zazu EMP — Windows V1 Candidate Package
 
 **Package status:** V1 installation candidate; not a production/SaaS release certification  
