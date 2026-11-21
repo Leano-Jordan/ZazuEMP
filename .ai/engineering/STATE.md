@@ -1,8 +1,8 @@
 ## Director execution checkpoint — 2026-11-21 (receiver sync completeness)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
-**Application/test source head:** `a31d3545b709d2a9395c1112ef8f0292d8517447`.  
-**Verification disposition:** Laravel, PostgreSQL, offline-browser, PHPMD and quality workflows have been queued for this head; results are not yet reconciled. Do not claim this change is verified until every relevant workflow finishes on this source head.
+**Application/test source head:** `559e66b87de8617f967b722b55b0fbfd9b116495`.  
+**Exact-head verification — `559e66b`:** Laravel **632 passed / 1 skipped / 4,388 assertions**; PostgreSQL migration/recovery smoke **PASS**; PHPMD, Zazu Quality, secret scan, Composer security audit, application, Director Health, Push-on-main and Actions/Python/JavaScript analysis **PASS**. SonarCloud **SKIPPED**, not counted. Offline-browser acceptance remains in progress; do not close the cross-device browser gate until its result is observed.
 
 ### Confirmed defect and correction
 - The receiver pulled an ordered delivery prefix, then applied the ordinary bounded bootstrap and acknowledged the prefix. A delivered aggregate outside a capped 500-record collection or a selected-record window could be omitted from the stored snapshot while the receiver's cursor advanced.
@@ -13,6 +13,8 @@
 - Explicit pairing selections remain pinned: delivery-driven customer, Work, quote and preparation records are included only when the owner had already selected them.
 - The ordinary bounded collections now select their working set by latest sync-identity update time (fallback to record `updated_at`) and retain their existing display order.
 - The client only acknowledges after the complete bootstrap snapshot has been applied locally. The service-worker static cache is `zazu-static-v58` so installed clients fetch the updated cache-first offline client.
+- Explicit pairing selections are preserved: delivery-driven customer, Work, quote and preparation records are included only when already present in that device's pinned selection.
+- Bootstrap access now uses the canonical business → device lock order, re-reads the active device and compares the persisted sync-token hash against the middleware-authenticated snapshot before updating last-seen activity and building data. Revoked/replaced devices return 401.
 
 ### Added regression coverage
 - A supplier outside the default 500-record alphabetical window is promoted after an online revision update.
