@@ -1,3 +1,18 @@
+## Director deep-audit increment — 2026-11-21 (online writer and paired-device stale-write correction)
+
+**Application/test source head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`.
+
+- Corrected the remaining primary-contact creation writer bypass: the previous primary is now demoted through locked Eloquent model updates, ensuring the parent Customer aggregate revision advances.
+- Added a feature regression for primary-contact creation and a second paired-device stale-write regression. The latter proves device B's committed revision 2 is preserved when device A submits a revision-1 update; the stale mutation remains pending with its local payload intact.
+- Laravel: **634 passed / 1 skipped / 4,399 assertions**.
+- PostgreSQL migration/recovery smoke: **PASS**.
+- PHPMD: **PASS**.
+- Desktop/mobile offline-browser acceptance: **IN PROGRESS** at this checkpoint.
+
+**CASE-ZAZU-0033 remains OPEN** pending browser acceptance and final disposition of the full supported offline sync matrix. Evidence maturity remains **75/100**; V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain owner gates.
+
+---
+
 ## Director execution checkpoint — 2026-11-21 (receiver sync and bootstrap security closure)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main`.  
