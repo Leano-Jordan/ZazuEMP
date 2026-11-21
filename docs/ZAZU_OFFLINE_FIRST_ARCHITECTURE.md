@@ -1,3 +1,17 @@
+### LAN host outage while Wi-Fi remains connected — 2026-11-21
+
+**Implementation:** [ae2a900](https://github.com/Leano-Jordan/ZazuEMP/commit/ae2a90080590f4aad8bfffc459e211f6b98c0bf8).  
+**UI:** [87521db](https://github.com/Leano-Jordan/ZazuEMP/commit/87521dbc6996bcfb8d7eb31b3e3a235fcdfedf5d).  
+**Regression:** [41d7a25](https://github.com/Leano-Jordan/ZazuEMP/commit/41d7a256f80b1e1d98cbb43509f81dc26cd600ec).
+
+- navigator.onLine does not detect a stopped LAN host when the phone remains connected to Wi-Fi. Before this change, the UI only rechecked HEAD /up during selected render/event paths, so the visible page could remain a stale server snapshot.
+- The app now polls the lightweight health route every 10 seconds and on focus/network/visibility changes. A host outage displays a non-destructive notice with a link to the cached dashboard workspace; the dashboard reveals the local IndexedDB workspace using the same origin-availability result.
+- The notice does not auto-redirect or discard unsaved form input, and it explicitly limits the offline promise to supported screens.
+- Playwright regression simulates host 503→200 while navigator.onLine stays true on desktop Chromium and Pixel 7 viewport.
+- Exact-head browser verification is pending. Actual installed Android stop-host/force-close/restart/reconnect acceptance remains mandatory.
+
+---
+
 ### Regression suite maintainability — 2026-11-21
 
 **Refactor:** [ea4247f](https://github.com/Leano-Jordan/ZazuEMP/commit/ea4247fbbde558f4fe7475482cd2325d9b25fa26) + [1e67154](https://github.com/Leano-Jordan/ZazuEMP/commit/1e67154405fa6fb96f7d0bafd67694274cb47025).
