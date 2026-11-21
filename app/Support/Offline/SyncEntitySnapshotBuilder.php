@@ -21,7 +21,11 @@ final class SyncEntitySnapshotBuilder
     public function build(SyncEntityIdentity $identity): array
     {
         $record = $identity->record;
-        if ($record instanceof Model && ! $this->recordBelongsToBusiness($record, (int) $identity->business_id)) {
+        if (
+            ! $record instanceof Model
+            || ! $this->recordBelongsToBusiness($record, (int) $identity->business_id)
+            || $identity->record_type !== $this->expectedMorphType($identity->entity_type)
+        ) {
             $record = null;
         }
 
@@ -38,6 +42,22 @@ final class SyncEntitySnapshotBuilder
         ];
     }
 
+
+    private function expectedMorphType(string $entityType): ?string
+    {
+        $model = match ($entityType) {
+            'customer' => Customer::class,
+            'job' => Event::class,
+            'quote' => Quote::class,
+            'invoice' => Invoice::class,
+            'purchase_order' => PurchaseOrder::class,
+            'inventory_item' => InventoryItem::class,
+            'asset' => Asset::class,
+            default => null,
+        };
+
+        return $model ? (new $model)->getMorphClass() : null;
+    }
 
     private function recordBelongsToBusiness(Model $record, int $businessId): bool
     {
