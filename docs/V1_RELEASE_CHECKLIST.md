@@ -457,3 +457,15 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [ ] Physical installed-device offline/restart/reconnect acceptance remains a separate owner-operated gate.
 
 Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality, Director Health, Push-on-main and offline browser/mobile acceptance passed on `041314f` (run 44810699348). CASE-ZAZU-0033 remains OPEN and V1 remains NOT READY until the remaining gates are evidenced. This implementation increment does not uplift the readiness score.
+
+
+## Director verification — 2026-11-21 (finance total integrity)
+
+**Verified `main` HEAD:** `c43ab8db309a2ccedd48d2298077e3a602b72a5d`.
+
+- Finance dashboard invoiced totals now exclude draft invoices; only issued and paid invoices are included.
+- Regression proves a 999.00 draft is excluded while 100.00 issued + 200.00 paid produces exactly 300.00.
+- Exact-head Laravel, offline browser acceptance (including mobile viewport, host-outage monitor and phone-local attachment journey), PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push on main: **PASS**.
+- SonarCloud: **SKIPPED**, not counted.
+
+**Release decision:** This closes one financial reporting defect only. V1 remains **NOT READY** pending physical Android acceptance, owner-operated installed-target recovery, populated live-business commercial reconciliation and POPIA operational controls.
