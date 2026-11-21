@@ -1,3 +1,21 @@
+## Director execution checkpoint — bootstrap nested relationships and regression correction — 2026-11-21
+
+**Nested relationship guard:** [4cbd1f7](https://github.com/Leano-Jordan/ZazuEMP/commit/4cbd1f7d83dad9e3b6000b89ebe04028023e569e).  
+**Bootstrap regression:** [530ff81](https://github.com/Leano-Jordan/ZazuEMP/commit/530ff81c47b9d7e82cef87bcdaf473353247f3b2).  
+**Test-fixture correction:** [7d08c9d](https://github.com/Leano-Jordan/ZazuEMP/commit/7d08c9dc2a2720e6c9fa3582e55b45de82eb0558).
+
+- Selected Work, Quote and Preparation bootstrap records now constrain nested Customer relationships to the active business before serialization.
+- The full bootstrap regression deliberately links a business-A event to a business-B customer and verifies no foreign customer name or identity appears in selected Work, Quote or Preparation payloads.
+- The earlier Laravel run exposed a separate test-fixture error: the asset-allocation foreign-business setup was rejected by the existing composite business/asset and business/event foreign keys. This confirms the database already enforces that invariant. Removed the impossible fixture; retained the snapshot guard as defense in depth for imported/legacy malformed state. No production test or constraint was weakened.
+- PHPMD passed on the preceding bootstrap regression head [530ff81](https://github.com/Leano-Jordan/ZazuEMP/commit/530ff81c47b9d7e82cef87bcdaf473353247f3b2). Latest Laravel run after removing the impossible fixture is [44923073728](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073728); PHPMD [44923073757](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073757), Zazu Quality [44923073689](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073689), Director Health [44923073663](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073663). At checkpoint these are queued/in progress. SonarCloud skipped.
+- The preceding run [44922914337](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922914337) is also still running; do not claim its result until complete.
+
+**Evidence maturity:** 77/100 unchanged; V1 NOT READY.
+
+**Next target:** close the latest Laravel/PHPMD/quality checks. Then continue selected-record and conflict delivery review only where the schema and code indicate a real tenant boundary. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — selected bootstrap nested tenant boundary — 2026-11-21
 
 **Implementation:** [4cbd1f7](https://github.com/Leano-Jordan/ZazuEMP/commit/4cbd1f7d83dad9e3b6000b89ebe04028023e569e).  
