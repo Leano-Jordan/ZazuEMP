@@ -2654,8 +2654,15 @@ function setupZazuOfflineDirectoryViews() {
         else main.prepend(notice);
 
         let checking = false;
+        let refreshQueued = false;
         const refreshOriginAvailability = async () => {
-            if (checking) return;
+            if (checking) {
+                // Do not drop an offline/online transition that arrives while
+                // the previous health request is still in flight.
+                refreshQueued = true;
+                return;
+            }
+
             checking = true;
             try {
                 const originAvailable = navigator.onLine && await canReachZazuOrigin();
@@ -2663,6 +2670,10 @@ function setupZazuOfflineDirectoryViews() {
                 await refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState(), originAvailable);
             } finally {
                 checking = false;
+                if (refreshQueued) {
+                    refreshQueued = false;
+                    refreshOriginAvailability();
+                }
             }
         };
 
