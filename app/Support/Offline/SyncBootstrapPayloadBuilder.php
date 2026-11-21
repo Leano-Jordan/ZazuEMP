@@ -24,6 +24,10 @@ use Illuminate\Support\Facades\DB;
 
 class SyncBootstrapPayloadBuilder
 {
+    public function __construct(
+        private readonly SyncBootstrapInvoiceRelationGuard $invoiceRelationGuard,
+    ) {}
+
     public const SELECTION_TYPES = [
         'customer' => Customer::class,
         'job' => Event::class,
@@ -212,7 +216,7 @@ class SyncBootstrapPayloadBuilder
 
         return $query->get()
             ->map(function (Invoice $invoice) use ($business, $registry): array {
-                $this->sanitizeInvoiceQuoteRelations($invoice, $business);
+                $this->invoiceRelationGuard->sanitize($invoice, $business);
 
                 return [
                 ...$this->identityPayload($invoice, 'invoice', $registry),
@@ -233,33 +237,6 @@ class SyncBootstrapPayloadBuilder
             ];
             })
             ->values();
-    }
-
-    private function sanitizeInvoiceQuoteRelations(Invoice $invoice, Business $business): void
-    {
-        $quote = $invoice->quote;
-        if (! $quote || (int) ($quote->event?->business_id ?? 0) !== (int) $business->id) {
-            $invoice->setAttribute('quote_id', null);
-            $invoice->setAttribute('quote_version_id', null);
-            $invoice->setRelation('quote', null);
-            $invoice->setRelation('quoteVersion', null);
-            return;
-        }
-
-        $invoice->setRelation('quote', null);
-        $quoteVersion = $invoice->quoteVersion;
-        if (
-            ! $quoteVersion
-            || (int) $quoteVersion->quote_id !== (int) $quote->id
-            || (int) ($quoteVersion->quote?->event?->business_id ?? 0) !== (int) $business->id
-        ) {
-            $invoice->setAttribute('quote_version_id', null);
-            $quoteVersion = null;
-        } else {
-            $quoteVersion->unsetRelation('quote');
-        }
-
-        $invoice->setRelation('quoteVersion', $quoteVersion);
     }
 
     private function bootstrapInventoryItems(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
