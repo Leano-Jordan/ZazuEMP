@@ -146,28 +146,7 @@ class SyncMutationProtocol
      */
     private function lockActiveDevice(SyncDevice $device): void
     {
-        DB::table('businesses')
-            ->where('id', $device->business_id)
-            ->lockForUpdate()
-            ->first();
-
-        $lockedDevice = SyncDevice::query()
-            ->where('business_id', $device->business_id)
-            ->whereKey($device->id)
-            ->active()
-            ->lockForUpdate()
-            ->first();
-
-        abort_unless($lockedDevice, 401, 'This sync device is no longer active.');
-
-        $expectedTokenHash = (string) (($device->metadata ?? [])['sync_token_hash'] ?? '');
-        $currentTokenHash = (string) (($lockedDevice->metadata ?? [])['sync_token_hash'] ?? '');
-
-        abort_unless(
-            $expectedTokenHash === $currentTokenHash,
-            401,
-            'This sync device credential has been replaced.',
-        );
+        app(SyncDeviceAccessGuard::class)->lockActive($device);
     }
 
     private function assertDeviceContext(SyncDevice $device, string $stream): void
