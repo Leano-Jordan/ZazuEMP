@@ -18,6 +18,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | CLOSED — exact-head CI PASS | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
 | CASE-ZAZU-0036 | Sync stale-device authorization | Conflict listing/resolution or attachment operations proceed from a middleware snapshot after revocation; a stale token may revoke a re-paired device | CLOSED — exact-head Laravel/PHPMD/Psalm PASS | Several endpoints did not share durable business/device lock and token-hash revalidation | Stale-snapshot regression tests for conflict listing/resolution, attachment upload/list and replacement-token revocation |
 | CASE-ZAZU-0037 | LAN host outage leaves phone on stale page | Zazu host stops while Wi-Fi remains connected; browser receives no offline event and visible server-rendered page remains stale | CLOSED — exact-head desktop/mobile browser PASS; physical Android drill remains a release gate | Origin availability was only rechecked during UI render/events; concurrent probes could race network transitions | Exact-head 503→200 health transition tests on desktop and Pixel 7 viewport; physical Android cold-launch/stop-host/restart remains separate |
+| CASE-ZAZU-0038 | Backup archive exceeds restore acceptance limits | Backup accepts up to 50,000 private files plus metadata/database, but restore previously allowed only 50,000 ZIP entries; backup also lacked the restore 2 GiB total-size ceiling | OPEN — shared limits and boundary tests committed; exact-head CI pending | Backup and restore maintained separate, drifting archive limits | Shared entry/size policy, boundary tests and complete-ZIP verification before publishing |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -722,3 +723,16 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression coverage:** Playwright simulates /up returning 503 while navigator.onLine remains true, then restoring 200. The test runs on desktop Chromium and Pixel 7 viewport.
 
 **Closure evidence:** exact-head workflow [44934728827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44934728827) passed 63 desktop Chromium tests, 7 mobile-viewport Work/customer tests, the Pixel 7 host-outage regression and the phone-local attachment/reconnect journey without failures or flaky retries. Laravel passed 670 / 1 skipped / 4,552 assertions; PostgreSQL migration/recovery smoke passed.\n\n**Remaining release gate:** actual installed Android host stop, force-close/restart, disconnected operation and reconnect must still be observed on the owner's physical phone. Browser viewport evidence does not close that gate.
+
+
+### CASE-ZAZU-0038
+
+**Status:** OPEN — shared policy and regression tests committed; exact-head CI pending.
+
+**Failure fingerprint:** Backup allowed 50,000 private files plus the database and manifest (50,002 ZIP entries), but restore rejected any archive above 50,000 entries. Backup also did not enforce the restore command's 2 GiB uncompressed-size ceiling. A large backup could therefore be published but rejected by the matching restore command.
+
+**Control implemented:** Backup and restore now use the same shared limits: 50,000 private files, 50,002 total ZIP entries, and 2 GiB total uncompressed content. Backup checks staged payload sizes and reopens the complete ZIP to verify the total including manifest before publishing.
+
+**Regression coverage:** boundary tests cover 50,000/50,001 private files, 50,002/50,003 ZIP entries and exact/over-limit uncompressed sizes.
+
+**Verification boundary:** exact-head Laravel, quality and backup/restore round-trip CI pending. A real installation recovery drill remains an owner/operator release gate.
