@@ -7,7 +7,7 @@
 - Exact-head Laravel: **676 passed / 1 skipped / 4,593 assertions**.
 - PHPMD: **PASS** [44947482711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482711).
 - PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS** in [Laravel workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
-- The workflow's offline-browser job was still in progress when this checkpoint was recorded; no browser pass is claimed here.
+- Offline browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries. All three jobs passed in [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
 
 **Score disposition:** evidence maturity remains **77/100**. This focused integrity fix is not a weighted-score uplift and does not close the broader offline sync matrix. V1 remains **NOT READY**.
 
