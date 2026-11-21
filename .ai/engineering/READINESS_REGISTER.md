@@ -3,7 +3,7 @@
 - Found a separate post-record TOCTOU window: the push processor recorded with a valid credential, then the applier checked only device active status in a new transaction.
 - The push processor now uses the authenticated applier, which locks/revalidates the original credential and confirms mutation business/device ownership before applying.
 - Adversarial regression: record mutation → replace credential → stale apply attempt must return 401 and leave the mutation pending with no delivery.
-- Implementation [ed5f420](https://github.com/Leano-Jordan/ZazuEMP/commit/ed5f420c69532f5ed4ad4a3f2c7eac839cea8fd3), push integration [c132650](https://github.com/Leano-Jordan/ZazuEMP/commit/c1326502db7dfd6d6f9e1a0188e9266044a0bf8b), regression [9d6f093](https://github.com/Leano-Jordan/ZazuEMP/commit/9d6f093742e76ca712be3799d74589434fa8e98d). Exact-head CI pending; readiness score unchanged.
+- Implementation [e66da83](https://github.com/Leano-Jordan/ZazuEMP/commit/e66da83a38f449482d83e9be9ffa6b4449830158), push integration [d31aee2](https://github.com/Leano-Jordan/ZazuEMP/commit/d31aee2d2b03ce983c7d6370a53d17b7f3d77da4), regression [b65ccfd](https://github.com/Leano-Jordan/ZazuEMP/commit/b65ccfd8dd99bd9b9effd964c0926889759e413e). Exact-head CI pending; readiness score unchanged.
 
 ---
 
