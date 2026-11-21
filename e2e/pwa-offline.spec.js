@@ -1343,6 +1343,8 @@ test.describe('Zazu installed PWA offline shell', () => {
             const order = window.ZazuOffline.getState().purchase_orders.find(item => Number(item.server_id ?? item.id) === id);
             const item = order?.items?.[0];
             return item ? {
+                orderLocalId: order.local_id,
+                orderRevision: Number(order.revision || 1),
                 localId: item.local_id,
                 serverId: Number(item.server_id ?? item.id),
                 description: item.description,
@@ -1367,6 +1369,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     server_id: 99101,
                     name: description,
                     capability_id: Number(capabilityId) + 999,
+                    revision: 1,
                     on_hand: '10.00',
                     movements: [],
                 },
@@ -1376,6 +1379,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     server_id: 99102,
                     name: description,
                     capability_id: Number(capabilityId),
+                    revision: 1,
                     on_hand: '2.10',
                     movements: [],
                 },
@@ -1431,6 +1435,103 @@ test.describe('Zazu installed PWA offline shell', () => {
             correctMovementCount: 2,
             correctMovementsPending: true,
             receiptMutations: 2,
+        });
+
+        // Reconnect both partial receipts. Each acknowledgement advances the
+        // purchase-order and matched inventory revisions; parent and nested
+        // optimistic markers clear only after every related receipt is settled.
+        const pushedReceipts = [];
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/push') {
+                const body = route.request().postDataJSON();
+                const recorded = body.mutations.map((mutation, index) => {
+                    if (mutation.entity_type !== 'purchase_receipt') {
+                        throw new Error('Unexpected queued mutation: ' + mutation.entity_type);
+                    }
+                    const payload = mutation.payload?.record || {};
+                    pushedReceipts.push({
+                        orderLocalId: payload.purchase_order_local_id,
+                        quantities: Object.values(payload.received_quantities || {}),
+                    });
+                    return {
+                        id: mutation.id,
+                        status: 'applied',
+                        applied: true,
+                        identity: null,
+                        related_identities: [
+                            {
+                                entity_type: 'purchase_order',
+                                local_id: line.orderLocalId,
+                                server_id: orderId,
+                                revision: line.orderRevision + index + 1,
+                            },
+                            {
+                                entity_type: 'inventory_item',
+                                local_id: 'correct-catalogue-stock-item',
+                                server_id: 99102,
+                                revision: index + 2,
+                            },
+                        ],
+                    };
+                });
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ recorded, applied: recorded.map(item => item.id) }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/pull') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/attachments') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+                return;
+            }
+            await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+        });
+
+        await page.context().setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => pushedReceipts.length).toBe(2);
+        await expect(pushedReceipts).toEqual([
+            { orderLocalId: line.orderLocalId, quantities: ['0.10'] },
+            { orderLocalId: line.orderLocalId, quantities: ['0.20'] },
+        ]);
+        await expect.poll(
+            () => page.evaluate(async () => (await window.ZazuOffline.pending()).length),
+            { message: 'both purchase receipt acknowledgements must clear the durable queue' },
+        ).toBe(0);
+
+        const reconciled = await page.evaluate(orderServerId => {
+            const state = window.ZazuOffline.getState();
+            const order = state.purchase_orders.find(item => Number(item.server_id ?? item.id) === orderServerId);
+            const correctItem = state.inventory_items.find(item => item.local_id === 'correct-catalogue-stock-item');
+            return {
+                orderRevision: order?.revision,
+                orderPending: order?.pending_sync,
+                receivedQuantity: order?.items?.[0]?.received_quantity,
+                linePending: order?.items?.[0]?.pending_sync,
+                inventoryRevision: correctItem?.revision,
+                inventoryPending: correctItem?.pending_sync,
+                onHand: correctItem?.on_hand,
+                movementPending: (correctItem?.movements || []).some(item => item.pending_sync === true),
+                localDirty: state.local_dirty,
+            };
+        }, orderId);
+
+        expect(reconciled).toEqual({
+            orderRevision: line.orderRevision + 2,
+            orderPending: false,
+            receivedQuantity: '0.30',
+            linePending: false,
+            inventoryRevision: 3,
+            inventoryPending: false,
+            onHand: 2.4,
+            movementPending: false,
+            localDirty: false,
         });
     });
 
