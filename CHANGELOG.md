@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-21 — Transactional trusted-device authorization
+
+- Added a shared transactional device guard that locks business then device, rechecks active status and verifies the authenticated token hash against persisted credentials.
+- Applied the guard to conflict resolution and attachment upload/list/download so revocation cannot race these operations after middleware authentication.
+- Device revocation now rejects a stale authenticated snapshot if the installation has already been re-paired with a replacement credential.
+- Added four focused stale-device authorization regression tests. Exact-head CI verification is pending.
+
+
 ## 2026-11-21 — Receiver sync completeness and bootstrap authorization
 
 - Fixed a receiver reconciliation defect where a delivered aggregate outside a bounded bootstrap collection could be omitted from the local snapshot while its delivery cursor was still acknowledged.
