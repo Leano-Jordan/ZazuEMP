@@ -30,6 +30,9 @@ class OfflineBootstrapRelationshipIsolationTest extends TestCase
         $event = Event::create([
             'business_id' => $business->id,
             'customer_id' => $foreignCustomer->id,
+            'customer_name' => 'FOREIGN CUSTOMER SECRET',
+            'customer_phone' => '+27123456789',
+            'customer_email' => 'foreign@example.invalid',
             'reference' => 'BOOTSTRAP-REL-001',
             'name' => 'Local event with corrupted customer link',
             'event_type' => 'Other',
