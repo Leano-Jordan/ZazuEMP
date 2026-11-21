@@ -8298,3 +8298,67 @@ body.zazu-has-wallpaper .zazu-content {
     outline: 3px solid var(--zazu-focus);
     outline-offset: 3px;
 }
+
+
+/* Keep the operator informed when Wi-Fi is up but the Zazu host is down. */
+.zazu-origin-offline-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: min(1200px, calc(100% - 2rem));
+    margin: 0.75rem auto;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e8b65b;
+    border-left-width: 4px;
+    border-radius: 0.65rem;
+    background: #fff8e8;
+    color: #633f0b;
+    line-height: 1.45;
+}
+.zazu-origin-offline-notice[hidden] {
+    display: none;
+}
+.zazu-origin-offline-notice strong {
+    display: block;
+    color: #633f0b;
+    font-weight: 750;
+}
+.zazu-origin-offline-notice p {
+    margin: 0.15rem 0 0;
+    color: inherit;
+    font-size: 0.9rem;
+}
+.zazu-origin-offline-action {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid #9b6715;
+    border-radius: 0.45rem;
+    color: #633f0b;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.zazu-origin-offline-action:hover,
+.zazu-origin-offline-action:focus-visible {
+    background: #fce9bd;
+    color: #422906;
+}
+@media (max-width: 720px) {
+    .zazu-origin-offline-notice {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 0.65rem;
+        width: calc(100% - 1.25rem);
+        margin: 0.6rem auto;
+        padding: 0.8rem;
+    }
+    .zazu-origin-offline-action {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
