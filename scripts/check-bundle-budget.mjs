@@ -28,8 +28,10 @@ const totals = assets.reduce((sum, asset) => {
 }, { js: { raw: 0, gzip: 0 }, css: { raw: 0, gzip: 0 } });
 
 const budgets = {
-    js: Number(process.env.ZAZU_JS_GZIP_BUDGET || 1024 * 1024),
-    css: Number(process.env.ZAZU_CSS_GZIP_BUDGET || 300 * 1024),
+    // Initial CI baseline: 23.6 KiB JS and 67.2 KiB CSS gzip on the 2026-11-21 production build.
+    // Allow headroom while still detecting substantial unreviewed growth.
+    js: Number(process.env.ZAZU_JS_GZIP_BUDGET || 64 * 1024),
+    css: Number(process.env.ZAZU_CSS_GZIP_BUDGET || 100 * 1024),
 };
 let failed = false;
 for (const type of ['js', 'css']) {
