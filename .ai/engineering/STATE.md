@@ -6,7 +6,7 @@
 - Found a recovery edge case: a valid backup declares database and private storage even when private storage is empty. ZIP files omit empty directories, so restore previously saw no private payload entry and left old private files on the target installation.
 - Restore now uses the v2 contents manifest as the authority for whether private storage is part of the snapshot, creates an empty staging directory when required, and swaps it in just like a populated private-storage snapshot.
 - Added an integration regression that backs up an empty private directory, creates a stale private file after backup, restores, and verifies the stale file is removed while the database returns to its backed-up state.
-- Exact-head Laravel/backup/restore verification pending. No pass is claimed until CI completes.
+- Exact-head verification on [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc): Laravel **673 passed / 1 skipped / 4,575 assertions**; PostgreSQL migration/recovery smoke **PASS**; PHPMD **PASS**; Zazu Quality, Composer security audit and secret scan **PASS**; Director Health **PASS**. Offline-browser acceptance is still running. The empty-private-storage restore integration test and archive-limit boundary tests are included in the passing Laravel run.
 
 ---
 
