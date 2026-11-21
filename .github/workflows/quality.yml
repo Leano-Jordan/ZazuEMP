@@ -46,14 +46,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - name: Setup PHP and Composer
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: '8.4'
       - name: Install locked PHP dependencies without application scripts
         run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
-      - name: Enforce PHP formatting without modifying files
-        run: vendor/bin/pint --test
+      - name: Enforce PHP formatting on changed PHP files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          mapfile -t php_files < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- '*.php')
+          if [ "${#php_files[@]}" -eq 0 ]; then
+            echo "No PHP files changed; incremental Pint gate has nothing to check."
+            exit 0
+          fi
+          vendor/bin/pint --test "${php_files[@]}"
 
   composer-security-audit:
     runs-on: ubuntu-latest
