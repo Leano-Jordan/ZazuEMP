@@ -53,3 +53,7 @@ Before release:
 - [ ] person/endorsement issues reviewed;
 - [ ] temporary stock imagery replaced or explicitly cleared;
 - [ ] provenance evidence archived with the release.
+
+## Design-only reference images (excluded from release media inventory)
+
+The 22 files in `reference ui ux images/` are retained solely as internal visual/design references. They are not application assets, are not bundled into the product, and are not approved for redistribution or customer-facing use. Exclude this directory from release media-rights sign-off; do not copy its contents into production asset paths. The directory is listed in the repository `.gitignore` so additional local reference images are not accidentally added.
