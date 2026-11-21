@@ -377,7 +377,7 @@
 
     <section class="zazu-context-card mt-4" data-zazu-current-device-trust>
         <div class="zazu-context-title">Trust this device</div>
-        <p class="zazu-context-copy mt-1">Approving this browser or installed app grants it a long-lived business sync credential and allows saved offline changes to be applied to this business. Only approve a device controlled by the business. Use the phone pairing code for a separate phone.</p>
+        <p class="zazu-context-copy mt-1">Approving this browser or installed app grants it a long-lived business sync credential and allows saved offline changes to be applied to this business. Only approve a device controlled by the business. Use the phone pairing code for a separate phone. Offline changes from this device are attributed to the approving owner, not necessarily the person using it; staff permissions are not re-checked for each offline mutation.</p>
         <div class="flex flex-wrap gap-3 mt-4">
             <button type="button" class="zazu-btn zazu-btn-secondary" data-zazu-trust-current-device>Trust this device for offline sync</button>
             <span class="zazu-field-help" data-zazu-current-device-trust-result role="status" aria-live="polite"></span>

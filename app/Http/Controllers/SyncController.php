@@ -70,6 +70,7 @@ class SyncController extends Controller
 
         SyncDevice::create([
             'business_id' => $business->id,
+            'approved_by_user_id' => $request->user()->getAuthIdentifier(),
             'installation_id' => $installationId,
             'device_name' => null,
             'device_type' => 'phone',
@@ -100,7 +101,9 @@ class SyncController extends Controller
         $business = $currentBusiness->resolve($request->user());
         abort_unless($business, 404);
 
-        [$device, $token] = DB::transaction(function () use ($validated, $business): array {
+        $ownerUserId = (int) $request->user()->getAuthIdentifier();
+
+        [$device, $token] = DB::transaction(function () use ($validated, $business, $ownerUserId): array {
             $device = SyncDevice::query()
                 ->where('installation_id', $validated['installation_id'])
                 ->lockForUpdate()
@@ -118,6 +121,7 @@ class SyncController extends Controller
             if (! $device) {
                 $device = SyncDevice::create([
                     'business_id' => $business->id,
+                    'approved_by_user_id' => $ownerUserId,
                     'installation_id' => $validated['installation_id'],
                     'device_name' => $validated['device_name'] ?? 'Zazu device',
                     'device_type' => $validated['device_type'] ?? 'phone',
@@ -128,6 +132,7 @@ class SyncController extends Controller
                 ]);
             } else {
                 $device->forceFill([
+                    'approved_by_user_id' => $ownerUserId,
                     'device_name' => $validated['device_name'] ?? $device->device_name ?? 'Zazu device',
                     'device_type' => $validated['device_type'] ?? $device->device_type ?? 'phone',
                     'status' => 'active',

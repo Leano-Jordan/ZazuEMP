@@ -19,6 +19,13 @@ This document records boundaries that are explicit in the V1 scope and current r
 - Browser emulation is not physical-device proof. Installed PWA launch, storage survival across real device restarts, reconnect and duplicate-safe sync still require the bounded phone/tablet acceptance on a trusted HTTPS origin.
 - The phone/tablet acceptance result is **OPEN** until real devices and the tested release commit are recorded. Do not describe V1 as physically device-certified before then.
 
+## Trusted-device authority boundary
+
+- A paired offline device is approved by a business owner and receives a business-scoped sync credential. The credential is intentionally retained across ordinary web logout so queued work is not stranded; logout does not revoke the trusted device.
+- Offline mutations are attributed in the server audit log to the owner who approved the device. This is attribution, **not per-user authentication**: the server does not independently verify which staff member is physically using the shared trusted device for each mutation, and normal staff role permissions are not re-evaluated per offline mutation.
+- Treat the device as a shared business data surface. Require a device screen lock, controlled physical custody and immediate owner revocation if it is lost, shared outside the business or reassigned. The owner must review the selected bootstrap data before pairing.
+- Existing devices that were paired before owner attribution was introduced may have no recorded approver. Their historical audit rows remain unattributed; owner re-pair/re-registration establishes attribution for subsequent sync activity. Do not retroactively guess an approver.
+
 ## iOS compatibility boundary
 
 - V1 physical offline acceptance is Android-only. iPhone/iPad offline cold launch, storage persistence, background behaviour and reconnect synchronisation have not been tested or certified.

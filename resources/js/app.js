@@ -3975,7 +3975,7 @@ let zazuLogoutInProgress = false;
 async function handleZazuLogout(form) {
     const businessId = Number(document.body?.dataset.zazuBusinessId || 0);
     const message = businessId > 0
-        ? 'Signing out ends this web session. This browser’s business-scoped offline workspace and any queued changes or attachments will remain on this device. To remove this device from the business, an owner must revoke it in Business Settings. Continue?'
+        ? 'Signing out ends this web session. This browser’s business-scoped offline workspace and any queued changes or attachments will remain on this device. To remove this device from the business, an owner must revoke it in Business Settings. Its sync credential remains on this browser after sign-out, and offline changes are attributed to the approving owner—not necessarily the person using it. Revoke it if this device is shared, lost or reassigned. Continue?'
         : 'Signing out ends this account’s web session. No active business workspace is attached to this account. Continue?';
 
     if (!window.confirm(message)) return;

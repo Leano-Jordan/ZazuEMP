@@ -20,6 +20,7 @@ class SyncDevice extends Model
 
     protected $fillable = [
         'business_id',
+        'approved_by_user_id',
         'installation_id',
         'device_name',
         'device_type',
@@ -43,6 +44,11 @@ class SyncDevice extends Model
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
+    }
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_user_id');
     }
 
     public function mutations(): HasMany
