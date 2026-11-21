@@ -9,6 +9,8 @@ This is the short hands-on check that engineering cannot honestly complete from 
 - Confirm the device has been paired/authorised for sync and has completed an initial successful sync.
 - Keep the PC/server available for the connected preparation phase only.
 
+For the exact Android LAN-HTTPS setup and host-stop test, follow [ZAZU_ANDROID_OFFLINE_INSTALL_ACCEPTANCE.md](ZAZU_ANDROID_OFFLINE_INSTALL_ACCEPTANCE.md). For the owner-PC backup/restore procedure, follow [RELEASE_BACKUP_RESTORE_RUNBOOK.md](RELEASE_BACKUP_RESTORE_RUNBOOK.md).
+
 If the stable HTTPS environment is not deployed yet, stop here. That is a deployment prerequisite, not a failed phone test.
 
 ## Phone — disconnected launch and local work
@@ -45,6 +47,21 @@ If the stable HTTPS environment is not deployed yet, stop here. That is a deploy
 
 **Pass:** installed desktop app opens independently of the developer workstation tooling and retains its supported local work while disconnected.
 
+## Business workflow — quote to profit
+
+Use a separate test business and fake records. Do not use real customer or financial data.
+
+1. Create a test customer and a job/event for that customer.
+2. Build a quote with the agreed services/items, quantities, prices and tax. Send it and accept it through the customer acceptance flow.
+3. Create the invoice from the accepted quote. Check that the invoice retains the quote's line items and totals.
+4. Record a deposit, then the remaining payment. Confirm the invoice reaches **Paid** with a zero balance and that replaying a payment does not duplicate it.
+5. Create a purchase order for the job, receive the items and record the actual incurred cost against that job.
+6. Complete the job and open the event profitability/report view.
+7. Reconcile net sales less incurred actual costs. Confirm void invoices, planned costs and cancelled costs do not inflate profit.
+
+**Pass:** the quote, invoice, payments, purchase/receipt, actual costs, job completion and report all refer to the same business and job; invoice balance is zero; profit/margin match the underlying records; audit history is present; retries do not duplicate money or stock.
+
+The automated seeded reference scenario is tests/Feature/CommercialReconciliationTest.php. It exercises a R10,000 net sale, R1,500 tax, R11,500 invoice, R3,450 deposit, R8,050 final payment, R2,800 incurred cost and R7,200 indicative contribution (72% margin). The live-business walkthrough remains a separate owner acceptance gate.
 ## What to send back
 
 For each device, report:
