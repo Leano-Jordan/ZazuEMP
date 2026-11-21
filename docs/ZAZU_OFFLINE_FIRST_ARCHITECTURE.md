@@ -17,11 +17,11 @@
 ### Related asset identity in conflict snapshots — 2026-11-21
 
 **Implementation:** [1fdbb02](https://github.com/Leano-Jordan/ZazuEMP/commit/1fdbb0212c099df1f8403628b9e71423f35c5434).  
-**Regression:** [f53e17a](https://github.com/Leano-Jordan/ZazuEMP/commit/f53e17ab33e82d960dc40bc4a67e19bc8da349b8).
+**Database invariant:** [2026_09_28_000003_enforce_business_parent_invariants.php](https://github.com/Leano-Jordan/ZazuEMP/blob/main/database/migrations/2026_09_28_000003_enforce_business_parent_invariants.php).
 
 - Asset-allocation conflict snapshots already constrained the allocation and asset identity rows to the current business, but did not validate the linked Asset record itself before returning its local identity and revision.
 - The snapshot builder now resolves the Asset and verifies its actual business ownership before returning related identity metadata.
-- Added a regression with a local allocation whose malformed tenant identity points to an asset owned by another business; the snapshot must return no related asset identity.
+- The attempted cross-business allocation fixture is rejected by the existing composite foreign keys tying both asset and event to the allocation's business. The additional snapshot ownership check remains defense in depth for legacy/imported malformed state; no impossible fixture is retained in the test suite.
 - Exact-head CI pending.
 
 ### Bootstrap resolver complexity correction — 2026-11-21
