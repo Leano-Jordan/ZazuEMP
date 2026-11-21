@@ -30,7 +30,7 @@ CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has pa
 - Receiver pull now sends the exact delivery prefix to bootstrap. Server resolves primary and related aggregates only for the authenticated business/device, includes those aggregates beyond the regular 500-record window and prioritizes recently revised records for the normal bounded refresh.
 - Explicit pairing selections remain pinned; delivery-driven Customer/Work/Quote/Preparation records cannot silently expand an explicitly restricted workspace.
 - Bootstrap now locks business before device, rechecks active status and the current bearer-token hash against the authenticated model, updates last-seen and builds the data snapshot under the same lock boundary. A revoked/replaced device cannot receive a stale bootstrap response.
-- Service-worker cache is `zazu-static-v58`.
+- Service-worker cache is `zazu-static-v59` after the acknowledged receipt-state correction.
 
 **Failure records:** CASE-ZAZU-0034 / ENG-DATA-004 (bounded receiver snapshot omission) and CASE-ZAZU-0035 / ENG-AUTH-001 (stale device authorization during bootstrap). Both defects are **CLOSED** on the exact source head; server-side and browser regressions passed.
 
