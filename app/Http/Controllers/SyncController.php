@@ -306,27 +306,30 @@ class SyncController extends Controller
 
     public function listConflicts(Request $request): JsonResponse
     {
-        $device = $request->attributes->get('sync_device');
-        $status = (string) $request->query('status', 'open');
+        return DB::transaction(function () use ($request): JsonResponse {
+            $device = $request->attributes->get('sync_device');
+            app(SyncDeviceAccessGuard::class)->lockActive($device);
+            $status = (string) $request->query('status', 'open');
 
-        if (! in_array($status, ['open', 'resolved', 'all'], true)) {
-            throw ValidationException::withMessages(['status' => 'Unsupported conflict status.']);
-        }
+            if (! in_array($status, ['open', 'resolved', 'all'], true)) {
+                throw ValidationException::withMessages(['status' => 'Unsupported conflict status.']);
+            }
 
-        $query = SyncConflict::query()
-            ->where('business_id', $device->business_id)
-            ->where('sync_device_id', $device->id)
-            ->latest('id');
+            $query = SyncConflict::query()
+                ->where('business_id', $device->business_id)
+                ->where('sync_device_id', $device->id)
+                ->latest('id');
 
-        if ($status !== 'all') {
-            $query->where('status', $status);
-        }
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
 
-        $presenter = app(SyncConflictPresenter::class);
+            $presenter = app(SyncConflictPresenter::class);
 
-        return response()->json([
-            'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $presenter->payload($conflict))->values(),
-        ]);
+            return response()->json([
+                'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $presenter->payload($conflict))->values(),
+            ]);
+        });
     }
 
     public function resolveConflict(Request $request, SyncConflict $conflict, ?SyncConflictResolutionService $resolver = null): JsonResponse
