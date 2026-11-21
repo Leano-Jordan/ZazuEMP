@@ -53,6 +53,16 @@
 - Added an adversarial regression for an invoice identity mapped to a Customer; the malformed mapping must produce no bootstrap targets.
 - Exact-head Laravel, PostgreSQL, quality and browser acceptance are pending for this latest change.
 
+### Complete conflict snapshot model mapping — 2026-11-21
+
+**Implementation:** [8268504](https://github.com/Leano-Jordan/ZazuEMP/commit/826850474aee06a79a2ea7bb8917a470ef1da2fe).  
+**Regression:** [f25216a](https://github.com/Leano-Jordan/ZazuEMP/commit/f25216ab4ae5c99b772fbf8d932070a4ec009c6f).
+
+- The first snapshot tenant guard only mapped the most common aggregate models. Applying a fail-closed unknown-type default would have incorrectly marked valid snapshots for other offline mutation models as deleted.
+- Expanded the expected morph-type map to cover the complete persisted offline mutation model set: service, customer, job, supplier, preparation, quote, invoice, payment, purchase order/item, inventory item/movement, expense, event cost, asset and asset allocation.
+- Added a positive regression proving a valid InventoryMovement identity remains a live conflict snapshot, not a synthetic deleted record.
+- Exact-head CI pending.
+
 ### Bootstrap invoice guard complexity refactor — 2026-11-21
 
 **Refactor:** [ae61053](https://github.com/Leano-Jordan/ZazuEMP/commit/ae61053f04e2f36bc4b284a681c6f5cbdf4cfdec) + [4c84a1f](https://github.com/Leano-Jordan/ZazuEMP/commit/4c84a1f6772ad8ed7e83ebf92c6fe8d8272cf96d).
