@@ -66,12 +66,12 @@
 
 ## Selected bootstrap nested relationship tenant isolation — 2026-11-21
 
-**Implementation:** [4cbd1f7](https://github.com/Leano-Jordan/ZazuEMP/commit/4cbd1f7d83dad9e3b6000b89ebe04028023e569e).  
-**Regression:** [530ff81](https://github.com/Leano-Jordan/ZazuEMP/commit/530ff81c47b9d7e82cef87bcdaf473353247f3b2).
+**Implementation:** [4cbd1f7](https://github.com/Leano-Jordan/ZazuEMP/commit/4cbd1f7d83dad9e3b6000b89ebe04028023e569e) + [c187b52](https://github.com/Leano-Jordan/ZazuEMP/commit/c187b528109e7467d19120cc46ff378bb9914e3e).  
+**Regression:** [530ff81](https://github.com/Leano-Jordan/ZazuEMP/commit/530ff81c47b9d7e82cef87bcdaf473353247f3b2) + [a235445](https://github.com/Leano-Jordan/ZazuEMP/commit/a2354452238a9f6bfdc5c16199ab23a48c7c98b0).
 
 - Selected Work, Quote and Preparation records serialized nested Customer relations without explicitly constraining those related customers to the active business. The parent records were tenant-scoped, but a corrupted cross-business foreign key could still pull another business's Customer into the nested bootstrap payload.
 - Selected Work now loads only a Customer whose business_id matches the Work record. Selected Quote and Preparation bootstrap data constrain the related Event to the parent business and its nested Customer to that same business.
-- Added a full bootstrap regression with a local Work/Quote/Preparation set deliberately linked to a foreign-business Customer; none of the selected payloads may contain the foreign Customer or its local identity.
+- Added a full bootstrap regression with a local Work/Quote/Preparation set deliberately linked to a foreign-business Customer and populated with copied customer contact details; none of the selected payloads may contain the foreign Customer, copied contact details or its local identity.
 - Exact-head Laravel, PHPMD, quality and Director Health checks are pending for the new nested relationship regression.
 
 ## Related offline identity acknowledgements and revision advancement — 2026-11-21
