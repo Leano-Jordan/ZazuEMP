@@ -437,4 +437,106 @@ class OfflinePurchasePrecisionTest extends TestCase
         }
     }
 
+
+    public function test_offline_expense_preserves_business_links_and_applies_idempotently(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Expense Reconciliation Business',
+            'slug' => 'offline-expense-reconciliation-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \\App\\Models\\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-EXPENSE-RECONCILIATION',
+            'name' => 'Offline expense job',
+            'status' => 'confirmed',
+        ]);
+        $supplier = \\App\\Models\\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Offline expense supplier',
+        ]);
+        $order = \\App\\Models\\PurchaseOrder::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'supplier_id' => $supplier->id,
+            'idempotency_key' => (string) Str::uuid(),
+            'reference' => 'PO-OFF-EXPENSE-001',
+            'status' => 'received',
+            'currency' => 'ZAR',
+            'total_amount' => '450.00',
+        ]);
+
+        $registry = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class);
+        $eventIdentity = $registry->identify($event, 'job');
+        $supplierIdentity = $registry->identify($supplier, 'supplier');
+        $orderIdentity = $registry->identify($order, 'purchase_order');
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'expense',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'description' => 'Offline catering fuel',
+                    'amount' => '125.50',
+                    'status' => 'paid',
+                    'expense_date' => now()->toDateString(),
+                    'reference' => 'FUEL-OFF-001',
+                    'notes' => 'Captured while disconnected.',
+                    'event_local_id' => $eventIdentity->entity_uuid,
+                    'supplier_local_id' => $supplierIdentity->entity_uuid,
+                    'purchase_order_local_id' => $orderIdentity->entity_uuid,
+                ],
+            ],
+        );
+
+        $handler = app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+        $applied = $applier->apply($mutation, ['expense' => $handler]);
+
+        $expense = \\App\\Models\\FinanceExpense::query()
+            ->where('business_id', $business->id)
+            ->where('idempotency_key', $mutation->mutation_id)
+            ->firstOrFail();
+        $identity = \\App\\Models\\SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'expense')
+            ->where('entity_uuid', $localId)
+            ->firstOrFail();
+
+        $this->assertSame('applied', $applied->status);
+        $this->assertSame('Offline catering fuel', $expense->description);
+        $this->assertSame('125.50', $expense->amount);
+        $this->assertSame('ZAR', $expense->currency);
+        $this->assertSame('paid', $expense->status);
+        $this->assertSame($event->id, $expense->event_id);
+        $this->assertSame($supplier->id, $expense->supplier_id);
+        $this->assertSame($order->id, $expense->purchase_order_id);
+        $this->assertSame($expense->id, $identity->record_id);
+        $this->assertSame(1, (int) $identity->revision);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $business->id,
+            'action' => 'finance.expense.recorded',
+            'subject_id' => $expense->id,
+        ]);
+
+        // An applied mutation replay is a no-op: no duplicate expense or audit.
+        $applier->apply($applied, ['expense' => $handler]);
+
+        $this->assertSame(1, \\App\\Models\\FinanceExpense::query()->where('business_id', $business->id)->count());
+        $this->assertSame(1, \\App\\Models\\AuditLog::query()
+            ->where('business_id', $business->id)
+            ->where('action', 'finance.expense.recorded')
+            ->count());
+        $this->assertSame(1, (int) $identity->fresh()->revision);
+    }
+
+
 }
