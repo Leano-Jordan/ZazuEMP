@@ -8,7 +8,9 @@
     "dev": "vite",
     "test:e2e": "playwright test",
     "test:service-worker": "node --test tests/js/service-worker-auth-cache.test.js",
-    "test:vite-config": "node --test tests/js/vite-config.test.js"
+    "test:vite-config": "node --test tests/js/vite-config.test.js",
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:performance": "node scripts/check-bundle-budget.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
