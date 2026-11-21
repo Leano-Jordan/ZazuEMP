@@ -16,8 +16,6 @@ use ZipArchive;
 class ZazuRestoreCommand extends Command
 {
     private const FORMAT_VERSION = 2;
-    private const MAX_ARCHIVE_ENTRIES = BackupArchiveLimits::MAX_ARCHIVE_ENTRIES;
-    private const MAX_UNCOMPRESSED_BYTES = BackupArchiveLimits::MAX_UNCOMPRESSED_BYTES;
 
     protected $signature = 'zazu:restore {archive : Path to a Zazu backup ZIP} {--force : Skip the interactive confirmation}';
     protected $description = 'Restore a Zazu database and private storage from a verified backup archive';
