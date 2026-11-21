@@ -673,7 +673,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             contentType: 'application/json',
             body: JSON.stringify({ mutations: [] }),
         }));
-        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+        await page.route('**/api/sync/bootstrap**', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({}),
@@ -1175,7 +1175,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             contentType: 'application/json',
             body: JSON.stringify({ mutations: [] }),
         }));
-        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+        await page.route('**/api/sync/bootstrap**', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
@@ -1489,7 +1489,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             contentType: 'application/json',
             body: JSON.stringify({ mutations: [] }),
         }));
-        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+        await page.route('**/api/sync/bootstrap**', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({ business: { id: businessId, name: 'Offline movement business', currency: 'ZAR' } }),
@@ -1593,7 +1593,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             contentType: 'application/json',
             body: JSON.stringify({ mutations: [] }),
         }));
-        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+        await page.route('**/api/sync/bootstrap**', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
@@ -1769,7 +1769,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             contentType: 'application/json',
             body: JSON.stringify({ mutations: [] }),
         }));
-        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+        await page.route('**/api/sync/bootstrap**', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
@@ -2405,7 +2405,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const requestStarted = new Promise(resolve => { markRequestStarted = resolve; });
         const heldResponse = new Promise(resolve => { releaseResponse = resolve; });
 
-        await page.route('**/api/sync/bootstrap', async route => {
+        await page.route('**/api/sync/bootstrap**', async route => {
             markRequestStarted();
             await heldResponse;
             await route.fulfill({
@@ -2478,7 +2478,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const requestStarted = new Promise(resolve => { markRequestStarted = resolve; });
         const heldResponse = new Promise(resolve => { releaseResponse = resolve; });
 
-        await page.route('**/api/sync/bootstrap', async route => {
+        await page.route('**/api/sync/bootstrap**', async route => {
             markRequestStarted();
             await heldResponse;
             await route.fulfill({
