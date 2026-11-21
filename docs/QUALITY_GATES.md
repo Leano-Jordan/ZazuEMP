@@ -2,6 +2,10 @@
 
 This document records what CI currently measures and what those measurements do—and do not—prove.
 
+## PHP formatting
+
+The blocking Zazu Quality workflow installs the locked PHP development dependencies under PHP 8.4 and runs `vendor/bin/pint --test`. The check is non-mutating: CI reports formatting drift and fails rather than rewriting repository files. It complements PHPMD and Psalm; it does not replace either analysis.
+
 ## Frontend performance baseline
 
 Measured from the production Vite build on 21 November 2026:
