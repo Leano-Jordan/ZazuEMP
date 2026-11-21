@@ -1,3 +1,17 @@
+## Automated business-archive restore safety evidence — 2026-11-21
+
+Exact source/test head `e45cab97cbcdbc3f989bf3843d751bb0f373c305` on `main`; [Laravel/PostgreSQL/browser workflow 44904393629](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44904393629).
+
+The business archive restore path now has exact-head regression coverage for:
+
+- refusing a target that already has trusted-device/offline sync state, before importing records or writing files;
+- rolling back imported database rows when a private-file write fails partway through restore;
+- deleting a file already written earlier in that same failed restore attempt.
+
+The failure-path test simulates the private storage adapter returning success for the first write and failure for the second, then verifies the first file is deleted and the target workspace remains empty. This is automated transaction/cleanup evidence, not a substitute for the owner-operated recovery drill on the intended PC and private media store.
+
+---
+
 # Zazu EMP — Backup / Restore Runbook
 
 **Status:** OPERATIONAL DRAFT — INSTALLATION-LEVEL OPERATOR PROCEDURE  
