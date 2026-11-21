@@ -1,9 +1,19 @@
+## Director closure checkpoint — 2026-11-21 (CASE-ZAZU-0033 stale-write protection)
+
+**Verified source/test head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`. Laravel **634 passed / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery **PASS**; offline browser **59 desktop + 7 mobile + 1 phone-local Work/attachment/reconnect passed**; PHPMD, Zazu Quality, Composer audit, secret scan and application checks **PASS**. [Exact-head workflow] (https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44881431689).
+
+CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has paired-device rejection, same-device causal chains, conflict/rebase payload preservation, parent-revision propagation and business-isolation evidence. The final online writer review found and corrected the remaining primary-contact creation mass-update bypass; other identified bulk operations are paired with tracked parent updates or are restore/protocol writes outside existing domain identities.
+
+**The full offline sync workflow matrix remains OPEN and separate.** Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain OPEN. Evidence maturity remains **75/100**; no unsupported score uplift. V1 remains **NOT READY**.
+
+---
+
 ## Director deep-audit checkpoint — 2026-11-21 (customer-contact writer correction)
 
 - **Source head:** `5f8dd6bdfa22b17bc6d0f14eb065400101caa1ea` on `main`; Laravel **634 passed / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD **PASS**; desktop/mobile browser acceptance remains in progress. A second paired-device stale-write regression now proves revision-1 writes cannot overwrite revision-2 server state.
 - Corrected a confirmed online revision bypass in primary-contact creation: existing primary contacts are now updated individually under lock instead of through a relationship mass update that bypassed Eloquent events.
 - Added a regression proving the parent Customer revision advances while preserving exactly one primary contact.
-- **Readiness remains 75/100; V1 remains NOT READY.** CASE-ZAZU-0033 remains OPEN until the exhaustive writer audit and full supported sync matrix are verified. Physical Android, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain separate owner gates.
+- **Readiness remains 75/100; V1 remains NOT READY.** CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED on exact-head evidence; the full supported offline sync matrix remains a separate OPEN gate. Physical Android, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain separate owner gates.
 
 ---
 ## Director execution checkpoint — 2026-11-21 (receiver reconciliation + bootstrap auth)
