@@ -1,9 +1,9 @@
 <?php
 
-namespace App\\Support\\Offline;
+namespace App\Support\Offline;
 
-use App\\Models\\SyncDevice;
-use Illuminate\\Support\\Facades\\DB;
+use App\Models\SyncDevice;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Revalidates middleware-authenticated device snapshots inside the operation
