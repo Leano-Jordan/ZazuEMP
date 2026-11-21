@@ -64,6 +64,10 @@ See [.ai/engineering/README.md](.ai/engineering/README.md), [.ai/engineering/06_
 
 Routine Director execution targets `main`; temporary branches are not part of the normal Zazu operating model.
 
+## Database compatibility
+
+See [the database compatibility matrix](docs/DATABASE_COMPATIBILITY.md) for the exact SQLite and PostgreSQL environments exercised by CI. MySQL/MariaDB are not currently certified Zazu V1 deployment targets.
+
 ## Product direction
 
 Zazu EMP is designed as a reusable commercial event-management platform.
