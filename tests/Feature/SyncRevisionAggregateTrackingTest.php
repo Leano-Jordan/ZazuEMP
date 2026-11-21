@@ -91,6 +91,11 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         // An ordinary online edit does not create a SyncDelivery. Its aggregate
         // revision timestamp must still promote it into the next bounded refresh.
         $deliveredSupplier->update(['name' => 'Z-supplier-updated-outside-window']);
+        DB::table('sync_entity_identities')
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'supplier')
+            ->where('entity_uuid', $identity->entity_uuid)
+            ->update(['updated_at' => now()->addMinute()]);
         $builder = app(SyncBootstrapPayloadBuilder::class);
         $onlineSnapshot = $builder->build($receivingDevice);
         $onlineIncluded = collect($onlineSnapshot['suppliers'])->first(
@@ -148,6 +153,18 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         $this->assertSame('Z-supplier-updated-outside-window', $included['record']['name']);
         $this->assertSame(2, (int) $included['revision']);
         $this->assertCount(501, $deliverySnapshot['suppliers']);
+
+        $unrelatedDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $unrelatedSnapshot = $builder->build($unrelatedDevice, [(int) $delivery->delivery_sequence]);
+        $this->assertFalse(
+            collect($unrelatedSnapshot['suppliers'])->contains(
+                fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $deliveredSupplier->id,
+            ),
+            'Delivery sequences must never pull records into another device workspace.',
+        );
     }
 
     public function test_nested_quote_item_and_inventory_movement_writes_advance_parent_revisions(): void
