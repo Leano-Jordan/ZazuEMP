@@ -1,16 +1,16 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\Business;
-use App\\Models\\SyncDevice;
-use App\\Support\\Offline\\OfflineDomainMutationHandler;
-use App\\Support\\Offline\\SyncMutationApplier;
-use App\\Support\\Offline\\SyncMutationRecorder;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Illuminate\\Support\\Str;
-use Illuminate\\Validation\\ValidationException;
-use Tests\\TestCase;
+use App\Models\Business;
+use App\Models\SyncDevice;
+use App\Support\Offline\OfflineDomainMutationHandler;
+use App\Support\Offline\SyncMutationApplier;
+use App\Support\Offline\SyncMutationRecorder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
 
 class OfflineMutationOperationValidationTest extends TestCase
 {
