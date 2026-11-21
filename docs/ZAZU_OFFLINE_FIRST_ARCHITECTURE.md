@@ -1,3 +1,13 @@
+### Bootstrap delivery target fallback tenant guard — 2026-11-21
+
+**Implementation:** [cb944b2](https://github.com/Leano-Jordan/ZazuEMP/commit/cb944b2fe0b3c74caec4eee99b0feda1a2188183) + [3d1586c](https://github.com/Leano-Jordan/ZazuEMP/commit/3d1586c04ba35e70e292a433f038e3b7ed3828d6).  
+**Regression:** [604cb07](https://github.com/Leano-Jordan/ZazuEMP/commit/604cb07b2c1a226056d413a559859514297f3d7a).
+
+- Bootstrap delivery target resolution had a fallback path that re-read the primary identity by business/entity/UUID and returned its raw numeric record ID when the related-identity resolver returned no entries.
+- That fallback now requires the expected model morph type, resolves the actual record, and confirms its business ownership before adding the record to the receiver's bootstrap targets.
+- Added an adversarial regression for an invoice identity mapped to a Customer; the malformed mapping must produce no bootstrap targets.
+- Exact-head Laravel, PostgreSQL, quality and browser acceptance are pending for this latest change.
+
 ## Related offline identity acknowledgements and revision advancement — 2026-11-21
 
 **Related identity resolver:** [c919d4f](https://github.com/Leano-Jordan/ZazuEMP/commit/c919d4fc7fb611d835b966b6babc70288fe5263f).  
