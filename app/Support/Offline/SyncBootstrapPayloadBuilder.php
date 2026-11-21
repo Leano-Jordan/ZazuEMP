@@ -320,6 +320,17 @@ class SyncBootstrapPayloadBuilder
             ? $this->defaultSelection($business)
             : ($metadata['bootstrap_selection'] ?? []);
 
+        if ($selectionMode === 'explicit' && $additionalSelection !== []) {
+            $pinned = array_fill_keys(array_map(
+                static fn (array $item): string => (string) ($item['type'] ?? '').':'.(int) ($item['id'] ?? 0),
+                $selection,
+            ), true);
+            $additionalSelection = array_values(array_filter(
+                $additionalSelection,
+                static fn (array $item): bool => isset($pinned[(string) ($item['type'] ?? '').':'.(int) ($item['id'] ?? 0)]),
+            ));
+        }
+
         $selection = array_merge($selection, $additionalSelection);
         $selected = [];
         $seen = [];
