@@ -2,10 +2,22 @@
 
 namespace App\Support\Offline;
 
+use App\Models\BusinessCapability;
+use App\Models\Customer;
+use App\Models\Event;
+use App\Models\EventCost;
+use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
+use App\Models\Invoice;
+use App\Models\InventoryItem;
+use App\Models\PurchaseOrder;
+use App\Models\Quote;
+use App\Models\Supplier;
 use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 final class SyncBootstrapDeliveryTargetResolver
@@ -75,9 +87,15 @@ final class SyncBootstrapDeliveryTargetResolver
             return [];
         }
 
+        $expectedModel = $this->expectedModel($mutation->entity_type);
+        if ($expectedModel === null) {
+            return [];
+        }
+
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $device->business_id)
             ->where('entity_type', $mutation->entity_type)
+            ->where('record_type', (new $expectedModel)->getMorphClass())
             ->where('entity_uuid', Str::lower($localId))
             ->first();
 
@@ -85,10 +103,46 @@ final class SyncBootstrapDeliveryTargetResolver
             return [];
         }
 
+        $record = $identity->record;
+        if (! $record instanceof Model || ! $record instanceof $expectedModel) {
+            return [];
+        }
+
+        $recordBusinessId = $record->getAttribute('business_id');
+        if ($recordBusinessId === null && method_exists($record, 'event')) {
+            $recordBusinessId = $record->event()->withTrashed()->value('business_id');
+        }
+
+        if (! is_numeric($recordBusinessId) || (int) $recordBusinessId !== (int) $device->business_id) {
+            return [];
+        }
+
         return [[
             'entity_type' => $identity->entity_type,
             'server_id' => (int) $identity->record_id,
         ]];
+    }
+
+    /**
+     * @return class-string<Model>|null
+     */
+    private function expectedModel(string $entityType): ?string
+    {
+        return match ($entityType) {
+            'service' => BusinessCapability::class,
+            'customer' => Customer::class,
+            'job' => Event::class,
+            'supplier' => Supplier::class,
+            'preparation' => EventPreparationItem::class,
+            'purchase_order' => PurchaseOrder::class,
+            'quote' => Quote::class,
+            'invoice' => Invoice::class,
+            'expense' => FinanceExpense::class,
+            'inventory_item' => InventoryItem::class,
+            'event_cost' => EventCost::class,
+            'asset' => \\App\\Models\\Asset::class,
+            default => null,
+        };
     }
 
     /**
