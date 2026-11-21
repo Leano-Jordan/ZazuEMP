@@ -1,3 +1,19 @@
+## Director execution checkpoint — transactional trusted-device authorization — 2026-11-21
+
+**Implementation:** [9245670](https://github.com/Leano-Jordan/ZazuEMP/commit/9245670978a41c78fd54b46654f9746cf4d3ef5d).  
+**Regression coverage:** [0f01244](https://github.com/Leano-Jordan/ZazuEMP/commit/0f01244229d1fc12b2adead728bd903f91e54b1c).
+
+- Added a shared business-first/device-row authorization guard that revalidates active status and the persisted token hash inside the caller's transaction.
+- Applied it to conflict resolution, attachment upload/list/download and device revocation. This serializes these operations with revocation and rejects stale middleware snapshots.
+- A stale credential can no longer revoke a replacement credential registered for the same installation.
+- Added four regression tests for revoked-device conflict resolution, attachment upload, attachment listing and stale-token revocation.
+- Existing bootstrap, pull and acknowledgement revalidation remains in place; this correction does not reopen those already-covered paths.
+- **Verification:** exact-head CI/test result is pending. The new tests have been committed but are not represented as passed. No readiness score change.
+
+**Next:** inspect the current exact-head Actions results, correct any failures, then continue the remaining V1 gates. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — offline tenant-boundary hardening verified — 2026-11-21
 
 **Current main:** [2ef47e8](https://github.com/Leano-Jordan/ZazuEMP/commit/2ef47e8ac94ac75db0384eb2d45705a360e109d1).  
