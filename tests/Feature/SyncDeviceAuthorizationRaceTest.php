@@ -96,7 +96,7 @@ class SyncDeviceAuthorizationRaceTest extends TestCase
         $handler = new class implements SyncMutationHandler {
             public function apply(SyncMutation $mutation): void
             {
-                throw new \\RuntimeException('The domain handler must not run for a replaced device credential.');
+                throw new \RuntimeException('The domain handler must not run for a replaced device credential.');
             }
         };
 
