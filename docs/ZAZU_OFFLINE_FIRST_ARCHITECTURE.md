@@ -1,3 +1,14 @@
+## Offline identity linked-record ownership — 2026-11-21
+
+**Implementation:** [15f0a17](https://github.com/Leano-Jordan/ZazuEMP/commit/15f0a176e46aaf19c389aa17e36e2d74028d9f50) on `main`.  
+**Regression:** [601b944](https://github.com/Leano-Jordan/ZazuEMP/commit/601b94493f9b3c037a8c4e4e26fa264fee2aebc2) and [e249313](https://github.com/Leano-Jordan/ZazuEMP/commit/e249313deb9cf73373e1acc11f881c7d631a63a6) on `main`.
+
+- The generic offline update resolver previously trusted the tenant-scoped identity row and immediately dereferenced its polymorphic record. It did not independently verify that the linked record still belonged to the mutation's business.
+- Added a fail-closed ownership check before any update handler receives the linked model. Directly business-owned records are checked through `business_id`; records whose ownership is inherited through an event are checked through that event relationship.
+- Added an adversarial regression that deliberately seeds a mismatched identity row (business A identity pointing to business B's Customer) and verifies that the mutation is rejected, remains pending, and cannot rename or transfer the foreign customer.
+- This is defense in depth against stale, corrupted, or incorrectly imported identity mappings. It is not evidence that a normal authenticated client can write identity rows directly, and should not be described as a demonstrated remote exploit.
+- Exact-head CI for these new commits is pending; do not count this hardening as verified until Laravel and quality checks pass.
+
 ## Offline event-cost local sync-state reconciliation — 2026-11-21
 
 **Implementation:** `764f53682123481579a276303dc5da45c7c6038b` on `main`.  
@@ -8,7 +19,7 @@
 - The form now marks the saved local event cost as pending. The browser regression asserts `pending_sync: true` before reconnect and `false` after canonical identity reconciliation and queue drainage.
 - This is a confirmed local UI-state defect; server-side event-cost persistence and tenant isolation remain separately covered.
 
-**Exact-head CI:** PENDING. Do not count the correction as verified until the event-cost browser journey and the full relevant checks pass.
+**Exact-head CI:** PASS. The event-cost browser journey passed on the production-fix/test head; Laravel and PostgreSQL also passed. The subsequent documentation and security commits are being verified independently.
 
 ---
 
