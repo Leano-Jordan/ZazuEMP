@@ -44,6 +44,9 @@ Zazu primarily serves:
 
 ## 4. Three Workspace Tiers and Experience Levels
 
+**Founder decision — 2026-11-21 (DEC-027):** The canonical commercial tier names are Basic (Free), Intermediate (paid) and Advanced (paid). These are the only three tiers. This confirms the existing entitlement identifiers and supersedes conflicting Starter/Team/Business naming in the historical valuation proposal. The Founder has not approved exact monthly prices, module allocations or numerical quotas; none may be presented as final or enforced by inference.
+
+
 The three experience levels are also the three commercial workspace tiers:
 
 - **Basic — Free, ongoing:** essential business continuity.
