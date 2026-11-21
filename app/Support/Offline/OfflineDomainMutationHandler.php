@@ -944,12 +944,27 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
-        $order = array_key_exists('purchase_order_local_id', $payload)
-            ? $this->resolveIdentityRecord($mutation->business_id, 'purchase_order', $payload['purchase_order_local_id'], PurchaseOrder::class)
-            : null;
-        $supplier = array_key_exists('supplier_local_id', $payload)
-            ? $this->resolveIdentityRecord($mutation->business_id, 'supplier', $payload['supplier_local_id'], Supplier::class)
-            : null;
+        $purchaseOrderUuid = $payload['purchase_order_local_id'] ?? null;
+        $order = $purchaseOrderUuid === null || $purchaseOrderUuid === ''
+            ? null
+            : $this->resolveIdentityRecord($mutation->business_id, 'purchase_order', $purchaseOrderUuid, PurchaseOrder::class);
+
+        if ($purchaseOrderUuid !== null && $purchaseOrderUuid !== '' && ! ($order instanceof PurchaseOrder)) {
+            throw ValidationException::withMessages([
+                'purchase_order_local_id' => 'The offline expense references an unknown purchase order.',
+            ]);
+        }
+
+        $supplierUuid = $payload['supplier_local_id'] ?? null;
+        $supplier = $supplierUuid === null || $supplierUuid === ''
+            ? null
+            : $this->resolveIdentityRecord($mutation->business_id, 'supplier', $supplierUuid, Supplier::class);
+
+        if ($supplierUuid !== null && $supplierUuid !== '' && ! ($supplier instanceof Supplier)) {
+            throw ValidationException::withMessages([
+                'supplier_local_id' => 'The offline expense references an unknown supplier.',
+            ]);
+        }
 
         $this->finance->recordExpense($mutation->business_id, $this->businessCurrency($mutation->business_id), [
             'idempotency_key' => $mutation->mutation_id,
