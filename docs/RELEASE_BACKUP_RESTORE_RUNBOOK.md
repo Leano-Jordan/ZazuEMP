@@ -1,13 +1,13 @@
-## Empty private-storage restore correctness — implementation checkpoint 2026-11-21
+## Empty private-storage restore correctness — automated verification PASS — 2026-11-21
 
 **Implementation:** [1906fd4](https://github.com/Leano-Jordan/ZazuEMP/commit/1906fd4da1876df66d745a57be9c3bd1d1714c48).  
 **Regression:** [1cb1154](https://github.com/Leano-Jordan/ZazuEMP/commit/1cb1154b4b813dca0cf04fe401dbdf38375a5808).
 
-A backup that declares private storage must restore that snapshot even when the directory contains zero files. ZIP omits empty directories, so restore now reads the v2 contents manifest, creates an empty staging directory and replaces the target private tree. A regression proves stale target files are removed while the database snapshot is restored. Exact-head CI pending; the owner-operated recovery drill remains mandatory.
+A backup that declares private storage must restore that snapshot even when the directory contains zero files. ZIP omits empty directories, so restore now reads the v2 contents manifest, creates an empty staging directory and replaces the target private tree. A regression proves stale target files are removed while the database snapshot is restored. Exact-head Laravel/recovery CI passed on [d716d5d / run 44937037910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937037910); Windows populated and empty-private-storage restore passed on [run 44937732880](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937732880). The owner-operated recovery drill remains mandatory.
 
 ---
 
-## Backup/restore capacity alignment — implementation checkpoint 2026-11-21
+## Backup/restore capacity alignment — automated verification PASS — 2026-11-21
 
 **Implementation:** [84dba32](https://github.com/Leano-Jordan/ZazuEMP/commit/84dba32ae96ececf6c1dd71034d79d0b93070b7e).  
 **Shared policy:** [4824469](https://github.com/Leano-Jordan/ZazuEMP/commit/48244694d5419df50ce9cdd3938f65aaf77d02eb).  
