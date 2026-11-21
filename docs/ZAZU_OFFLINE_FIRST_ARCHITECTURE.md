@@ -18,6 +18,7 @@
 - Snapshot generation now verifies the resolved record's business owner before serializing it. An invalid/foreign target is represented as unavailable and contributes no record data.
 - The related asset-allocation lookup is also constrained by the identity's business ID.
 - Added a regression proving that a foreign Customer's name and notes are not serialized by a snapshot built from a mismatched identity.
+- The first adversarial test attempt hit the expected-revision gate before reaching the handler. The regression now supplies the identity's current revision so it exercises the ownership guard itself.
 - Exact-head CI remains pending.
 
 ### Offline linked-identity morph-type validation — 2026-11-21
