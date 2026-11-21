@@ -7,7 +7,7 @@
 - PostgreSQL migration/recovery smoke: **PASS**.
 - PHPMD, Zazu Quality, Composer security audit, secret scan and Director Health: **PASS**.
 - Exact-head offline acceptance on [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc): **63 desktop Chromium + 7 mobile viewport + 1 Pixel 7 host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries. [Workflow 44937037910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937037910).
-- Windows V1 package/fresh-install and populated upgrade/rollback passed on runtime code head [84dba32](https://github.com/Leano-Jordan/ZazuEMP/commit/84dba32ae96ececf6c1dd71034d79d0b93070b7e).
+- Windows V1 package/fresh-install plus Windows-native populated and empty private-storage restore passed on [workflow 44937732880](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937732880), packaging the same runtime source head [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc). Populated upgrade/rollback passed on earlier runtime code head [84dba32](https://github.com/Leano-Jordan/ZazuEMP/commit/84dba32ae96ececf6c1dd71034d79d0b93070b7e).
 - CASE-ZAZU-0037 (LAN host outage UI), CASE-ZAZU-0038 (backup/restore archive limit drift) and CASE-ZAZU-0039 (empty private-storage restore retaining stale files) are closed at code/automated-test level.
 
 ### Remaining release gates — still NOT READY
