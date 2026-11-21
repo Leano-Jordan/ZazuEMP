@@ -1,11 +1,28 @@
 # Zazu EMP — V1 Release Checklist
 
 Latest full application-code verification baseline: 041314fd80147758dd2edb33c187b16328aea938.
-Latest receiver-sync implementation source head: 472e301065a5301c80f0ffbb97f82b61c24575ba (exact-head CI pending).
+Latest receiver-sync and bootstrap-auth hardening source head: 559e66b87de8617f967b722b55b0fbfd9b116495 (backend gates pass; offline-browser acceptance still running).
 Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 
+## Receiver reconciliation and bootstrap authorization — 2026-11-21
+
+**Source head:** 559e66b87de8617f967b722b55b0fbfd9b116495.
+
+- [x] Laravel: 632 passed / 1 skipped / 4,388 assertions.
+- [x] PostgreSQL migration/registration/recovery smoke.
+- [x] PHPMD, Zazu Quality, application, Composer audit, secret scan, Director Health, Push-on-main and Actions/Python/JavaScript analysis. SonarCloud was skipped.
+- [x] Receiver bootstrap includes the exact pulled delivery prefix and all primary/related aggregates outside the normal 500-record window.
+- [x] Normal bounded collections promote recently revised aggregates while retaining display order.
+- [x] Explicit Customer/Work/Quote/Preparation pairing selections remain pinned; targeted delivery cannot silently broaden them.
+- [x] Bootstrap revalidates active device status and token hash under business-first locks; revocation and credential-replacement regressions pass.
+- [ ] Offline-browser pull → targeted bootstrap → local persist → acknowledgement sequence; workflow is still running.
+- [ ] Full sync matrix and physical-device cold launch/restart/reconnect remain open. CASE-ZAZU-0034 and CASE-ZAZU-0035 remain open until the browser run passes on this source head.
+
+Evidence maturity remains 73/100 until the browser acceptance completes. No uplift is claimed from partial CI.
+
+---
 ## Exact-head automated acceptance — 2026-11-20
 
 - [x] Laravel [44810699348](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699348): 623 passed / 1 skipped / 4,283 assertions.
