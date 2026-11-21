@@ -13,7 +13,7 @@
 - This is a corrupted/stale identity mapping defense, not a demonstrated remote client exploit. Do not overstate the threat model.
 - Updated `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md` with the acceptance closure, ownership guard, morph-type validation and stale-snapshot protection.
 
-**Verification of the ownership + morph-type + snapshot hardening:** latest Laravel run [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572) is running on the corrected test head. Earlier failures were isolated to test setup (missing expected revision) and test-file syntax; the corrected head must pass before this work is marked complete. Do not mark the new guard complete until those checks pass.
+**Verification of the ownership + morph-type + snapshot hardening:** exact source-head Laravel [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572) **PASS — 659 passed / 1 skipped / 4,527 assertions**; PostgreSQL migration/recovery smoke **PASS**; Zazu Quality, PHPMD and Director Health **PASS**. The matching offline-browser acceptance job remains in progress; do not close the full verification gate until it finishes. SonarCloud is skipped. Do not mark the new guard complete until those checks pass.
 
 **Evidence maturity:** **77/100, unchanged**. No score uplift. V1 remains **NOT READY**.
 
