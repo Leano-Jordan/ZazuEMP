@@ -245,3 +245,13 @@ An offline mutation may be based on an older business-record snapshot than the s
 **Regression controls:** stale middleware snapshot after revocation; stale snapshot after sync-token replacement. Existing pull/ack revocation tests remain in place.
 
 **Status:** IMPLEMENTED ON MAIN — exact-head Laravel, PostgreSQL, PHPMD, quality and offline-browser verification pending. No security-gate closure is claimed until the new exact-head run passes.
+
+## REG-026 — Bootstrap authorization reuses a stale middleware device snapshot
+
+**Failure:** The bootstrap endpoint relied on the SyncDevice model attached by authentication middleware. Revocation or bearer-token replacement between middleware lookup and bootstrap could leave the old request snapshot authorized to receive business data. The old last-seen write also occurred before the business lock.
+
+**Control:** Bootstrap now takes the business lock first, re-reads the active destination device under row lock, checks the persisted bearer-token hash against the authenticated request snapshot, updates activity and builds the bootstrap in that locked transaction. A revoked/replaced device receives 401 before snapshot data is returned.
+
+**Regression controls:** Direct stale-snapshot tests for revocation and credential replacement. Existing pull and acknowledgement stale-snapshot protections are retained.
+
+**Status:** IMPLEMENTED ON MAIN — Laravel backend and supporting quality/security checks pass on source head `559e66b`; offline-browser acceptance is still in progress. Keep the case open until browser acceptance completes.
