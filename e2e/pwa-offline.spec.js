@@ -1795,6 +1795,146 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
+    test('event cost form saves locally and reconciles its job identity after reconnect', async ({ page, context }, testInfo) => {
+        test.setTimeout(40_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Event-cost form reconciliation runs once in Chromium.');
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        const job = await page.evaluate(() => {
+            const item = window.ZazuOffline.getState().jobs.find(record => record.local_id && Number(record.id ?? record.server_id) > 0);
+            return item ? {
+                id: Number(item.id ?? item.server_id),
+                localId: item.local_id,
+                name: item.name,
+            } : null;
+        });
+        expect(job).not.toBeNull();
+
+        await page.goto(`/work/${job.id}/costs/create`, { waitUntil: 'domcontentloaded' });
+        const form = page.locator('form[data-zazu-offline-entity="event_cost"]');
+        await expect(form).toBeVisible();
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        await context.setOffline(true);
+        await form.locator('select[name="category"]').selectOption({ index: 1 });
+        await form.locator('input[name="description"]').fill('Offline transport and delivery');
+        await form.locator('select[name="currency"]').selectOption('ZAR');
+        await form.locator('input[name="projected_amount"]').fill('320.00');
+        await form.locator('input[name="actual_amount"]').fill('295.50');
+        await form.locator('select[name="status"]').selectOption('incurred');
+        await form.locator('textarea[name="notes"]').fill('Recorded on the disconnected device.');
+        await form.getByRole('button', { name: 'Save cost' }).click();
+        await expect(form.getByRole('status')).toContainText('Saved on this device');
+
+        const local = await page.evaluate(async () => {
+            const queue = await window.ZazuOffline.pending();
+            const mutation = queue.find(item => item.entity_type === 'event_cost');
+            const cost = window.ZazuOffline.getState().costs.find(item => item.local_id === mutation?.payload?.local_id);
+            return {
+                mutationId: mutation?.id ?? null,
+                payload: mutation?.payload ?? null,
+                cost: cost ? {
+                    description: cost.description,
+                    projectedAmount: cost.projected_amount,
+                    actualAmount: cost.actual_amount,
+                    status: cost.status,
+                } : null,
+            };
+        });
+        expect(local.mutationId).toEqual(expect.any(String));
+        expect(local.payload).toMatchObject({
+            event_local_id: job.localId,
+            category: expect.any(String),
+            description: 'Offline transport and delivery',
+            currency: 'ZAR',
+            projected_amount: '320.00',
+            actual_amount: '295.50',
+            status: 'incurred',
+            notes: 'Recorded on the disconnected device.',
+        });
+        expect(local.cost).toEqual({
+            description: 'Offline transport and delivery',
+            projectedAmount: '320.00',
+            actualAmount: '295.50',
+            status: 'incurred',
+        });
+
+        let pushed = null;
+        await page.route('**/api/sync/push', async route => {
+            const body = route.request().postDataJSON();
+            const mutation = body.mutations.find(item => item.id === local.mutationId);
+            pushed = mutation ? {
+                entityType: mutation.entity_type,
+                localId: mutation.payload?.local_id,
+                eventLocalId: mutation.payload?.event_local_id,
+            } : null;
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    recorded: [{
+                        id: local.mutationId,
+                        sequence: 1,
+                        status: 'applied',
+                        applied: true,
+                        error: null,
+                        retryable: false,
+                        identity: {
+                            entity_type: 'event_cost',
+                            local_id: local.payload.local_id,
+                            server_id: 95002,
+                            revision: 1,
+                        },
+                    }],
+                    applied: [local.mutationId],
+                }),
+            });
+        });
+        await page.route('**/api/sync/pull**', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ mutations: [] }),
+        }));
+        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                business: { id: Number(await page.evaluate(() => document.body.dataset.zazuBusinessId)), name: 'Event cost business', currency: 'ZAR' },
+            }),
+        }));
+
+        await context.setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => pushed?.entityType).toBe('event_cost');
+        expect(pushed).toEqual({
+            entityType: 'event_cost',
+            localId: local.payload.local_id,
+            eventLocalId: job.localId,
+        });
+
+        await expect.poll(async () => page.evaluate(async localId => {
+            const state = window.ZazuOffline.getState();
+            const cost = state.costs.find(item => item.local_id === localId);
+            return {
+                serverId: cost?.server_id ?? null,
+                id: cost?.id ?? null,
+                pendingSync: cost?.pending_sync ?? null,
+                pendingCount: (await window.ZazuOffline.pending()).length,
+            };
+        }, local.payload.local_id)).toEqual({
+            serverId: 95002,
+            id: 95002,
+            pendingSync: false,
+            pendingCount: 0,
+        });
+    });
+
     test('offline payment receives its canonical server identity inside the invoice', async ({ page }, testInfo) => {
         test.setTimeout(45_000);
         test.skip(testInfo.project.name !== 'chromium', 'Nested payment identity reconciliation runs once in Chromium.');
