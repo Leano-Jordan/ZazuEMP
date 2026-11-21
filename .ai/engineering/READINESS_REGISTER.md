@@ -1,11 +1,12 @@
-## Additional security checkpoint — mutation application credential race — 2026-11-21
+## Closed security checkpoint — stale device credential writes — 2026-11-21
 
-- Found a separate post-record TOCTOU window: the push processor recorded with a valid credential, then the applier checked only device active status in a new transaction.
-- The push processor now uses the authenticated applier, which locks/revalidates the original credential and confirms mutation business/device ownership before applying.
-- Adversarial regressions: record mutation → replace credential → stale apply attempt returns 401 and leaves the mutation pending with no delivery; stale conflict recording after re-pair returns 401 and creates no conflict row.
-- Implementation [e66da83](https://github.com/Leano-Jordan/ZazuEMP/commit/e66da83a38f449482d83e9be9ffa6b4449830158), push integration [d31aee2](https://github.com/Leano-Jordan/ZazuEMP/commit/d31aee2d2b03ce983c7d6370a53d17b7f3d77da4), regression [b65ccfd](https://github.com/Leano-Jordan/ZazuEMP/commit/b65ccfd8dd99bd9b9effd964c0926889759e413e). Exact-head CI pending; readiness score unchanged.
+- Mutation application revalidates the original authenticated credential and mutation business/device ownership inside the same transaction as the domain write.
+- Conflict recording now revalidates the same credential under the business-first/device-row guard; stale requests cannot create conflict state after device re-pair.
+- Bootstrap, pull and acknowledgement now share the same guard, removing duplicated credential-check implementations.
+- Adversarial regressions prove stale apply returns 401 without applying/delivering and stale conflict recording returns 401 without a conflict row.
+- Exact-head [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7): Laravel **675 passed / 1 skipped / 4,581 assertions**; PostgreSQL migration/recovery smoke and desktop/mobile browser acceptance **PASS** (63 desktop, 7 mobile, 1 LAN host-outage, 1 phone-local attachment/reconnect; no flaky retries); PHPMD, Psalm, Zazu Quality, Director Health, populated upgrade/rollback, Windows package/fresh install and Push-on-main **PASS**. SonarCloud skipped.
+- CASE-ZAZU-0040 CLOSED at automated-test/source level. Readiness score unchanged; physical Android, owner-PC recovery, live-business commercial, POPIA and name-clearance gates remain open.
 
----
 
 ## Director execution checkpoint — offline host detection + recovery archive hardening — 2026-11-21
 
