@@ -2866,7 +2866,6 @@ test.describe('Zazu installed PWA offline shell', () => {
         const jobLocalId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
         const customerLocalId = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
         const quoteLocalId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
-        const invoiceLocalId = 'abababab-abab-4bab-8bab-abababababab';
         const paymentLocalId = 'acacacac-acac-4cac-8cac-acacacacacac';
         const jobServerId = 88101;
         const quoteServerId = 88201;
@@ -2951,7 +2950,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                         },
                     ],
                     invoices: [{
-                        local_id: invoiceLocalId,
+                        local_id: createdInvoiceLocalId,
                         server_id: 88401,
                         record: {
                             id: 88401,
@@ -3062,6 +3061,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 && item.payload?.record?.quote_local_id === quoteId
             );
             return {
+                local_id: mutation?.payload?.record?.local_id || null,
                 quote_local_id: mutation?.payload?.record?.quote_local_id || null,
                 status: mutation?.status || null,
                 local_invoice: state.invoices?.find(item =>
@@ -3070,10 +3070,12 @@ test.describe('Zazu installed PWA offline shell', () => {
             };
         }, quoteLocalId);
         expect(queuedInvoice).toEqual({
+            local_id: expect.any(String),
             quote_local_id: quoteLocalId,
             status: 'pending',
             local_invoice: quoteLocalId,
         });
+        const createdInvoiceLocalId = queuedInvoice.local_id;
 
         // Reconnect both queued commands. The acceptance acknowledgement must
         // advance the quote/work revisions, and the invoice acknowledgement must
@@ -3105,7 +3107,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                             applied: true,
                             identity: {
                                 entity_type: 'invoice',
-                                local_id: invoiceLocalId,
+                                local_id: createdInvoiceLocalId,
                                 server_id: 88601,
                                 revision: 1,
                             },
@@ -3155,7 +3157,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 invoiceQuoteLocalId: invoice?.quote_local_id,
                 pending: state.local_dirty,
             };
-        }, { quoteLocalId, jobLocalId, invoiceLocalId });
+        }, { quoteLocalId, jobLocalId, invoiceLocalId: createdInvoiceLocalId });
 
         expect(reconciled).toEqual({
             quoteStatus: 'accepted',
@@ -3437,7 +3439,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 status: 'sent',
             }];
             state.invoices = [{
-                local_id: invoiceLocalId,
+                local_id: createdInvoiceLocalId,
                 number: 'INV-OFFLINE-TEMP-LOCAL',
                 status: 'issued',
                 currency: 'ZAR',
@@ -3523,7 +3525,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     contentType: 'application/json',
                     body: JSON.stringify({
                         invoices: [{
-                            local_id: invoiceLocalId,
+                            local_id: createdInvoiceLocalId,
                             server_id: 7654322,
                             record: {
                                 id: 7654322,
