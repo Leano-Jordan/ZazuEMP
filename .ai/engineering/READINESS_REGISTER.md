@@ -1,3 +1,15 @@
+## Director disposition refresh — 2026-11-21 (receiver sync completeness)
+
+- **Application/test source head:** `472e301065a5301c80f0ffbb97f82b61c24575ba`.
+- **Verification status:** exact-head Laravel, PostgreSQL recovery, offline-browser, PHPMD and quality workflows are pending; no pass is claimed for this source head until results finish.
+- **Confirmed receiver defect:** the previous receiver flow could acknowledge delivery sequences after applying a bounded bootstrap that omitted a delivered older aggregate. A similar freshness risk existed for online updates because collection limits followed static display ordering.
+- **Correction:** client sends exact delivery sequences with bootstrap; server resolves target primary/related aggregates using business + destination-device scoping and includes them beyond normal collection limits; recent aggregate revisions are prioritized in the ordinary bounded window; client only acknowledges after local snapshot persistence. Static offline client cache advanced to v58.
+- **Regression coverage:** online revision promotion; explicit delivery inclusion outside 500; non-recipient device isolation; commercial second-device snapshot; receipt/inventory related aggregates; browser pull → bootstrap → ack ordering.
+- **Failure register:** CASE-ZAZU-0034 / ENG-DATA-004. CASE-ZAZU-0033 remains open separately for full writer audit and stale-write matrix.
+- **Disposition:** NOT READY. Evidence maturity stays **73/100** pending exact-head verification; physical Android, intended-installation recovery, live-business commercial reconciliation and POPIA owner acceptance remain open.
+
+---
+
 ## Director disposition refresh — 2026-11-20
 
 - **Verified code SHA:** `041314fd80147758dd2edb33c187b16328aea938`. Exact-head Laravel [44810699348](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44810699348): 623 passed / 1 skipped / 4,283 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery smoke PASS; desktop offline browser 57 passed; mobile viewport 7 passed; dedicated phone-local Work attachment journey 1 passed. PHPMD [44810699344], Zazu Quality [44810699254], Director Health [44810699270] and Push-on-main [44810699529] PASS. SonarCloud skipped.
