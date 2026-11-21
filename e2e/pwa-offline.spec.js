@@ -1818,6 +1818,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 local_id: 'offline-payment-invoice-identity',
                 id: 98401,
                 server_id: 98401,
+                revision: 1,
                 number: 'INV-OFFLINE-PAY-001',
                 status: 'issued',
                 currency: 'ZAR',
@@ -1931,6 +1932,12 @@ test.describe('Zazu installed PWA offline shell', () => {
                             local_id: pushedPaymentLocalId,
                             server_id: 98501,
                         },
+                        related_identities: [{
+                            entity_type: 'invoice',
+                            local_id: 'offline-payment-invoice-identity',
+                            server_id: 98401,
+                            revision: 2,
+                        }],
                     }],
                     applied: [mutation.id],
                 }),
@@ -1959,8 +1966,9 @@ test.describe('Zazu installed PWA offline shell', () => {
                 id: payment?.id ?? null,
                 serverId: payment?.server_id ?? null,
                 pendingSync: payment?.pending_sync ?? null,
+                invoiceRevision: invoice?.revision ?? null,
             };
-        }, pushedPaymentLocalId)).toEqual({ id: 98501, serverId: 98501, pendingSync: false });
+        }, pushedPaymentLocalId)).toEqual({ id: 98501, serverId: 98501, pendingSync: false, invoiceRevision: 2 });
 
         expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
     });
