@@ -422,22 +422,34 @@ class SyncBootstrapPayloadBuilder
 
     private function selectedQuoteData(Quote $quote, SyncEntityIdentityRegistry $registry): array
     {
-        $quote->loadMissing('latestVersion.items', 'event.customer');
-        $data = $quote->toArray();
-        $data['event_local_id'] = $quote->event
-            ? $registry->identify($quote->event, 'job')->entity_uuid
+        $quote->loadMissing('latestVersion.items');
+        $businessId = (int) $quote->event()->value('business_id');
+        $event = $businessId > 0
+            ? $quote->event()
+                ->where('business_id', $businessId)
+                ->with(['customer' => fn ($customer) => $customer->where('business_id', $businessId)])
+                ->first()
             : null;
-        $data['event_name'] = $quote->event?->name;
+        $quote->setRelation('event', $event);
+
+        $data = $quote->toArray();
+        $data['event_local_id'] = $event
+            ? $registry->identify($event, 'job')->entity_uuid
+            : null;
+        $data['event_name'] = $event?->name;
 
         return $data;
     }
 
     private function selectedJobData(Event $event, SyncEntityIdentityRegistry $registry): array
     {
-        $event->loadMissing('requirements', 'customer');
+        $event->loadMissing('requirements');
+        $customer = $event->customer()->where('business_id', $event->business_id)->first();
+        $event->setRelation('customer', $customer);
+
         $data = $event->toArray();
-        $data['customer_local_id'] = $event->customer
-            ? $registry->identify($event->customer, 'customer')->entity_uuid
+        $data['customer_local_id'] = $customer
+            ? $registry->identify($customer, 'customer')->entity_uuid
             : null;
         $data['requirements'] = $event->requirements->map(function ($requirement) use ($registry): array {
             return [
@@ -454,12 +466,17 @@ class SyncBootstrapPayloadBuilder
         EventPreparationItem $preparation,
         SyncEntityIdentityRegistry $registry,
     ): array {
-        $preparation->loadMissing('event.customer');
+        $event = $preparation->event()
+            ->where('business_id', $preparation->business_id)
+            ->with(['customer' => fn ($customer) => $customer->where('business_id', $preparation->business_id)])
+            ->first();
+        $preparation->setRelation('event', $event);
+
         $data = $preparation->toArray();
-        $data['event_local_id'] = $preparation->event
-            ? $registry->identify($preparation->event, 'job')->entity_uuid
+        $data['event_local_id'] = $event
+            ? $registry->identify($event, 'job')->entity_uuid
             : null;
-        $data['event_name'] = $preparation->event?->name;
+        $data['event_name'] = $event?->name;
 
         return $data;
     }
