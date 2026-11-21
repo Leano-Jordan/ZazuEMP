@@ -1,3 +1,21 @@
+## Offline expense reconciliation — 2026-11-21
+
+**Exact source/test head:** `3c8db9bd02fec06603d48b3050f7d306d7b41070` on `main`.  
+**Laravel workflow:** [44902438027](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44902438027) · **Zazu Quality:** [44902438064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44902438064) · **Push-on-main:** [44902438499](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44902438499).
+
+- The existing offline expense form now has browser acceptance: save while disconnected, preserve the job/supplier/purchase-order local identities, reconnect, receive the canonical expense server ID and drain the durable queue.
+- Server-side feature coverage applies the real offline expense handler and verifies the ZAR amount, paid status, event/supplier/purchase-order ownership, expense identity, audit event and duplicate-safe replay.
+- Laravel: **651 passed / 1 skipped / 4,480 assertions**.
+- Offline browser: **61 desktop Chromium + 7 mobile viewport + 1 phone-local attachment journey passed**.
+- PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS**.
+- Zazu Quality, Composer security audit, secret scan and Push-on-main: **PASS**. PHPMD and Director Health passed on the immediately preceding PHP-identical source head. SonarCloud: **SKIPPED**.
+
+**Evidence boundary:** the browser acknowledgement is deterministic/mocked. The PHP feature test exercises the real server-side mutation handler and database transaction. The full populated live-business commercial walkthrough remains a separate acceptance gate. Physical Android cold launch/restart/reconnect, intended-PC recovery and POPIA operational sign-off remain separate gates. V1 remains **NOT READY**; no score increase is claimed.
+
+**Next engineering target:** strengthen business archive restore acceptance by proving a workspace with existing trusted-device state is rejected before any imported data or files are written.
+
+---
+
 ## Offline payment reconciliation — 2026-11-21
 
 **Exact source/test head:** `e1debd77c9d064f92895768f120ac752a34d897b` on `main`.  
@@ -14,7 +32,7 @@
 
 **Evidence boundary:** the browser acknowledgement is deterministic/mocked. The PHP feature test exercises the real server-side mutation handler and database transaction. The populated online commercial reconciliation remains a separate live-business acceptance gate. Physical Android cold launch/restart/reconnect, intended-PC recovery and POPIA operational sign-off remain separate gates. V1 remains **NOT READY**; no score increase is claimed.
 
-**Next engineering target:** exercise the existing offline expense workflow end-to-end, including its linked business records, canonical identity acknowledgement and duplicate-safe replay.
+**Superseded target:** offline expense capture and reconciliation is now verified; see the subsequent expense acceptance record above.
 
 ---
 
