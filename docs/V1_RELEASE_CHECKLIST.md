@@ -19,7 +19,7 @@ Disposition: NOT READY · Evidence maturity: 77/100 (+2 for verified stale-write
 - [x] Online root/nested writer review and parent revision propagation; primary-contact creation mass-update bypass corrected.
 - [x] CASE-ZAZU-0033 / ENG-DATA-003 CLOSED.
 
-The full offline sync workflow matrix remains OPEN separately, along with physical Android cold launch/restart/reconnect, intended-PC recovery drill, live-business commercial reconciliation and POPIA operational sign-off. V1 remains NOT READY; evidence maturity remains 75/100.
+The full offline sync workflow matrix remains OPEN separately, along with physical Android cold launch/restart/reconnect, intended-PC recovery drill, live-business commercial reconciliation and POPIA operational sign-off. V1 remains NOT READY; evidence maturity is 77/100 (+2 for verified stale-write protection).
 
 [Exact-head workflow](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44881431689).
 
