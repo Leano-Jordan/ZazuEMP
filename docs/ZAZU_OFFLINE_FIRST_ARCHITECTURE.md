@@ -1,3 +1,11 @@
+### Regression suite maintainability — 2026-11-21
+
+**Refactor:** [ea4247f](https://github.com/Leano-Jordan/ZazuEMP/commit/ea4247fbbde558f4fe7475482cd2325d9b25fa26) + [1e67154](https://github.com/Leano-Jordan/ZazuEMP/commit/1e67154405fa6fb96f7d0bafd67694274cb47025).
+
+- PHPMD flagged the expanded OfflineExpenseReferenceIsolationTest class after the new adversarial cases pushed it above the configured public-method limit.
+- Moved the positive InventoryMovement acknowledgement case and related foreign-asset snapshot case into OfflineIdentityAcknowledgementIsolationTest. No test was removed or suppressed.
+- Current test classes remain focused and below the configured method threshold; latest PHPMD and Laravel runs are pending.
+
 ### Inventory movement primary identity compatibility — 2026-11-21
 
 **Implementation:** [3f8d2cd](https://github.com/Leano-Jordan/ZazuEMP/commit/3f8d2cd9bc70f718ff991eb9dc9503b204aa8a62).  
