@@ -1,6 +1,7 @@
 # Zazu EMP — V1 Release Checklist
 
 Latest full application-code verification baseline: 041314fd80147758dd2edb33c187b16328aea938.
+Latest receiver-sync implementation source head: 472e301065a5301c80f0ffbb97f82b61c24575ba (exact-head CI pending).
 Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
@@ -51,7 +52,13 @@ Offline synchronization is a separate V1 reliability target from phone pairing a
 
 - [x] Complete a static source trace for every currently declared offline entity/operation from UI action → IndexedDB state → mutation queue → server handler → identity mapping → acknowledgement/pull/bootstrap → visible reconciled state. This closes the inventory task only; runtime acceptance remains open.
 
-**Source-level sync path map — verified against `main` on 2026-11-20**
+**Receiver bootstrap completeness correction — 2026-11-21 (implementation committed; exact-head CI pending)**
+
+The receiving client now sends the exact delivery sequence prefix to /api/sync/bootstrap. The controller validates and caps the list; SyncBootstrapDeliveryTargetResolver resolves primary and related aggregates only for the current business and destination device. The builder adds those records to the current receiver snapshot even when they are outside a normal 500-record collection. Ordinary bounded collections are ranked by latest sync-identity update time, fallback to record updated_at, and then returned in the existing display order. The client applies and persists the snapshot before acknowledging the prefix. Service-worker cache v58 delivers the updated precached offline client.
+
+Regression tests cover revision-ranked refresh, delivery inclusion outside 500, cross-device sequence isolation, commercial second-device reconciliation, receipt/inventory reconciliation, and browser pull → targeted bootstrap → acknowledgement ordering. CASE-ZAZU-0034 / ENG-DATA-004 records this defect. This does not close CASE-ZAZU-0033 or the complete V1 offline-sync matrix.
+
+**Source-level sync path map — verified against main on 2026-11-21**
 
 Shared transport: `resources/js/app.js::setupZazuOfflineForms` and the local customer/Work editors build the supported payloads. `public/zazu-offline.js::queueMutation` persists each mutation alongside the business-scoped workspace in IndexedDB; `pending` orders the queue by creation time and `push` sends batches to `SyncController::push`. The server records mutation identity/sequence, applies it under the business → device → mutation transaction/lock order, and publishes receiver deliveries atomically. `OfflineDomainMutationHandler::apply` dispatches the entity-specific handler. Model results are registered through `SyncEntityIdentityRegistry` and returned as canonical IDs; command effects without their own model identity are reconciled through their owning records. On the receiving device, `SyncMutationProtocol::pull` returns only a contiguous delivery prefix; the client fetches the authoritative bootstrap snapshot, applies it only when its local queue/conflicts are clear, then acknowledges the contiguous delivery sequence.
 
