@@ -1,3 +1,13 @@
+## Director deep-audit increment — 2026-11-21 (customer-contact create revision bypass)
+
+**Implementation head:** `5f8dd6bdfa22b17bc6d0f14eb065400101caa1ea` on `main`; exact-head CI is running.
+
+- The repository-wide online-writer review found a second primary-contact mass-update bypass in `CustomerContactController::store`. The update-contact path had already been converted to per-model writes, but creating a replacement primary still used a relationship query-builder update that skipped `CustomerContact` model events and therefore left the registered Customer aggregate revision unchanged.
+- Replaced that mass update with a locked collection of currently-primary contact models and per-model updates. Each affected contact now emits the nested-model event that advances the parent Customer revision.
+- Added `CustomerContactLifecycleTest::test_adding_a_primary_contact_advances_customer_sync_revision`, asserting the former primary is demoted, exactly one primary remains, and the customer revision advances.
+- This is a confirmed writer correction, not closure of CASE-ZAZU-0033. Continue the exhaustive inventory across all indirect, bulk, console and transaction-boundary writers; verify exact-head Laravel, PostgreSQL and browser suites before changing status.
+- No schema changes, production data changes or branches. V1 remains NOT READY; evidence maturity remains 75/100 pending broader sync-matrix and owner acceptance.
+
 ## Director execution checkpoint — 2026-11-21 (receiver sync completeness)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
