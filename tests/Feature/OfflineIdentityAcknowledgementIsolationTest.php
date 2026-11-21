@@ -7,6 +7,7 @@ use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\SyncEntityIdentity;
 use App\Support\Offline\SyncMutationRelatedIdentityResolver;
+use App\Support\Offline\SyncEntitySnapshotBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -42,6 +43,11 @@ class OfflineIdentityAcknowledgementIsolationTest extends TestCase
         ]);
 
         $this->assertTrue(app(SyncMutationRelatedIdentityResolver::class)->isSafeIdentity($identity));
+
+        $snapshot = app(SyncEntitySnapshotBuilder::class)->build($identity);
+
+        $this->assertFalse($snapshot['deleted']);
+        $this->assertSame($movement->id, $snapshot['record']['id']);
     }
 
 
