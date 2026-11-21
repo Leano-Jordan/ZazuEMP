@@ -182,6 +182,55 @@ class SyncRevisionConcurrencyTest extends TestCase
         $this->assertSame('pending', $mutation->fresh()->status);
     }
 
+    public function test_second_paired_device_rejects_a_stale_update_after_the_first_device_commits(): void
+    {
+        [$business, $customer, $firstDevice, $identity] = $this->customerFixtureWithDevice();
+        $secondDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $secondDeviceMutation = $this->recordCustomerUpdate(
+            $secondDevice,
+            $identity,
+            'Second device committed version',
+            ['expected_revision' => 1],
+        );
+        $secondDeviceMutation = app(SyncMutationApplier::class)->apply(
+            $secondDeviceMutation,
+            ['customer' => $this->customerUpdateHandler()],
+        );
+        $this->assertSame(2, (int) $secondDeviceMutation->result_revision);
+
+        $staleFirstDeviceMutation = $this->recordCustomerUpdate(
+            $firstDevice,
+            $identity,
+            'First device stale version',
+            ['expected_revision' => 1],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply(
+                $staleFirstDeviceMutation,
+                ['customer' => $this->customerUpdateHandler()],
+            );
+            $this->fail('A second paired device must not overwrite a newer committed aggregate revision.');
+        } catch (StaleSyncRevisionException $exception) {
+            $this->assertSame(2, $exception->remotePayload()['revision']);
+            $this->assertSame(
+                'Second device committed version',
+                $exception->remotePayload()['record']['name'],
+            );
+        }
+
+        $this->assertSame('Second device committed version', $customer->fresh()->name);
+        $this->assertSame('pending', $staleFirstDeviceMutation->fresh()->status);
+        $this->assertSame(
+            'First device stale version',
+            $staleFirstDeviceMutation->fresh()->payload['record']['name'],
+        );
+    }
+
     public function test_same_device_updates_chain_to_the_previous_result_and_detect_intervening_writes(): void
     {
         [$business, $customer, $device, $identity] = $this->customerFixtureWithDevice();
