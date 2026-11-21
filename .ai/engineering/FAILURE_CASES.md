@@ -781,8 +781,8 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Correction on `main`:**
 - Added explicit `create`, `upsert` and `update` allowlists to customer, job and service handlers.
 - Unsupported operations now raise a field-level validation error before payload processing or domain writes.
-- Added `OfflineMutationOperationValidationTest`, which submits a `delete` operation for each entity and verifies that the mutation remains pending, attempts remain zero, and no customer, event or business capability is created.
+- Expanded `OfflineMutationOperationValidationTest` to submit an unsupported `delete` operation to all 17 registered offline entity handlers. Every mutation remains pending with zero attempts, and all 15 entity-record tables remain empty.
 
-**Verification:** Laravel `676 passed / 1 skipped / 4,593 assertions`; PHPMD PASS; PostgreSQL migration/registration/backup/restore smoke PASS; offline browser **63 desktop + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, with no failures. Exact application-code workflow [44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
+**Verification:** Expanded all-17-handler regression: Laravel `676 passed / 1 skipped / 4,647 assertions`; PHPMD PASS; Zazu Quality PASS; PostgreSQL migration/recovery PASS on [test head 0e619e9](https://github.com/Leano-Jordan/ZazuEMP/commit/0e619e9e3675d8ad67a5a1fe8d1b8daf23b4af79). Browser acceptance **63 desktop + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed** on the runtime-identical implementation head [e95dd5c / workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747). The repeat browser job on test-only head `0e619e9` was still running at this update.
 
 **Scope:** This closes the unsupported-operation acceptance defect for these three handlers. It does not implement deletion support; delete remains unsupported. The broader offline sync matrix remains OPEN.
