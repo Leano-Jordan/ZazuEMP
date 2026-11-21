@@ -722,7 +722,9 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Regression coverage:** Playwright simulates /up returning 503 while navigator.onLine remains true, then restoring 200. The test runs on desktop Chromium and Pixel 7 viewport.
 
-**Closure evidence:** exact-head workflow [44934728827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44934728827) passed 63 desktop Chromium tests, 7 mobile-viewport Work/customer tests, the Pixel 7 host-outage regression and the phone-local attachment/reconnect journey without failures or flaky retries. Laravel passed 670 / 1 skipped / 4,552 assertions; PostgreSQL migration/recovery smoke passed.\n\n**Remaining release gate:** actual installed Android host stop, force-close/restart, disconnected operation and reconnect must still be observed on the owner's physical phone. Browser viewport evidence does not close that gate.
+**Closure evidence:** exact-head workflow [44934728827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44934728827) passed 63 desktop Chromium tests, 7 mobile-viewport Work/customer tests, the Pixel 7 host-outage regression and the phone-local attachment/reconnect journey without failures or flaky retries. Laravel passed 670 / 1 skipped / 4,552 assertions; PostgreSQL migration/recovery smoke passed.
+
+**Remaining release gate:** actual installed Android host stop, force-close/restart, disconnected operation and reconnect must still be observed on the owner's physical phone. Browser viewport evidence does not close that gate.
 
 
 ### CASE-ZAZU-0038
