@@ -1,3 +1,24 @@
+## Director execution checkpoint — offline acceptance closure + identity ownership hardening — 2026-11-21
+
+**Current source head before this checkpoint:** `e249313deb9cf73373e1acc11f881c7d631a63a6` on `main`.  
+**Implementation:** [15f0a17](https://github.com/Leano-Jordan/ZazuEMP/commit/15f0a176e46aaf19c389aa17e36e2d74028d9f50).  
+**Regression:** [601b944](https://github.com/Leano-Jordan/ZazuEMP/commit/601b94493f9b3c037a8c4e4e26fa264fee2aebc2) + [e249313](https://github.com/Leano-Jordan/ZazuEMP/commit/e249313deb9cf73373e1acc11f881c7d631a63a6).
+
+- Closed the previously pending event-cost reconnect acceptance: both the production-fix and test-head Chromium jobs completed successfully. The broader browser acceptance passed, including desktop Chromium, mobile viewport flows and the phone-local attachment journey.
+- Exact application/test-head checks: Laravel **656 passed / 1 skipped / 4,516 assertions**; PostgreSQL migration/backup/restore/private-file recovery smoke **PASS**; Zazu Quality, Director Health, Windows V1 package/fresh-install verification, Director Contract Lint and Push-on-main **PASS**. SonarCloud was **SKIPPED**, not passed.
+- Continued adversarial review of `OfflineDomainMutationHandler::existing()`. Found a defense-in-depth gap: after a tenant-scoped identity lookup, the generic resolver dereferenced its polymorphic target without revalidating the target record's business ownership.
+- Hardened the resolver to fail closed when the target model is missing, lacks a resolvable business owner, or belongs to a different business. Added an adversarial regression with a deliberately mismatched identity row targeting another business's Customer; the expected outcome is rejection with no mutation or ownership transfer.
+- This is a corrupted/stale identity mapping defense, not a demonstrated remote client exploit. Do not overstate the threat model.
+- Updated `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md` with the acceptance closure and ownership guard.
+
+**Verification of the new ownership hardening:** PENDING exact-head Laravel and quality CI on the security/test commits. Do not mark the new guard complete until those checks pass.
+
+**Evidence maturity:** **77/100, unchanged**. No score uplift. V1 remains **NOT READY**.
+
+**Next target after CI:** continue adversarial tenant-boundary review across offline linked records and identity types; then return to the remaining owner-PC recovery, physical-device, commercial workflow and POPIA acceptance gates. No branch creation; `main` remains authoritative.
+
+---
+
 ## Director execution checkpoint — event-cost offline reconciliation — 2026-11-21
 
 **Current documentation head:** `3f41be195c76b0af4932f8410ce7759604de9f3f` on `main`.  
