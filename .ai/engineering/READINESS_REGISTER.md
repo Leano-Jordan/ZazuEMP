@@ -1,3 +1,15 @@
+## Director disposition refresh — 2026-11-21 (receiver sync + bootstrap credential fence)
+
+- **Application/test source head:** `559e66b87de8617f967b722b55b0fbfd9b116495`.
+- **Laravel:** 632 passed / 1 skipped / 4,388 assertions. **PostgreSQL recovery smoke:** PASS.
+- **PHPMD, Zazu Quality, Composer audit, secret scan, application, Director Health, Push-on-main and JavaScript/TypeScript/Python/Actions analysis:** PASS. SonarCloud skipped.
+- **Offline browser:** still running on this exact source head; final cross-device client reconciliation remains unverified until its result finishes.
+- **Receiver completeness correction:** targeted bootstrap sequence inclusion, revision-ranked normal windows, business/device scoping and explicit-pairing selection preservation are implemented. CASE-ZAZU-0034.
+- **Bootstrap authentication correction:** stale device snapshots are rejected after revocation or bearer-token replacement under business-first locking. CASE-ZAZU-0035.
+- **Disposition:** V1 NOT READY. Evidence maturity remains 73/100 pending browser acceptance and remaining owner gates. Physical Android cold launch/restart/reconnect, intended-installation recovery, real-business commercial reconciliation and POPIA controls remain OPEN.
+
+---
+
 ## Director disposition refresh — 2026-11-21 (receiver sync completeness)
 
 - **Application/test source head:** `472e301065a5301c80f0ffbb97f82b61c24575ba`.
