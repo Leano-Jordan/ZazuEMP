@@ -1,3 +1,31 @@
+# Dependency refresh verification — 2026-11-22
+
+**Exact repository HEAD:** [7005bc8](https://github.com/Leano-Jordan/ZazuEMP/commit/7005bc805bdf94429579e4b0cdb2208eec322235) on `main`.
+
+The recent Dependabot refreshes are merged; there are no open pull requests in the repository. The current lockfiles contain the upgraded versions below:
+
+- Laravel Framework **13.43.0**; Laravel Tinker **3.2.0**.
+- PHPUnit **13.4.7**; Laravel Pint **1.32.3**; Laravel Pail **1.3.0**; Laravel Pao **1.1.5**.
+- Vite **8.3.8**; Playwright **1.65.1**; Node types **26.6.6**; Tailwind CSS **4.3.5**; Laravel Multiplex **0.4.5**; Laravel Vite plugin **3.2.0**.
+- Symfony Console and HttpFoundation **7.4.23**.
+
+The package constraints remain compatible with the resolved lockfile versions; no unnecessary constraint widening or manual lockfile edits were made.
+
+**Exact-main verification on 7005bc8:**
+- Laravel: **678 passed, 1 skipped, 4,655 assertions** — [run 44961259381](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44961259381).
+- Offline browser acceptance: **PASS**, including desktop, mobile viewport, simulated host outage and phone-local attachment/reconnect journeys — same run.
+- PostgreSQL migration, rollback/reapply, registration, backup/restore and private-file recovery: **PASS** — same run.
+- Windows installation candidate build and fresh PowerShell install/recovery: **PASS** — [run 44961259393](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44961259393).
+- Zazu Quality, Composer security audit, secret-history scan, incremental Pint formatting, production asset build/budget and documentation validation: **PASS** — [run 44961259439](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44961259439).
+- Director contract lint and CodeQL language/Actions/Python analysis: **PASS** — [run 44961259432](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44961259432) and [run 44961259058](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44961259058).
+- Windows prerelease publication was **skipped**, not passed.
+
+The first full-repository Pint attempt exposed pre-existing formatting debt. The incremental changed-PHP gate now passes on this exact HEAD without mass-reformatting legacy files.
+
+**Release disposition:** V1 remains **NOT READY**. Keep the evidence score at **77/100** until physical Android acceptance, owner-PC off-disk recovery, populated live-business financial reconciliation, POPIA operational sign-off and ZAZU name clearance are completed. CI green does not substitute for these operational proofs.
+
+---
+
 # Director wrap-up — 2026-11-22
 
 **Current `main` HEAD:** [da43fde](https://github.com/Leano-Jordan/ZazuEMP/commit/da43fde04dcfc75b5d031efc86945799315a3c05).
