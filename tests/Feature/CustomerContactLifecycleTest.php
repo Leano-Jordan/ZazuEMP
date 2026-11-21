@@ -177,6 +177,29 @@ class CustomerContactLifecycleTest extends TestCase
     }
 
 
+    public function test_adding_a_primary_contact_advances_customer_sync_revision(): void
+    {
+        $customer = Customer::create(['name' => 'Primary Contact Create Revision Customer']);
+        $existingPrimary = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Existing Primary',
+            'is_primary' => true,
+        ]);
+        $identity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)
+            ->identify($customer, 'customer');
+        $revisionBefore = (int) $identity->revision;
+
+        $response = $this->post(route('customers.contacts.store', $customer), [
+            'name' => 'Replacement Primary',
+            'is_primary' => true,
+        ]);
+
+        $response->assertRedirect(route('customers.show', $customer));
+        $this->assertFalse((bool) $existingPrimary->fresh()->is_primary);
+        $this->assertSame(1, $customer->contacts()->where('is_primary', true)->count());
+        $this->assertGreaterThan($revisionBefore, (int) $identity->fresh()->revision);
+    }
+
     public function test_primary_contact_cannot_be_removed_without_replacement(): void
     {
         $customer = Customer::create(['name' => 'Primary Protection Customer']);
