@@ -64,6 +64,10 @@ See [.ai/engineering/README.md](.ai/engineering/README.md), [.ai/engineering/06_
 
 Routine Director execution targets `main`; temporary branches are not part of the normal Zazu operating model.
 
+## Automated quality gates
+
+See [the quality gates register](docs/QUALITY_GATES.md) for measured frontend asset budgets, accessibility coverage, documentation checks and release safeguards.
+
 ## Database compatibility
 
 See [the database compatibility matrix](docs/DATABASE_COMPATIBILITY.md) for the exact SQLite and PostgreSQL environments exercised by CI. MySQL/MariaDB are not currently certified Zazu V1 deployment targets.
