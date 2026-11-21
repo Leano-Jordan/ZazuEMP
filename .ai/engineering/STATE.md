@@ -1,3 +1,20 @@
+## Director execution checkpoint — complete conflict snapshot model mapping — 2026-11-21
+
+**Implementation:** [8268504](https://github.com/Leano-Jordan/ZazuEMP/commit/826850474aee06a79a2ea7bb8917a470ef1da2fe).  
+**Regression:** [f25216a](https://github.com/Leano-Jordan/ZazuEMP/commit/f25216ab4ae5c99b772fbf8d932070a4ec009c6f).
+
+- Adversarial review caught an unintended compatibility risk in the earlier snapshot tenant guard: its expected-model map covered only common aggregates, which would make valid snapshots for other persisted offline mutation types appear deleted.
+- Expanded the map to cover every persisted offline mutation model type, including service, supplier, preparation, payment, inventory movement, expense, event cost, asset allocation and purchase-order items.
+- Added a positive InventoryMovement snapshot regression proving a valid tenant-owned identity is not misclassified as deleted.
+- Exact test-head CI [Laravel 44924557047](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557047), PHPMD [44924557089](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557089), Zazu Quality [44924557021](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557021), Director Health [44924557064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557064) is running; at checkpoint Laravel/PostgreSQL/browser and PHPMD were in progress, quality and Director Health passed.
+- Prior complete implementation head [4c84a1f](https://github.com/Leano-Jordan/ZazuEMP/commit/4c84a1f6772ad8ed7e83ebf92c6fe8d8272cf96d) passed Laravel **665 / 1 skipped / 4,543 assertions**, PostgreSQL, PHPMD, quality, Psalm, Windows fresh install and populated upgrade/rollback. Browser acceptance remains in progress on [44924126299](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924126299).
+
+**Evidence maturity:** 77/100 unchanged; V1 NOT READY.
+
+**Next target:** close the complete snapshot-map regression, then finish the desktop/mobile offline acceptance run. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — bootstrap payload complexity correction — 2026-11-21
 
 **Refactor:** [ae61053](https://github.com/Leano-Jordan/ZazuEMP/commit/ae61053f04e2f36bc4b284a681c6f5cbdf4cfdec) + [4c84a1f](https://github.com/Leano-Jordan/ZazuEMP/commit/4c84a1f6772ad8ed7e83ebf92c6fe8d8272cf96d).
