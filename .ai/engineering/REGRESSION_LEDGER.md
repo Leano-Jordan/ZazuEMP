@@ -219,3 +219,19 @@ An offline mutation may be based on an older business-record snapshot than the s
 **Control:** every existing-record offline update accepted by a server domain handler carries an authoritative server revision. Relevant online and offline writes advance that revision transactionally. The server checks the expected revision under lock and preserves stale local and current remote values in a conflict. Same-device queued edits chain revisions; an intervening external write breaks the chain. Conflict retry uses a new mutation ID and an explicitly reviewed latest base revision.
 
 **Status:** CONTROL REQUIRED — implementation and regression evidence OPEN. See CASE-ZAZU-0033 / ENG-DATA-003.
+
+## REG-025 — Receiver bootstrap acknowledges an incomplete bounded snapshot
+
+**Failure:** The receiving device pulls a contiguous delivery batch, fetches the ordinary bounded business bootstrap, persists it and acknowledges the batch. When a delivered aggregate falls outside a capped collection (or a recently changed aggregate is hidden by static display ordering), the receiver can acknowledge the change without ever refreshing that record.
+
+**Control:**
+- Include the exact receiver delivery sequences on the bootstrap request.
+- Resolve delivery targets only within the authenticated device, business and stream.
+- Add both primary and related aggregate snapshots for those sequences, including command-side parent effects.
+- Keep normal working sets bounded, but promote recently revised aggregates into the next refresh window using sync-identity update time (fall back to record `updated_at`) and retain the existing display order.
+- Persist the complete snapshot before acknowledging the contiguous delivery prefix. A failed or rejected bootstrap must leave the cursor untouched.
+- Advance the precached offline client cache when this code changes.
+
+**Regression controls:** 500-record supplier-window test, recently revised online supplier promotion, exact delivery inclusion and non-recipient isolation; cross-device commercial and receipt/inventory reconciliation; browser pull → targeted bootstrap → acknowledgement ordering.
+
+**Status:** IMPLEMENTED ON MAIN — exact-head CI verification pending. Do not mark the case closed until Laravel, PostgreSQL, offline-browser, PHPMD and quality workflows pass on the same code head.
