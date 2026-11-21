@@ -673,4 +673,12 @@ The correction on `main` is:
 
 Regression coverage includes a supplier deliberately outside the default 500-record window, online revision promotion, explicit delivery inclusion, recipient-device isolation, second-device quote → acceptance → invoice → payment reconciliation, purchase receipt → affected inventory reconciliation, and a browser assertion that the client performs pull → targeted bootstrap → acknowledgement in that order.
 
+## Bootstrap device revalidation — 2026-11-21
+
+The authenticated bootstrap endpoint now follows the same durable authorization boundary as pull and acknowledgement. It acquires the business lock first, re-reads and locks the active device row, compares the persisted sync-token hash with the device snapshot attached by middleware, updates last-seen activity under that lock and builds the snapshot before releasing the transaction. Revocation or credential replacement between middleware authentication and bootstrap therefore returns HTTP 401 rather than disclosing a business snapshot. This also removes the previous device-first last-seen write before business-lock acquisition.
+
+Regression coverage exercises a stale middleware snapshot after revocation and after token replacement. On source head `559e66b`, the backend suite passed 632 tests / 1 skipped / 4,388 assertions; PostgreSQL recovery, PHPMD, Zazu Quality, Director Health, Push-on-main, Composer/secret/application checks and language-specific analysis passed. SonarCloud was skipped. Offline-browser acceptance was still running when recorded.
+
+**Verification boundary:** receiver completeness and bootstrap authorization are implemented and backend-verified on `559e66b`. The browser workflow remains pending; this does not close the full V1 sync matrix, exhaustive writer audit or physical-device cold-launch/restart/reconnect acceptance.
+
 **Verification boundary:** implementation and regression tests are committed. Exact-head Laravel, PostgreSQL, offline-browser, PHPMD and quality results must be observed before this correction is marked verified. This does not close the full V1 sync matrix, the final writer audit, or physical-device cold-launch/restart/reconnect acceptance.
