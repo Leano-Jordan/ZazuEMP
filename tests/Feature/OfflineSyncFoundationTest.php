@@ -1926,7 +1926,11 @@ class OfflineSyncFoundationTest extends TestCase
             $delivered->pluck('entity_type')->all(),
         );
 
-        $remoteSnapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)->build($receivingDevice);
+        $deliverySequences = $delivered->pluck('delivery_sequence')
+            ->map(static fn ($sequence): int => (int) $sequence)
+            ->all();
+        $remoteSnapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)
+            ->build($receivingDevice, $deliverySequences);
         $remoteInvoice = collect($remoteSnapshot['invoices'])->first(
             fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $invoice->id,
         );
