@@ -85,7 +85,11 @@ class ZazuEmptyPrivateStorageRestoreTest extends TestCase
             DB::purge('sqlite');
             File::deleteDirectory($privateRoot);
             if ($hadPrivateDirectory && is_dir($preservedPrivate)) {
-                rename($preservedPrivate, $privateRoot);
+                if (!rename($preservedPrivate, $privateRoot)) {
+                    throw new \RuntimeException('Could not restore the pre-test private storage directory.');
+                }
+            } elseif (!$hadPrivateDirectory) {
+                File::deleteDirectory($preservedPrivate);
             }
             foreach ([$database, $database.'-wal', $database.'-shm'] as $path) {
                 File::delete($path);
