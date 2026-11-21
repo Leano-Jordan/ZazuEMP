@@ -154,9 +154,9 @@ class BusinessArchiveTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $device = \\App\\Models\\SyncDevice::create([
+        $device = \App\Models\SyncDevice::create([
             'business_id' => $target->id,
-            'installation_id' => (string) \\Illuminate\\Support\\Str::uuid(),
+            'installation_id' => (string) \Illuminate\Support\Str::uuid(),
             'device_name' => 'Trusted phone',
             'device_type' => 'mobile',
         ]);
@@ -165,7 +165,7 @@ class BusinessArchiveTest extends TestCase
             try {
                 $service->restore($archive, $target);
                 $this->fail('A workspace with trusted-device state must never accept a business archive.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('still has offline sync state', $exception->getMessage());
             }
         } finally {
@@ -174,7 +174,7 @@ class BusinessArchiveTest extends TestCase
 
         $this->assertSame('Paired Restore Target', $target->fresh()->name);
         $this->assertSame(0, Customer::query()->where('business_id', $target->id)->count());
-        $this->assertSame(1, \\App\\Models\\SyncDevice::query()->where('business_id', $target->id)->count());
+        $this->assertSame(1, \App\Models\SyncDevice::query()->where('business_id', $target->id)->count());
         $this->assertSame('active', $device->fresh()->status);
         $this->assertSame([], Storage::disk('private')->allFiles());
         $this->assertSame([], Storage::disk('public')->allFiles());
