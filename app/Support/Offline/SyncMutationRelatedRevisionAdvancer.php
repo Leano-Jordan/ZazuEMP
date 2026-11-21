@@ -38,7 +38,7 @@ final class SyncMutationRelatedRevisionAdvancer
         }
 
         $quoteIdentity = $this->identityByUuid($mutation->business_id, 'quote', $quoteUuid);
-        $quote = $quoteIdentity?->record;
+        $quote = $quoteIdentity ? $this->safeRecord($quoteIdentity) : null;
 
         if ($quote instanceof Quote && is_numeric($quote->event_id)) {
             $this->incrementRecordIdentity(
@@ -61,7 +61,7 @@ final class SyncMutationRelatedRevisionAdvancer
         }
 
         $orderIdentity = $this->identityByUuid($mutation->business_id, 'purchase_order', $orderUuid);
-        $order = $orderIdentity?->record;
+        $order = $orderIdentity ? $this->safeRecord($orderIdentity) : null;
 
         if (! $order instanceof PurchaseOrder) {
             return;
@@ -69,6 +69,7 @@ final class SyncMutationRelatedRevisionAdvancer
 
         $lineIds = $this->resolvedPurchaseOrderLineIds(
             (int) $mutation->business_id,
+            (int) $order->id,
             $payload['received_quantities'] ?? [],
         );
         if ($lineIds === []) {
@@ -96,7 +97,7 @@ final class SyncMutationRelatedRevisionAdvancer
      * @param mixed $receivedQuantities
      * @return array<int, int>
      */
-    private function resolvedPurchaseOrderLineIds(int $businessId, mixed $receivedQuantities): array
+    private function resolvedPurchaseOrderLineIds(int $businessId, int $purchaseOrderId, mixed $receivedQuantities): array
     {
         if (! is_array($receivedQuantities)) {
             return [];
@@ -105,7 +106,12 @@ final class SyncMutationRelatedRevisionAdvancer
         $ids = [];
         foreach (array_keys($receivedQuantities) as $lineIdentityOrId) {
             if (is_string($lineIdentityOrId) && Str::isUuid($lineIdentityOrId)) {
-                $identity = $this->identityByUuid($businessId, 'purchase_order_item', $lineIdentityOrId);
+                $identity = SyncEntityIdentity::query()
+                    ->where('business_id', $businessId)
+                    ->where('entity_type', 'purchase_order_item')
+                    ->where('record_type', (new \\App\\Models\\PurchaseOrderItem)->getMorphClass())
+                    ->where('entity_uuid', Str::lower($lineIdentityOrId))
+                    ->first();
                 if ($identity) {
                     $ids[] = (int) $identity->record_id;
                 }
@@ -117,7 +123,18 @@ final class SyncMutationRelatedRevisionAdvancer
             }
         }
 
-        return array_values(array_unique($ids));
+        if ($ids === []) {
+            return [];
+        }
+
+        return DB::table('purchase_order_items')
+            ->where('business_id', $businessId)
+            ->where('purchase_order_id', $purchaseOrderId)
+            ->whereIn('id', array_values(array_unique($ids)))
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
     }
 
     private function identityByUuid(int $businessId, string $entityType, string $uuid): ?SyncEntityIdentity
@@ -125,9 +142,44 @@ final class SyncMutationRelatedRevisionAdvancer
         return SyncEntityIdentity::query()
             ->where('business_id', $businessId)
             ->where('entity_type', $entityType)
+            ->where('record_type', $this->expectedMorphType($entityType))
             ->where('entity_uuid', Str::lower($uuid))
             ->lockForUpdate()
             ->first();
+    }
+
+    private function safeRecord(SyncEntityIdentity $identity): ?\\Illuminate\\Database\\Eloquent\\Model
+    {
+        if ($identity->record_type !== $this->expectedMorphType($identity->entity_type)) {
+            return null;
+        }
+
+        $record = $identity->record;
+        if (! $record instanceof \\Illuminate\\Database\\Eloquent\\Model) {
+            return null;
+        }
+
+        $businessId = $record->getAttribute('business_id');
+        if ($businessId === null && method_exists($record, 'event')) {
+            $businessId = $record->event()->withTrashed()->value('business_id');
+        }
+
+        return is_numeric($businessId) && (int) $businessId === (int) $identity->business_id
+            ? $record
+            : null;
+    }
+
+    private function expectedMorphType(string $entityType): ?string
+    {
+        $model = match ($entityType) {
+            'job' => Event::class,
+            'quote' => Quote::class,
+            'purchase_order' => PurchaseOrder::class,
+            'purchase_order_item' => \\App\\Models\\PurchaseOrderItem::class,
+            default => null,
+        };
+
+        return $model ? (new $model)->getMorphClass() : null;
     }
 
     private function incrementRecordIdentity(
