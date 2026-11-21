@@ -12,6 +12,11 @@ Claude is an independent read-only auditor/adviser for V1. The owner remains fin
 - Exact-head CI at `0e5d4e0`: Laravel **PASS** ([44036479173](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44036479173)); Zazu Quality **PASS** ([44036479156](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44036479156)); Push on main **PASS** ([44036478578](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44036478578)); SonarCloud **SKIPPED**.
 - These workflow conclusions do not prove physical Android acceptance or live-business reconciliation.
 
+## Founder commercial decision — 2026-11-21
+- Exactly three commercial tiers: Basic (permanent Free), Intermediate (paid), Advanced (paid).
+- No exact paid prices, feature allocations or quotas have been approved. The former Starter/Team/Business and R499/R899/R1,499 proposal is withdrawn; do not treat it as current pricing.
+- See .ai/engineering/DECISION_LOG.md DEC-027 and docs/product-specification.md.
+
 ## V1 boundaries
 - Frozen scope: fix reproducible defects in agreed workflows and demonstrated security, privacy or data-integrity failures. No speculative features, broad rewrites or generic best-practice lists.
 - Never weaken tests to get green. Do not repeat checks without new evidence.
@@ -38,7 +43,7 @@ Read only the relevant source/tests for the chosen target. Useful paths are disc
 - POPIA operational/privacy sign-off.
 - Owner-PC/browser rendered acceptance where still outstanding.
 
-The current release checklist and readiness register govern these gates. Do not restate or duplicate them in a new tracker. Do not inflate the recorded 73/100 evidence-maturity score without qualifying evidence.
+The current release checklist and readiness register govern these gates. Do not restate or duplicate them in a new tracker. The current evidence-maturity score is 77/100 following verified stale-write protection closure; V1 remains NOT READY.
 
 ## Required audit response
 Return at most **three** ranked findings, each with severity, exact evidence (file/function/line or reproducible test), customer impact, confidence, smallest recommended correction and V1 disposition (**fix now / accepted limitation / defer**). If no finding is confirmed, say so. End with one best next target. No alternative scorecard, speculative backlog or long report.
