@@ -1,3 +1,31 @@
+## Director execution checkpoint — offline tenant-boundary hardening verified — 2026-11-21
+
+**Current main:** [2ef47e8](https://github.com/Leano-Jordan/ZazuEMP/commit/2ef47e8ac94ac75db0384eb2d45705a360e109d1).  
+**Latest code/test head:** [f25216a](https://github.com/Leano-Jordan/ZazuEMP/commit/f25216ab4ae5c99b772fbf8d932070a4ec009c6f).  
+**Core implementation:** [8268504](https://github.com/Leano-Jordan/ZazuEMP/commit/826850474aee06a79a2ea7bb8917a470ef1da2fe).
+
+- Completed adversarial hardening across offline mutation identity acknowledgements, bootstrap fallback identity resolution, related asset identity snapshots, selected-record customer details, and invoice quote references.
+- Expanded identity-to-model validation to cover all persisted offline mutation models. Added rejection tests for malformed/cross-business references and positive tests ensuring valid InventoryMovement identities still sync and appear in conflict snapshots.
+- Latest exact code/test head passed Laravel **665 passed / 1 skipped / 4,545 assertions**, PostgreSQL migration/recovery smoke, desktop Chromium offline acceptance, mobile viewport customer/Work acceptance, and phone-local attachment acceptance: [Laravel run 44924557047](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557047).
+- PHPMD passed [44924557089](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557089). Zazu Quality, Composer dependency security audit, secret scan and application checks passed [44924557021](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557021). Director Health passed [44924557064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557064).
+- On the same implementation generation, Psalm security scan and CodeQL passed [44924540403](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924540403); populated upgrade/rollback passed [44924540447](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924540447); Windows V1 package build and fresh PowerShell installation passed [44924540392](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924540392). SonarCloud is skipped, not passed.
+- Latest Director Health, Zazu Quality, Contract Lint and Push-on-main also passed on [2ef47e8](https://github.com/Leano-Jordan/ZazuEMP/commit/2ef47e8ac94ac75db0384eb2d45705a360e109d1).
+
+**What this closes:** the previously outstanding CI/browser acceptance gate for the latest offline identity/snapshot changes. This is strong engineering evidence, not proof of production readiness under every real customer environment.
+
+**Remaining V1 gates:**
+1. Owner-PC data safety and recovery: complete the documented business export/import and full installation recovery drill using an actual populated installation.
+2. Device authority/security: finish owner/device credential and session-transition acceptance, including revoked/expired device behavior.
+3. Phone offline acceptance: owner must verify the disconnected physical phone remains usable after server shutdown and restart; browser mobile emulation is not a substitute.
+4. Commercial acceptance: run one populated end-to-end quote → invoice → payment → expenses/costs → profit reconciliation and verify totals.
+5. Legal/brand: POPIA operational controls and Zazu name clearance remain outside automated code CI.
+
+**Evidence maturity:** 77/100 remains the last scored baseline. The score is not automatically raised just because CI is green; operational gates above still require evidence. V1 remains NOT READY for commercial release until they are closed.
+
+**Next Director target:** continue source-level security review of remaining pull/conflict/bootstrap relationship boundaries, then prepare a short owner-run acceptance pack for the remaining PC/phone/commercial drills. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — complete conflict snapshot model mapping — 2026-11-21
 
 **Implementation:** [8268504](https://github.com/Leano-Jordan/ZazuEMP/commit/826850474aee06a79a2ea7bb8917a470ef1da2fe).  
