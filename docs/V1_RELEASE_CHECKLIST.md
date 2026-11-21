@@ -1,3 +1,23 @@
+# Director wrap-up — 2026-11-22
+
+**Current `main` HEAD:** [da43fde](https://github.com/Leano-Jordan/ZazuEMP/commit/da43fde04dcfc75b5d031efc86945799315a3c05).
+
+- The initial whole-repository Pint gate failed because existing formatting drift spans many legacy and test PHP files. No mass formatting rewrite was applied.
+- Pint is now scoped to PHP files changed by each push/PR. This is a blocking, non-mutating incremental gate; its first exact-main run is pending.
+- On the previous exact application baseline [aa93a470](https://github.com/Leano-Jordan/ZazuEMP/commit/aa93a4701f562f72bf91a8b26e49eea80ee2ad64), Laravel, offline browser/emulation, PostgreSQL recovery, Windows install, dependency/security, docs, bundle and accessibility checks passed as recorded below.
+- The repository remains **V1 NOT READY**. Evidence maturity remains **77/100**. No score increase is claimed from documentation/CI wiring alone.
+
+**Final release blockers that cannot be certified by repository CI alone:**
+1. Physical Android installed-app cold launch, host-offline work, force-close/restart and reconnect.
+2. Owner-operated PC backup with independent off-disk copy and full restore including private media.
+3. Populated live-business quote → invoice → payment → costs/expenses → profit reconciliation.
+4. POPIA operational controls and owner sign-off.
+5. ZAZU name clearance.
+
+The automated mobile viewport and simulated LAN outage tests are not physical-device evidence. Automated Windows/PostgreSQL recovery tests are not the owner's PC recovery drill.
+
+---
+
 # Exact-main verification — 2026-11-22
 
 **Repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified HEAD:** [aa93a470](https://github.com/Leano-Jordan/ZazuEMP/commit/aa93a4701f562f72bf91a8b26e49eea80ee2ad64).
