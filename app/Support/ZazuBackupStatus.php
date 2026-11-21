@@ -45,7 +45,7 @@ final class ZazuBackupStatus
                 'status' => 'attention',
                 'latest_at' => null,
                 'age_hours' => null,
-                'message' => 'No scheduled installation backup has been recorded on this PC.',
+                'message' => 'No scheduled backup has been recorded on this PC for this installation.',
                 ...$secondary,
             ];
         }

@@ -21,6 +21,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use App\Models\SyncMutation;
+use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationHandler;
 use App\Support\Offline\SyncMutationRecorder;
@@ -41,6 +42,107 @@ use Tests\TestCase;
 class SyncRevisionAggregateTrackingTest extends TestCase
 {
     use RefreshDatabase;
+
+
+    public function test_offline_relationship_deletes_advance_the_job_and_quote_parent_revisions(): void
+    {
+        [$business, $customer, $device] = $this->customerFixtureWithDevice();
+        $eventType = config('zazu.job_types')[0];
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'REV-RELATION-DELETE-WORK',
+            'name' => 'Relationship Delete Work',
+            'event_type' => $eventType,
+            'status' => 'confirmed',
+        ]);
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => 'Existing offline requirement',
+            'category' => 'catering',
+            'quantity' => '10.00',
+            'unit' => 'person',
+            'status' => 'open',
+        ]);
+
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'REV-RELATION-DELETE-QUOTE',
+            'status' => 'draft',
+            'currency' => 'ZAR',
+        ]);
+        $version = QuoteVersion::create([
+            'quote_id' => $quote->id,
+            'version' => 1,
+            'status' => 'draft',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'deposit_percent' => '0.00',
+            'deposit_amount' => '0.00',
+        ]);
+        $oldQuoteItem = QuoteItem::create([
+            'quote_version_id' => $version->id,
+            'description' => 'Old offline quote line',
+            'quantity' => '1.00',
+            'unit' => 'person',
+            'unit_price' => '100.00',
+            'line_total' => '100.00',
+        ]);
+
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $jobIdentity = $registry->identify($event, 'job');
+        $quoteIdentity = $registry->identify($quote, 'quote');
+        $handler = app(OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $jobMutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'job',
+            $jobIdentity->entity_uuid,
+            'update',
+            [
+                'local_id' => $jobIdentity->entity_uuid,
+                'expected_revision' => 1,
+                'record' => [
+                    'name' => 'Relationship Delete Work',
+                    'event_type' => $eventType,
+                    'status' => 'confirmed',
+                    'services' => [],
+                ],
+            ],
+        );
+        $applier->apply($jobMutation, ['job' => $handler]);
+
+        $this->assertDatabaseMissing('event_requirements', ['id' => $requirement->id]);
+        $this->assertSame(2, (int) $jobIdentity->fresh()->revision);
+
+        $quoteMutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'quote',
+            $quoteIdentity->entity_uuid,
+            'update',
+            [
+                'local_id' => $quoteIdentity->entity_uuid,
+                'expected_revision' => 1,
+                'record' => [
+                    'event_local_id' => $jobIdentity->entity_uuid,
+                    'items' => [[
+                        'description' => 'Replacement offline quote line',
+                        'quantity' => '2.00',
+                        'unit' => 'person',
+                        'unit_price' => '50.00',
+                    ]],
+                ],
+            ],
+        );
+        $applier->apply($quoteMutation, ['quote' => $handler]);
+
+        $this->assertDatabaseMissing('quote_items', ['id' => $oldQuoteItem->id]);
+        $this->assertSame(1, QuoteItem::query()->where('quote_version_id', $version->id)->count());
+        $this->assertSame(2, (int) $quoteIdentity->fresh()->revision);
+    }
 
     public function test_bootstrap_reads_aggregate_data_and_revisions_inside_one_business_transaction(): void
     {
