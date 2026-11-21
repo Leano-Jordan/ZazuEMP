@@ -3,12 +3,17 @@
 namespace App\Support\Offline;
 
 use App\Models\Asset;
+use App\Models\AssetAllocation;
+use App\Models\Customer;
 use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
+use App\Models\Supplier;
 use App\Models\Quote;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -66,7 +71,7 @@ final class SyncMutationRelatedIdentityResolver
 
     private function appendAcceptedWork(array &$identities, SyncEntityIdentity $quoteIdentity): void
     {
-        $quote = $quoteIdentity->record;
+        $quote = $this->safeRecord($quoteIdentity);
         if (! $quote instanceof Quote || ! is_numeric($quote->event_id)) {
             return;
         }
@@ -88,7 +93,7 @@ final class SyncMutationRelatedIdentityResolver
         SyncMutation $mutation,
         SyncEntityIdentity $purchaseOrderIdentity,
     ): void {
-        $order = $purchaseOrderIdentity->record;
+        $order = $this->safeRecord($purchaseOrderIdentity);
         if (! $order instanceof PurchaseOrder) {
             return;
         }
@@ -148,6 +153,7 @@ final class SyncMutationRelatedIdentityResolver
                 $identity = SyncEntityIdentity::query()
                     ->where('business_id', $businessId)
                     ->where('entity_type', 'purchase_order_item')
+                    ->where('record_type', (new PurchaseOrderItem)->getMorphClass())
                     ->where('entity_uuid', Str::lower($lineIdentityOrId))
                     ->first();
 
@@ -182,6 +188,7 @@ final class SyncMutationRelatedIdentityResolver
         return SyncEntityIdentity::query()
             ->where('business_id', $mutation->business_id)
             ->where('entity_type', $entityType)
+            ->where('record_type', $this->expectedMorphType($entityType))
             ->where('entity_uuid', Str::lower($uuid))
             ->first();
     }
@@ -189,7 +196,7 @@ final class SyncMutationRelatedIdentityResolver
     private function assetParentIdentity(SyncMutation $mutation): ?SyncEntityIdentity
     {
         $allocationIdentity = $this->identityByUuid($mutation, 'asset_allocation', $mutation->entity_id);
-        $allocation = $allocationIdentity?->record;
+        $allocation = $allocationIdentity ? $this->safeRecord($allocationIdentity) : null;
 
         if (! $allocation instanceof \App\Models\AssetAllocation) {
             return null;
@@ -203,11 +210,55 @@ final class SyncMutationRelatedIdentityResolver
             ->first();
     }
 
+    private function safeRecord(SyncEntityIdentity $identity): ?Model
+    {
+        $expectedType = $this->expectedMorphType($identity->entity_type);
+        if ($expectedType === null || $identity->record_type !== $expectedType) {
+            return null;
+        }
+
+        $record = $identity->record;
+        if (! $record instanceof Model) {
+            return null;
+        }
+
+        $businessId = $record->getAttribute('business_id');
+        if ($businessId === null && method_exists($record, 'event')) {
+            $businessId = $record->event()->withTrashed()->value('business_id');
+        }
+
+        return is_numeric($businessId) && (int) $businessId === (int) $identity->business_id
+            ? $record
+            : null;
+    }
+
+    private function expectedMorphType(string $entityType): ?string
+    {
+        $model = match ($entityType) {
+            'customer' => Customer::class,
+            'job' => Event::class,
+            'quote' => Quote::class,
+            'invoice' => \\App\\Models\\Invoice::class,
+            'purchase_order' => PurchaseOrder::class,
+            'purchase_order_item' => PurchaseOrderItem::class,
+            'inventory_item' => InventoryItem::class,
+            'asset' => Asset::class,
+            'asset_allocation' => AssetAllocation::class,
+            'supplier' => Supplier::class,
+            default => null,
+        };
+
+        return $model ? (new $model)->getMorphClass() : null;
+    }
     /**
      * @param array<string, array{entity_type:string,local_id:string,server_id:int,revision:int}> $identities
      */
     private function append(array &$identities, SyncEntityIdentity $identity): void
     {
+        if (! $this->safeRecord($identity)) {
+            return;
+        }
+
         $key = $identity->entity_type.':'.$identity->entity_uuid;
         $identities[$key] = [
             'entity_type' => $identity->entity_type,
