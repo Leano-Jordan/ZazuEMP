@@ -1,3 +1,12 @@
+## Backup/restore archive compatibility — implementation checkpoint 2026-11-21
+
+- Fixed a mismatch where backup could publish up to 50,002 entries but restore accepted only 50,000.
+- Backup and restore now share limits: 50,000 private files, 50,002 ZIP entries, and 2 GiB uncompressed total. Backup verifies the completed ZIP including its manifest before publication.
+- Added boundary regression tests. Exact-head CI pending.
+- The owner-operated isolated restore drill and independent off-host copy remain mandatory; this code correction does not close the physical recovery gate.
+
+---
+
 ## Offline host-outage monitor — exact-head acceptance PASS — 2026-11-21
 
 **Source:** [41d7a25](https://github.com/Leano-Jordan/ZazuEMP/commit/41d7a256f80b1e1d98cbb43509f81dc26cd600ec).
