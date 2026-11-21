@@ -17,6 +17,8 @@ use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncDevice;
+use App\Models\SyncDelivery;
+use App\Models\SyncEntityIdentity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,7 +34,7 @@ class SyncBootstrapPayloadBuilder
         'purchase_order' => PurchaseOrder::class,
     ];
 
-    public function build(SyncDevice $device): array
+    public function build(SyncDevice $device, array $deliverySequences = []): array
     {
         return DB::transaction(function () use ($device): array {
             // The snapshot and its revisions must describe one serialized
@@ -43,6 +45,7 @@ class SyncBootstrapPayloadBuilder
                 ->lockForUpdate()
                 ->firstOrFail();
             $registry = app(SyncEntityIdentityRegistry::class);
+            $deliveryTargets = $this->deliveryTargets($device, $deliverySequences);
 
             return [
                 'version' => 1,
@@ -57,20 +60,147 @@ class SyncBootstrapPayloadBuilder
                     'tax_number' => $business->tax_number,
                 ],
                 'catalogue' => $this->bootstrapCatalogue($business, $registry),
-                'suppliers' => $this->bootstrapSuppliers($business, $registry),
-                'purchase_orders' => $this->bootstrapPurchaseOrders($business, $registry),
-                'invoices' => $this->bootstrapInvoices($business, $registry),
-                'expenses' => $this->bootstrapExpenses($business, $registry),
-                'inventory_items' => $this->bootstrapInventoryItems($business, $registry),
-                'assets' => $this->bootstrapAssets($business, $registry),
-                'costs' => $this->bootstrapCosts($business, $registry),
-                'selected' => $this->bootstrapSelectedRecords($device, $business, $registry),
+                'suppliers' => $this->bootstrapSuppliers($business, $registry, $deliveryTargets['supplier'] ?? []),
+                'purchase_orders' => $this->bootstrapPurchaseOrders($business, $registry, $deliveryTargets['purchase_order'] ?? []),
+                'invoices' => $this->bootstrapInvoices($business, $registry, $deliveryTargets['invoice'] ?? []),
+                'expenses' => $this->bootstrapExpenses($business, $registry, $deliveryTargets['expense'] ?? []),
+                'inventory_items' => $this->bootstrapInventoryItems($business, $registry, $deliveryTargets['inventory_item'] ?? []),
+                'assets' => $this->bootstrapAssets($business, $registry, $deliveryTargets['asset'] ?? []),
+                'costs' => $this->bootstrapCosts($business, $registry, $deliveryTargets['event_cost'] ?? []),
+                'selected' => $this->bootstrapSelectedRecords($device, $business, $registry, $deliveryTargets['selected'] ?? []),
                 'device' => [
                     'id' => $device->id,
                     'installation_id' => $device->installation_id,
                 ],
             ];
         });
+    }
+
+    /**
+     * Include aggregates touched by the exact delivery batch being reconciled.
+     * The ordinary offline working set remains bounded, but a delivered update
+     * must never be acknowledged when its affected record falls outside that
+     * bounded window.
+     *
+     * @param array<int, mixed> $deliverySequences
+     * @return array<string, array<int, mixed>>
+     */
+    private function deliveryTargets(SyncDevice $device, array $deliverySequences): array
+    {
+        $sequences = array_values(array_unique(array_filter(
+            array_map(static fn ($sequence): int => (int) $sequence, $deliverySequences),
+            static fn (int $sequence): bool => $sequence > 0,
+        )));
+
+        if ($sequences === []) {
+            return [];
+        }
+
+        $deliveries = SyncDelivery::query()
+            ->where('business_id', $device->business_id)
+            ->where('destination_device_id', $device->id)
+            ->where('stream', 'business')
+            ->whereIn('delivery_sequence', $sequences)
+            ->with('mutation')
+            ->get();
+
+        $targets = [];
+        $resolver = app(SyncMutationRelatedIdentityResolver::class);
+        foreach ($deliveries as $delivery) {
+            $mutation = $delivery->mutation;
+            if (! $mutation) {
+                continue;
+            }
+
+            $identities = $resolver->resolve($mutation);
+            if ($identities === []) {
+                $localId = $mutation->payload['local_id'] ?? $mutation->entity_id;
+                if (is_string($localId)) {
+                    $identity = SyncEntityIdentity::query()
+                        ->where('business_id', $device->business_id)
+                        ->where('entity_type', $mutation->entity_type)
+                        ->where('entity_uuid', $localId)
+                        ->first();
+
+                    if ($identity) {
+                        $identities[] = [
+                            'entity_type' => $identity->entity_type,
+                            'server_id' => (int) $identity->record_id,
+                        ];
+                    }
+                }
+            }
+
+            foreach ($identities as $identity) {
+                $type = (string) ($identity['entity_type'] ?? '');
+                $recordId = (int) ($identity['server_id'] ?? 0);
+                if ($recordId < 1) {
+                    continue;
+                }
+
+                $collection = match ($type) {
+                    'supplier' => 'supplier',
+                    'purchase_order' => 'purchase_order',
+                    'invoice' => 'invoice',
+                    'expense' => 'expense',
+                    'inventory_item' => 'inventory_item',
+                    'asset' => 'asset',
+                    'event_cost' => 'event_cost',
+                    default => null,
+                };
+
+                if ($collection !== null) {
+                    $targets[$collection][] = $recordId;
+                }
+
+                if (in_array($type, ['customer', 'job', 'quote', 'preparation'], true)) {
+                    $targets['selected'][] = ['type' => $type, 'id' => $recordId];
+                }
+            }
+        }
+
+        foreach ($targets as $key => $ids) {
+            if ($key === 'selected') {
+                $unique = [];
+                foreach ($ids as $item) {
+                    $unique[$item['type'].':'.$item['id']] = $item;
+                }
+                $targets[$key] = array_values($unique);
+            } else {
+                $targets[$key] = array_values(array_unique(array_map('intval', $ids)));
+            }
+        }
+
+        return $targets;
+    }
+
+    /**
+     * Apply the normal bounded window plus any aggregates required by a
+     * receiver's unacknowledged delivery batch.
+     */
+    private function applyBoundedWorkingSet(
+        $query,
+        string $modelClass,
+        Business $business,
+        array $includedIds,
+        string $orderColumn,
+        string $direction,
+    ): void {
+        if ($includedIds !== []) {
+            $window = $modelClass::query()
+                ->select('id')
+                ->where('business_id', $business->id)
+                ->orderBy($orderColumn, $direction)
+                ->limit(500);
+
+            $query->where(function ($builder) use ($includedIds, $window): void {
+                $builder->whereIn('id', $includedIds)->orWhereIn('id', $window);
+            });
+        } else {
+            $query->limit(500);
+        }
+
+        $query->orderBy($orderColumn, $direction);
     }
 
     /**
@@ -120,13 +250,12 @@ class SyncBootstrapPayloadBuilder
             ->values();
     }
 
-    private function bootstrapSuppliers(Business $business, SyncEntityIdentityRegistry $registry)
+    private function bootstrapSuppliers(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        return Supplier::query()
-            ->where('business_id', $business->id)
-            ->orderBy('name')
-            ->limit(500)
-            ->get()
+        $query = Supplier::query()->where('business_id', $business->id);
+        $this->applyBoundedWorkingSet($query, Supplier::class, $business, $includedIds, 'name', 'asc');
+
+        return $query->get()
             ->map(fn (Supplier $supplier) => [
                 ...$this->identityPayload($supplier, 'supplier', $registry),
                 'server_id' => $supplier->id,
@@ -135,14 +264,12 @@ class SyncBootstrapPayloadBuilder
             ->values();
     }
 
-    private function bootstrapPurchaseOrders(Business $business, SyncEntityIdentityRegistry $registry)
+    private function bootstrapPurchaseOrders(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        return PurchaseOrder::query()
-            ->where('business_id', $business->id)
-            ->with('items')
-            ->latest()
-            ->limit(500)
-            ->get()
+        $query = PurchaseOrder::query()->where('business_id', $business->id)->with('items');
+        $this->applyBoundedWorkingSet($query, PurchaseOrder::class, $business, $includedIds, 'created_at', 'desc');
+
+        return $query->get()
             ->map(fn (PurchaseOrder $order) => [
                 ...$this->identityPayload($order, 'purchase_order', $registry),
                 'server_id' => $order->id,
@@ -156,14 +283,12 @@ class SyncBootstrapPayloadBuilder
             ->values();
     }
 
-    private function bootstrapInvoices(Business $business, SyncEntityIdentityRegistry $registry)
+    private function bootstrapInvoices(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        return Invoice::query()
-            ->where('business_id', $business->id)
-            ->with(['items', 'payments', 'quoteVersion'])
-            ->latest('id')
-            ->limit(500)
-            ->get()
+        $query = Invoice::query()->where('business_id', $business->id)->with(['items', 'payments', 'quoteVersion']);
+        $this->applyBoundedWorkingSet($query, Invoice::class, $business, $includedIds, 'id', 'desc');
+
+        return $query->get()
             ->map(fn (Invoice $invoice) => [
                 ...$this->identityPayload($invoice, 'invoice', $registry),
                 'server_id' => $invoice->id,
@@ -184,14 +309,12 @@ class SyncBootstrapPayloadBuilder
             ->values();
     }
 
-    private function bootstrapInventoryItems(Business $business, SyncEntityIdentityRegistry $registry)
+    private function bootstrapInventoryItems(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        return InventoryItem::query()
-            ->where('business_id', $business->id)
-            ->with('movements')
-            ->orderBy('name')
-            ->limit(500)
-            ->get()
+        $query = InventoryItem::query()->where('business_id', $business->id)->with('movements');
+        $this->applyBoundedWorkingSet($query, InventoryItem::class, $business, $includedIds, 'name', 'asc');
+
+        return $query->get()
             ->map(fn (InventoryItem $item) => [
                 ...$this->identityPayload($item, 'inventory_item', $registry),
                 'server_id' => $item->id,
@@ -207,14 +330,14 @@ class SyncBootstrapPayloadBuilder
             ->values();
     }
 
-    private function bootstrapAssets(Business $business, SyncEntityIdentityRegistry $registry)
+    private function bootstrapAssets(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        return Asset::query()
+        $query = Asset::query()
             ->where('business_id', $business->id)
-            ->with(['allocations' => fn ($query) => $query->where('status', 'allocated')])
-            ->orderBy('name')
-            ->limit(500)
-            ->get()
+            ->with(['allocations' => fn ($query) => $query->where('status', 'allocated')]);
+        $this->applyBoundedWorkingSet($query, Asset::class, $business, $includedIds, 'name', 'asc');
+
+        return $query->get()
             ->map(fn (Asset $asset) => [
                 ...$this->identityPayload($asset, 'asset', $registry),
                 'server_id' => $asset->id,
@@ -229,14 +352,12 @@ class SyncBootstrapPayloadBuilder
             ->values();
     }
 
-    private function bootstrapCosts(Business $business, SyncEntityIdentityRegistry $registry)
+    private function bootstrapCosts(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        return EventCost::query()
-            ->where('business_id', $business->id)
-            ->with('event')
-            ->latest('id')
-            ->limit(500)
-            ->get()
+        $query = EventCost::query()->where('business_id', $business->id)->with('event');
+        $this->applyBoundedWorkingSet($query, EventCost::class, $business, $includedIds, 'id', 'desc');
+
+        return $query->get()
             ->map(fn (EventCost $cost) => [
                 ...$this->identityPayload($cost, 'event_cost', $registry),
                 'server_id' => $cost->id,
@@ -247,13 +368,12 @@ class SyncBootstrapPayloadBuilder
             ->values();
     }
 
-    private function bootstrapExpenses(Business $business, SyncEntityIdentityRegistry $registry)
+    private function bootstrapExpenses(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        return FinanceExpense::query()
-            ->where('business_id', $business->id)
-            ->latest('id')
-            ->limit(500)
-            ->get()
+        $query = FinanceExpense::query()->where('business_id', $business->id);
+        $this->applyBoundedWorkingSet($query, FinanceExpense::class, $business, $includedIds, 'id', 'desc');
+
+        return $query->get()
             ->map(fn (FinanceExpense $expense) => [
                 ...$this->identityPayload($expense, 'expense', $registry),
                 'server_id' => $expense->id,
@@ -269,6 +389,7 @@ class SyncBootstrapPayloadBuilder
         SyncDevice $device,
         Business $business,
         SyncEntityIdentityRegistry $registry,
+        array $additionalSelection = [],
     ): array {
         $metadata = $device->metadata ?? [];
         $selectionMode = $metadata['bootstrap_selection_mode']
@@ -277,8 +398,15 @@ class SyncBootstrapPayloadBuilder
             ? $this->defaultSelection($business)
             : ($metadata['bootstrap_selection'] ?? []);
 
+        $selection = array_merge($selection, $additionalSelection);
         $selected = [];
+        $seen = [];
         foreach ($selection as $item) {
+            $selectionKey = (string) ($item['type'] ?? '').':'.(int) ($item['id'] ?? 0);
+            if (isset($seen[$selectionKey])) {
+                continue;
+            }
+            $seen[$selectionKey] = true;
             $record = $this->findSelectedRecord($business, $item);
             if (! $record) {
                 continue;
