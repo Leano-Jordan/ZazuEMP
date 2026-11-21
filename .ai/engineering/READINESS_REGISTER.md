@@ -1,3 +1,12 @@
+## Additional security checkpoint — mutation application credential race — 2026-11-21
+
+- Found a separate post-record TOCTOU window: the push processor recorded with a valid credential, then the applier checked only device active status in a new transaction.
+- The push processor now uses the authenticated applier, which locks/revalidates the original credential and confirms mutation business/device ownership before applying.
+- Adversarial regression: record mutation → replace credential → stale apply attempt must return 401 and leave the mutation pending with no delivery.
+- Implementation [ed5f420](https://github.com/Leano-Jordan/ZazuEMP/commit/ed5f420c69532f5ed4ad4a3f2c7eac839cea8fd3), push integration [c132650](https://github.com/Leano-Jordan/ZazuEMP/commit/c1326502db7dfd6d6f9e1a0188e9266044a0bf8b), regression [9d6f093](https://github.com/Leano-Jordan/ZazuEMP/commit/9d6f093742e76ca712be3799d74589434fa8e98d). Exact-head CI pending; readiness score unchanged.
+
+---
+
 ## Director execution checkpoint — offline host detection + recovery archive hardening — 2026-11-21
 
 **Current source/test head:** [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc) on main.
