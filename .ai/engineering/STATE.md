@@ -1,6 +1,6 @@
 ## Director execution checkpoint — offline acceptance closure + identity ownership hardening — 2026-11-21
 
-**Current source/test head before this checkpoint:** `ad6268c08b0697d87a9f0f4464455637e5d25acb` on `main`.  
+**Current source/test head before this checkpoint:** `d7d93152da24c128b1a48b3eb3191762cfe8d4a1` on `main`.  
 **Ownership guard:** [15f0a17](https://github.com/Leano-Jordan/ZazuEMP/commit/15f0a176e46aaf19c389aa17e36e2d74028d9f50).  
 **Morph-type validation:** [57c4888](https://github.com/Leano-Jordan/ZazuEMP/commit/57c48885459c956906abebb13782722d1eb7e383).  
 **Snapshot guard:** [89891a6](https://github.com/Leano-Jordan/ZazuEMP/commit/89891a6ea787028951020757b9de734030872023).  
@@ -13,7 +13,7 @@
 - This is a corrupted/stale identity mapping defense, not a demonstrated remote client exploit. Do not overstate the threat model.
 - Updated `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md` with the acceptance closure, ownership guard, morph-type validation and stale-snapshot protection.
 
-**Verification of the ownership + morph-type + snapshot hardening:** PENDING exact-head Laravel and quality CI on the security/test commits. Do not mark the new guard complete until those checks pass.
+**Verification of the ownership + morph-type + snapshot hardening:** latest Laravel run [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572) is running on the corrected test head. Earlier failures were isolated to test setup (missing expected revision) and test-file syntax; the corrected head must pass before this work is marked complete. Do not mark the new guard complete until those checks pass.
 
 **Evidence maturity:** **77/100, unchanged**. No score uplift. V1 remains **NOT READY**.
 
