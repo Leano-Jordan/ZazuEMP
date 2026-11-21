@@ -57,7 +57,7 @@ final class SyncMutationPushProcessor
         $retryable = false;
 
         try {
-            $mutation = $this->applier->apply($mutation, [$mutation->entity_type => $this->handler]);
+            $mutation = $this->applier->applyAuthenticated($mutation, [$mutation->entity_type => $this->handler], $device);
             $identity = SyncEntityIdentity::query()
                 ->where('business_id', $mutation->business_id)
                 ->where('entity_type', $mutation->entity_type)
