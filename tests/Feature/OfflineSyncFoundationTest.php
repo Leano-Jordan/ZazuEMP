@@ -2820,8 +2820,11 @@ class OfflineSyncFoundationTest extends TestCase
         $deliverySequences = $deliveries->pluck('delivery_sequence')
             ->map(static fn ($sequence): int => (int) $sequence)
             ->all();
-        $snapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)
-            ->build($receivingDevice, $deliverySequences);
+        $bootstrapRequest = Request::create('/api/sync/bootstrap', 'GET', [
+            'delivery_sequences' => $deliverySequences,
+        ]);
+        $bootstrapRequest->attributes->set('sync_device', $receivingDevice->fresh());
+        $snapshot = app(SyncController::class)->bootstrap($bootstrapRequest)->getData(true);
         $remoteOrder = collect($snapshot['purchase_orders'])->first(
             fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $order->id,
         );
