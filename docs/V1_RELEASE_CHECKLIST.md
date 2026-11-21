@@ -3,7 +3,7 @@
 Latest full application-code verification baseline: 51a75eb1d06017211bd7808093d1863c930b6d71.
 Latest receiver-sync and bootstrap-auth hardening source head: 559e66b87de8617f967b722b55b0fbfd9b116495 (all automated gates passed). Latest stale-write protection acceptance head: 51a75eb1d06017211bd7808093d1863c930b6d71 (all relevant automated gates passed).
 Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
-Disposition: NOT READY · Evidence maturity: 75/100 (+2 for verified receiver reconciliation and bootstrap authorization).
+Disposition: NOT READY · Evidence maturity: 77/100 (+2 for verified stale-write protection; prior +2 for receiver reconciliation and bootstrap authorization).
 
 
 ## Stale-write protection closure — 2026-11-21
