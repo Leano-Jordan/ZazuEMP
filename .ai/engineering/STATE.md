@@ -1,3 +1,21 @@
+## Director execution checkpoint — offline identity acknowledgement compatibility — 2026-11-21
+
+**Latest code:** [3f8d2cd](https://github.com/Leano-Jordan/ZazuEMP/commit/3f8d2cd9bc70f718ff991eb9dc9503b204aa8a62) adds the InventoryMovement model to the shared primary identity guard.  
+**Latest regression:** [3be50c7](https://github.com/Leano-Jordan/ZazuEMP/commit/3be50c76bbb62c99b3834731157fac0c48072977) proves a valid business-owned InventoryMovement identity is still accepted.  
+**Related asset snapshot guard:** [1fdbb02](https://github.com/Leano-Jordan/ZazuEMP/commit/1fdbb0212c099df1f8403628b9e71423f35c5434) + [f53e17a](https://github.com/Leano-Jordan/ZazuEMP/commit/f53e17ab33e82d960dc40bc4a67e19bc8da349b8).
+
+- Completed the follow-through on primary acknowledgement mapping: InventoryMovement is a real persisted mutation result and must remain acknowledgeable; command-only quote acceptance and purchase receipt do not create a primary model identity.
+- The conflict snapshot's related asset identity now verifies the actual Asset's business ownership, not only the tenant identity row and allocation.
+- Added a positive InventoryMovement regression and a negative cross-business related-asset snapshot regression.
+- PHPMD on [f53e17a](https://github.com/Leano-Jordan/ZazuEMP/commit/f53e17ab33e82d960dc40bc4a67e19bc8da349b8) passed; Director Health passed. Current exact regression-head checks are [Laravel run 44922555573](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922555573), [PHPMD run 44922555612](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922555612), [Zazu Quality run 44922555513](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922555513), and [Director Health run 44922555567](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922555567). At checkpoint these were queued. The code-head PHPMD/Psalm/upgrade runs from [3f8d2cd](https://github.com/Leano-Jordan/ZazuEMP/commit/3f8d2cd9bc70f718ff991eb9dc9503b204aa8a62) are in progress; Laravel is queued. SonarCloud skipped.
+- Previous complete desktop/mobile offline acceptance remains green on [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572); no claim is made that the latest changed PHP has already passed the browser suite.
+
+**Evidence maturity:** 77/100 unchanged; V1 NOT READY.
+
+**Next target:** close exact-head checks, then inspect any remaining identity paths used by receiver pull, conflict resolution and bootstrap selected-record serialization. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — related snapshot ownership completed — 2026-11-21
 
 **Latest implementation:** [1fdbb02](https://github.com/Leano-Jordan/ZazuEMP/commit/1fdbb0212c099df1f8403628b9e71423f35c5434).  
