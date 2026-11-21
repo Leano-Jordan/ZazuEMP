@@ -260,10 +260,17 @@ class SyncController extends Controller
 
     public function bootstrap(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'delivery_sequences' => ['sometimes', 'array', 'max:100'],
+            'delivery_sequences.*' => ['required', 'integer', 'min:1'],
+        ]);
         $device = $request->attributes->get('sync_device');
         $device->update(['last_seen_at' => now()]);
 
-        return response()->json($this->bootstrapPayload($device));
+        return response()->json($this->bootstrapPayload(
+            $device,
+            array_values(array_unique(array_map('intval', $validated['delivery_sequences'] ?? []))),
+        ));
     }
 
     public function pull(Request $request, SyncMutationProtocol $protocol): JsonResponse
@@ -689,9 +696,9 @@ class SyncController extends Controller
         return $result;
     }
 
-    private function bootstrapPayload(SyncDevice $device): array
+    private function bootstrapPayload(SyncDevice $device, array $deliverySequences = []): array
     {
-        return app(SyncBootstrapPayloadBuilder::class)->build($device);
+        return app(SyncBootstrapPayloadBuilder::class)->build($device, $deliverySequences);
     }
 
 
