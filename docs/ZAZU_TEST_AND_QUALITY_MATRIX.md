@@ -14,7 +14,7 @@ This is the current map of Zazu's verification ecosystem. It prevents tests, sta
 | Static quality | PHPMD | maintainability |
 | Static security | Psalm | security/static analysis |
 | External analysis | SonarCloud | conditional |
-| Formatting | Laravel Pint dependency | currently not a CI gate |
+| Formatting | Laravel Pint `--test` on PHP 8.4 with locked dependencies | blocking CI gate; non-mutating |
 | Dependency drift | Dependabot | maintenance |
 | Build | Vite/npm | asset integrity |
 | Database | migrations + PHPUnit/browser setup | schema/workflow integrity |
@@ -38,10 +38,10 @@ Owner-added tests are part of the quality system. If they catch a real regressio
 
 1. No single repository-side verification authority classified failures before application changes.
 2. Static-analysis and CI failures can be mistaken for application failures.
-3. Pint is installed but not an explicit CI gate.
+3. Laravel Pint is now an explicit non-mutating CI gate; first exact-main result is pending.
 4. SonarCloud is conditional and must not be treated as active evidence unless configured and successfully run.
 5. Psalm has a compatibility shim and needs its own toolchain-health acceptance rule.
-6. Latest main commits currently lack usable workflow-run evidence through the connected inspection path.
+6. Exact-main workflow evidence is now available; record the source SHA and run IDs in the canonical release checklist.
 7. Critical business workflows are not yet mapped in one concise evidence matrix.
 8. The visual stylesheet had accumulated repeated token/sweep layers; the token declarations have now been consolidated into one light and one dark root authority. Fresh browser verification remains required.
 
