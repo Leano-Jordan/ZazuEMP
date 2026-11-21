@@ -76,6 +76,12 @@ class SyncConflictRecorder
         });
     }
 
+    /**
+     * Trusted internal row-creation helper. Request-originated conflict writes
+     * must use recordOnce() so the authenticated device credential is rechecked.
+     *
+     * @internal
+     */
     public function record(
         int $businessId,
         string $entityType,
