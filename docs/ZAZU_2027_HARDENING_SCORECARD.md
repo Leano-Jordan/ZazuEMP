@@ -1,6 +1,6 @@
 ## Director deep-audit checkpoint — 2026-11-21 (customer-contact writer correction)
 
-- **Source head:** `5f8dd6bdfa22b17bc6d0f14eb065400101caa1ea` on `main`; exact-head CI pending.
+- **Source head:** `5f8dd6bdfa22b17bc6d0f14eb065400101caa1ea` on `main`; Laravel **634 passed / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD **PASS**; desktop/mobile browser acceptance remains in progress. A second paired-device stale-write regression now proves revision-1 writes cannot overwrite revision-2 server state.
 - Corrected a confirmed online revision bypass in primary-contact creation: existing primary contacts are now updated individually under lock instead of through a relationship mass update that bypassed Eloquent events.
 - Added a regression proving the parent Customer revision advances while preserving exactly one primary contact.
 - **Readiness remains 75/100; V1 remains NOT READY.** CASE-ZAZU-0033 remains OPEN until the exhaustive writer audit and full supported sync matrix are verified. Physical Android, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain separate owner gates.
