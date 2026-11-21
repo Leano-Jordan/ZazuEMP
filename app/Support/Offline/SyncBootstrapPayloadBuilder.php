@@ -77,17 +77,10 @@ class SyncBootstrapPayloadBuilder
     }
 
     /**
-     * Include aggregates touched by the exact delivery batch being reconciled.
-     * The ordinary offline working set remains bounded, but a delivered update
-     * must never be acknowledged when its affected record falls outside that
-     * bounded window.
-     *
-     * @param array<int, mixed> $deliverySequences
-     * @return array<string, array<int, mixed>>
-     */
-    /**
      * Apply the normal bounded window plus any aggregates required by a
      * receiver's unacknowledged delivery batch.
+     *
+     * @param array<int, int> $includedIds
      */
     private function applyBoundedWorkingSet(
         Builder $query,
