@@ -14,6 +14,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ## Case index
 
 | CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | OPEN | No authoritative record revision is carried or checked; a second device can overwrite an intervening write | Revision contract + two-device and same-device causal-chain tests |
+| CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | OPEN — implementation committed; exact-head CI pending | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -598,3 +599,28 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Online writer source trace — 2026-11-20:** reviewed the relevant controllers and services for customers/contacts/import, Work/lifecycle, quotes, catalogue services, suppliers, assets, event costs/preparation, invoices/payments/expenses, inventory and purchasing. Inspected existing-record writes use the shared business-first lock boundary and model revision tracking. Query-builder operations found in the reviewed flows are accompanied by a tracked parent update in the same transaction or are part of restoring into an empty target business with no pre-existing sync identities. This does not yet certify every indirect/console/future writer; keep the final exhaustive writer inventory as a release gate.
 
 **Exact-head evidence — `7d5f861`:** Laravel unit/feature, PostgreSQL migration smoke, PHPMD, Zazu Quality and Director Health passed. Offline-browser acceptance, including the new related-aggregate regression, remained in progress when recorded. CASE-ZAZU-0033 remains OPEN until the browser result and final writer inventory pass.
+
+### CASE-ZAZU-0034
+
+**Status:** OPEN — correction and regression coverage committed on `main`; exact-head CI verification pending.  
+**Engineering diagnostic code:** ENG-DATA-004.  
+**First observed:** 2026-11-21.  
+**Target:** `SyncProtocol::pull` → `SyncController::bootstrap` → `SyncBootstrapPayloadBuilder` → `public/zazu-offline.js::pull`.
+
+**Failure fingerprint:** A receiver pulls a contiguous sequence of committed deliveries, refreshes from the ordinary bounded business bootstrap, then acknowledges the highest sequence. If the affected aggregate is outside a 500-record collection window or a 25-record selected-record window, the snapshot can omit it and the receiver still advances its cursor. Static name/creation ordering could also keep older records that changed online outside the bounded refresh.
+
+**Classification:** F1/F7 — application data-reconciliation defect and delivery/bootstrap contract gap. The receiver's acknowledgement was stronger than the completeness guarantee of the snapshot it had persisted.
+
+**Correction on main:**
+- The client now sends the exact delivery sequences with its bootstrap request.
+- The controller validates positive integer values and caps the request at 100 sequence values.
+- `SyncBootstrapDeliveryTargetResolver` looks up only deliveries for the same business, destination device and business stream, then resolves primary and related aggregates.
+- The builder includes those exact target aggregates beyond the normal bounded window, including command-side related records.
+- The normal 500-record collections are selected by latest sync-identity update time (fallback to record `updated_at`) while preserving existing display order.
+- The browser persists the snapshot before acknowledging the contiguous prefix. The worker cache advances to `zazu-static-v58` to ship the updated precached client.
+
+**Regression coverage:** recent online supplier revision promotion; a supplier intentionally outside the 500-record window; forced inclusion for its intended receiver; non-recipient device isolation; cross-device quote → acceptance → invoice → payment reconciliation; purchase receipt → purchase-order/inventory reconciliation; and client pull → targeted bootstrap → acknowledge ordering.
+
+**Verification:** Exact-head Laravel, PostgreSQL, offline-browser, PHPMD and quality evidence is pending for the final implementation head. Source inspection alone is not closure evidence.
+
+**Loop prevention:** Never acknowledge a delivery batch solely because a generic bootstrap returned 200. The snapshot must demonstrably include all primary and related aggregates changed by the exact receiver delivery prefix. Do not remove collection bounds or broaden a device's data scope as a workaround.
