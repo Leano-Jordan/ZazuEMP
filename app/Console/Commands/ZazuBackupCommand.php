@@ -290,7 +290,8 @@ class ZazuBackupCommand extends Command
         }
 
         try {
-            if ($zip->numFiles < 2 || !BackupArchiveLimits::canIncludeArchiveEntries($zip->numFiles)) {
+            if (!BackupArchiveLimits::canIncludeArchiveEntries($zip->numFiles)
+                || !$this->archiveWithinRestoreLimits($zip)) {
                 return false;
             }
 
@@ -310,6 +311,26 @@ class ZazuBackupCommand extends Command
         } finally {
             $zip->close();
         }
+    }
+
+    private function archiveWithinRestoreLimits(ZipArchive $zip): bool
+    {
+        $totalBytes = 0;
+
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $stat = $zip->statIndex($index);
+            if (!is_array($stat)) {
+                return false;
+            }
+
+            $size = (int) ($stat['size'] ?? -1);
+            if (!BackupArchiveLimits::canIncludeUncompressedBytes($totalBytes, $size)) {
+                return false;
+            }
+            $totalBytes += $size;
+        }
+
+        return true;
     }
 
     private function readVerifiedManifest(ZipArchive $zip, string $driver): ?array
