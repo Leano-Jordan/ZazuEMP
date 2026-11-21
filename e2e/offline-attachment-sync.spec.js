@@ -178,11 +178,11 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     const originalBusinessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0));
     const beforeReload = await page.evaluate(async id => ({
         businessId: Number(document.body.dataset.zazuBusinessId || 0),
-        records: await window.ZazuOffline.loadAttachments(id),
+        recordCount: (await window.ZazuOffline.loadAttachments(id)).length,
     }), eventId);
     expect(originalBusinessId).toBeGreaterThan(0);
     expect(beforeReload.businessId).toBe(originalBusinessId);
-    expect(beforeReload.records).toHaveLength(1);
+    expect(beforeReload.recordCount).toBe(1);
 
     // A page/document restart while disconnected must recover the file from
     // the same business-scoped IndexedDB partition, not the previous JavaScript
