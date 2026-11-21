@@ -1696,6 +1696,8 @@
             return null;
         };
 
+        const relatedReconciliations = [];
+
         for (const mutation of mutations) {
             const remote = recorded.get(mutation.id);
             const identity = remote?.identity;
@@ -1722,11 +1724,51 @@
                     : null;
                 if (relatedRecord) {
                     relatedRecord.revision = Number(related.revision || relatedRecord.revision || 1);
+                    relatedReconciliations.push({
+                        entityType: related.entity_type,
+                        localId: related.local_id,
+                        record: relatedRecord,
+                        sourceMutation: mutation,
+                    });
                 }
             }
         }
 
         const remainingMutations = await pending();
+        const unresolvedMutations = (await allMutations()).filter(item =>
+            ['pending', 'failed'].includes(item.status)
+        );
+
+        for (const related of relatedReconciliations) {
+            if (related.record?.pending_sync !== true) continue;
+
+            const sourcePayload = related.sourceMutation.payload?.record || {};
+            const stillPending = unresolvedMutations.some(item => {
+                const payload = item.payload?.record || {};
+                const localId = payload.local_id || item.entity_id;
+
+                if (item.entity_type === related.entityType && localId === related.localId) return true;
+
+                if (related.entityType === 'purchase_order') {
+                    return item.entity_type === 'purchase_receipt'
+                        && payload.purchase_order_local_id === related.localId;
+                }
+
+                if (related.entityType === 'inventory_item') {
+                    if (item.entity_type === 'inventory_movement'
+                        && payload.inventory_item_local_id === related.localId) return true;
+
+                    return related.sourceMutation.entity_type === 'purchase_receipt'
+                        && item.entity_type === 'purchase_receipt'
+                        && payload.purchase_order_local_id === sourcePayload.purchase_order_local_id;
+                }
+
+                return false;
+            });
+
+            if (!stillPending) related.record.pending_sync = false;
+        }
+
         for (const mutation of mutations) {
             const remote = recorded.get(mutation.id);
             if (!['applied', 'discarded'].includes(remote?.status)) continue;
