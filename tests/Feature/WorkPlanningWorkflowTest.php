@@ -60,6 +60,52 @@ class WorkPlanningWorkflowTest extends TestCase
         $this->assertSame('1650.00', $cost->actual_amount);
     }
 
+    public function test_cancelled_costs_remain_visible_but_are_excluded_from_cost_totals(): void
+    {
+        $event = $this->event();
+
+        EventCost::create([
+            'business_id' => $event->business_id,
+            'event_id' => $event->id,
+            'category' => 'Food',
+            'description' => 'Planned ingredients',
+            'currency' => 'ZAR',
+            'projected_amount' => '2000.00',
+            'actual_amount' => null,
+            'status' => 'planned',
+        ]);
+        EventCost::create([
+            'business_id' => $event->business_id,
+            'event_id' => $event->id,
+            'category' => 'Transport',
+            'description' => 'Actual delivery cost',
+            'currency' => 'ZAR',
+            'projected_amount' => '1500.00',
+            'actual_amount' => '1650.00',
+            'status' => 'incurred',
+        ]);
+        EventCost::create([
+            'business_id' => $event->business_id,
+            'event_id' => $event->id,
+            'category' => 'Equipment',
+            'description' => 'Cancelled equipment hire',
+            'currency' => 'ZAR',
+            'projected_amount' => '500.00',
+            'actual_amount' => '500.00',
+            'status' => 'cancelled',
+        ]);
+
+        $this->get(route('work.costs.index', $event))
+            ->assertOk()
+            ->assertViewHas('costs', fn ($costs): bool => $costs->count() === 3)
+            ->assertViewHas('totalsByCurrency', function ($totals): bool {
+                $this->assertSame('3500.00', $totals->get('ZAR')['projected']);
+                $this->assertSame('1650.00', $totals->get('ZAR')['actual']);
+                return true;
+            })
+            ->assertSee('Cancelled equipment hire');
+    }
+
     public function test_preparation_item_status_records_readiness_and_can_be_changed(): void
     {
         $event = $this->event();
