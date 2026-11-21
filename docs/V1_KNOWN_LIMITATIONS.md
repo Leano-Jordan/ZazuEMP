@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Known Limitations
 
-**Evidence baseline:** application/test source `7193038a2b2d14ea71278050a0d7c26ce246bf86`  
+**Evidence baseline:** application/test source `d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb`  
 **Status:** engineering record; physical-device acceptance remains open.
 
 This document records boundaries that are explicit in the V1 scope and current regression coverage. It is not a promise of capabilities that have not been verified.
@@ -31,6 +31,16 @@ This document records boundaries that are explicit in the V1 scope and current r
 - V1 physical offline acceptance is Android-only. iPhone/iPad offline cold launch, storage persistence, background behaviour and reconnect synchronisation have not been tested or certified.
 - Do not promise iOS offline reliability or parity in V1. Online use may be available where supported, but offline behaviour remains unverified until a separate device acceptance pass is completed.
 
+## Database engine coverage boundary
+
+- The current V1 host target is the owner's Windows PC using SQLite. The full Laravel suite runs against SQLite; PostgreSQL currently receives migration and recovery smoke coverage, not the full commercial/sync feature suite.
+- This is a conditional limitation, not a blocker for the SQLite owner-PC V1. If a PostgreSQL host or pilot is selected, run the commercial and sync feature suites against PostgreSQL in CI before that pilot. Do not infer full PostgreSQL parity from the smoke test.
+
+## Password policy boundary
+
+- New registrations and password resets require a minimum of 10 characters.
+- Zazu does not call an online breached-password service. This avoids making password creation dependent on internet access in LAN/offline deployments; users should choose unique passphrases.
+
 ## Deliberately deferred product capabilities
 
 - Full enterprise identity/SSO.
@@ -50,4 +60,4 @@ This document records boundaries that are explicit in the V1 scope and current r
 
 ## Release interpretation
 
-These limitations do not by themselves block V1 where they match the frozen scope. The remaining acceptance item is real installed-device offline acceptance, followed by the final release decision. Any new blocker must be a reproducible failure in an agreed V1 workflow, a demonstrated security/privacy/data-integrity failure, or an explicitly owner-approved requirement.
+These limitations do not by themselves block V1 where they match the frozen scope. Remaining owner-dependent gates include the Windows installation backup/off-disk copy/restore drill, physical Android offline acceptance, populated commercial reconciliation, POPIA operational sign-off and ZAZU name clearance. PostgreSQL commercial/sync testing becomes a gate only if a PostgreSQL host is selected. Any new blocker must be a reproducible failure in an agreed V1 workflow, a demonstrated security/privacy/data-integrity failure, or an explicitly owner-approved requirement.

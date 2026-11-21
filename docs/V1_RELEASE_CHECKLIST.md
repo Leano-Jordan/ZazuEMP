@@ -1,10 +1,30 @@
 # Zazu EMP — V1 Release Checklist
 
-Latest full application-code verification baseline: 51a75eb1d06017211bd7808093d1863c930b6d71.
-Latest receiver-sync and bootstrap-auth hardening source head: 559e66b87de8617f967b722b55b0fbfd9b116495 (all automated gates passed). Latest stale-write protection acceptance head: 51a75eb1d06017211bd7808093d1863c930b6d71 (all relevant automated gates passed).
-Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
-Disposition: NOT READY · Evidence maturity: 77/100 (+2 for verified stale-write protection; prior +2 for receiver reconciliation and bootstrap authorization).
+Latest application/test source verification: d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb — 643 passed / 1 skipped / 4,424 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 59 desktop + 7 mobile + 1 phone-local journey PASS.
+Latest Windows host-operations source: f589d2acecf775df2b69846aea45abd16709a33b; Windows package PASS and the daily-backup script contract checks PASS on the subsequent workflow-only head fb2c31467d548dfb3dfb3a0ea55d786cc13206f2.
+Disposition: **NOT READY** · Evidence maturity: **77/100**. Code implementation does not substitute for owner-PC recovery, physical Android or POPIA evidence.
 
+## Operational reliability implementation — 2026-11-21
+
+- [x] Daily 02:00 Windows backup task, missed-run catch-up, 14-archive retention and protected local destination implemented.
+- [x] Startup backup-age warning and Founder Control Centre missing/stale archive warning implemented.
+- [x] Off-disk USB/cloud-folder copy and recovery-drill procedure documented.
+- [ ] Observe the scheduled backup on the owner's actual PC, copy an archive off-disk and pass the controlled restore drill.
+- [x] Owner approver recorded on each newly paired/re-registered device; sync audit entries use the approver as actor.
+- [x] Trust and logout prompts disclose that device sync changes are attributed to the approving owner, not necessarily the operator.
+- [x] Shared-device/per-user authority limitation and legacy-device attribution boundary recorded in docs/V1_KNOWN_LIMITATIONS.md.
+- [x] Query-builder mass-write guard for revision-tracked aggregates added.
+- [x] Existing PC installs migrate to LOG_STACK=daily at startup; 14-day log retention is configured.
+- [x] New registrations and password resets require at least 10 characters; no online breached-password service is required.
+- [x] iOS offline limitations are explicitly documented; V1 physical offline acceptance is Android-only.
+- [ ] Physical Android cold-launch/restart/reconnect acceptance.
+- [ ] Live populated commercial reconciliation.
+- [ ] POPIA operational sign-off and ZAZU name clearance.
+- [ ] Full PostgreSQL commercial/sync suite only if a PostgreSQL host/pilot is selected; the current V1 owner-PC host uses SQLite.
+
+Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner-dependent gates above are evidenced.
+
+---
 
 ## Stale-write protection closure — 2026-11-21
 

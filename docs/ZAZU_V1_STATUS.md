@@ -1,3 +1,33 @@
+## Director operational reliability checkpoint — 2026-11-21
+
+**Current repository head:** fb2c31467d548dfb3dfb3a0ea55d786cc13206f2 on main.  
+**Application/test source head:** d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb. **Windows host-operations source head:** f589d2acecf775df2b69846aea45abd16709a33b.
+
+- Laravel: **643 passed / 1 skipped / 4,424 assertions**. [Run 44885232020](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44885232020)
+- PostgreSQL migration and recovery smoke: **PASS**; full Laravel suite remains SQLite-backed.
+- Offline browser: **59 desktop Chromium + 7 mobile-viewport + 1 phone-local Work/attachment/reconnect passed** in the same run.
+- PHPMD, Psalm, Zazu Quality and populated upgrade/rollback: **PASS**. SonarCloud was skipped.
+- Windows V1 package: **PASS** [run 44885302086](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44885302086). Windows Ops script checks: **PASS** [run 44885668471](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44885668471).
+
+### Implemented
+- Windows host startup now installs/refreshes an idempotent daily 02:00 Task Scheduler backup task. It runs under S4U without storing the Windows password, catches up after missed runs, and writes zazu:backup archives to the protected storage/app/zazu-backups/daily directory.
+- The runner retains the newest 14 successful archives and records bounded scheduler logs. Startup warns if no archive exists or the latest is more than 26 hours old; the Founder Control Centre displays the latest archive age and warns when missing/stale.
+- The restore runbook requires a separate USB/cloud-folder copy. Same-PC backups are not disk-failure protection.
+- sync_devices.approved_by_user_id records the owner who approved a trusted device. Sync audit entries use that owner as actor, even if a staff web session is present; Settings shows the approver and trust/logout prompts disclose the attribution boundary.
+- The accepted limitation is explicit: a trusted device is a shared business-scoped workspace, not per-staff authentication. Normal staff permissions are not rechecked per offline mutation.
+- A regression guard now rejects query-builder mass writes to revision-tracked aggregate tables. New registrations and password resets require 10 characters; no internet-dependent breached-password lookup is used. Daily log rotation is applied to existing installs at startup.
+
+### Still open — do not mark V1 ready
+- Run the scheduled backup on the actual owner PC, copy an archive off-disk, and complete the controlled restore drill.
+- Physical Android installed-app cold launch, restart, disconnected operation and reconnect acceptance.
+- Live business-record quote-to-payment-to-profit reconciliation.
+- POPIA operational sign-off and ZAZU name clearance.
+- PostgreSQL commercial/sync feature testing is deferred while the V1 host remains the owner's SQLite PC. It becomes a pre-pilot gate if a PostgreSQL host is selected.
+
+**Evidence maturity remains 77/100. No score uplift is claimed from code changes alone. V1 remains NOT READY.**
+
+---
+
 ## Director deep-audit increment — 2026-11-21 (online writer and paired-device stale-write correction)
 
 **Application/test source head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`.
