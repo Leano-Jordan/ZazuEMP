@@ -226,8 +226,12 @@ jobs:
         php artisan migrate:fresh --seed --force
     - name: Prepare second business for workspace-switch acceptance
       run: php artisan db:seed --class='Database\Seeders\DemoBusinessSwitchSeeder' --force
+    - name: Install pinned axe accessibility scanner for browser acceptance
+      run: npm install --no-save --package-lock=false @axe-core/playwright@4.10.2
     - name: Install Chromium for Playwright
       run: npx playwright install --with-deps chromium
+    - name: Run public and authentication accessibility acceptance
+      run: npm run test:e2e -- --project=chromium e2e/accessibility-smoke.spec.js
     - name: Run offline browser acceptance suite
       run: npm run test:e2e -- --project=chromium e2e/pwa-offline.spec.js e2e/offline-session-transition.spec.js e2e/offline-conflict-resolution.spec.js e2e/offline-attachment-sync.spec.js e2e/offline-work-creation.spec.js e2e/zazu-visual-foundation.spec.js
     - name: Run offline customer and Work acceptance on mobile viewport
