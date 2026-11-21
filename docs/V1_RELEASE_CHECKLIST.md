@@ -1,3 +1,12 @@
+## Empty private-storage restore — implementation checkpoint 2026-11-21
+
+- Restore now treats the v2 manifest declaration as authoritative even when private storage contains zero files.
+- An empty staging directory replaces stale target private files; rollback remains in the existing guarded path.
+- Added a database + empty-private-storage integration regression proving stale files are removed. Exact-head CI pending.
+- Owner-operated restore and private-media acceptance remain open.
+
+---
+
 ## Backup/restore archive compatibility — implementation checkpoint 2026-11-21
 
 - Fixed a mismatch where backup could publish up to 50,002 entries but restore accepted only 50,000.
