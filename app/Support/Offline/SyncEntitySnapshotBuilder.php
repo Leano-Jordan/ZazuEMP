@@ -3,10 +3,19 @@
 namespace App\Support\Offline;
 
 use App\Models\Asset;
+use App\Models\AssetAllocation;
+use App\Models\BusinessCapability;
+use App\Models\EventCost;
+use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\Invoice;
+use App\Models\InventoryMovement;
+use App\Models\Payment;
+use App\Models\PurchaseOrderItem;
+use App\Models\Supplier;
 use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
 use App\Models\Quote;
@@ -45,16 +54,26 @@ final class SyncEntitySnapshotBuilder
 
     private function expectedMorphType(string $entityType): ?string
     {
-        $model = match ($entityType) {
+        $models = [
+            'service' => BusinessCapability::class,
             'customer' => Customer::class,
             'job' => Event::class,
+            'supplier' => Supplier::class,
+            'preparation' => EventPreparationItem::class,
             'quote' => Quote::class,
             'invoice' => Invoice::class,
+            'payment' => Payment::class,
             'purchase_order' => PurchaseOrder::class,
+            'purchase_order_item' => PurchaseOrderItem::class,
             'inventory_item' => InventoryItem::class,
+            'inventory_movement' => InventoryMovement::class,
+            'expense' => FinanceExpense::class,
+            'event_cost' => EventCost::class,
             'asset' => Asset::class,
-            default => null,
-        };
+            'asset_allocation' => AssetAllocation::class,
+        ];
+
+        $model = $models[$entityType] ?? null;
 
         return $model ? (new $model)->getMorphClass() : null;
     }
