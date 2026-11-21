@@ -248,6 +248,75 @@ jobs:
           }
 
           Write-Host "PASS: Windows backup/restore recovered the SQLite sentinel and private media from $($archive.Name)."
+      - name: Verify Windows restore clears stale files for empty private storage
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $project = (Get-Location).Path
+          $privateRoot = Join-Path $project 'storage/app/private'
+          if (Test-Path -LiteralPath $privateRoot) {
+            Remove-Item -LiteralPath $privateRoot -Recurse -Force
+          }
+          New-Item -ItemType Directory -Path $privateRoot -Force | Out-Null
+
+          $seedScript = Join-Path $env:RUNNER_TEMP 'zazu-empty-private-seed.php'
+          $seedPhp = @'
+          <?php
+          $db = new PDO('sqlite:database/database.sqlite');
+          $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          $db->exec("UPDATE zazu_windows_recovery_probe SET value = 'before-empty-private-restore' WHERE id = 1");
+          '@
+          [System.IO.File]::WriteAllText($seedScript, $seedPhp, [System.Text.UTF8Encoding]::new($false))
+          php $seedScript
+          if ($LASTEXITCODE -ne 0) { throw 'Could not prepare the empty-private-storage recovery sentinel.' }
+
+          $backupDirectory = Join-Path $env:RUNNER_TEMP 'zazu-windows-empty-private-backup'
+          New-Item -ItemType Directory -Path $backupDirectory -Force | Out-Null
+          php artisan zazu:backup "--output=$backupDirectory"
+          if ($LASTEXITCODE -ne 0) { throw 'Windows backup of empty private storage failed.' }
+
+          $archives = @(Get-ChildItem -Path $backupDirectory -Filter 'zazu-backup-*.zip' -File)
+          if ($archives.Count -ne 1) { throw "Expected exactly one empty-private-storage backup; found $($archives.Count)." }
+          $archive = $archives[0]
+
+          $staleFile = Join-Path $privateRoot 'stale-after-empty-backup.txt'
+          [System.IO.File]::WriteAllText($staleFile, 'must be removed by restore', [System.Text.UTF8Encoding]::new($false))
+
+          $mutateScript = Join-Path $env:RUNNER_TEMP 'zazu-empty-private-mutate.php'
+          $mutatePhp = @'
+          <?php
+          $db = new PDO('sqlite:database/database.sqlite');
+          $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          $db->exec("UPDATE zazu_windows_recovery_probe SET value = 'after-empty-private-mutation' WHERE id = 1");
+          '@
+          [System.IO.File]::WriteAllText($mutateScript, $mutatePhp, [System.Text.UTF8Encoding]::new($false))
+          php $mutateScript
+          if ($LASTEXITCODE -ne 0) { throw 'Could not mutate the empty-private-storage recovery sentinel.' }
+
+          php artisan zazu:restore $archive.FullName --force
+          if ($LASTEXITCODE -ne 0) { throw 'Windows empty-private-storage restore failed.' }
+
+          $verifyScript = Join-Path $env:RUNNER_TEMP 'zazu-empty-private-verify.php'
+          $verifyPhp = @'
+          <?php
+          $db = new PDO('sqlite:database/database.sqlite');
+          $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          echo (string) $db->query('SELECT value FROM zazu_windows_recovery_probe WHERE id = 1')->fetchColumn();
+          '@
+          [System.IO.File]::WriteAllText($verifyScript, $verifyPhp, [System.Text.UTF8Encoding]::new($false))
+          $restoredValue = (& php $verifyScript | Out-String).Trim()
+          if ($LASTEXITCODE -ne 0 -or $restoredValue -ne 'before-empty-private-restore') {
+            throw "Empty-private-storage restore did not recover the database snapshot (received: $restoredValue)."
+          }
+          if (Test-Path -LiteralPath $staleFile) {
+            throw 'Empty-private-storage restore retained a stale private file.'
+          }
+          $remaining = @(Get-ChildItem -LiteralPath $privateRoot -Force -Recurse)
+          if ($remaining.Count -ne 0) {
+            throw "Empty-private-storage restore left $($remaining.Count) stale files or directories."
+          }
+
+          Write-Host "PASS: Windows restore replaced stale private files with the empty storage snapshot from $($archive.Name)."
       - name: Run the first-install script using Windows PowerShell
         shell: powershell
         run: |
