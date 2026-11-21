@@ -12,7 +12,7 @@ CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has pa
 
 - Confirmed and corrected a remaining online revision bypass in `CustomerContactController::store`: creating a new primary contact previously mass-updated the existing primary via a relationship query, bypassing nested Eloquent events.
 - The controller now locks and updates existing primary contact models individually; a new feature regression asserts the parent Customer sync revision advances and the primary-contact invariant remains intact.
-- Exact-head Laravel on `51a75eb` passed **634 / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD passed. Desktop/mobile offline-browser acceptance is still running. The new two-device stale-write regression is included in that Laravel pass. CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED on exact-head evidence. The complete offline sync workflow matrix remains OPEN as a separate release gate. No score uplift; V1 remains NOT READY.
+- Exact-head Laravel on `51a75eb` passed **634 / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD passed. Desktop/mobile offline-browser acceptance passed (59 desktop, 7 mobile and 1 phone-local attachment/reconnect). The new two-device stale-write regression is included in that Laravel pass. CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED on exact-head evidence. The complete offline sync workflow matrix remains OPEN as a separate release gate. No score uplift; V1 remains NOT READY.
 
 ## Director disposition refresh — 2026-11-21 (receiver sync + bootstrap credential fence)
 
