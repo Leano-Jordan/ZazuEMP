@@ -21,6 +21,10 @@ final class SyncEntitySnapshotBuilder
     public function build(SyncEntityIdentity $identity): array
     {
         $record = $identity->record;
+        if ($record instanceof Model && ! $this->recordBelongsToBusiness($record, (int) $identity->business_id)) {
+            $record = null;
+        }
+
         $deleted = $record === null || (method_exists($record, 'trashed') && $record->trashed());
         $data = $this->aggregateData($record, $record?->toArray() ?? []);
 
@@ -35,6 +39,17 @@ final class SyncEntitySnapshotBuilder
     }
 
 
+    private function recordBelongsToBusiness(Model $record, int $businessId): bool
+    {
+        $recordBusinessId = $record->getAttribute('business_id');
+
+        if ($recordBusinessId === null && method_exists($record, 'event')) {
+            $recordBusinessId = $record->event()->withTrashed()->value('business_id');
+        }
+
+        return is_numeric($recordBusinessId) && (int) $recordBusinessId === $businessId;
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -45,6 +60,7 @@ final class SyncEntitySnapshotBuilder
         }
 
         $allocation = DB::table('asset_allocations')
+            ->where('business_id', $identity->business_id)
             ->where('id', $identity->record_id)
             ->first();
 
