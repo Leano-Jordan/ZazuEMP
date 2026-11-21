@@ -1973,6 +1973,214 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
     });
 
+    test('offline expense sync preserves job, supplier and purchase-order links', async ({ page, context }, testInfo) => {
+        test.setTimeout(35_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Offline expense reconciliation runs once in Chromium.');
+
+        const jobLocalId = 'a1a1a1a1-a1a1-41a1-81a1-a1a1a1a1a1a1';
+        const supplierLocalId = 'b2b2b2b2-b2b2-42b2-82b2-b2b2b2b2b2b2';
+        const orderLocalId = 'c3c3c3c3-c3c3-43c3-83c3-c3c3c3c3c3c3';
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/finance/expenses/create', { waitUntil: 'domcontentloaded' });
+        const expenseForm = page.locator('form[data-zazu-offline-entity="expense"]');
+        await expect(expenseForm).toBeVisible();
+        await page.evaluate(() => window.ZazuOffline.ready);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(businessId).toBeGreaterThan(0);
+
+        await page.evaluate(async ({ activeBusinessId, jobLocalId, supplierLocalId, orderLocalId }) => {
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'offline-expense-reconciliation-token',
+                device: { id: 987667, business_id: activeBusinessId },
+            };
+            state.jobs = [{
+                id: 99101,
+                server_id: 99101,
+                local_id: jobLocalId,
+                name: 'Offline expense job',
+                status: 'confirmed',
+            }];
+            state.suppliers = [{
+                id: 99102,
+                server_id: 99102,
+                local_id: supplierLocalId,
+                name: 'Offline expense supplier',
+            }];
+            state.purchase_orders = [{
+                id: 99103,
+                server_id: 99103,
+                local_id: orderLocalId,
+                reference: 'PO-OFF-EXPENSE-001',
+                status: 'received',
+                supplier_id: 99102,
+                event_id: 99101,
+                supplier_local_id: supplierLocalId,
+                event_local_id: jobLocalId,
+                currency: 'ZAR',
+                total_amount: '450.00',
+            }];
+            state.expenses = [];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        }, { activeBusinessId: businessId, jobLocalId, supplierLocalId, orderLocalId });
+
+        await page.locator('select[name="supplier_id"]').evaluate(select => {
+            select.add(new Option('Offline expense supplier', '99102'));
+            select.value = '99102';
+        });
+        await page.locator('select[name="event_id"]').evaluate(select => {
+            select.add(new Option('Offline expense job', '99101'));
+            select.value = '99101';
+        });
+        await page.locator('select[name="purchase_order_id"]').evaluate(select => {
+            select.add(new Option('PO-OFF-EXPENSE-001', '99103'));
+            select.value = '99103';
+        });
+
+        await context.setOffline(true);
+        await expenseForm.locator('input[name="description"]').fill('Offline catering fuel');
+        await expenseForm.locator('input[name="amount"]').fill('125.50');
+        await expenseForm.locator('input[name="expense_date"]').fill('2026-11-21');
+        await expenseForm.locator('select[name="status"]').selectOption('paid');
+        await expenseForm.locator('input[name="reference"]').fill('FUEL-OFF-001');
+        await expenseForm.locator('textarea[name="notes"]').fill('Captured while disconnected.');
+        await expenseForm.getByRole('button', { name: 'Record expense' }).click();
+        await expect(expenseForm.getByRole('status')).toContainText('Saved on this device');
+
+        const local = await page.evaluate(async () => {
+            const queued = await window.ZazuOffline.pending();
+            const mutation = queued.find(item => item.entity_type === 'expense');
+            const expense = window.ZazuOffline.getState().expenses.find(item =>
+                item.local_id === mutation?.payload?.local_id
+            );
+            const record = mutation?.payload?.record || mutation?.payload || {};
+            return {
+                localId: mutation?.payload?.local_id || null,
+                entityType: mutation?.entity_type || null,
+                eventLocalId: record.event_local_id || null,
+                supplierLocalId: record.supplier_local_id || null,
+                orderLocalId: record.purchase_order_local_id || null,
+                expense: expense ? {
+                    description: expense.description,
+                    amount: expense.amount,
+                    status: expense.status,
+                    pendingSync: expense.pending_sync,
+                } : null,
+            };
+        });
+        expect(local).toEqual({
+            localId: expect.any(String),
+            entityType: 'expense',
+            eventLocalId: jobLocalId,
+            supplierLocalId,
+            orderLocalId,
+            expense: {
+                description: 'Offline catering fuel',
+                amount: '125.50',
+                status: 'paid',
+                pendingSync: true,
+            },
+        });
+
+        let pushed = null;
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/push') {
+                const body = route.request().postDataJSON();
+                const mutation = body.mutations.find(item => item.entity_type === 'expense');
+                const record = mutation?.payload?.record || mutation?.payload || {};
+                pushed = {
+                    mutationId: mutation?.id || null,
+                    localId: record.local_id || mutation?.payload?.local_id || null,
+                    eventLocalId: record.event_local_id || null,
+                    supplierLocalId: record.supplier_local_id || null,
+                    orderLocalId: record.purchase_order_local_id || null,
+                };
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        recorded: [{
+                            id: mutation.id,
+                            status: 'applied',
+                            applied: true,
+                            identity: {
+                                entity_type: 'expense',
+                                local_id: pushed.localId,
+                                server_id: 99201,
+                                revision: 1,
+                            },
+                            related_identities: [],
+                        }],
+                        applied: [mutation.id],
+                    }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/pull') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/attachments') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/bootstrap') {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ business: { id: businessId, name: 'Offline expense business', currency: 'ZAR' } }),
+                });
+                return;
+            }
+            await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+        });
+
+        await context.setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => pushed?.mutationId).toBe(local.localId === null ? null : expect.any(String));
+        expect(pushed).toEqual({
+            mutationId: expect.any(String),
+            localId: local.localId,
+            eventLocalId: jobLocalId,
+            supplierLocalId,
+            orderLocalId,
+        });
+        await expect.poll(
+            () => page.evaluate(async () => (await window.ZazuOffline.pending()).length),
+            { message: 'the acknowledged offline expense must leave the durable queue' },
+        ).toBe(0);
+
+        const reconciled = await page.evaluate(localId => {
+            const state = window.ZazuOffline.getState();
+            const expense = state.expenses.find(item => item.local_id === localId);
+            return {
+                id: expense?.id ?? null,
+                serverId: expense?.server_id ?? null,
+                pendingSync: expense?.pending_sync ?? null,
+                eventLocalId: expense?.event_local_id ?? null,
+                supplierLocalId: expense?.supplier_local_id ?? null,
+                orderLocalId: expense?.purchase_order_local_id ?? null,
+                localDirty: state.local_dirty,
+            };
+        }, local.localId);
+
+        expect(reconciled).toEqual({
+            id: 99201,
+            serverId: 99201,
+            pendingSync: false,
+            eventLocalId: jobLocalId,
+            supplierLocalId,
+            orderLocalId,
+            localDirty: false,
+        });
+    });
+
     test('offline deposits respect the quote deposit requirement', async ({ page }, testInfo) => {
         test.setTimeout(35_000);
         test.skip(testInfo.project.name !== 'chromium', 'Offline deposit limit runs once in Chromium.');
