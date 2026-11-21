@@ -187,4 +187,92 @@ class OfflinePaymentPrecisionTest extends TestCase
             $this->assertSame('0.00', $invoice->fresh()->paid_amount);
         }
     }
+
+    public function test_offline_payment_updates_invoice_totals_and_returns_its_related_revision(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Payment Reconciliation Business',
+            'slug' => 'offline-payment-reconciliation-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-PAYMENT-RECONCILIATION',
+            'name' => 'Payment Reconciliation Work',
+            'status' => 'confirmed',
+        ]);
+        $invoice = Invoice::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'number' => 'INV-OFFLINE-RECONCILIATION',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'issued_at' => now()->toDateString(),
+        ]);
+
+        $invoiceIdentity = app(SyncEntityIdentityRegistry::class)->identify($invoice, 'invoice');
+        $mutationId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'payment',
+            $mutationId,
+            'create',
+            [
+                'local_id' => $mutationId,
+                'record' => [
+                    'invoice_local_id' => $invoiceIdentity->entity_uuid,
+                    'type' => 'payment',
+                    'amount' => '25.00',
+                    'method' => 'bank_transfer',
+                    'paid_at' => now()->toDateString(),
+                ],
+            ],
+        );
+
+        $handler = app(OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+        $applied = $applier->apply($mutation, ['payment' => $handler]);
+
+        $payment = Payment::query()
+            ->where('business_id', $business->id)
+            ->where('idempotency_key', $mutationId)
+            ->firstOrFail();
+        $reconciledInvoice = $invoice->fresh();
+
+        $this->assertSame('applied', $applied->status);
+        $this->assertSame('25.00', $payment->amount);
+        $this->assertSame('issued', $reconciledInvoice->status);
+        $this->assertSame('25.00', $reconciledInvoice->paid_amount);
+        $this->assertSame('75.00', $reconciledInvoice->balance);
+        $this->assertSame(2, (int) $invoiceIdentity->fresh()->revision);
+        $this->assertSame([
+            [
+                'entity_type' => 'invoice',
+                'local_id' => $invoiceIdentity->entity_uuid,
+                'server_id' => (int) $invoice->id,
+                'revision' => 2,
+            ],
+        ], app(SyncMutationRelatedIdentityResolver::class)->resolve($applied));
+
+        // Replaying an already-applied mutation must not post a second payment
+        // or advance the parent invoice revision again.
+        $applier->apply($applied, ['payment' => $handler]);
+
+        $this->assertSame(1, Payment::query()->where('business_id', $business->id)->count());
+        $this->assertSame('25.00', $invoice->fresh()->paid_amount);
+        $this->assertSame(2, (int) $invoiceIdentity->fresh()->revision);
+    }
+
+
 }
