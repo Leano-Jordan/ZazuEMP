@@ -22,6 +22,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0039 | Empty private-storage restore retains stale target files | Backup manifest declares private_storage but ZIP contains no file entries; restore skips the private directory swap and leaves files from the pre-restore installation | CLOSED — exact-head Laravel/PHPMD/Quality PASS; owner restore drill remains open | Restore inferred private-storage presence only from file entries; ZIP omits empty directories | Restore uses declared contents manifest and swaps in an empty private directory; integration test proves stale file removal |
 | CASE-ZAZU-0040 | Stale device snapshot writes sync state after credential replacement | Mutation apply or conflict recording can proceed after a device is re-paired if the later transaction checks only active status | CLOSED — exact-head Laravel/PHPMD/Psalm/browser/quality PASS on 04db872 | Mutation recorder checked token hash, but separate apply/conflict writes did not consistently revalidate the authenticated snapshot | Apply and conflict writes now use the same business-first/device-row credential guard; regressions prove stale snapshots return 401 without apply/delivery/conflict |
 | CASE-ZAZU-0041 | Unsupported offline mutation operation | Customer, job and service handlers could interpret an unsupported operation as create/update rather than rejecting it | CLOSED — exact-head Laravel + PHPMD + PostgreSQL PASS | Three handlers lacked the explicit operation allowlists already used by other entity handlers | Regression sends delete operations for all three entities and proves rejection before domain writes |
+| CASE-ZAZU-0042 | Draft invoices counted as invoiced revenue | Finance dashboard summed draft invoices into the invoiced total | CLOSED — exact-head Laravel/quality/PHPMD PASS | Aggregate query included every invoice status | Restrict invoiced totals to issued and paid; regression covers draft, issued and paid records |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -786,3 +787,18 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** Expanded all-17-handler regression: Laravel `676 passed / 1 skipped / 4,647 assertions`; PHPMD PASS; Zazu Quality PASS; PostgreSQL migration/recovery PASS on [test head 0e619e9](https://github.com/Leano-Jordan/ZazuEMP/commit/0e619e9e3675d8ad67a5a1fe8d1b8daf23b4af79). Browser acceptance **63 desktop + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed** on the runtime-identical implementation head [e95dd5c / workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747). The repeat browser job on test-only head `0e619e9` was still running at this update.
 
 **Scope:** This closes the unsupported-operation acceptance defect for these three handlers. It does not implement deletion support; delete remains unsupported. The broader offline sync matrix remains OPEN.
+
+
+### CASE-ZAZU-0042
+
+**Status:** CLOSED — exact-head CI PASS on `c43ab8db309a2ccedd48d2298077e3a602b72a5d`.
+
+**Target:** Finance dashboard invoiced totals.
+
+**Confirmed root cause:** The dashboard aggregate included every invoice status. Draft invoices therefore inflated the amount presented as invoiced, even though they had not been issued to customers.
+
+**Correction:** `FinanceController::index()` now includes only `issued` and `paid` invoices in `invoicedByCurrency`.
+
+**Regression:** `test_finance_invoiced_total_excludes_unissued_draft_invoices` creates a draft invoice of 999.00, an issued invoice of 100.00 and a paid invoice of 200.00, then verifies the dashboard total is 300.00.
+
+**Exact-head evidence:** Laravel, offline browser acceptance, PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push on main passed on `c43ab8db309a2ccedd48d2298077e3a602b72a5d`. SonarCloud was skipped and is not counted.
