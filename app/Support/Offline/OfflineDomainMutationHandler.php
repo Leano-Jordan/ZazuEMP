@@ -1705,7 +1705,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         if (! is_string($eventUuid) || ! Str::isUuid($eventUuid)) {
-            throw ValidationException::withMessages(['payload' => 'The offline purchase order job identity is invalid.']);
+            throw ValidationException::withMessages(['payload' => 'The offline mutation job identity is invalid.']);
         }
 
         $identity = SyncEntityIdentity::query()
@@ -1719,7 +1719,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             : null;
 
         if (! $event) {
-            throw ValidationException::withMessages(['payload' => 'The offline purchase order references an unknown job.']);
+            throw ValidationException::withMessages(['payload' => 'The offline mutation references an unknown job.']);
         }
 
         $event = $this->lifecycle->lock($businessId, $event->id);
