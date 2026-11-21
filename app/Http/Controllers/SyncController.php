@@ -237,23 +237,14 @@ class SyncController extends Controller
             $device = app(SyncDeviceAccessGuard::class)->lockActive($authenticatedDevice);
 
             $metadata = $device->metadata ?? [];
-            $alreadyRevoked = $device->status === 'revoked'
-                && $device->revoked_at !== null
-                && $device->token_expires_at === null
-                && ! array_key_exists('sync_token_hash', $metadata)
-                && ! array_key_exists('pairing_code_hash', $metadata)
-                && ! array_key_exists('pairing_expires_at', $metadata);
+            unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
 
-            if (! $alreadyRevoked) {
-                unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
-
-                $device->forceFill([
-                    'status' => 'revoked',
-                    'revoked_at' => $device->revoked_at ?? now(),
-                    'token_expires_at' => null,
-                    'metadata' => $metadata,
-                ])->save();
-            }
+            $device->forceFill([
+                'status' => 'revoked',
+                'revoked_at' => now(),
+                'token_expires_at' => null,
+                'metadata' => $metadata,
+            ])->save();
 
             return response()->json([
                 'revoked' => true,
