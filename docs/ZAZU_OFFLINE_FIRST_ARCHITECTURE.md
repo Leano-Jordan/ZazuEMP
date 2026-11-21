@@ -9,6 +9,17 @@
 - This is defense in depth against stale, corrupted, or incorrectly imported identity mappings. It is not evidence that a normal authenticated client can write identity rows directly, and should not be described as a demonstrated remote exploit.
 - Exact-head CI for these new commits is pending; do not count this hardening as verified until Laravel and quality checks pass.
 
+### Stale-revision snapshot tenant guard — 2026-11-21
+
+**Implementation:** [89891a6](https://github.com/Leano-Jordan/ZazuEMP/commit/89891a6ea787028951020757b9de734030872023).  
+**Regression:** [906233c](https://github.com/Leano-Jordan/ZazuEMP/commit/906233ce0d3183e811d3afed6ba4d111509b060d).
+
+- The stale-revision path builds a server snapshot before the domain handler runs. A tenant-scoped identity row with a corrupted polymorphic target could therefore have exposed the target record in a conflict response, even though the mutation handler now rejects it.
+- Snapshot generation now verifies the resolved record's business owner before serializing it. An invalid/foreign target is represented as unavailable and contributes no record data.
+- The related asset-allocation lookup is also constrained by the identity's business ID.
+- Added a regression proving that a foreign Customer's name and notes are not serialized by a snapshot built from a mismatched identity.
+- Exact-head CI remains pending.
+
 ### Offline linked-identity morph-type validation — 2026-11-21
 
 **Implementation:** [57c4888](https://github.com/Leano-Jordan/ZazuEMP/commit/57c48885459c956906abebb13782722d1eb7e383).  
