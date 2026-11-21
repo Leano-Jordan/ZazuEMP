@@ -2834,7 +2834,7 @@ class OfflineSyncFoundationTest extends TestCase
             collect($remoteOrder['items'])->pluck('record.received_quantity')->all(),
         );
 
-        $receivedInventoryIds = DB::table('inventory_movements')
+        $receivedInventoryIds = \\Illuminate\\Support\\Facades\\DB::table('inventory_movements')
             ->where('business_id', $order->business_id)
             ->where('purchase_order_id', $order->id)
             ->distinct()
