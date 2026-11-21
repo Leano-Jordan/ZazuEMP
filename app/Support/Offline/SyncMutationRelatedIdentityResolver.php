@@ -13,6 +13,7 @@ use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\Invoice;
 use App\Models\PurchaseOrder;
+use App\Models\Payment;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use App\Models\Quote;
@@ -250,6 +251,7 @@ final class SyncMutationRelatedIdentityResolver
             'job' => Event::class,
             'quote' => Quote::class,
             'invoice' => Invoice::class,
+            'payment' => Payment::class,
             'purchase_order' => PurchaseOrder::class,
             'purchase_order_item' => PurchaseOrderItem::class,
             'inventory_item' => InventoryItem::class,
