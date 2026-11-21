@@ -139,7 +139,7 @@ final class SyncBootstrapDeliveryTargetResolver
      */
     private function expectedModel(string $entityType): ?string
     {
-        return match ($entityType) {
+        $models = [
             'service' => BusinessCapability::class,
             'customer' => Customer::class,
             'job' => Event::class,
@@ -152,8 +152,9 @@ final class SyncBootstrapDeliveryTargetResolver
             'inventory_item' => InventoryItem::class,
             'event_cost' => EventCost::class,
             'asset' => Asset::class,
-            default => null,
-        };
+        ];
+
+        return $models[$entityType] ?? null;
     }
 
     /**
