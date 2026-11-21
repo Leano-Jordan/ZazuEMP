@@ -73,6 +73,69 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(readiness).toBe('ready');
     });
 
+    test('reconciles exact delivered aggregates before acknowledging receiver sync', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Receiver delivery reconciliation contract runs once.');
+
+        await login(page);
+        await page.context().setOffline(true);
+        await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'receiver-delivery-reconciliation-token',
+                device: { id: 998866, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        });
+
+        const bootstrapDeliverySequences = [];
+        const acknowledgedSequences = [];
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/pull') {
+                const mutations = acknowledgedSequences.length === 0
+                    ? [{ id: 'receiver-delivery-mutation', entity_type: 'supplier', entity_id: 'receiver-delivery-supplier', delivery_sequence: 17 }]
+                    : [];
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ mutations }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/bootstrap') {
+                bootstrapDeliverySequences.push(url.searchParams.getAll('delivery_sequences[]'));
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ version: 1 }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/acknowledge') {
+                acknowledgedSequences.push(Number(route.request().postDataJSON()?.sequence || 0));
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ cursor: { last_acknowledged_sequence: 17 } }),
+                });
+                return;
+            }
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ attachments: [] }),
+            });
+        });
+
+        await page.context().setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+
+        expect(bootstrapDeliverySequences[0]).toEqual(['17']);
+        expect(acknowledgedSequences).toEqual([17]);
+    });
+
     test('does not register a fresh browser device without explicit owner approval', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Primary device consent contract runs once.');
