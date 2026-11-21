@@ -177,3 +177,113 @@ Zazu has a serious engineering base: broad domain coverage, strong automated reg
 The largest gap is no longer raw feature count. It is proving that the whole supported product behaves predictably when the network, device, data, user session or business workflow does not behave as expected.
 
 **Current disposition: NOT READY.** The shortest route to a credible V1 is to close the five operational/security gates above, add the small CI/quality controls, and resist feature expansion until real acceptance evidence supports release.
+
+---
+
+## 11. Current-main reinspection addendum — 2026-11-21
+
+This section supersedes the earlier evidence snapshot above where the two differ. It does not erase the earlier dated history.
+
+### 11.1 Exact current engineering evidence
+
+The reinspection reached application/test commit `6b3ddb5af18dd992037caf57037cf20d72ac3757` on `main`. On that exact head:
+
+- Laravel: **655 passed / 1 skipped / 4,513 assertions**.
+- PostgreSQL migration, registration and backup/restore/private-file recovery smoke: **PASS**.
+- Offline Chromium acceptance: **61 passed / 1 failed**.
+- Zazu Quality, Composer security audit, secret scan, PHPMD, Director Health and Push-on-main: **PASS**.
+- SonarCloud: **SKIPPED**, not a successful scan.
+- The failed browser job prevented the subsequent mobile-viewport and phone-local attachment steps from running on that exact head.
+
+Evidence:
+- [Laravel run 44905870260](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44905870260)
+- [Zazu Quality run 44905870250](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44905870250)
+- [PHPMD run 44905870220](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44905870220)
+- [Director Health run 44905870177](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44905870177)
+- [Push-on-main run 44905870766](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44905870766)
+
+### 11.2 Browser failure classification and correction
+
+The repeated failure was:
+
+`e2e/pwa-offline.spec.js` — `event cost form saves locally and reconciles its job identity after reconnect`, failing at the assertion that a locally cached server-backed job exists.
+
+Root cause in the test setup:
+- It sets `window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true` before page boot.
+- The offline runtime correctly resolves readiness from IndexedDB before network activity and, by design, suppresses automatic initial synchronization/device registration under that flag.
+- The test then reads `state.jobs` and assumes the server-seeded demo event has already been hydrated locally.
+- The test had not explicitly trusted the device and completed a bootstrap before making that assumption.
+
+The same failure appeared on consecutive source heads. It is therefore a deterministic setup defect, not a transient flake. The failure occurs before the cost form is submitted; it is not evidence that the production event-cost mutation or reconciliation path itself is broken.
+
+**Correction committed on main:** `1f658f4abb98dbe47325255caa330c6057594927`. The test now explicitly trusts the device, invokes synchronization, and waits until a server-backed job is present locally before entering the offline cost journey. The assertion was retained; the test was not skipped or weakened.
+
+Exact-head verification is running as [Laravel workflow 44907862242](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862242). At the time this addendum was written, that run had not yet completed; no pass is claimed here. Its Zazu Quality run [44907862245](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862245) passed; SonarCloud [44907862244](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862244) was skipped.
+
+### 11.3 Documentation and decision-control defects
+
+The repository contains a material documentation-drift problem. Current state snapshots still cite `e45cab9` and 653 passing tests, while the inspected application head had advanced to `6b3ddb5` and 655 passing tests. The latest application test correction is now `1f658f4`.
+
+Files requiring current-state reconciliation include:
+- `.ai/engineering/STATE.md`
+- `.ai/engineering/READINESS_REGISTER.md`
+- `docs/ZAZU_V1_STATUS.md`
+- `docs/V1_RELEASE_CHECKLIST.md`
+- `docs/ZAZU_2027_HARDENING_SCORECARD.md`
+- `docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md`
+- `docs/ZAZU_TEST_AND_QUALITY_MATRIX.md`
+- `docs/V1_KNOWN_LIMITATIONS.md`
+
+Specific conflicts:
+1. `docs/product-specification.md` section 4 reflects the current Founder decision DEC-027: exactly three tiers, Basic (permanent Free), Intermediate (paid), Advanced (paid). However, section 29 still contains the old four-tier R299/R499/R799/R1,299 hypothesis.
+2. `docs/ZAZU_COMMERCIAL_REQUIREMENTS.md` still presents that four-tier pricing model as its commercial baseline.
+3. `docs/v1-capability-map.md` still refers to the old R299→R499 and R799/R1,299 sequencing.
+4. `.ai/engineering/READINESS_REGISTER.md` still says the tier conflict is awaiting an owner decision, despite DEC-027 being active.
+5. `docs/ZAZU_TEST_AND_QUALITY_MATRIX.md` says latest main commits lack usable workflow-run evidence, which is no longer accurate.
+6. `docs/V1_KNOWN_LIMITATIONS.md` uses an older evidence baseline and describes a narrower offline test boundary than the later quote, payment, expense and event-cost acceptance work now present.
+
+**Risk:** these are not cosmetic inconsistencies. They can cause future engineering, licensing, sales and release decisions to be made against superseded pricing, entitlements or offline capabilities. DEC-027 is authoritative: do not infer prices, feature gates or quotas from the old tables.
+
+### 11.4 Additional engineering observations
+
+- The V1 capability map describes a broad event-business operating loop across customers, events, resources, purchasing, costs, finance, documents and reporting. The core architecture direction is sound; current readiness is limited by proof, not a reason to rewrite the application.
+- The offline bootstrap controller applies `limit(500)` to multiple workspace collections. This may be an intentional V1 bound, but the product must not silently imply unlimited offline history. Validate representative record volumes and define clear truncation/pagination or supported offline-history behaviour before larger businesses rely on it.
+- The current trusted-device limitation remains material: a paired device is a shared business data surface, and offline audit attribution identifies the approving owner rather than independently authenticating each staff operator. This must be a deliberate V1 owner-operated policy or a separately implemented and tested per-user authority model.
+- The current SQLite full-suite / PostgreSQL smoke split is acceptable for the documented SQLite Windows V1 target. It is not evidence of full PostgreSQL commercial/sync parity.
+- Pint remains installed but is not a CI formatting gate. SonarCloud remains skipped. Neither should be counted as passing evidence.
+- Physical Android acceptance, the installed owner-PC recovery drill, populated live-business reconciliation, privacy operations and final trusted-device authority acceptance remain open.
+
+### 11.5 Market evidence refinement
+
+The South African competitor review confirms that EventSync is a direct competitor, not merely an adjacent venue tool. Its published catering workflow already covers enquiry/headcount, reusable packages and per-head quoting, accepted orders, inventory/load-out checklists, invoicing and pay links: [EventSync catering](https://eventsync.co.za/solutions/catering).
+
+Additional customer evidence:
+- [Perfect Venue Capterra reviews](https://www.capterra.com/p/266878/Perfect-Venue/reviews/) include praise for mobile edits, proposal workflows, ease of use and BEO automation, alongside complaints about attachment size, proposal flexibility and occasional bugs.
+- [CaterZen Capterra reviews](https://www.capterra.com/p/82293/Restaurant-Catering-System/reviews/) emphasize accounts receivable, customer history, ease of use and support; some reviewers identify menu setup and group communication limitations.
+- [Tripleseat Capterra reviews](https://www.capterra.com/p/118047/Tripleseat/) show a mature review base and strengths in central event coordination, with reported learning-curve, pricing and workflow-complexity trade-offs.
+- A recent [r/catering software discussion](https://www.reddit.com/r/catering/comments/1wzkxwq/building_a_catering_software/) describes an operator's use of spreadsheets, calendars and QuickBooks. This is a useful qualitative signal, not statistically representative demand evidence.
+
+The competitive recommendation remains differentiation, not feature copying: dependable offline continuity, trustworthy event-level financial truth, fast owner-operated workflows, local fit and recovery confidence.
+
+### 11.6 Standards-based QA target
+
+Use the following as the verification baseline, not as certification claims:
+
+- **ISO/IEC 25010:2023** — assess functional suitability, performance efficiency, compatibility, interaction capability, reliability, security, maintainability, flexibility and safety. [ISO standard](https://www.iso.org/standard/78176.html)
+- **OWASP ASVS 5.0.0** — map relevant application controls to a practical Level 2 verification target, especially authentication, session management, authorization, tenant isolation, API/device credentials, file handling, data protection and security logging. [OWASP ASVS](https://asvs.owasp.org/)
+- **NIST SSDF 1.1** — maintain secure development, review, vulnerability response and release provenance practices. [NIST SP 800-218](https://csrc.nist.gov/pubs/sp/800/218/final)
+- **WCAG 2.2 AA** — verify keyboard access, focus visibility, contrast, target size, form error recovery, accessible authentication and mobile interaction. [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/)
+
+### 11.7 Updated execution order
+
+1. Obtain green exact-head evidence for commit `1f658f4`, including the full desktop, mobile-viewport and phone-local attachment jobs. Do not claim a pass before the run completes.
+2. Reconcile current engineering state and commercial documents against DEC-027 and the latest exact-head CI evidence.
+3. Complete the real Android installed-PWA cold-launch, restart, offline-write, attachment and reconnect acceptance. Browser emulation is not a substitute.
+4. Complete the intended Windows owner-PC off-disk backup and full restore drill, including private media and representative records.
+5. Reconcile one populated business through quote, acceptance, invoice, deposit/payment, purchasing/receiving, actual costs, event contribution and export.
+6. Explicitly accept or narrow the shared trusted-device authority boundary.
+7. Complete risk-based ASVS security verification, WCAG 2.2 AA checks and representative performance/capacity tests.
+
+No new feature expansion or architecture rewrite is justified before these gates close.
+
+**Evidence maturity remains 77/100 as the last documented score; this audit does not independently recalculate it. V1 remains NOT READY.**
