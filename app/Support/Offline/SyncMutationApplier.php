@@ -60,6 +60,18 @@ class SyncMutationApplier
             return $mutation;
         }
 
+        $handler = $this->resolveHandler($mutation, $handlers);
+
+        return DB::transaction(
+            fn (): SyncMutation => $this->applyWithinTransaction($mutation, $handler, $authenticatedDevice)
+        );
+    }
+
+    /**
+     * @param array<string, SyncMutationHandler> $handlers
+     */
+    private function resolveHandler(SyncMutation $mutation, array $handlers): SyncMutationHandler
+    {
         $handler = $handlers[$mutation->entity_type] ?? null;
 
         if (! $handler instanceof SyncMutationHandler) {
@@ -68,82 +80,112 @@ class SyncMutationApplier
             ]);
         }
 
-        return DB::transaction(function () use ($mutation, $handler, $authenticatedDevice): SyncMutation {
-            // Keep lock order consistent with SyncMutationRecorder: business,
-            // device, mutation, then aggregate identity and domain rows.
-            if ($authenticatedDevice !== null) {
-                abort_unless(
-                    (int) $mutation->business_id === (int) $authenticatedDevice->business_id
-                        && (int) $mutation->sync_device_id === (int) $authenticatedDevice->id,
-                    404,
-                );
+        return $handler;
+    }
 
-                app(SyncDeviceAccessGuard::class)->lockActive($authenticatedDevice);
-            } else {
-                DB::table('businesses')->where('id', $mutation->business_id)->lockForUpdate()->first();
+    private function applyWithinTransaction(
+        SyncMutation $mutation,
+        SyncMutationHandler $handler,
+        ?SyncDevice $authenticatedDevice,
+    ): SyncMutation {
+        $this->lockApplicationDevice($mutation, $authenticatedDevice);
+        $locked = $this->lockMutation($mutation);
+        $this->assertAuthenticatedMutationOwnership($locked, $authenticatedDevice);
 
-                $lockedDevice = SyncDevice::query()
-                    ->where('business_id', $mutation->business_id)
-                    ->whereKey($mutation->sync_device_id)
-                    ->active()
-                    ->lockForUpdate()
-                    ->first();
+        if ($locked->status !== 'pending') {
+            return $locked;
+        }
 
-                abort_unless(
-                    $lockedDevice,
-                    401,
-                    'This sync device was revoked before the offline change could be applied.'
-                );
-            }
+        return $this->applyPendingMutation($locked, $handler);
+    }
 
-            $locked = SyncMutation::query()
-                ->whereKey($mutation->id)
-                ->lockForUpdate()
-                ->first();
+    private function lockApplicationDevice(SyncMutation $mutation, ?SyncDevice $authenticatedDevice): void
+    {
+        if ($authenticatedDevice !== null) {
+            abort_unless(
+                (int) $mutation->business_id === (int) $authenticatedDevice->business_id
+                    && (int) $mutation->sync_device_id === (int) $authenticatedDevice->id,
+                404,
+            );
 
-            if (! $locked) {
-                throw (new ModelNotFoundException)->setModel(SyncMutation::class, [$mutation->id]);
-            }
+            app(SyncDeviceAccessGuard::class)->lockActive($authenticatedDevice);
 
-            if ($authenticatedDevice !== null) {
-                abort_unless(
-                    (int) $locked->business_id === (int) $authenticatedDevice->business_id
-                        && (int) $locked->sync_device_id === (int) $authenticatedDevice->id,
-                    404,
-                );
-            }
+            return;
+        }
 
-            if ($locked->status !== 'pending') {
-                return $locked;
-            }
+        DB::table('businesses')->where('id', $mutation->business_id)->lockForUpdate()->first();
 
-            $identity = $this->lockEntityIdentity($locked);
-            $hadIdentity = $identity !== null;
-            $this->assertExpectedRevision($locked, $identity);
+        $lockedDevice = SyncDevice::query()
+            ->where('business_id', $mutation->business_id)
+            ->whereKey($mutation->sync_device_id)
+            ->active()
+            ->lockForUpdate()
+            ->first();
 
-            SyncEntityRevisionTracker::withoutTracking(fn () => $handler->apply($locked));
-            $this->advanceParentAggregateRevision($locked);
+        abort_unless(
+            $lockedDevice,
+            401,
+            'This sync device was revoked before the offline change could be applied.'
+        );
+    }
 
-            $identity = $this->lockEntityIdentity($locked);
-            if ($identity && $hadIdentity) {
-                $identity->increment('revision');
-                $identity->refresh();
-            }
+    private function lockMutation(SyncMutation $mutation): SyncMutation
+    {
+        $locked = SyncMutation::query()
+            ->whereKey($mutation->id)
+            ->lockForUpdate()
+            ->first();
 
-            $locked->update([
-                'result_revision' => $identity?->revision,
-                'status' => 'applied',
-                'applied_at' => now(),
-                'attempts' => $locked->attempts + 1,
-                'last_error' => null,
-            ]);
+        if (! $locked) {
+            throw (new ModelNotFoundException)->setModel(SyncMutation::class, [$mutation->id]);
+        }
 
-            // Publish inside the same database transaction as the domain mutation.
-            // If delivery creation fails, the domain mutation and applied marker roll back together.
-            $this->recorder->publish($locked);
+        return $locked;
+    }
 
-            return $locked->fresh();
-        });
+    private function assertAuthenticatedMutationOwnership(
+        SyncMutation $mutation,
+        ?SyncDevice $authenticatedDevice,
+    ): void {
+        if ($authenticatedDevice === null) {
+            return;
+        }
+
+        abort_unless(
+            (int) $mutation->business_id === (int) $authenticatedDevice->business_id
+                && (int) $mutation->sync_device_id === (int) $authenticatedDevice->id,
+            404,
+        );
+    }
+
+    private function applyPendingMutation(SyncMutation $locked, SyncMutationHandler $handler): SyncMutation
+    {
+        $identity = $this->lockEntityIdentity($locked);
+        $hadIdentity = $identity !== null;
+        $this->assertExpectedRevision($locked, $identity);
+
+        SyncEntityRevisionTracker::withoutTracking(fn () => $handler->apply($locked));
+        $this->advanceParentAggregateRevision($locked);
+
+        $identity = $this->lockEntityIdentity($locked);
+        if ($identity && $hadIdentity) {
+            $identity->increment('revision');
+            $identity->refresh();
+        }
+
+        $locked->update([
+            'result_revision' => $identity?->revision,
+            'status' => 'applied',
+            'applied_at' => now(),
+            'attempts' => $locked->attempts + 1,
+            'last_error' => null,
+        ]);
+
+        // Publish inside the same database transaction as the domain mutation.
+        // If delivery creation fails, the domain mutation and applied marker roll back together.
+        $this->recorder->publish($locked);
+
+        return $locked->fresh();
     }
 
     private function lockEntityIdentity(SyncMutation $mutation): ?SyncEntityIdentity
