@@ -73,6 +73,9 @@ Offline synchronization is a separate V1 reliability target from phone pairing a
 
 The receiving client now sends the exact delivery sequence prefix to /api/sync/bootstrap. The controller validates and caps the list; SyncBootstrapDeliveryTargetResolver resolves primary and related aggregates only for the current business and destination device. The builder adds those records to the current receiver snapshot even when they are outside a normal 500-record collection. Ordinary bounded collections are ranked by latest sync-identity update time, fallback to record updated_at, and then returned in the existing display order. The client applies and persists the snapshot before acknowledging the prefix. Service-worker cache v58 delivers the updated precached offline client.
 
+
+**Writer-audit correction — 2026-11-21:** primary-contact creation previously used a relationship mass update that bypassed parent Customer revision tracking. The create path now locks and updates existing primary contacts through their models, with a regression asserting revision advancement. Exact-head CI is pending on `5f8dd6b`; this does not close CASE-ZAZU-0033 or the complete offline sync matrix.
+
 Regression tests cover revision-ranked refresh, delivery inclusion outside 500, cross-device sequence isolation, commercial second-device reconciliation, receipt/inventory reconciliation, and browser pull → targeted bootstrap → acknowledgement ordering. CASE-ZAZU-0034 / ENG-DATA-004 records this defect. This does not close CASE-ZAZU-0033 or the complete V1 offline-sync matrix.
 
 **Source-level sync path map — verified against main on 2026-11-21**
