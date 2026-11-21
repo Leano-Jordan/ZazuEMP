@@ -1,14 +1,16 @@
 ## Director execution checkpoint — bootstrap delivery fallback hardened — 2026-11-21
 
+**Primary acknowledgement guard:** [6b27c41](https://github.com/Leano-Jordan/ZazuEMP/commit/6b27c41912f5a4fe98f50e4bbf78f73c4dca422e).  
 **Latest implementation:** [cb944b2](https://github.com/Leano-Jordan/ZazuEMP/commit/cb944b2fe0b3c74caec4eee99b0feda1a2188183) + [3d1586c](https://github.com/Leano-Jordan/ZazuEMP/commit/3d1586c04ba35e70e292a433f038e3b7ed3828d6).  
 **Regression:** [604cb07](https://github.com/Leano-Jordan/ZazuEMP/commit/604cb07b2c1a226056d413a559859514297f3d7a).
 
 - Extended the related identity audit to the bootstrap delivery target resolver. Its fallback previously returned a raw server ID from a tenant-scoped identity row without checking the polymorphic target model or revalidating the record's business ownership.
 - Fallback resolution now uses an explicit entity-to-model mapping, requires the matching morph type, resolves the record, and confirms tenant ownership before returning a target.
+- Primary push acknowledgements also used a separate raw identity lookup. They now pass through the shared model-type/tenant-ownership validator before returning a server ID or revision.
 - Added a regression where an invoice identity points to a Customer and must not create an invoice bootstrap target.
 - Documentation updated in docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md.
 - Prior full acceptance remains green on run [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572): 659 passed / 1 skipped / 4,527 assertions; PostgreSQL recovery; desktop Chromium; mobile customer/Work; phone-local attachments.
-- The current bootstrap/related-identity regression head is running CI under [Laravel run 44921815863](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815863), [Zazu Quality run 44921815750](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815750), and [Director Health run 44921815803](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815803). Do not count the new work verified until Laravel, PostgreSQL, browser acceptance, quality and security checks finish. SonarCloud is skipped by current workflow configuration.
+- The current primary-acknowledgement regression head is running CI under [Laravel run 44921977586](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921977586), [Zazu Quality run 44921977614](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921977614), [PHPMD run 44921977686](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921977686), and [Director Health run 44921977622](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921977622). Earlier security and populated-upgrade runs on the preceding code commit are also active: [Psalm 44921963812](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921963812) and [upgrade/rollback 44921963643](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921963643). Do not count the new work verified until Laravel, PostgreSQL, browser acceptance, quality and security checks finish. SonarCloud is skipped by current workflow configuration.
 
 **Evidence maturity:** 77/100 remains the last independently recorded baseline; V1 remains NOT READY.
 
