@@ -18,9 +18,9 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class SyncBootstrapPayloadBuilder
 {
