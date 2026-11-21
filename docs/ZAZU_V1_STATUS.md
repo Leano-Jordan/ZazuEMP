@@ -6,10 +6,11 @@
 - Added a feature regression for primary-contact creation and a second paired-device stale-write regression. The latter proves device B's committed revision 2 is preserved when device A submits a revision-1 update; the stale mutation remains pending with its local payload intact.
 - Laravel: **634 passed / 1 skipped / 4,399 assertions**.
 - PostgreSQL migration/recovery smoke: **PASS**.
-- PHPMD: **PASS**.
-- Desktop/mobile offline-browser acceptance: **IN PROGRESS** at this checkpoint.
+- Offline browser: **59 desktop + 7 mobile + 1 phone-local Work/attachment/reconnect passed**.
+- PHPMD, Zazu Quality, Composer audit, secret scan and application checks: **PASS**. SonarCloud was skipped.
+- CASE-ZAZU-0033 / ENG-DATA-003: **CLOSED** on exact-head evidence; the full offline sync matrix remains OPEN.
 
-**CASE-ZAZU-0033 remains OPEN** pending browser acceptance and final disposition of the full supported offline sync matrix. Evidence maturity remains **75/100**; V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain owner gates.
+**CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED**; the full supported offline sync matrix remains OPEN. Evidence maturity remains **75/100**; V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain owner gates.
 
 ---
 
