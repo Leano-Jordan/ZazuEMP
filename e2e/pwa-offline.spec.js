@@ -2069,7 +2069,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     description: expense.description,
                     amount: expense.amount,
                     status: expense.status,
-                    pendingSync: expense.pending_sync,
+                    pendingSync: expense?.pending_sync ?? null,
                 } : null,
             };
         });
@@ -2083,7 +2083,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 description: 'Offline catering fuel',
                 amount: '125.50',
                 status: 'paid',
-                pendingSync: true,
+                pendingSync: null,
             },
         });
 
@@ -2143,7 +2143,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await context.setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
-        await expect.poll(() => pushed?.mutationId).toBe(local.localId === null ? null : expect.any(String));
+        await expect.poll(() => pushed?.localId).toBe(local.localId);
         expect(pushed).toEqual({
             mutationId: expect.any(String),
             localId: local.localId,
