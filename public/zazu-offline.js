@@ -1827,7 +1827,18 @@
             const mutations = result.mutations || [];
             if (!mutations.length) return;
 
-            const bootstrap = await api('/api/sync/bootstrap');
+            const deliveryQuery = new URLSearchParams();
+            for (const mutation of mutations) {
+                const sequence = Number(mutation.delivery_sequence || 0);
+                if (Number.isSafeInteger(sequence) && sequence > 0) {
+                    deliveryQuery.append('delivery_sequences[]', String(sequence));
+                }
+            }
+            const deliveryQueryString = deliveryQuery.toString();
+            const bootstrapPath = deliveryQueryString
+                ? '/api/sync/bootstrap?' + deliveryQueryString
+                : '/api/sync/bootstrap';
+            const bootstrap = await api(bootstrapPath);
             if (!bootstrap.ok || sessionCleared || !state?.sync?.token) return;
 
             const snapshot = await bootstrap.json();
