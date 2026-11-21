@@ -223,7 +223,7 @@ class ZazuBackupCommand extends Command
         }
 
         $files = File::allFiles($privateRoot);
-        if (count($files) > BackupArchiveLimits::MAX_PRIVATE_FILES) {
+        if (!BackupArchiveLimits::canIncludePrivateFiles(count($files))) {
             $this->error('Private storage contains too many files for one backup.');
             return false;
         }
@@ -254,8 +254,7 @@ class ZazuBackupCommand extends Command
 
         foreach (File::allFiles($work) as $file) {
             $size = $file->getSize();
-            if ($size < 0 || $size > BackupArchiveLimits::MAX_UNCOMPRESSED_BYTES
-                || $totalBytes > BackupArchiveLimits::MAX_UNCOMPRESSED_BYTES - $size) {
+            if (!BackupArchiveLimits::canIncludeUncompressedBytes($totalBytes, $size)) {
                 $this->error('Backup payload exceeds the 2 GB restore limit; no archive was published.');
                 return null;
             }
@@ -291,7 +290,7 @@ class ZazuBackupCommand extends Command
         }
 
         try {
-            if ($zip->numFiles < 2 || $zip->numFiles > BackupArchiveLimits::MAX_ARCHIVE_ENTRIES) {
+            if ($zip->numFiles < 2 || !BackupArchiveLimits::canIncludeArchiveEntries($zip->numFiles)) {
                 return false;
             }
 
