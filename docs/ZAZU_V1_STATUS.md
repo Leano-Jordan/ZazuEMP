@@ -1,3 +1,31 @@
+## Director execution checkpoint — 2026-11-21 (receiver sync and bootstrap security closure)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main`.  
+**Verified application/test source head:** `559e66b87de8617f967b722b55b0fbfd9b116495`.  
+**Exact-head workflow:** [Laravel / PostgreSQL / offline-browser run 44880113367](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44880113367).
+
+### Deep-audit corrections delivered
+- Receiver sync no longer acknowledges a delivery prefix after persisting a generic bounded bootstrap that omitted an affected older aggregate. The receiver sends the exact delivery sequences with bootstrap; the server resolves primary and related aggregates within business/device scope and includes them before acknowledgement.
+- Normal 500-record working sets prioritize recently revised aggregates while preserving display order. Explicit pairing selections remain pinned and cannot silently expand due to deliveries.
+- Bootstrap now revalidates active device status and the persisted sync-token hash under the business-first lock order before returning business data. Stale requests after revocation or credential replacement receive HTTP 401.
+- The precached offline client was advanced to `zazu-static-v58`.
+
+### Exact-head automated evidence
+- Laravel **632 passed / 1 skipped / 4,388 assertions**.
+- Offline browser: **59 desktop Chromium passed**, **7 mobile-viewport passed**, **1 phone-local Work/attachment/reconnect journey passed**.
+- PostgreSQL migration, real account/workspace registration, backup/restore and private-file recovery smoke: **PASS**.
+- PHPMD, Zazu Quality, Composer security audit, secret scan, application check, Director Health, Push-on-main and Actions/Python/JavaScript analysis: **PASS**. SonarCloud was **SKIPPED**, not counted.
+- Regressions close CASE-ZAZU-0034 / ENG-DATA-004 and CASE-ZAZU-0035 / ENG-AUTH-001. CASE-ZAZU-0033 and the full sync workflow matrix remain separate and OPEN.
+
+### Release disposition
+**V1 remains NOT READY. Evidence maturity: 75/100 (+2)** for the newly verified receiver reconciliation and bootstrap authorization controls. This is not production-readiness certification.
+
+**Still OPEN:** physical Android cold launch/restart/reconnect; intended-PC installation recovery drill; live-business quote → invoice/payment → actual cost/profit reconciliation; POPIA operational/privacy sign-off; complete offline sync matrix and exhaustive writer audit. ZAZU name clearance remains deferred by Founder direction. DB-001 remains DORMANT / MONITORING; its historical root cause remains unproven.
+
+No production deployment or live business data changed. No branches were created.
+
+---
+
 ## Director execution checkpoint — 2026-11-21
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main`.  
