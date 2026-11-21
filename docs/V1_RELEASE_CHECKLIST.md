@@ -4,11 +4,11 @@
 
 - Closed CASE-ZAZU-0041: customer, job and service offline handlers now explicitly allow only `create`, `upsert` and `update`.
 - Unsupported `delete` mutations are rejected before domain writes; delete support has not been added.
-- Added `OfflineMutationOperationValidationTest`: all three unsupported operations remain pending with zero attempts and create no domain records.
-- Laravel: **676 passed / 1 skipped / 4,593 assertions**.
-- PHPMD: **PASS** [run 44947482711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482711).
+- Expanded `OfflineMutationOperationValidationTest`: unsupported `delete` is rejected by all 17 registered offline entity handlers; each mutation remains pending with zero attempts, and all 15 entity-record tables remain empty.
+- Expanded all-handler Laravel regression: **676 passed / 1 skipped / 4,647 assertions** [workflow 44948063650](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063650).
+- PHPMD: **PASS** [run 44948063618](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063618); Zazu Quality: **PASS** [run 44948063564](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063564).
 - PostgreSQL migration, registration and backup/restore/private-file recovery smoke: **PASS** in [Laravel workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
-- Offline browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries. All three jobs in [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747) passed.n:** V1 remains **NOT READY**. This targeted server-side integrity closure does not close the full offline sync matrix or any owner-operated physical acceptance gate.
+- Runtime-identical browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries on [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747). A repeat browser run on test-only head `0e619e9` was still running; no result is claimed for that repeat.n:** V1 remains **NOT READY**. This targeted server-side integrity closure does not close the full offline sync matrix or any owner-operated physical acceptance gate.
 
 ---
 
