@@ -397,6 +397,7 @@ jobs:
           }
 
           Write-Host 'PASS: Windows backup runner creates an archive, prunes both copies to 14, verifies SHA-256, and preserves last success after secondary-copy failure.'
+          exit 0
 
       - name: Verify LAN HTTPS command wrappers
         shell: pwsh
