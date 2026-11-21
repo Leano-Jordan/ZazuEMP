@@ -55,11 +55,11 @@
 
 ### Bootstrap invoice guard complexity refactor — 2026-11-21
 
-**Refactor:** [ae61053](https://github.com/Leano-Jordan/ZazuEMP/commit/ae61053f04e2f36bc4b284a681c6f5cbdf4cfdec).
+**Refactor:** [ae61053](https://github.com/Leano-Jordan/ZazuEMP/commit/ae61053f04e2f36bc4b284a681c6f5cbdf4cfdec) + [4c84a1f](https://github.com/Leano-Jordan/ZazuEMP/commit/4c84a1f6772ad8ed7e83ebf92c6fe8d8272cf96d).
 
 - PHPMD flagged the bootstrap payload builder's total class complexity after the invoice quote-reference validation was added.
 - Extracted the invoice relationship sanitizer into SyncBootstrapInvoiceRelationGuard and injected it into the payload builder. No complexity rule was suppressed or raised.
-- Exact-head PHPMD and Laravel verification are running.
+- The first Laravel run on the builder-only commit preceded the new helper file commit and failed with an expected missing-class error. The subsequent exact implementation head [4c84a1f](https://github.com/Leano-Jordan/ZazuEMP/commit/4c84a1f6772ad8ed7e83ebf92c6fe8d8272cf96d) passed Laravel **665 / 1 skipped / 4,543 assertions**, PostgreSQL recovery, PHPMD, Zazu Quality, Director Health, Psalm security scan and populated upgrade/rollback. Its desktop/mobile browser acceptance is still in progress.
 
 ### Invoice bootstrap quote-version ownership — 2026-11-21
 
