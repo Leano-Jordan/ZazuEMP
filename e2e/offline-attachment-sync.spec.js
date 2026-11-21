@@ -664,7 +664,7 @@ test('operator creates an offline Work job, attaches a file from its directory r
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
     });
 
-    await page.route('**/api/sync/bootstrap', async route => {
+    await page.route('**/api/sync/bootstrap**', async route => {
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
     });
 
