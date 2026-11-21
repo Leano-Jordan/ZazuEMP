@@ -1,10 +1,29 @@
 # Zazu EMP — V1 Release Checklist
 
-Latest full application-code verification baseline: 559e66b87de8617f967b722b55b0fbfd9b116495.
-Latest receiver-sync and bootstrap-auth hardening source head: 559e66b87de8617f967b722b55b0fbfd9b116495 (all automated gates passed).
+Latest full application-code verification baseline: 51a75eb1d06017211bd7808093d1863c930b6d71.
+Latest receiver-sync and bootstrap-auth hardening source head: 559e66b87de8617f967b722b55b0fbfd9b116495 (all automated gates passed). Latest stale-write protection acceptance head: 51a75eb1d06017211bd7808093d1863c930b6d71 (all relevant automated gates passed).
 Subsequent repository documentation reconciliations do not change application code; consult the live `main` ref for the current commit.
 Disposition: NOT READY · Evidence maturity: 75/100 (+2 for verified receiver reconciliation and bootstrap authorization).
 
+
+## Stale-write protection closure — 2026-11-21
+
+**Source/test head:** `51a75eb1d06017211bd7808093d1863c930b6d71`.
+
+- [x] Laravel: 634 passed / 1 skipped / 4,399 assertions.
+- [x] PostgreSQL migration/recovery smoke.
+- [x] Offline browser: 59 desktop Chromium, 7 mobile-viewport and 1 phone-local Work/attachment/reconnect journey passed.
+- [x] PHPMD, Zazu Quality, Composer security audit, secret scan and application checks passed. SonarCloud was skipped.
+- [x] Paired-device stale-write rejection with authoritative remote snapshot and preserved local payload.
+- [x] Same-device causal chains, intervening server writes, rejected-first-mutation rebase, immutable new mutation IDs and conflict payload preservation.
+- [x] Online root/nested writer review and parent revision propagation; primary-contact creation mass-update bypass corrected.
+- [x] CASE-ZAZU-0033 / ENG-DATA-003 CLOSED.
+
+The full offline sync workflow matrix remains OPEN separately, along with physical Android cold launch/restart/reconnect, intended-PC recovery drill, live-business commercial reconciliation and POPIA operational sign-off. V1 remains NOT READY; evidence maturity remains 75/100.
+
+[Exact-head workflow](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44881431689).
+
+---
 
 ## Receiver reconciliation and bootstrap authorization — 2026-11-21
 
