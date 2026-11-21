@@ -1,3 +1,21 @@
+## Exact-head verification update — 2026-11-21
+
+**Application code head:** [7d4b097](https://github.com/Leano-Jordan/ZazuEMP/commit/7d4b097a13d02f3d5369bf8e75e2dc85c361beb7).
+
+- Laravel: **670 passed / 1 skipped / 4,552 assertions**.
+- PostgreSQL migration/recovery smoke: PASS.
+- Offline browser acceptance: **62 desktop Chromium**, **7 mobile viewport**, **1 phone-local Work/attachment/reconnect journey** passed.
+- Windows V1 package: PASS.
+- PHPMD, Psalm, Zazu Quality, populated upgrade/rollback and Director Health: PASS.
+- SonarCloud: SKIPPED; not counted as a pass.
+- Trusted-device stale-snapshot authorization case CASE-ZAZU-0036: CLOSED on this code head.
+
+Evidence: [Laravel + browser + PostgreSQL run 44931555043](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555043) · [Windows package 44931554910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931554910) · [PHPMD 44931555002](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555002) · [Psalm 44931555131](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555131) · [Upgrade/rollback 44931555044](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555044) · [Director Health 44931554979](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931554979).
+
+**Release disposition remains NOT READY.** Physical Android cold launch/restart/reconnect, actual owner-PC off-disk restore, populated live-business commercial reconciliation, POPIA operational controls and ZAZU name clearance remain open. No readiness score uplift is claimed.
+
+---
+
 ## Director acceptance checkpoint — 2026-11-21
 
 **Current source/test head:** `e45cab97cbcdbc3f989bf3843d751bb0f373c305` on `main`.  
