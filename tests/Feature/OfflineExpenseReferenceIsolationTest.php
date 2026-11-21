@@ -95,7 +95,10 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             ]);
             $this->fail('An offline event cost must reject a job identity owned by another business.');
         } catch (ValidationException $exception) {
-            $this->assertArrayHasKey('event_local_id', $exception->errors());
+            $this->assertSame(
+                ['The offline mutation references an unknown job.'],
+                $exception->errors()['payload'] ?? [],
+            );
             $this->assertSame('pending', $mutation->fresh()->status);
         }
 
