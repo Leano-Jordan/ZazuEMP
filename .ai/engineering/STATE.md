@@ -1,3 +1,20 @@
+## Director execution checkpoint — invoice quote-version bootstrap isolation — 2026-11-21
+
+**Implementation:** [1c88144](https://github.com/Leano-Jordan/ZazuEMP/commit/1c88144120e9c7c4a1094d2b27680cf661ab2fd0).  
+**Regression:** [e9a1cfd](https://github.com/Leano-Jordan/ZazuEMP/commit/e9a1cfdfba043bd9101b58e99d5c9f2c21e77429).
+
+- Invoice bootstrap eager-loaded QuoteVersion by its numeric foreign key without checking the owning Quote/Event business. Unlike several other aggregate relationships, this reference is not protected by a composite business foreign key.
+- Bootstrap now verifies that the QuoteVersion's Quote matches the Invoice.quote_id and that the Quote's Event belongs to the active business. Foreign/mismatched versions are omitted and deposit terms fall back safely.
+- Added an adversarial regression with a local invoice pointing to a foreign QuoteVersion.
+- The preceding selected Work/Quote/Preparation nested-customer fix passed Laravel **664 passed / 1 skipped / 4,538 assertions**, PHPMD, Zazu Quality and Director Health on [run 44923073728](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073728) and companion checks [44923073757](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073757), [44923073689](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073689), [44923073663](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923073663). Browser acceptance from that run remains in progress.
+- Current invoice-version regression CI: Laravel [44923396867](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923396867) is in progress; PHPMD [44923396811](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923396811) and Zazu Quality [44923396878](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923396878) are queued; Director Health [44923396879](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923396879) passed. SonarCloud skipped.
+
+**Evidence maturity:** 77/100 unchanged; V1 NOT READY.
+
+**Next target:** close the invoice-version regression and remaining bootstrap acceptance checks; then review any other unconstrained nested foreign-key references in the bootstrap payload. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — bootstrap nested relationships and regression correction — 2026-11-21
 
 **Nested relationship guard:** [4cbd1f7](https://github.com/Leano-Jordan/ZazuEMP/commit/4cbd1f7d83dad9e3b6000b89ebe04028023e569e).  
