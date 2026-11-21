@@ -117,6 +117,31 @@ class SyncDeviceAuthorizationRaceTest extends TestCase
         $this->assertDatabaseCount('sync_deliveries', 0);
     }
 
+    public function test_replaced_credential_snapshot_cannot_record_a_conflict_after_repair(): void
+    {
+        [, $device, $snapshot] = $this->deviceFixture();
+        $metadata = $device->metadata ?? [];
+        $metadata['sync_token_hash'] = hash('sha256', 'replacement-token-before-conflict');
+        $device->update(['metadata' => $metadata]);
+
+        try {
+            app(SyncConflictRecorder::class)->recordOnce(
+                $snapshot,
+                'customer',
+                'customer-1',
+                'domain_rejection',
+                (string) Str::uuid(),
+                ['name' => 'stale local value'],
+                ['name' => 'current server value'],
+            );
+            $this->fail('A replaced credential must not create conflict state using its stale middleware snapshot.');
+        } catch (HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+
+        $this->assertDatabaseCount('sync_conflicts', 0);
+    }
+
     public function test_revoked_device_snapshot_cannot_list_conflicts(): void
     {
         [, $device, $snapshot] = $this->deviceFixture();
