@@ -2473,17 +2473,53 @@ class OfflineSyncFoundationTest extends TestCase
             'device_type' => 'phone',
         ]));
 
-        \App\Models\Customer::create([
+        $unselectedCustomer = \App\Models\Customer::create([
             'business_id' => $business->id,
             'name' => 'Newer Customer Not Selected',
         ]);
+        $unselectedIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($unselectedCustomer, 'customer');
+        $unselectedCustomer->update(['name' => 'Delivered but not pinned']);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $sourceDevice,
+            'customer',
+            $unselectedIdentity->entity_uuid,
+            'update',
+            [
+                'local_id' => $unselectedIdentity->entity_uuid,
+                'expected_revision' => 1,
+                'record' => ['name' => 'Delivered but not pinned'],
+            ],
+        );
+        $mutation->update([
+            'status' => 'applied',
+            'result_revision' => (int) $unselectedIdentity->fresh()->revision,
+            'applied_at' => now(),
+        ]);
+        app(SyncMutationRecorder::class)->publish($mutation);
+        $delivery = \App\Models\SyncDelivery::query()
+            ->where('business_id', $business->id)
+            ->where('destination_device_id', $device->id)
+            ->where('sync_mutation_id', $mutation->id)
+            ->firstOrFail();
 
-        $refreshRequest = Request::create('/api/sync/bootstrap', 'GET');
+        $refreshRequest = Request::create('/api/sync/bootstrap', 'GET', [
+            'delivery_sequences' => [(int) $delivery->delivery_sequence],
+        ]);
         $refreshRequest->attributes->set('sync_device', $device->fresh());
         $selected = app(SyncController::class)->bootstrap($refreshRequest)->getData(true)['selected'];
 
         $this->assertCount(1, $selected);
         $this->assertSame($selectedCustomer->id, $selected[0]['server_id']);
+        $this->assertNotContains(
+            $unselectedIdentity->entity_uuid,
+            collect($selected)->pluck('local_id')->all(),
+            'A delivered update must not expand an explicitly pinned phone selection.',
+        );
     }
 
     public function test_sync_mutation_rejection_is_recorded_as_a_conflict_without_losing_queue_traceability(): void
