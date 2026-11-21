@@ -6,7 +6,7 @@
 - A visible, non-destructive notice now explains that the host is unavailable and links to the cached local workspace. It does not auto-redirect or discard an open form.
 - Dashboard offline workspace visibility now responds to actual Zazu-origin availability, not only the network-interface state.
 - Regression simulates host 503/200 transitions while the browser remains online, on desktop Chromium and Pixel 7 viewport.
-- Exact-head Laravel/browser verification is pending. This does not close physical Android acceptance.
+- Exact-head Laravel: **670 passed / 1 skipped / 4,552 assertions**; PostgreSQL migration/recovery smoke: **PASS**; Zazu Quality and Push-on-main: **PASS** on test head [41d7a25](https://github.com/Leano-Jordan/ZazuEMP/commit/41d7a256f80b1e1d98cbb43509f81dc26cd600ec). Offline-browser acceptance remains in progress; this does not close physical Android acceptance.
 
 **Physical acceptance still required:** install/update the PWA on the actual phone while online, open a supported route, stop the Zazu host while Wi-Fi remains connected, verify the outage notice and local workspace shortcut, then verify local reads/writes, force-close/relaunch, reconnect and queue drain. Capture the exact app build and observed result. Do not substitute browser emulation for this drill.
 
