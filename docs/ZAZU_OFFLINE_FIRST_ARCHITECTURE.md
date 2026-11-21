@@ -55,12 +55,12 @@
 
 ### Invoice bootstrap quote-version ownership — 2026-11-21
 
-**Implementation:** [1c88144](https://github.com/Leano-Jordan/ZazuEMP/commit/1c88144120e9c7c4a1094d2b27680cf661ab2fd0).  
-**Regression:** [e9a1cfd](https://github.com/Leano-Jordan/ZazuEMP/commit/e9a1cfdfba043bd9101b58e99d5c9f2c21e77429).
+**Implementation:** [1c88144](https://github.com/Leano-Jordan/ZazuEMP/commit/1c88144120e9c7c4a1094d2b27680cf661ab2fd0) + [a938757](https://github.com/Leano-Jordan/ZazuEMP/commit/a93875716f8d546302009d0a7639a30d6bedebe8).  
+**Regression:** [e9a1cfd](https://github.com/Leano-Jordan/ZazuEMP/commit/e9a1cfdfba043bd9101b58e99d5c9f2c21e77429) + [c28588e](https://github.com/Leano-Jordan/ZazuEMP/commit/c28588eef0a39f827500035bb7d427a89518eb2d).
 
 - Invoice bootstrap previously eager-loaded quoteVersion by its numeric foreign key alone. That relation is not protected by a composite business/quote foreign key, so a malformed invoice row could reference a QuoteVersion belonging to another business.
 - Bootstrap now eager-loads the QuoteVersion's Quote and Event, verifies that the version belongs to the invoice's own quote and that the quote's event belongs to the active business, then removes the nested Quote relation before serialization.
-- Invalid or foreign quote versions are omitted; deposit-required values safely fall back to zero rather than importing another business's commercial terms.
+- Foreign quote references and quote versions are removed from the serialized invoice; deposit-required values safely fall back to zero rather than importing another business's commercial terms.
 - Added a regression with a local invoice deliberately pointing at a foreign QuoteVersion; bootstrap must omit the foreign version and deposit amount.
 - Exact-head CI pending.
 
