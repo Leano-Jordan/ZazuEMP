@@ -550,7 +550,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0033
 
-**2026-11-21 source-audit increment:** a second primary-contact revision bypass was found in `CustomerContactController::store` (the create-primary route; the edit-primary route had already been corrected). Replaced the relationship mass update with locked per-model updates and added a regression asserting Customer revision advancement. Exact-head verification is pending on `5f8dd6b`. This closes only the identified writer defect; CASE-ZAZU-0033 remains OPEN for the complete indirect/bulk writer inventory and sync matrix.
+**2026-11-21 source-audit increment:** a second primary-contact revision bypass was found in `CustomerContactController::store` (the create-primary route; the edit-primary route had already been corrected). Replaced the relationship mass update with locked per-model updates and added a regression asserting Customer revision advancement. Exact-head Laravel on `51a75eb` passed **634 / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD passed; desktop/mobile browser acceptance remains in progress. A second paired-device regression now proves a stale revision-1 mutation cannot overwrite the revision-2 result committed by the other device, while preserving the stale local payload. This closes only the identified writer defect; CASE-ZAZU-0033 remains OPEN for the complete indirect/bulk writer inventory and sync matrix.
 
 
 **Status:** OPEN — implementation committed; exact-head acceptance and exhaustive writer audit still pending.  
