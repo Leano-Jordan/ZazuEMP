@@ -3472,4 +3472,97 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(detail).toBeHidden();
     });
 
+    test('opens the local quote register and queues acceptance from the dashboard shell while disconnected', async ({ page, context }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Local quote acceptance contract runs once on desktop Chromium.');
+
+        const quoteLocalId = '55555555-5555-4555-8555-555555555555';
+        const jobLocalId = '66666666-6666-4666-8666-666666666666';
+        const customerLocalId = '77777777-7777-4777-8777-777777777777';
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+        await page.evaluate(async ({ quoteLocalId, jobLocalId, customerLocalId }) => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.customers = [{
+                local_id: customerLocalId,
+                name: 'Offline quote acceptance customer',
+            }];
+            state.jobs = [{
+                local_id: jobLocalId,
+                customer_local_id: customerLocalId,
+                name: 'Offline quote acceptance event',
+                status: 'draft',
+            }];
+            state.quotes = [{
+                local_id: quoteLocalId,
+                reference: 'LOCAL-QUOTE-ACCEPT-001',
+                event_local_id: jobLocalId,
+                status: 'sent',
+                currency: 'ZAR',
+                latest_version: {
+                    version: 1,
+                    status: 'sent',
+                    subtotal: '1000.00',
+                    tax_total: '150.00',
+                    total: '1150.00',
+                    items: [{
+                        description: 'Catering package',
+                        quantity: '10',
+                        unit: 'guests',
+                        unit_price: '100.00',
+                        line_total: '1000.00',
+                    }],
+                },
+            }];
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, { quoteLocalId, jobLocalId, customerLocalId });
+
+        await context.setOffline(true);
+        await page.getByRole('link', { name: 'Quotes', exact: true }).click();
+        const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'LOCAL-QUOTE-ACCEPT-001' });
+        await expect(quoteRow).toBeVisible();
+        await quoteRow.getByRole('button', { name: 'View offline' }).click();
+
+        const detail = page.getByRole('region', { name: 'Offline quote details' });
+        await expect(detail).toBeVisible();
+        await expect(detail.getByText('Offline quote acceptance event')).toBeVisible();
+        await expect(detail.getByText('Offline quote acceptance customer')).toBeVisible();
+        await expect(detail.getByText('Catering package')).toBeVisible();
+        await expect(detail.getByText('1150.00')).toBeVisible();
+
+        await detail.getByRole('button', { name: 'Accept quote offline' }).click();
+        await expect(detail.getByRole('status')).toContainText('Acceptance saved on this device');
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+
+        const result = await page.evaluate(async ({ quoteLocalId, jobLocalId }) => {
+            const quote = window.ZazuOffline.getState().quotes.find(item => item.local_id === quoteLocalId);
+            const job = window.ZazuOffline.getState().jobs.find(item => item.local_id === jobLocalId);
+            const [mutation] = await window.ZazuOffline.pending();
+            return {
+                quoteStatus: quote?.status,
+                versionStatus: quote?.latest_version?.status,
+                jobStatus: job?.status,
+                entityType: mutation?.entity_type,
+                operation: mutation?.operation,
+                quoteLocalId: mutation?.payload?.record?.quote_local_id,
+            };
+        }, { quoteLocalId, jobLocalId });
+
+        expect(result).toEqual({
+            quoteStatus: 'accepted',
+            versionStatus: 'accepted',
+            jobStatus: 'confirmed',
+            entityType: 'quote_acceptance',
+            operation: 'create',
+            quoteLocalId,
+        });
+    });
+
 });
