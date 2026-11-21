@@ -227,6 +227,61 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertSame('Foreign customer must remain untouched', $foreignCustomer->fresh()->name);
     }
 
+    public function test_offline_job_rejects_a_customer_identity_with_the_wrong_record_type(): void
+    {
+        $business = $this->business('Typed identity business');
+        $device = $this->device($business);
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Customer behind mismatched identity',
+        ]);
+        $customerUuid = (string) Str::uuid();
+
+        // The identity claims to represent a job, but its numeric record ID
+        // collides with a real Customer ID in the same business.
+        SyncEntityIdentity::create([
+            'business_id' => $business->id,
+            'entity_type' => 'customer',
+            'entity_uuid' => $customerUuid,
+            'record_type' => (new Event())->getMorphClass(),
+            'record_id' => $customer->id,
+        ]);
+
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'job',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'name' => 'Must not attach a mismatched identity',
+                    'customer_local_id' => $customerUuid,
+                    'event_type' => 'Wedding',
+                    'event_date' => now()->addDays(14)->toDateString(),
+                    'services' => [],
+                ],
+            ],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'job' => app(OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('A customer identity with a non-Customer morph type must be rejected.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('customer_local_id', $exception->errors());
+        }
+
+        $this->assertSame('pending', $mutation->fresh()->status);
+        $this->assertDatabaseMissing('events', [
+            'business_id' => $business->id,
+            'name' => 'Must not attach a mismatched identity',
+        ]);
+        $this->assertSame('Customer behind mismatched identity', $customer->fresh()->name);
+    }
+
     private function business(string $name): Business
     {
         return Business::create([
