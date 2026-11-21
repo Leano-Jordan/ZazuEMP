@@ -442,7 +442,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncController::class)->bootstrap($revokedRequest);
             $this->fail('A stale bootstrap authentication snapshot must not disclose business data after revocation.');
-        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
 
@@ -461,7 +461,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncController::class)->bootstrap($replacedRequest);
             $this->fail('A bootstrap request authenticated with a replaced credential must be rejected.');
-        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
     }
