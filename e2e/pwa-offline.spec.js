@@ -3074,6 +3074,99 @@ test.describe('Zazu installed PWA offline shell', () => {
             status: 'pending',
             local_invoice: quoteLocalId,
         });
+
+        // Reconnect both queued commands. The acceptance acknowledgement must
+        // advance the quote/work revisions, and the invoice acknowledgement must
+        // bind the local invoice to its server identity without losing the quote
+        // relationship or leaving either command pending.
+        const pushed = [];
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/push') {
+                const body = route.request().postDataJSON();
+                const recorded = body.mutations.map(mutation => {
+                    pushed.push(mutation.entity_type);
+                    if (mutation.entity_type === 'quote_acceptance') {
+                        return {
+                            id: mutation.id,
+                            status: 'applied',
+                            applied: true,
+                            identity: null,
+                            related_identities: [
+                                { entity_type: 'quote', local_id: quoteLocalId, server_id: quoteServerId, revision: 3 },
+                                { entity_type: 'job', local_id: jobLocalId, server_id: jobServerId, revision: 4 },
+                            ],
+                        };
+                    }
+                    if (mutation.entity_type === 'invoice') {
+                        return {
+                            id: mutation.id,
+                            status: 'applied',
+                            applied: true,
+                            identity: {
+                                entity_type: 'invoice',
+                                local_id: invoiceLocalId,
+                                server_id: 88601,
+                                revision: 1,
+                            },
+                            related_identities: [],
+                        };
+                    }
+                    throw new Error('Unexpected queued mutation: ' + mutation.entity_type);
+                });
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ recorded, applied: recorded.map(item => item.id) }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/pull') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/attachments') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+                return;
+            }
+            await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+        });
+
+        await context.setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => pushed.length).toBe(2);
+        await expect.poll(
+            () => page.evaluate(async () => (await window.ZazuOffline.pending()).length),
+            { message: 'quote acceptance and invoice acknowledgements must both clear the durable queue' },
+        ).toBe(0);
+
+        const reconciled = await page.evaluate(({ quoteLocalId, jobLocalId, invoiceLocalId }) => {
+            const state = window.ZazuOffline.getState();
+            const quote = state.quotes.find(item => item.local_id === quoteLocalId);
+            const job = state.jobs.find(item => item.local_id === jobLocalId);
+            const invoice = state.invoices.find(item => item.local_id === invoiceLocalId);
+            return {
+                quoteStatus: quote?.status,
+                quoteRevision: quote?.revision,
+                jobStatus: job?.status,
+                jobRevision: job?.revision,
+                invoiceServerId: invoice?.server_id,
+                invoiceRevision: invoice?.revision,
+                invoiceQuoteLocalId: invoice?.quote_local_id,
+                pending: state.local_dirty,
+            };
+        }, { quoteLocalId, jobLocalId, invoiceLocalId });
+
+        expect(reconciled).toEqual({
+            quoteStatus: 'accepted',
+            quoteRevision: 3,
+            jobStatus: 'confirmed',
+            jobRevision: 4,
+            invoiceServerId: 88601,
+            invoiceRevision: 1,
+            invoiceQuoteLocalId: quoteLocalId,
+            pending: false,
+        });
     });
 
     test('inspects a device-local Work record and its commercial chain while disconnected', async ({ page, context }, testInfo) => {
