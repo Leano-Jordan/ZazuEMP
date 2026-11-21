@@ -73,6 +73,34 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(readiness).toBe('ready');
     });
 
+    test('detects a stopped Zazu host while Wi-Fi remains connected and exposes the local workspace', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Origin-outage monitor contract runs once.');
+
+        let originAvailable = true;
+        await page.route('**/up', async route => {
+            await route.fulfill({
+                status: originAvailable ? 200 : 503,
+                contentType: 'text/plain',
+                body: originAvailable ? 'ok' : 'unavailable',
+            });
+        });
+
+        await login(page);
+        expect(await page.evaluate(() => navigator.onLine)).toBe(true);
+
+        originAvailable = false;
+        const notice = page.locator('[data-zazu-origin-offline-notice]');
+        await expect(notice).toBeVisible({ timeout: 15_000 });
+        await expect(notice).toContainText('Zazu server is unavailable');
+        await expect(notice).toContainText('Only supported offline screens can be used');
+        await expect(notice.getByRole('link', { name: 'Open offline workspace' })).toHaveAttribute('href', '/dashboard');
+        await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
+
+        originAvailable = true;
+        await expect(notice).toBeHidden({ timeout: 15_000 });
+    });
+
     test('reconciles exact delivered aggregates before acknowledging receiver sync', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Receiver delivery reconciliation contract runs once.');
