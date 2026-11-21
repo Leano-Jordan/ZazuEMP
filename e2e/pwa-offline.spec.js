@@ -1827,8 +1827,15 @@ test.describe('Zazu installed PWA offline shell', () => {
             window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
         });
         await login(page);
-        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
-        await page.evaluate(() => window.ZazuOffline.ready);
+        // Initial sync is intentionally deferred for this scenario. Explicitly
+        // trust the device and hydrate its business workspace before selecting
+        // the server-backed Work record used by the event-cost form.
+        await trustCurrentDevice(page);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => page.evaluate(() => (
+            window.ZazuOffline.getState().jobs || []
+        ).some(record => record.local_id && Number(record.id ?? record.server_id) > 0))).toBe(true);
+
         const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
         expect(businessId).toBeGreaterThan(0);
 
