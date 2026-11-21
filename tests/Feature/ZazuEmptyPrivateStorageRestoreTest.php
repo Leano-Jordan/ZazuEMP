@@ -16,7 +16,7 @@ class ZazuEmptyPrivateStorageRestoreTest extends TestCase
         $environment = $this->prepareEmptyPrivateStorageEnvironment();
 
         try {
-            $archive = $this->createEmptyPrivateStorageBackup($environment['database'], $environment['output']);
+            $archive = $this->createEmptyPrivateStorageBackup($environment['output']);
             $this->assertArchiveDeclaresEmptyPrivateStorage($archive);
             $this->restoreOverStalePrivateFile($archive, $environment['private_root']);
             $this->assertDatabaseAndPrivateStorageWereRestored($environment);
@@ -64,7 +64,7 @@ class ZazuEmptyPrivateStorageRestoreTest extends TestCase
         return $environment;
     }
 
-    private function createEmptyPrivateStorageBackup(string $database, string $output): string
+    private function createEmptyPrivateStorageBackup(string $output): string
     {
         DB::purge('sqlite');
         DB::connection('sqlite')->getSchemaBuilder()->create('empty_private_restore_probe', function ($table) {
