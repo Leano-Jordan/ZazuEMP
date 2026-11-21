@@ -178,6 +178,18 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('500.00', $cost->actual_amount);
         $this->assertSame($event->id, $cost->event_id);
 
+        $profitability = app(\\App\\Services\\EventProfitabilityService::class);
+        $contribution = $profitability->forBusiness($business)->firstWhere('event_id', $event->id);
+        $this->assertNotNull($contribution);
+        $this->assertSame(50000, $contribution['actual_cost_cents']);
+        $this->assertSame(-50000, $contribution['indicative_result_cents']);
+
+        // Replaying the acknowledged command must not double the recorded cost.
+        $applier->apply($mutation, ['event_cost' => $handler]);
+        $this->assertSame(1, EventCost::query()->where('business_id', $business->id)->count());
+        $replayedContribution = $profitability->forBusiness($business)->firstWhere('event_id', $event->id);
+        $this->assertSame(50000, $replayedContribution['actual_cost_cents']);
+
         $badMutation = $recorder->record($device, 'event_cost', (string) Str::uuid(), 'create', [
             'local_id' => (string) Str::uuid(),
             'record' => [
