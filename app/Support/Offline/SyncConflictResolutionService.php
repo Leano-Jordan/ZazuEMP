@@ -5,6 +5,7 @@ namespace App\Support\Offline;
 use App\Models\SyncConflict;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
+use App\Support\Offline\SyncDeviceAccessGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
