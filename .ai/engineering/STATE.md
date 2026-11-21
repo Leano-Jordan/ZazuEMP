@@ -1,10 +1,10 @@
 ## Director execution checkpoint — offline acceptance closure + identity ownership hardening — 2026-11-21
 
-**Current source/test head before this checkpoint:** `906233ce0d3183e811d3afed6ba4d111509b060d` on `main`.  
+**Current source/test head before this checkpoint:** `ad6268c08b0697d87a9f0f4464455637e5d25acb` on `main`.  
 **Ownership guard:** [15f0a17](https://github.com/Leano-Jordan/ZazuEMP/commit/15f0a176e46aaf19c389aa17e36e2d74028d9f50).  
 **Morph-type validation:** [57c4888](https://github.com/Leano-Jordan/ZazuEMP/commit/57c48885459c956906abebb13782722d1eb7e383).  
 **Snapshot guard:** [89891a6](https://github.com/Leano-Jordan/ZazuEMP/commit/89891a6ea787028951020757b9de734030872023).  
-**Regression coverage:** [601b944](https://github.com/Leano-Jordan/ZazuEMP/commit/601b94493f9b3c037a8c4e4e26fa264fee2aebc2) + [e249313](https://github.com/Leano-Jordan/ZazuEMP/commit/e249313deb9cf73373e1acc11f881c7d631a63a6) + [3713553](https://github.com/Leano-Jordan/ZazuEMP/commit/37135539e9de7e4548f67c972fced14138911d95) + [906233c](https://github.com/Leano-Jordan/ZazuEMP/commit/906233ce0d3183e811d3afed6ba4d111509b060d).
+**Regression coverage:** [601b944](https://github.com/Leano-Jordan/ZazuEMP/commit/601b94493f9b3c037a8c4e4e26fa264fee2aebc2) + [e249313](https://github.com/Leano-Jordan/ZazuEMP/commit/e249313deb9cf73373e1acc11f881c7d631a63a6) + [3713553](https://github.com/Leano-Jordan/ZazuEMP/commit/37135539e9de7e4548f67c972fced14138911d95) + [906233c](https://github.com/Leano-Jordan/ZazuEMP/commit/906233ce0d3183e811d3afed6ba4d111509b060d) + [ad6268c](https://github.com/Leano-Jordan/ZazuEMP/commit/ad6268c08b0697d87a9f0f4464455637e5d25acb).
 
 - Closed the previously pending event-cost reconnect acceptance: both the production-fix and test-head Chromium jobs completed successfully. The broader browser acceptance passed, including desktop Chromium, mobile viewport flows and the phone-local attachment journey.
 - Exact application/test-head checks: Laravel **656 passed / 1 skipped / 4,516 assertions**; PostgreSQL migration/backup/restore/private-file recovery smoke **PASS**; Zazu Quality, Director Health, Windows V1 package/fresh-install verification, Director Contract Lint and Push-on-main **PASS**. SonarCloud was **SKIPPED**, not passed.
