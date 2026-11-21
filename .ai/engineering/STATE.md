@@ -1,3 +1,24 @@
+## Director execution checkpoint — bootstrap + primary acknowledgement hardening — 2026-11-21
+
+**Current implementation head:** [e587bc0](https://github.com/Leano-Jordan/ZazuEMP/commit/e587bc078f1dba9ad4ac50141f021fbdb0207bbc).  
+**Primary acknowledgement guard:** [6b27c41](https://github.com/Leano-Jordan/ZazuEMP/commit/6b27c41912f5a4fe98f50e4bbf78f73c4dca422e) + [80f509d](https://github.com/Leano-Jordan/ZazuEMP/commit/80f509d6a910715aa1656650ba3625c72647e309) + [1c2d5e1](https://github.com/Leano-Jordan/ZazuEMP/commit/1c2d5e13d27d08fece18c878bcfb847a77b302f1).  
+**Bootstrap fallback guard:** [cb944b2](https://github.com/Leano-Jordan/ZazuEMP/commit/cb944b2fe0b3c74caec4eee99b0feda1a2188183) + [3d1586c](https://github.com/Leano-Jordan/ZazuEMP/commit/3d1586c04ba35e70e292a433f038e3b7ed3828d6).  
+**Regression:** [604cb07](https://github.com/Leano-Jordan/ZazuEMP/commit/604cb07b2c1a226056d413a559859514297f3d7a) + [bb959cc](https://github.com/Leano-Jordan/ZazuEMP/commit/bb959cc33b1c2262e94f065349d7160592fd36fb) + [2a18c86](https://github.com/Leano-Jordan/ZazuEMP/commit/2a18c867403c3096f4d170a2f7b45a77332df7e4).  
+**PHPMD complexity correction:** [438d322](https://github.com/Leano-Jordan/ZazuEMP/commit/438d3220be5eb02078ed7e5f690c38161b612e25) + [e587bc0](https://github.com/Leano-Jordan/ZazuEMP/commit/e587bc078f1dba9ad4ac50141f021fbdb0207bbc).
+
+- The bootstrap fallback and primary push acknowledgement no longer return a raw server record ID from a tenant-scoped identity without validating its expected Eloquent model type and actual business ownership.
+- Shared identity validation now covers the offline domain model types used by bootstrap and mutation acknowledgement.
+- The first PHPMD run on [2a18c86](https://github.com/Leano-Jordan/ZazuEMP/commit/2a18c867403c3096f4d170a2f7b45a77332df7e4) failed because the new bootstrap resolver exceeded configured cyclomatic/NPath complexity. The resolver was decomposed and its model map changed to a lookup table; no rule was suppressed or threshold weakened.
+- Corrected regression fixture now targets the malformed primary invoice identity directly, ensuring the fallback would have returned it before the guard.
+- Latest exact-code-head verification is running on [Laravel + PostgreSQL + browser run 44922161545](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161545), [PHPMD run 44922161649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161649), [Zazu Quality run 44922161606](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161606), [Psalm run 44922161824](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161824), [Windows package run 44922161573](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161573), and [populated upgrade/rollback run 44922161727](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161727). Director Health [44922161921](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922161921) and populated upgrade/rollback have passed. Remaining jobs are pending/in progress. SonarCloud is skipped.
+- Prior full offline acceptance is green on [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572): Laravel 659 passed / 1 skipped / 4,527 assertions, PostgreSQL recovery, desktop Chromium, mobile customer/Work, and phone-local attachment acceptance.
+
+**Evidence maturity:** 77/100 remains the last independently recorded baseline. V1 remains NOT READY; no score uplift until current exact-head checks and remaining operational acceptance gates close.
+
+**Next target:** close current CI; then continue adversarial review of bootstrap/pull acknowledgement and conflict delivery, without reopening already-passed browser journeys unnecessarily. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — bootstrap delivery fallback hardened — 2026-11-21
 
 **Primary acknowledgement guard:** [6b27c41](https://github.com/Leano-Jordan/ZazuEMP/commit/6b27c41912f5a4fe98f50e4bbf78f73c4dca422e).  
