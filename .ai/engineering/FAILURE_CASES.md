@@ -21,6 +21,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0038 | Backup archive exceeds restore acceptance limits | Backup accepts up to 50,000 private files plus metadata/database, but restore previously allowed only 50,000 ZIP entries; backup also lacked the restore 2 GiB total-size ceiling | CLOSED — exact-head Laravel/PHPMD/Quality PASS; owner restore drill remains open | Backup and restore maintained separate, drifting archive limits | Shared entry/size policy, boundary tests and complete-ZIP verification before publishing |
 | CASE-ZAZU-0039 | Empty private-storage restore retains stale target files | Backup manifest declares private_storage but ZIP contains no file entries; restore skips the private directory swap and leaves files from the pre-restore installation | CLOSED — exact-head Laravel/PHPMD/Quality PASS; owner restore drill remains open | Restore inferred private-storage presence only from file entries; ZIP omits empty directories | Restore uses declared contents manifest and swaps in an empty private directory; integration test proves stale file removal |
 | CASE-ZAZU-0040 | Stale device snapshot writes sync state after credential replacement | Mutation apply or conflict recording can proceed after a device is re-paired if the later transaction checks only active status | CLOSED — exact-head Laravel/PHPMD/Psalm/browser/quality PASS on 04db872 | Mutation recorder checked token hash, but separate apply/conflict writes did not consistently revalidate the authenticated snapshot | Apply and conflict writes now use the same business-first/device-row credential guard; regressions prove stale snapshots return 401 without apply/delivery/conflict |
+| CASE-ZAZU-0041 | Unsupported offline mutation operation | Customer, job and service handlers could interpret an unsupported operation as create/update rather than rejecting it | CLOSED — exact-head Laravel + PHPMD + PostgreSQL PASS | Three handlers lacked the explicit operation allowlists already used by other entity handlers | Regression sends delete operations for all three entities and proves rejection before domain writes |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -766,3 +767,22 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression coverage:** record with the original credential, replace the stored credential, attempt apply with the stale authenticated snapshot, and assert 401, pending mutation status, zero attempts and no delivery; separately attempt conflict recording with a replaced credential and assert 401 with no conflict row. Existing pull/ack/bootstrap revocation regressions remain green.
 
 **Verification:** exact-head Laravel **675 passed / 1 skipped / 4,581 assertions**, PostgreSQL migration/recovery smoke, offline browser **63 desktop + 7 mobile + 1 host-outage + 1 phone-local attachment/reconnect passed with no flaky retries**, PHPMD, Psalm, Zazu Quality, Director Health, populated upgrade/rollback, Windows V1 package/fresh install and Push-on-main passed on 04db872. SonarCloud skipped. No exploit was demonstrated in a running installation; this was a source-level TOCTOU path closed with adversarial regressions.
+
+### CASE-ZAZU-0041
+
+**Status:** CLOSED — exact-head Laravel, PHPMD and PostgreSQL migration/recovery checks passed on `e95dd5c`.
+
+**Target:** `OfflineDomainMutationHandler::customer`, `event` and `capability`.
+
+**Failure fingerprint:** An authenticated trusted device could submit an unsupported operation such as `delete` for a customer, job or service. These handlers did not enforce the operation allowlists already present in the other entity handlers. Their create/update logic could therefore process the payload instead of rejecting the unsupported command.
+
+**Root cause:** Operation validation was inconsistent across entity handlers. The server trusted the mutation operation contract for three handlers rather than enforcing it at the domain boundary.
+
+**Correction on `main`:**
+- Added explicit `create`, `upsert` and `update` allowlists to customer, job and service handlers.
+- Unsupported operations now raise a field-level validation error before payload processing or domain writes.
+- Added `OfflineMutationOperationValidationTest`, which submits a `delete` operation for each entity and verifies that the mutation remains pending, attempts remain zero, and no customer, event or business capability is created.
+
+**Verification:** Laravel `676 passed / 1 skipped / 4,593 assertions`; PHPMD PASS; PostgreSQL migration/registration/backup/restore smoke PASS. The full offline-browser job was still running at the time this case was documented and is not claimed as passed here.
+
+**Scope:** This closes the unsupported-operation acceptance defect for these three handlers. It does not implement deletion support; delete remains unsupported. The broader offline sync matrix remains OPEN.
