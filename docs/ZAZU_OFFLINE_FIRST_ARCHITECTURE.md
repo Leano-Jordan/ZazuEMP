@@ -8,7 +8,7 @@
 - The app now polls the lightweight health route every 10 seconds and on focus/network/visibility changes. A host outage displays a non-destructive notice with a link to the cached dashboard workspace; the dashboard reveals the local IndexedDB workspace using the same origin-availability result.
 - The notice does not auto-redirect or discard unsaved form input, and it explicitly limits the offline promise to supported screens.
 - Playwright regression simulates host 503→200 while navigator.onLine stays true on desktop Chromium and Pixel 7 viewport.
-- Exact-head Laravel passed **670 / 1 skipped / 4,552 assertions**, PostgreSQL migration/recovery smoke and Zazu Quality passed on [41d7a25](https://github.com/Leano-Jordan/ZazuEMP/commit/41d7a256f80b1e1d98cbb43509f81dc26cd600ec). The offline-browser acceptance job is still running. Actual installed Android stop-host/force-close/restart/reconnect acceptance remains mandatory.
+- Exact-head [7df9d7c](https://github.com/Leano-Jordan/ZazuEMP/commit/7df9d7c176cb5fe931bf62617d2908cc74e8d041) passed Laravel **670 / 1 skipped / 4,552 assertions**, PostgreSQL migration/recovery smoke, **63 desktop Chromium**, **7 mobile Work/customer**, **1 Pixel 7 host-outage** and **1 phone-local attachment/reconnect** browser journeys. No failures or flaky retries. Zazu Quality, Director Health, Contract Lint and Push-on-main passed; SonarCloud skipped. The Windows package and fresh-install check passed on runtime implementation head [96e57e4](https://github.com/Leano-Jordan/ZazuEMP/commit/96e57e4674b93c028b8aa5ffb2805d12b15a0457).\n- CASE-ZAZU-0037 is closed for simulated host outage detection and workspace recovery. Actual installed Android stop-host/force-close/restart/reconnect acceptance remains mandatory.
 
 ---
 
