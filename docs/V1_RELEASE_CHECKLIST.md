@@ -12,7 +12,7 @@
 - Fixed a mismatch where backup could publish up to 50,002 entries but restore accepted only 50,000.
 - Backup and restore now share limits: 50,000 private files, 50,002 ZIP entries, and 2 GiB uncompressed total. Backup verifies the completed ZIP including its manifest before publication.
 - Added boundary regression tests and an empty-private-storage restore integration test that proves stale target files are removed. Exact-head workflow [44937037910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937037910) passed Laravel **673 / 1 skipped / 4,575 assertions**, PostgreSQL migration/recovery smoke, **63 desktop + 7 mobile + 1 host-outage + 1 phone-local attachment/reconnect browser journeys**, PHPMD and Zazu Quality.
-- The owner-operated isolated restore drill and independent off-host copy remain mandatory; automated CI does not close the physical recovery gate.
+- Windows package build, fresh PowerShell install, populated database/private-media restore and empty-private-storage restore passed [workflow 44937732880](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937732880) against the same runtime source. The owner-operated isolated restore drill and independent off-host copy remain mandatory; automated CI does not close the physical recovery gate.
 
 ---
 
