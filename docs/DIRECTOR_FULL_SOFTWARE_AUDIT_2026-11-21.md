@@ -208,13 +208,15 @@ The repeated failure was:
 
 `e2e/pwa-offline.spec.js` — `event cost form saves locally and reconciles its job identity after reconnect`, failing at the assertion that a locally cached server-backed job exists.
 
-Root cause in the test setup:
-- It sets `window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true` before page boot.
-- The offline runtime correctly resolves readiness from IndexedDB before network activity and, by design, suppresses automatic initial synchronization/device registration under that flag.
-- The test then reads `state.jobs` and assumes the server-seeded demo event has already been hydrated locally.
-- The test had not explicitly trusted the device and completed a bootstrap before making that assumption.
+Initial failure hypothesis (not yet confirmed):
+- The test sets `window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true` before page boot.
+- The offline runtime resolves readiness from IndexedDB before network activity and, by design, suppresses automatic initial synchronization/device registration under that flag.
+- The test then reads `state.jobs` and expects a server-backed demo event to be available locally.
+- This suggested a missing test precondition: trusted-device registration and workspace bootstrap.
 
-The same failure appeared on consecutive source heads. It is therefore a deterministic setup defect, not a transient flake. The failure occurs before the cost form is submitted; it is not evidence that the production event-cost mutation or reconciliation path itself is broken.
+However, the first correction explicitly trusted the device and invoked synchronization, yet the same job assertion still failed. Therefore it is not yet proven that this is solely a test-fixture defect. The remaining possibilities include active-business selection, an empty/incorrect bootstrap selection, bootstrap response/application mapping, or local-state preservation preventing hydration. The diagnostic follow-up records the business context, pairing state, local-dirty flag, cached jobs and pending queue so the next correction is evidence-led.
+
+The failure occurs before the cost form is submitted. It does not yet establish a defect in the event-cost mutation/reconciliation path, but neither can a production bootstrap defect be ruled out.
 
 **First attempted correction (not accepted as fixed):** `1f658f4abb98dbe47325255caa330c6057594927`. It explicitly trusted the device, invoked synchronization and waited for a server-backed job, while retaining the assertion. Exact-head run [44907862242](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862242) still failed at the same missing-job assertion. Therefore this change did not close the failure and must not be reported as a successful fix.
 
