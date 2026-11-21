@@ -206,6 +206,7 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             'update',
             [
                 'local_id' => $localId,
+                'expected_revision' => 2,
                 'record' => ['name' => 'Attempted cross-business takeover'],
             ],
         );
