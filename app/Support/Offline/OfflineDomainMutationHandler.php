@@ -82,6 +82,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function customer(SyncMutation $mutation): Customer
     {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline customers only support create/upsert/update.']);
+        }
+
         $payload = $this->recordPayload($mutation);
         $customer = $this->existing($mutation);
 
@@ -227,6 +231,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function event(SyncMutation $mutation): Event
     {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline jobs only support create/upsert/update.']);
+        }
+
         $payload = $this->recordPayload($mutation);
         $event = $this->existing($mutation);
 
@@ -1878,6 +1886,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function capability(SyncMutation $mutation): BusinessCapability
     {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline services only support create/upsert/update.']);
+        }
+
         $payload = $this->recordPayload($mutation);
         $capability = $this->existing($mutation);
 
