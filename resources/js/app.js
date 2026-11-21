@@ -2574,30 +2574,23 @@ function setupZazuOfflineDirectoryViews() {
         refreshLocalAttachmentLists();
     };
 
-    let workspaceVisibilityRequest = 0;
-    const refreshOfflineWorkspaceVisibility = async (state, knownOriginAvailability = null) => {
+    // One shared origin state prevents overlapping health probes from
+    // racing and hiding the local workspace after a newer offline transition.
+    let lastOriginAvailable = navigator.onLine;
+    const refreshOfflineWorkspaceVisibility = (state) => {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
+        if (!workspace?.isConnected) return lastOriginAvailable;
+
         const hasPendingRecords = ['customers', 'jobs', 'quotes'].some(collection =>
             (state?.[collection] || []).some(record =>
                 record?.local_id && !(record.server_id ?? record.id)
             )
         );
-        const request = ++workspaceVisibilityRequest;
-        let originAvailable = knownOriginAvailability ?? navigator.onLine;
 
-        // navigator.onLine only reports the network interface. The server may
-        // be unavailable while Wi-Fi remains connected, so check Zazu itself
-        // before hiding the device-local workspace.
-        if (originAvailable && knownOriginAvailability === null) {
-            originAvailable = await canReachZazuOrigin();
-        }
-        if (request !== workspaceVisibilityRequest) return originAvailable;
-        if (workspace?.isConnected) {
-            workspace.hidden = !hasPendingRecords && originAvailable;
-            applyOfflineRouteView();
-        }
+        workspace.hidden = !hasPendingRecords && lastOriginAvailable;
+        applyOfflineRouteView();
 
-        return originAvailable;
+        return lastOriginAvailable;
     };
 
     const offlineRouteViews = [
@@ -2665,9 +2658,9 @@ function setupZazuOfflineDirectoryViews() {
 
             checking = true;
             try {
-                const originAvailable = navigator.onLine && await canReachZazuOrigin();
-                notice.hidden = originAvailable;
-                await refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState(), originAvailable);
+                lastOriginAvailable = navigator.onLine && await canReachZazuOrigin();
+                notice.hidden = lastOriginAvailable;
+                refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState());
             } finally {
                 checking = false;
                 if (refreshQueued) {
@@ -2678,7 +2671,12 @@ function setupZazuOfflineDirectoryViews() {
         };
 
         window.addEventListener('online', refreshOriginAvailability);
-        window.addEventListener('offline', refreshOriginAvailability);
+        window.addEventListener('offline', () => {
+            lastOriginAvailable = false;
+            notice.hidden = false;
+            refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState());
+            refreshOriginAvailability();
+        });
         window.addEventListener('focus', refreshOriginAvailability);
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') refreshOriginAvailability();
