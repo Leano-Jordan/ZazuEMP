@@ -41,6 +41,7 @@ class FinanceController extends Controller
         $payments = Payment::where('business_id', $businessId)->latest('paid_at')->limit(10)->get();
         $expenses = FinanceExpense::where('business_id', $businessId)->latest('expense_date')->limit(10)->get();
         $invoicedByCurrency = Invoice::where('business_id', $businessId)
+            ->whereIn('status', ['issued', 'paid'])
             ->select('currency')
             ->selectRaw('SUM(total) as total')
             ->groupBy('currency')
