@@ -1,3 +1,20 @@
+## Director execution checkpoint — invoice quote-reference isolation — 2026-11-21
+
+**Implementation:** [1c88144](https://github.com/Leano-Jordan/ZazuEMP/commit/1c88144120e9c7c4a1094d2b27680cf661ab2fd0) + [a938757](https://github.com/Leano-Jordan/ZazuEMP/commit/a93875716f8d546302009d0a7639a30d6bedebe8).  
+**Regression:** [e9a1cfd](https://github.com/Leano-Jordan/ZazuEMP/commit/e9a1cfdfba043bd9101b58e99d5c9f2c21e77429) + [c28588e](https://github.com/Leano-Jordan/ZazuEMP/commit/c28588eef0a39f827500035bb7d427a89518eb2d).
+
+- Expanded invoice bootstrap validation beyond QuoteVersion ownership: invoice.quote_id must resolve to a Quote whose Event belongs to the active business; the QuoteVersion must belong to that same Quote and business.
+- Foreign quote and version IDs are removed from the serialized invoice, not merely hidden in the nested relation. Deposit terms fall back to zero.
+- Added an adversarial regression with a business-A invoice deliberately referencing a business-B Quote and QuoteVersion; bootstrap must clear both foreign IDs and omit the version/foreign deposit amount.
+- The earlier selected Work/Quote/Preparation nested-customer regression passed **664 / 1 skipped / 4,538 assertions** with PostgreSQL recovery, PHPMD, Zazu Quality and Director Health green on the 7d08c9d test head. Its mobile/desktop browser acceptance was still running at last poll.
+- Current invoice quote-reference regression CI: Laravel [44923620655](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923620655), PHPMD [44923620616](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923620616), Zazu Quality [44923620654](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923620654), Director Health [44923620619](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923620619). All were in progress at checkpoint. SonarCloud skipped.
+
+**Evidence maturity:** 77/100 unchanged; V1 NOT READY.
+
+**Next target:** close current exact-head checks, then continue reviewing only unconstrained nested references that can cross business boundaries. Main only; no branch creation.
+
+---
+
 ## Director execution checkpoint — invoice quote-version bootstrap isolation — 2026-11-21
 
 **Implementation:** [1c88144](https://github.com/Leano-Jordan/ZazuEMP/commit/1c88144120e9c7c4a1094d2b27680cf661ab2fd0).  
