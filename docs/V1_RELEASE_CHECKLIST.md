@@ -1,3 +1,15 @@
+## Offline host-outage monitor — implementation checkpoint 2026-11-21
+
+**Source:** [41d7a25](https://github.com/Leano-Jordan/ZazuEMP/commit/41d7a256f80b1e1d98cbb43509f81dc26cd600ec).
+
+- Added periodic HEAD /up health checks because navigator.onLine can remain true while the Zazu LAN host is stopped.
+- A visible, non-destructive notice now explains that the host is unavailable and links to the cached local workspace. It does not auto-redirect or discard an open form.
+- Dashboard offline workspace visibility now responds to actual Zazu-origin availability, not only the network-interface state.
+- Regression simulates host 503/200 transitions while the browser remains online, on desktop Chromium and Pixel 7 viewport.
+- Exact-head Laravel/browser verification is pending. This does not close physical Android acceptance.
+
+**Physical acceptance still required:** install/update the PWA on the actual phone while online, open a supported route, stop the Zazu host while Wi-Fi remains connected, verify the outage notice and local workspace shortcut, then verify local reads/writes, force-close/relaunch, reconnect and queue drain. Capture the exact app build and observed result. Do not substitute browser emulation for this drill.
+
 ## Exact-head verification update — 2026-11-21
 
 **Application code head:** [7d4b097](https://github.com/Leano-Jordan/ZazuEMP/commit/7d4b097a13d02f3d5369bf8e75e2dc85c361beb7).
