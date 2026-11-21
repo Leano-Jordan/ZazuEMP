@@ -1,3 +1,18 @@
+## Related offline identity acknowledgements and revision advancement — 2026-11-21
+
+**Related identity resolver:** [c919d4f](https://github.com/Leano-Jordan/ZazuEMP/commit/c919d4fc7fb611d835b966b6babc70288fe5263f).  
+**Related revision advancement:** [043de08](https://github.com/Leano-Jordan/ZazuEMP/commit/043de08cf28389e2a4b4ff07f24971f95835922d) + [e21fe2b](https://github.com/Leano-Jordan/ZazuEMP/commit/e21fe2b5a77948602d2b42984b4ba3a530f26e86) + [683e920](https://github.com/Leano-Jordan/ZazuEMP/commit/683e9208b7dfc1fdd1fbf630c2b77e23132c6b1f).  
+**Conflict snapshot model-type guard:** [1d18c90](https://github.com/Leano-Jordan/ZazuEMP/commit/1d18c90c46462e2af8c32ba77b56603c54611c72).  
+**Regression coverage:** [8952da2](https://github.com/Leano-Jordan/ZazuEMP/commit/8952da23a87be4aa7ef5ac7143b8caa0e2163a08) + [50a0efe](https://github.com/Leano-Jordan/ZazuEMP/commit/50a0efe0cfa9b9aff23a37832488c6807436cada) + [d33f395](https://github.com/Leano-Jordan/ZazuEMP/commit/d33f395b9f60e13ab5886692999f9896a61cd141) + [19bb269](https://github.com/Leano-Jordan/ZazuEMP/commit/19bb26973c086bc2dfdc0a733483305643c36763).
+
+- Related acknowledgements now require the identity's record_type to match the expected model for the entity type and verify the resolved record belongs to the same business before returning its local/server ID and revision.
+- Quote acceptance, payment, purchase receipt, inventory movement and asset allocation parent identity resolution use typed identity lookups. Related quote/event and purchase-order/inventory acknowledgements are filtered through the same safe-record check.
+- Purchase-order item identity resolution requires the PurchaseOrderItem morph type and then verifies the item belongs to the same business and purchase order before including it.
+- Related revision advancement now resolves quote/purchase-order parents only through typed identities, verifies parent ownership, scopes received lines to the relevant purchase order, and refuses to increment a related identity whose linked model is not tenant-owned.
+- Conflict snapshots now also reject same-business wrong-model identity targets; business ownership alone is insufficient if a malformed identity points to a different model with a colliding numeric ID.
+- Added adversarial regression coverage for a payment acknowledgement whose invoice identity points to a Customer, and for a conflict snapshot whose customer identity points to a same-business Event.
+- The earlier exact-head CI on [run 44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572) passed 659 Laravel tests / 1 skipped / 4,527 assertions, PostgreSQL recovery, desktop Chromium, mobile customer/Work acceptance and phone-local attachment acceptance. The additional related-identity hardening and new regression tests above require their own exact-head CI; pending.
+
 ## Offline identity linked-record ownership — 2026-11-21
 
 **Implementation:** [15f0a17](https://github.com/Leano-Jordan/ZazuEMP/commit/15f0a176e46aaf19c389aa17e36e2d74028d9f50) on `main`.  
