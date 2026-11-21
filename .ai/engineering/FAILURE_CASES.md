@@ -14,8 +14,8 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ## Case index
 
 | CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | OPEN | No authoritative record revision is carried or checked; a second device can overwrite an intervening write | Revision contract + two-device and same-device causal-chain tests |
-| CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | OPEN — implementation committed; exact-head CI pending | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
-| CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | OPEN — lock/revalidation correction committed; exact-head CI pending | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
+| CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | CLOSED — exact-head CI PASS | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
+| CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | CLOSED — exact-head CI PASS | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -603,7 +603,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0034
 
-**Status:** OPEN — correction and regression coverage committed on `main`; exact-head CI verification pending.  
+**Status:** CLOSED — correction and regression coverage passed on exact source head `559e66b87de8617f967b722b55b0fbfd9b116495`.  
 **Engineering diagnostic code:** ENG-DATA-004.  
 **First observed:** 2026-11-21.  
 **Target:** `SyncProtocol::pull` → `SyncController::bootstrap` → `SyncBootstrapPayloadBuilder` → `public/zazu-offline.js::pull`.
@@ -623,13 +623,13 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Regression coverage:** recent online supplier revision promotion; a supplier intentionally outside the 500-record window; forced inclusion for its intended receiver; non-recipient device isolation; cross-device quote → acceptance → invoice → payment reconciliation; purchase receipt → purchase-order/inventory reconciliation; and client pull → targeted bootstrap → acknowledge ordering.
 
-**Verification:** Exact-head Laravel, PostgreSQL, offline-browser, PHPMD and quality evidence is pending for the final implementation head. Source inspection alone is not closure evidence.
+**Verification:** Laravel 632 passed / 1 skipped / 4,388 assertions; the 500-record supplier promotion/forced inclusion and non-recipient isolation regressions passed. Desktop Chromium 59 passed (including targeted pull → bootstrap → acknowledgement), mobile viewport 7 passed, and the phone-local Work/attachment journey 1 passed. PostgreSQL recovery, PHPMD, Zazu Quality, Director Health, Push-on-main, secret scan and Composer audit passed. SonarCloud was skipped. This closes the bounded receiver omission defect; the wider sync matrix remains open.
 
 **Loop prevention:** Never acknowledge a delivery batch solely because a generic bootstrap returned 200. The snapshot must demonstrably include all primary and related aggregates changed by the exact receiver delivery prefix. Do not remove collection bounds or broaden a device's data scope as a workaround.
 
 ### CASE-ZAZU-0035
 
-**Status:** OPEN — correction and regression tests committed on `main`; exact-head CI verification pending.  
+**Status:** CLOSED — correction and regression tests passed on exact source head `559e66b87de8617f967b722b55b0fbfd9b116495`.  
 **Engineering diagnostic code:** ENG-AUTH-001.  
 **First observed:** 2026-11-21.  
 **Target:** `SyncController::bootstrap` → `bootstrapPayload` → `SyncBootstrapPayloadBuilder`.
@@ -647,6 +647,6 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Regression coverage:** two stale-snapshot cases: revoke the device after authentication lookup, and replace the token hash after authentication lookup. Both must return 401 before a bootstrap payload is returned. Existing pull and acknowledgement revalidation regressions remain unchanged.
 
-**Verification:** Exact-head Laravel, PostgreSQL, offline-browser, PHPMD and quality results are pending for the source head containing this correction.
+**Verification:** The Laravel stale-snapshot tests for revocation and bearer-token replacement passed within 632 passed / 1 skipped / 4,388 assertions. PostgreSQL recovery, desktop/mobile offline-browser acceptance, PHPMD, Zazu Quality, Director Health, Push-on-main, secret scan and Composer audit also passed on the same source head. SonarCloud was skipped.
 
 **Loop prevention:** Bootstrap is an authenticated data-read endpoint and must have the same durable device-state revalidation as pull/acknowledge. Never rely solely on a middleware model snapshot for an operation that returns business-scoped offline data.
