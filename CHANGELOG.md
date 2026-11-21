@@ -6,6 +6,7 @@
 - Backup and restore now share archive-entry and 2 GiB uncompressed-size limits; backup verifies the complete ZIP, including its manifest, before publishing.
 - Restore now replaces private storage from the manifest even when the backup's private directory is empty, preventing stale files from surviving a restore.
 - Added desktop/mobile outage acceptance, backup-limit boundary tests and an empty-private-storage restore integration regression. Exact-head run 44937037910 passed 673 Laravel tests (1 skipped, 4,575 assertions), PostgreSQL recovery smoke and desktop/mobile browser acceptance.
+- Windows V1 package workflow now also verifies populated private-media recovery and an empty-private-storage restore that removes stale target files; package, Windows PowerShell fresh install and both recovery cases passed in run 44937732880.
 
 
 ## 2026-11-21 — Transactional trusted-device authorization
