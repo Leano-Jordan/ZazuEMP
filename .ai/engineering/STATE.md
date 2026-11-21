@@ -1,3 +1,17 @@
+## Director execution checkpoint — authenticated mutation-apply boundary — 2026-11-21
+
+**Implementation:** [ed5f420](https://github.com/Leano-Jordan/ZazuEMP/commit/ed5f420c69532f5ed4ad4a3f2c7eac839cea8fd3).  
+**Push integration:** [c132650](https://github.com/Leano-Jordan/ZazuEMP/commit/c1326502db7dfd6d6f9e1a0188e9266044a0bf8b).  
+**Regression:** [9d6f093](https://github.com/Leano-Jordan/ZazuEMP/commit/9d6f093742e76ca712be3799d74589434fa8e98d).
+
+- Found a second TOCTOU window after mutation recording: the push processor recorded under the middleware-authenticated credential, then applied the mutation in a separate transaction that checked only whether the device remained active. A credential replacement between those transactions could therefore allow the old request to apply its recorded mutation.
+- Added an explicit authenticated applier entrypoint. It verifies the mutation's business/device ownership and locks/revalidates the same active credential inside the transaction that applies the domain change.
+- The push processor now uses only the authenticated entrypoint. The trusted/internal applier remains explicitly marked internal for direct domain tests.
+- Added an adversarial regression: record a mutation with the original credential, replace the credential, attempt application with the stale snapshot, and verify HTTP 401, mutation still pending, zero attempts and no delivery.
+- Exact-head Laravel, PHPMD, Psalm and Director Health verification pending. No pass is claimed until CI completes.
+
+---
+
 ## Director execution checkpoint — empty private-storage restore correctness — 2026-11-21
 
 **Implementation:** [1906fd4](https://github.com/Leano-Jordan/ZazuEMP/commit/1906fd4da1876df66d745a57be9c3bd1d1714c48).  
