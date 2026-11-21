@@ -556,6 +556,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $eventIdentity = SyncEntityIdentity::query()
             ->where('business_id', $mutation->business_id)
             ->where('entity_type', 'job')
+            ->where('record_type', (new Event())->getMorphClass())
             ->where('entity_uuid', Str::lower($eventUuid))
             ->first();
 
@@ -1450,6 +1451,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $businessId)
             ->where('entity_type', $entityType)
+            ->where('record_type', (new $model())->getMorphClass())
             ->where('entity_uuid', Str::lower($uuid))
             ->first();
 
@@ -1546,6 +1548,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $businessId)
             ->where('entity_type', 'supplier')
+            ->where('record_type', (new Supplier())->getMorphClass())
             ->where('entity_uuid', Str::lower($supplierUuid))
             ->first();
 
@@ -1618,6 +1621,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $mutation->business_id)
             ->where('entity_type', 'purchase_order')
+            ->where('record_type', (new PurchaseOrder())->getMorphClass())
             ->where('entity_uuid', Str::lower($purchaseOrderUuid))
             ->first();
 
@@ -1673,6 +1677,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $lineIdentity = SyncEntityIdentity::query()
                 ->where('business_id', $businessId)
                 ->where('entity_type', 'purchase_order_item')
+                ->where('record_type', (new PurchaseOrderItem())->getMorphClass())
                 ->where('entity_uuid', Str::lower($lineIdentityOrId))
                 ->first();
 
@@ -1711,6 +1716,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $businessId)
             ->where('entity_type', 'job')
+            ->where('record_type', (new Event())->getMorphClass())
             ->where('entity_uuid', Str::lower($eventUuid))
             ->first();
 
