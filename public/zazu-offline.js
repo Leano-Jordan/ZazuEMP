@@ -1766,7 +1766,21 @@
                 return false;
             });
 
-            if (!stillPending) related.record.pending_sync = false;
+            if (!stillPending) {
+                related.record.pending_sync = false;
+
+                if (related.entityType === 'purchase_order') {
+                    for (const line of related.record.items || []) {
+                        if (line.pending_sync === true) line.pending_sync = false;
+                    }
+                }
+
+                if (related.entityType === 'inventory_item') {
+                    for (const movement of related.record.movements || []) {
+                        if (movement.pending_sync === true) movement.pending_sync = false;
+                    }
+                }
+            }
         }
 
         for (const mutation of mutations) {
