@@ -245,3 +245,11 @@ An offline mutation may be based on an older business-record snapshot than the s
 **Regression controls:** Direct stale-snapshot tests for revocation and credential replacement. Existing pull and acknowledgement stale-snapshot protections are retained.
 
 **Status:** CLOSED — exact-head source `559e66b87de8617f967b722b55b0fbfd9b116495` passed Laravel (632 passed / 1 skipped / 4,388 assertions), PostgreSQL recovery, desktop Chromium (59), mobile viewport (7), phone-local attachment journey (1), PHPMD, Zazu Quality, Director Health, Push-on-main, Composer and secret checks. SonarCloud was skipped.
+
+
+## REG-027 — Sync endpoints trust stale middleware device snapshots
+A sync request can pass middleware authentication, then continue after the durable device has been revoked or its bearer credential has been replaced. Conflict listing/resolution and attachment endpoints previously did not all revalidate the device inside their operation transaction; a stale token could also target a replacement credential during self-revocation.
+
+**Control:** sensitive sync reads and writes re-lock business → device inside their operation transaction, recheck active status, and compare the authenticated token hash with the persisted hash. Never treat the middleware's Eloquent model as current authorization state for a later transaction.
+
+**Status:** CONTROL VERIFIED — exact-head Laravel (670 passed / 1 skipped / 4,552 assertions), PostgreSQL migration/recovery, PHPMD and Psalm passed on `7d4b097`; offline-browser and Windows package acceptance were still in progress at the checkpoint.
