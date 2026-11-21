@@ -7,6 +7,7 @@
 - Restore now uses the v2 contents manifest as the authority for whether private storage is part of the snapshot, creates an empty staging directory when required, and swaps it in just like a populated private-storage snapshot.
 - Added an integration regression that backs up an empty private directory, creates a stale private file after backup, restores, and verifies the stale file is removed while the database returns to its backed-up state.
 - Exact-head workflow [44937037910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937037910) on [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc): Laravel **673 passed / 1 skipped / 4,575 assertions**; PostgreSQL migration/recovery smoke **PASS**; offline browser **63 desktop + 7 mobile + 1 host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries; PHPMD, Zazu Quality, Composer security audit, secret scan and Director Health **PASS**. The empty-private-storage restore integration test and archive-limit boundary tests are included in the passing Laravel run. SonarCloud skipped.
+- Windows package/fresh-install and Windows-native populated + empty private-storage restore **PASS** on workflow [44937732880](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937732880), packaging exact runtime source [d716d5d](https://github.com/Leano-Jordan/ZazuEMP/commit/d716d5da615335c1afb3509867631c42b416ffbc). This validates Windows CI filesystem behaviour, not the owner's installed PC.
 
 ---
 
