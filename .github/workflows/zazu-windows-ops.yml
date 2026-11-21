@@ -320,7 +320,7 @@ jobs:
               exit(2);
           }
           $output = null;
-          foreach ($argument in $argv) {
+          foreach ($argv as $argument) {
               if (strpos($argument, '--output=') === 0) {
                   $output = substr($argument, 9);
               }
