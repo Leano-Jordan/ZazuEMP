@@ -7,7 +7,7 @@
 - Added a fail-closed ownership check before any update handler receives the linked model. Directly business-owned records are checked through `business_id`; records whose ownership is inherited through an event are checked through that event relationship.
 - Added an adversarial regression that deliberately seeds a mismatched identity row (business A identity pointing to business B's Customer) and verifies that the mutation is rejected, remains pending, and cannot rename or transfer the foreign customer.
 - This is defense in depth against stale, corrupted, or incorrectly imported identity mappings. It is not evidence that a normal authenticated client can write identity rows directly, and should not be described as a demonstrated remote exploit.
-- Exact-head CI for these new commits is pending; do not count this hardening as verified until Laravel and quality checks pass.
+- Exact source-head Laravel: **659 passed / 1 skipped / 4,527 assertions** ([run 44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572)); PostgreSQL migration/recovery smoke **PASS**; Zazu Quality, PHPMD and Director Health **PASS**. The matching offline-browser acceptance job is still running. SonarCloud is skipped.
 
 ### Stale-revision snapshot tenant guard — 2026-11-21
 
