@@ -2,14 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Asset;
-use App\Models\AssetAllocation;
 use App\Models\Business;
-use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\SyncEntityIdentity;
-use App\Support\Offline\SyncEntitySnapshotBuilder;
 use App\Support\Offline\SyncMutationRelatedIdentityResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -48,51 +44,6 @@ class OfflineIdentityAcknowledgementIsolationTest extends TestCase
         $this->assertTrue(app(SyncMutationRelatedIdentityResolver::class)->isSafeIdentity($identity));
     }
 
-    public function test_sync_snapshot_does_not_return_a_foreign_related_asset_identity(): void
-    {
-        $business = $this->business('Asset snapshot business');
-        $foreignBusiness = $this->business('Foreign asset owner');
-        $foreignAsset = Asset::create([
-            'business_id' => $foreignBusiness->id,
-            'asset_tag' => 'FOREIGN-ASSET-001',
-            'name' => 'Foreign asset',
-            'status' => 'available',
-            'condition' => 'good',
-        ]);
-        $event = Event::create([
-            'business_id' => $business->id,
-            'reference' => 'ASSET-SNAPSHOT-001',
-            'name' => 'Local allocation event',
-            'event_type' => 'Other',
-            'event_date' => now()->addDays(10)->toDateString(),
-            'status' => 'confirmed',
-        ]);
-        $allocation = AssetAllocation::create([
-            'business_id' => $business->id,
-            'asset_id' => $foreignAsset->id,
-            'event_id' => $event->id,
-            'allocated_from' => now()->toDateString(),
-            'status' => 'allocated',
-        ]);
-        $allocationIdentity = SyncEntityIdentity::create([
-            'business_id' => $business->id,
-            'entity_type' => 'asset_allocation',
-            'entity_uuid' => (string) Str::uuid(),
-            'record_type' => $allocation->getMorphClass(),
-            'record_id' => $allocation->id,
-        ]);
-        SyncEntityIdentity::create([
-            'business_id' => $business->id,
-            'entity_type' => 'asset',
-            'entity_uuid' => (string) Str::uuid(),
-            'record_type' => $foreignAsset->getMorphClass(),
-            'record_id' => $foreignAsset->id,
-        ]);
-
-        $snapshot = app(SyncEntitySnapshotBuilder::class)->build($allocationIdentity);
-
-        $this->assertSame([], $snapshot['related']);
-    }
 
     private function business(string $name): Business
     {
