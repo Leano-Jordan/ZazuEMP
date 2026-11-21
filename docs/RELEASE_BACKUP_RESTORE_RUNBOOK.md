@@ -1,3 +1,13 @@
+## Backup/restore capacity alignment — implementation checkpoint 2026-11-21
+
+**Implementation:** [84dba32](https://github.com/Leano-Jordan/ZazuEMP/commit/84dba32ae96ececf6c1dd71034d79d0b93070b7e).  
+**Shared policy:** [4824469](https://github.com/Leano-Jordan/ZazuEMP/commit/48244694d5419df50ce9cdd3938f65aaf77d02eb).  
+**Regression:** [675742e](https://github.com/Leano-Jordan/ZazuEMP/commit/675742eef40a819b6e509ea168303a8d239fd584).
+
+Backup and restore now share one policy: 50,000 private files, 50,002 total ZIP entries (database + manifest + private files), and 2 GiB total uncompressed content. Backup rejects oversized staging payloads and verifies the completed ZIP, including the manifest, against the restore ceiling before publishing. Boundary tests cover the entry and byte limits. Exact-head CI verification is pending.
+
+---
+
 ## Automated business-archive restore safety evidence — 2026-11-21
 
 Exact source/test head `e45cab97cbcdbc3f989bf3843d751bb0f373c305` on `main`; [Laravel/PostgreSQL/browser workflow 44904393629](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44904393629).
