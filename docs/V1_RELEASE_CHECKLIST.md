@@ -1,3 +1,19 @@
+## Trusted-device credential boundary — exact-head acceptance PASS — 2026-11-21
+
+**Verified code/test head:** [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7).
+
+- Mutation application revalidates the original credential and mutation business/device ownership inside the domain-application transaction.
+- Conflict recording now revalidates the middleware credential before creating/updating conflict state. Bootstrap, pull and acknowledgement use the same shared business-first/device-row guard.
+- Stale-credential apply and conflict-write regressions pass; the attachment reconnect browser test now verifies offline state and the same business-scoped IndexedDB partition before and after reload.
+- Laravel: **675 passed / 1 skipped / 4,581 assertions**; PostgreSQL migration/recovery smoke: **PASS**.
+- Offline browser: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries.
+- PHPMD, Psalm, Zazu Quality, Director Health, populated upgrade/rollback, Windows V1 package/fresh install and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- CASE-ZAZU-0040 is closed at automated-test/source level.
+
+**Still required for V1 release:** actual Android installed-app cold launch/host-stop/force-close/restart/reconnect; owner-PC off-disk backup and full restore drill with private media; populated live-business quote-to-payment-to-profit reconciliation; POPIA operational sign-off; ZAZU name clearance. Mobile emulation and CI recovery tests do not replace those owner-side acceptance steps. V1 remains **NOT READY**.
+
+---
+
 ## Empty private-storage restore — implementation checkpoint 2026-11-21
 
 - Restore now treats the v2 manifest declaration as authoritative even when private storage contains zero files.
