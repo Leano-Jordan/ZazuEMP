@@ -1,3 +1,18 @@
+## Director execution checkpoint — offline mutation operation integrity — 2026-11-21
+
+**Code/test head:** [e95dd5c](https://github.com/Leano-Jordan/ZazuEMP/commit/e95dd5cd8966c7457de70e9a4bc882709db7d30b).
+
+- Confirmed and corrected inconsistent operation validation in the customer, job and service offline mutation handlers.
+- Unsupported delete commands are now rejected before any domain write; regression covers all three handlers.
+- Exact-head Laravel: **676 passed / 1 skipped / 4,593 assertions**.
+- PHPMD: **PASS** [44947482711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482711).
+- PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS** in [Laravel workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
+- The workflow's offline-browser job was still in progress when this checkpoint was recorded; no browser pass is claimed here.
+
+**Score disposition:** evidence maturity remains **77/100**. This focused integrity fix is not a weighted-score uplift and does not close the broader offline sync matrix. V1 remains **NOT READY**.
+
+---
+
 ## Director convergence checkpoint — exact repository reconciliation — 2026-11-21
 
 **Documentation head:** [3e91346](https://github.com/Leano-Jordan/ZazuEMP/commit/3e91346ec239aac85543ecdd096c5e69571a5c2a) on `main`. This commit changes the offline architecture checkpoint documentation only; it does not change application code.
