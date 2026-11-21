@@ -1,3 +1,18 @@
+## Director execution checkpoint — bootstrap payload complexity correction — 2026-11-21
+
+**Refactor:** [ae61053](https://github.com/Leano-Jordan/ZazuEMP/commit/ae61053f04e2f36bc4b284a681c6f5cbdf4cfdec).
+
+- PHPMD flagged SyncBootstrapPayloadBuilder at the configured excessive-class-complexity threshold after invoice quote-reference sanitization was added.
+- Extracted the invoice relation sanitizer into SyncBootstrapInvoiceRelationGuard and injected the focused dependency into the payload builder. No suppressions or threshold changes.
+- The denormalized customer-data sanitization regression is still being verified; the current exact code head [ae61053](https://github.com/Leano-Jordan/ZazuEMP/commit/ae61053f04e2f36bc4b284a681c6f5cbdf4cfdec) is running Laravel [44924122308](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924122308), PHPMD [44924122220](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924122220), Zazu Quality [44924122269](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924122269), Director Health [44924122207](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924122207), Psalm [44924122176](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924122176), Windows V1 package [44924122256](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924122256) and populated upgrade/rollback [44924122265](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924122265). SonarCloud skipped.
+- Previous exact invoice-guard head [c28588e](https://github.com/Leano-Jordan/ZazuEMP/commit/c28588eef0a39f827500035bb7d427a89518eb2d) passed Laravel **665 / 1 skipped / 4,543 assertions**, PostgreSQL, PHPMD, Zazu Quality, Composer audit, secret scan and Director Health. The latest bootstrap browser acceptance remains pending.
+
+**Evidence maturity:** 77/100 unchanged; V1 NOT READY.
+
+**Next target:** close the current code-head tests and browser acceptance; then finish remaining nested bootstrap and conflict/pull tenant-boundary review. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — bootstrap contact-data sanitization — 2026-11-21
 
 **Implementation:** [c187b52](https://github.com/Leano-Jordan/ZazuEMP/commit/c187b528109e7467d19120cc46ff378bb9914e3e).  
