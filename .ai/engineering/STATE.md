@@ -8,7 +8,7 @@
 - Added a regression where an invoice identity points to a Customer and must not create an invoice bootstrap target.
 - Documentation updated in docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md.
 - Prior full acceptance remains green on run [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572): 659 passed / 1 skipped / 4,527 assertions; PostgreSQL recovery; desktop Chromium; mobile customer/Work; phone-local attachments.
-- The current bootstrap/related-identity regression head is running CI under [Laravel run 44921815863](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815863), [Zazu Quality run 44921815750](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815750), and [Director Health run 44921815750 family / 44921815750 not applicable]. Do not count the new work verified until Laravel, PostgreSQL, browser acceptance, quality and security checks finish. SonarCloud is skipped by current workflow configuration.
+- The current bootstrap/related-identity regression head is running CI under [Laravel run 44921815863](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815863), [Zazu Quality run 44921815750](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815750), and [Director Health run 44921815803](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815803). Do not count the new work verified until Laravel, PostgreSQL, browser acceptance, quality and security checks finish. SonarCloud is skipped by current workflow configuration.
 
 **Evidence maturity:** 77/100 remains the last independently recorded baseline; V1 remains NOT READY.
 
