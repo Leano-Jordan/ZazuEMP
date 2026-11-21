@@ -1,3 +1,21 @@
+## Director convergence checkpoint — exact repository reconciliation — 2026-11-21
+
+**Documentation head:** [3e91346](https://github.com/Leano-Jordan/ZazuEMP/commit/3e91346ec239aac85543ecdd096c5e69571a5c2a) on `main`. This commit changes the offline architecture checkpoint documentation only; it does not change application code.
+
+**Latest verified application/test baseline:** [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7). Recorded exact-head evidence: Laravel **675 passed / 1 skipped / 4,581 assertions**; PostgreSQL migration/recovery smoke **PASS**; offline browser **63 desktop + 7 mobile viewport + 1 LAN host-outage + 1 phone-local attachment/reconnect passed**; PHPMD, Psalm, Zazu Quality, Director Health, populated upgrade/rollback, Windows V1 package/fresh install and Push-on-main **PASS**. SonarCloud was skipped and is not counted as a pass.
+
+**Current documentation-head workflows:** Zazu Quality [44941545302](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44941545302), Director Contract Lint [44941545341](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44941545341), and Push on main [44941544684](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44941544684) **PASS**. These documentation/control checks are not a fresh application test run.
+
+**Security / isolation review:** CASE-ZAZU-0040 is closed at source and automated-test level. The repository also contains targeted offline expense-reference isolation regressions covering foreign event, supplier and purchase-order identities, wrong morph targets, and corrupted cross-business identity mappings. These are source/test evidence, not a black-box penetration test of a running installation.
+
+**Score disposition:** evidence maturity remains **77/100**. No uplift is awarded for documentation-only commits or viewport emulation. The weighted mandate score has not yet been independently re-baselined against all nine categories; do not represent 77/100 as a verified weighted score under the new mandate.
+
+**Release gates still OPEN:** physical Android installed-app cold launch / host outage / force-close / restart / reconnect; actual owner-PC off-disk backup and full installation restore with private media; populated live-business quote-to-payment-to-expense-to-profit reconciliation; POPIA operational sign-off; ZAZU name clearance. V1 remains **NOT READY**.
+
+**Next engineering sequence:** continue targeted adversarial offline authorization and account/session transition review; then complete source-backed commercial reconciliation and recovery checks. Physical device and owner-operated recovery evidence must remain separate from automated CI.
+
+---
+
 ## Director closure checkpoint — stale sync-device authorization — 2026-11-21
 
 **Verified application code head:** [7d4b097](https://github.com/Leano-Jordan/ZazuEMP/commit/7d4b097a13d02f3d5369bf8e75e2dc85c361beb7) on `main`.
