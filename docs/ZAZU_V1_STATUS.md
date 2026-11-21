@@ -1,6 +1,6 @@
 ## Director full-audit and exact-head V1 checkpoint — 2026-11-21
 
-**Current repository head:** `3f33110833fe3aa0457cfa34ae96184998ca2f91` (audit documentation commit on main).  
+**Current documentation state:** this checkpoint follows the full audit and status reconciliation commits on `main`; no application code changed in those documentation commits.  
 **Latest documented application/test source head:** `2d0269b00a3a94ecfb392f04c06438ece6eda603`.  
 **Latest verified Windows package/source baseline:** `365609b4d30ca4978ba9480cf3571bb792ad442b`.
 
