@@ -295,6 +295,109 @@ jobs:
 
           Write-Host 'PASS: Daily 02:00 S4U backup task, catch-up, runner, retention, daily logs and cached-config invalidation are wired.'
 
+      - name: Set up PHP for scheduled backup runner test
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.4'
+          extensions: zip
+          coverage: none
+
+      - name: Exercise scheduled backup runner on Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = Join-Path $env:RUNNER_TEMP ('zazu-backup-runner-' + [guid]::NewGuid().ToString('N'))
+          $project = Join-Path $root 'installation'
+          $backup = Join-Path $project 'storage\app\zazu-backups\daily'
+          $secondary = Join-Path $root 'secondary'
+          New-Item -ItemType Directory -Path $backup -Force | Out-Null
+          New-Item -ItemType Directory -Path $secondary -Force | Out-Null
+
+          $artisan = @'
+          <?php
+          if (($argv[1] ?? '') !== 'zazu:backup') {
+              fwrite(STDERR, "Unexpected fixture command.\n");
+              exit(2);
+          }
+          $output = null;
+          foreach ($argument in $argv) {
+              if (strpos($argument, '--output=') === 0) {
+                  $output = substr($argument, 9);
+              }
+          }
+          if (!$output || !is_dir($output)) {
+              fwrite(STDERR, "Backup output directory is missing.\n");
+              exit(3);
+          }
+          $archive = $output . DIRECTORY_SEPARATOR . 'zazu-backup-fixture-' . bin2hex(random_bytes(6)) . '.zip';
+          $zip = new ZipArchive();
+          if ($zip->open($archive, ZipArchive::CREATE) !== true) {
+              fwrite(STDERR, "Could not create fixture archive.\n");
+              exit(4);
+          }
+          $zip->addFromString('snapshot.txt', 'verified Windows backup fixture');
+          $zip->close();
+          echo "Backup created: " . $archive . PHP_EOL;
+          '@
+          [System.IO.File]::WriteAllText(
+            (Join-Path $project 'artisan'),
+            $artisan,
+            (New-Object System.Text.UTF8Encoding($false))
+          )
+          Set-Content -LiteralPath (Join-Path $project '.env') -Value ('ZAZU_BACKUP_SECONDARY_PATH="' + $secondary + '"') -Encoding ASCII
+
+          for ($index = 0; $index -lt 15; $index++) {
+            $localOld = Join-Path $backup ('zazu-backup-old-{0:D2}.zip' -f $index)
+            $secondaryOld = Join-Path $secondary ('zazu-backup-old-{0:D2}.zip' -f $index)
+            [System.IO.File]::WriteAllText($localOld, 'old')
+            [System.IO.File]::WriteAllText($secondaryOld, 'old')
+            (Get-Item -LiteralPath $localOld).LastWriteTimeUtc = [DateTime]::UtcNow.AddDays(-($index + 1))
+            (Get-Item -LiteralPath $secondaryOld).LastWriteTimeUtc = [DateTime]::UtcNow.AddDays(-($index + 1))
+          }
+
+          $runner = (Resolve-Path 'ops/windows/Invoke-ZazuScheduledBackup.ps1').Path
+          $windowsPowerShell = Join-Path $PSHOME 'powershell.exe'
+          & $windowsPowerShell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $runner -ProjectPath $project
+          $successExit = $LASTEXITCODE
+          if ($successExit -ne 0) { throw "Scheduled backup runner failed its success path: $successExit" }
+
+          $localArchives = @(Get-ChildItem -LiteralPath $backup -Filter 'zazu-backup-*.zip' -File)
+          $secondaryArchives = @(Get-ChildItem -LiteralPath $secondary -Filter 'zazu-backup-*.zip' -File)
+          if ($localArchives.Count -ne 14) { throw "Local retention expected 14 archives; found $($localArchives.Count)." }
+          if ($secondaryArchives.Count -ne 14) { throw "Secondary retention expected 14 archives; found $($secondaryArchives.Count)." }
+
+          $latestArchive = $localArchives | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          $secondaryCopy = Join-Path $secondary $latestArchive.Name
+          if (-not (Test-Path -LiteralPath $secondaryCopy -PathType Leaf)) { throw 'The latest archive was not copied to the secondary destination.' }
+          $sourceHash = (Get-FileHash -LiteralPath $latestArchive.FullName -Algorithm SHA256).Hash
+          $copyHash = (Get-FileHash -LiteralPath $secondaryCopy -Algorithm SHA256).Hash
+          if ($sourceHash -ne $copyHash) { throw 'The secondary archive does not match its source SHA-256.' }
+
+          $statusPath = Join-Path $backup '.secondary-copy-status.json'
+          $verifiedStatus = Get-Content -LiteralPath $statusPath -Raw | ConvertFrom-Json
+          if ($verifiedStatus.status -ne 'verified' -or -not $verifiedStatus.last_successful_at) {
+            throw 'The successful secondary-copy status was not persisted.'
+          }
+          $lastSuccess = [string]$verifiedStatus.last_successful_at
+
+          $missingDrive = @('Z','Y','X','W','V','U','T','S','R','Q','P','O','N','M','L','K','J','I','H','G','F','E','D') |
+            Where-Object { -not (Test-Path -LiteralPath ($_ + ':\')) } |
+            Select-Object -First 1
+          if (-not $missingDrive) { throw 'Could not find an unused drive letter for the failure-path test.' }
+          Set-Content -LiteralPath (Join-Path $project '.env') -Value ('ZAZU_BACKUP_SECONDARY_PATH="' + $missingDrive + ':\ZazuUnavailable"') -Encoding ASCII
+
+          & $windowsPowerShell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $runner -ProjectPath $project
+          $failureExit = $LASTEXITCODE
+          if ($failureExit -eq 0) { throw 'The runner must fail when the configured secondary drive is unavailable.' }
+
+          $failedStatus = Get-Content -LiteralPath $statusPath -Raw | ConvertFrom-Json
+          if ($failedStatus.status -ne 'failed') { throw 'The unavailable secondary destination did not produce a failed status.' }
+          if ([string]$failedStatus.last_successful_at -ne $lastSuccess) {
+            throw 'A failed secondary copy must preserve the timestamp of the previous verified copy.'
+          }
+
+          Write-Host 'PASS: Windows backup runner creates an archive, prunes both copies to 14, verifies SHA-256, and preserves last success after secondary-copy failure.'
+
       - name: Verify LAN HTTPS command wrappers
         shell: pwsh
         run: |
