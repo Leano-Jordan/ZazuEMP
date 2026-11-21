@@ -90,6 +90,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(() => navigator.onLine)).toBe(true);
 
         originAvailable = false;
+        await page.evaluate(() => window.dispatchEvent(new Event('focus')));
         const notice = page.locator('[data-zazu-origin-offline-notice]');
         await expect(notice).toBeVisible({ timeout: 15_000 });
         await expect(notice).toContainText('Zazu server is unavailable');
@@ -98,6 +99,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
 
         originAvailable = true;
+        await page.evaluate(() => window.dispatchEvent(new Event('focus')));
         await expect(notice).toBeHidden({ timeout: 15_000 });
     });
 
