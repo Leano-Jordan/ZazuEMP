@@ -81,12 +81,13 @@ class SyncDeviceAuthorizationRaceTest extends TestCase
     public function test_recorded_mutation_cannot_apply_after_device_credential_replacement(): void
     {
         [, $device, $snapshot] = $this->deviceFixture();
+        $entityId = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $snapshot,
-            'test_atomic_publish',
-            'entity-1',
-            'upsert',
-            ['value' => 'must remain pending'],
+            'job',
+            $entityId,
+            'create',
+            ['local_id' => $entityId, 'record' => ['name' => 'must remain pending']],
         );
 
         $metadata = $device->metadata ?? [];
@@ -103,7 +104,7 @@ class SyncDeviceAuthorizationRaceTest extends TestCase
         try {
             app(SyncMutationApplier::class)->applyAuthenticated(
                 $mutation,
-                ['test_atomic_publish' => $handler],
+                ['job' => $handler],
                 $snapshot,
             );
             $this->fail('A mutation recorded before re-pairing must not apply under a stale authenticated credential.');
