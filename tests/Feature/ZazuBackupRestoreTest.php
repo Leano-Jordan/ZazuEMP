@@ -122,6 +122,7 @@ class ZazuBackupRestoreTest extends TestCase
             'application' => 'Zazu EMP',
             'format_version' => 2,
             'database_driver' => 'sqlite',
+            'contents' => ['database', 'private_storage'],
             'checksums' => [
                 'database.sqlite' => hash('sha256', $databasePayload),
                 'storage/private/probe.txt' => hash('sha256', $privatePayload),
