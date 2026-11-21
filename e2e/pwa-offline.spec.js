@@ -1805,6 +1805,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         await page.goto('/settings', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(businessId).toBeGreaterThan(0);
 
         const job = await page.evaluate(() => {
             const item = window.ZazuOffline.getState().jobs.find(record => record.local_id && Number(record.id ?? record.server_id) > 0);
@@ -1905,7 +1907,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
-                business: { id: Number(await page.evaluate(() => document.body.dataset.zazuBusinessId)), name: 'Event cost business', currency: 'ZAR' },
+                business: { id: businessId, name: 'Event cost business', currency: 'ZAR' },
             }),
         }));
 
