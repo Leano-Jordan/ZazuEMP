@@ -8,9 +8,7 @@
 - Laravel: **676 passed / 1 skipped / 4,593 assertions**.
 - PHPMD: **PASS** [run 44947482711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482711).
 - PostgreSQL migration, registration and backup/restore/private-file recovery smoke: **PASS** in [Laravel workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
-- The full offline-browser job in that workflow was still running at this checkpoint and is not counted as passed.
-
-**Release disposition:** V1 remains **NOT READY**. This targeted server-side integrity closure does not close the full offline sync matrix or any owner-operated physical acceptance gate.
+- Offline browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries. All three jobs in [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747) passed.n:** V1 remains **NOT READY**. This targeted server-side integrity closure does not close the full offline sync matrix or any owner-operated physical acceptance gate.
 
 ---
 
