@@ -1,3 +1,16 @@
+## Offline event-cost tenant isolation regression — 2026-11-21
+
+**Test source:** `9f1846cdf1da780883b199391ab4b3b96372d129` on `main`.
+
+- Added a real server-side sync regression that creates a second business, registers that business's event identity, and submits it in an event-cost mutation from the first business's trusted device.
+- Acceptance requires validation rejection on `event_local_id`, leaves the mutation pending for explicit conflict handling, and creates no event-cost row in the receiving business.
+- The resolver is business-scoped at both the identity lookup and Event lookup. This test protects that boundary against future regressions.
+- Exact-head Laravel/quality/Director verification is pending.
+
+**Evidence disposition:** this is targeted tenant-isolation regression coverage, not a full penetration test or a release-readiness score increase. Evidence maturity remains **77/100**; V1 remains **NOT READY**.
+
+---
+
 ## Event-cost offline reconnect regression — 2026-11-21
 
 **Current test source:** `1600816a7495449acc9f5a8e69c0fe92dc63b654` on `main`.  
