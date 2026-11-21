@@ -39,7 +39,13 @@ class CustomerContactController extends Controller
             $makePrimary = $request->boolean('is_primary');
 
             if ($makePrimary) {
-                $lockedCustomer->contacts()->update(['is_primary' => false]);
+                // Relationship mass updates bypass Eloquent events and leave
+                // the parent customer sync revision unchanged.
+                $lockedCustomer->contacts()
+                    ->where('is_primary', true)
+                    ->lockForUpdate()
+                    ->get()
+                    ->each(fn (CustomerContact $contact) => $contact->update(['is_primary' => false]));
             }
 
             $lockedCustomer->contacts()->create([
