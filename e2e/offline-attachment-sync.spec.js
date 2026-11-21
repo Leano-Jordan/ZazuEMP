@@ -166,6 +166,7 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     });
 
     await page.context().setOffline(true);
+    await expect.poll(() => page.evaluate(() => navigator.onLine)).toBe(false);
     await attachmentForm.locator('input[name="files[]"]').setInputFiles({
         name: 'offline-evidence.txt',
         mimeType: 'text/plain',
@@ -174,11 +175,23 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     await attachmentForm.getByRole('button', { name: 'Add to job' }).click();
     await expect(attachmentForm.locator('[data-zazu-offline-attachment-status]')).toContainText('saved on this phone');
 
+    const originalBusinessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0));
+    const beforeReload = await page.evaluate(async id => ({
+        businessId: Number(document.body.dataset.zazuBusinessId || 0),
+        records: await window.ZazuOffline.loadAttachments(id),
+    }), eventId);
+    expect(originalBusinessId).toBeGreaterThan(0);
+    expect(beforeReload.businessId).toBe(originalBusinessId);
+    expect(beforeReload.records).toHaveLength(1);
+
     // A page/document restart while disconnected must recover the file from
-    // IndexedDB, not from the previous JavaScript heap or an in-memory queue.
+    // the same business-scoped IndexedDB partition, not the previous JavaScript
+    // heap, an unscoped fallback database or an in-memory queue.
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
     await page.evaluate(async () => window.ZazuOffline.ready);
+    const reloadedBusinessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0));
+    expect(reloadedBusinessId).toBe(originalBusinessId);
 
     const pending = await page.evaluate(async id => window.ZazuOffline.loadAttachments(id), eventId);
     expect(pending).toHaveLength(1);
