@@ -1,3 +1,24 @@
+## Director execution checkpoint — related offline identity paths hardened — 2026-11-21
+
+**Implementation commits:** [c919d4f](https://github.com/Leano-Jordan/ZazuEMP/commit/c919d4fc7fb611d835b966b6babc70288fe5263f), [043de08](https://github.com/Leano-Jordan/ZazuEMP/commit/043de08cf28389e2a4b4ff07f24971f95835922d), [e21fe2b](https://github.com/Leano-Jordan/ZazuEMP/commit/e21fe2b5a77948602d2b42984b4ba3a530f26e86), [683e920](https://github.com/Leano-Jordan/ZazuEMP/commit/683e9208b7dfc1fdd1fbf630c2b77e23132c6b1f), [1d18c90](https://github.com/Leano-Jordan/ZazuEMP/commit/1d18c90c46462e2af8c32ba77b56603c54611c72).  
+**Regression commits:** [8952da2](https://github.com/Leano-Jordan/ZazuEMP/commit/8952da23a87be4aa7ef5ac7143b8caa0e2163a08), [50a0efe](https://github.com/Leano-Jordan/ZazuEMP/commit/50a0efe0cfa9b9aff23a37832488c6807436cada), [d33f395](https://github.com/Leano-Jordan/ZazuEMP/commit/d33f395b9f60e13ab5886692999f9896a61cd141), [19bb269](https://github.com/Leano-Jordan/ZazuEMP/commit/19bb26973c086bc2dfdc0a733483305643c36763).
+
+- The previous full acceptance run [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572) is now fully green: Laravel 659 passed / 1 skipped / 4,527 assertions; PostgreSQL migration/recovery; desktop Chromium; mobile customer/Work acceptance; phone-local attachment journey.
+- Extended the security audit beyond mutation application to related identity acknowledgements, parent revision advancement and conflict snapshot serialization.
+- Related identity acknowledgements now validate expected Eloquent morph type and tenant ownership before returning related local/server identity mappings.
+- Related revision advancement now validates parent identity model type and ownership, scopes purchase-order line resolution to the specific business/order, and checks tenant ownership before incrementing related identity revisions.
+- Conflict snapshots now reject both foreign-business targets and same-business wrong-model targets.
+- Added adversarial tests for a payment acknowledgement whose invoice identity points to a Customer and a conflict snapshot whose customer identity points to an Event in the same business.
+- Updated docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md with the new threat boundaries and regression contracts.
+
+**Verification of this additional hardening:** PENDING exact-head Laravel, quality, PostgreSQL and browser acceptance. No new score uplift until these checks pass.
+
+**Evidence maturity:** 77/100 remains the last independently recorded baseline; V1 is NOT READY. Keep it unchanged until the broader owner-PC, recovery, commercial, physical-device and POPIA acceptance evidence is closed.
+
+**Next Director target:** verify the new exact-head checks, fix any failures, then continue the same adversarial review across bootstrap delivery target resolution and remaining offline linked-record paths. Main only; no branch creation.
+
+---
+
 ## Director execution checkpoint — offline acceptance closure + identity ownership hardening — 2026-11-21
 
 **Current source/test head before this checkpoint:** `d7d93152da24c128b1a48b3eb3191762cfe8d4a1` on `main`.  
