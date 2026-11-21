@@ -63,6 +63,13 @@ final class SyncMutationPushProcessor
                 ->where('entity_type', $mutation->entity_type)
                 ->where('entity_uuid', $mutation->entity_id)
                 ->first();
+
+            if (
+                $identity
+                && ! app(SyncMutationRelatedIdentityResolver::class)->isSafeIdentity($identity)
+            ) {
+                $identity = null;
+            }
         } catch (Throwable $exception) {
             if ($exception instanceof HttpException && $exception->getStatusCode() === 401) {
                 throw $exception;
