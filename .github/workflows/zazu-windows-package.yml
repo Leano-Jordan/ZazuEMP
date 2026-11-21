@@ -21,6 +21,11 @@ on:
       - 'docs/V1_PACKAGE_INSTALLATION.md'
       - '.github/workflows/zazu-windows-package.yml'
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Optional semantic version to publish as a GitHub prerelease (for example 1.0.0-rc.1). Leave blank for a build-only run.'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -472,3 +477,82 @@ jobs:
           }
 
           Write-Host 'PASS: Windows PowerShell fresh install generated a private environment and app key, migrated SQLite, booted routes, and returned a usable loopback HTTP session cookie.'
+
+
+  publish-prerelease:
+    name: Publish verified Windows candidate as a GitHub prerelease
+    if: github.event_name == 'workflow_dispatch' && inputs.release_version != ''
+    needs: [package, windows-fresh-install-smoke]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Download the exact tested Windows package
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4.1.8
+        with:
+          name: zazu-emp-windows-v1-candidate-${{ github.sha }}
+          path: release-assets
+
+      - name: Validate release version and package checksums
+        id: release
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semantic version: $RELEASE_VERSION" >&2
+            exit 1
+          fi
+          test -f release-assets/SHA256SUMS.txt
+          cd release-assets
+          sha256sum --check SHA256SUMS.txt
+          package_count=$(find . -maxdepth 1 -type f -name '*.zip' | wc -l)
+          test "$package_count" -eq 1
+          package=$(find . -maxdepth 1 -type f -name '*.zip' -print -quit)
+          cp "$package" "ZazuEMP-${RELEASE_VERSION}-Windows.zip"
+          sha256sum "ZazuEMP-${RELEASE_VERSION}-Windows.zip" > "ZazuEMP-${RELEASE_VERSION}-Windows.sha256"
+          echo "tag=v${RELEASE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "package=ZazuEMP-${RELEASE_VERSION}-Windows.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Refuse to overwrite an existing release tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags "https://github.com/$GITHUB_REPOSITORY.git" "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Git tag $TAG already exists; refusing to move or reuse it." >&2
+            exit 1
+          fi
+
+      - name: Publish immutable tested candidate as a prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ inputs.release_version }}
+          PACKAGE: ${{ steps.release.outputs.package }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          cat > release-notes.md <<EOF
+          # Zazu EMP ${VERSION} — Windows installation candidate
+
+          This prerelease was built from source commit ${SOURCE_SHA} and published only after the Windows fresh-install acceptance job passed.
+
+          - Package type: fresh Windows installation candidate
+          - Runtime: PHP 8.4+
+          - Database: SQLite
+          - Install instructions: see the packaged installation guide
+          - SHA-256: verify using the attached checksum file
+
+          **This prerelease is not a declaration that all Zazu V1 commercial, physical-device, recovery and legal acceptance gates are closed.**
+          EOF
+          gh release create "$TAG" "release-assets/$PACKAGE" "release-assets/ZazuEMP-${VERSION}-Windows.sha256" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SOURCE_SHA" \
+            --title "Zazu EMP ${VERSION} — Windows candidate" \
+            --notes-file release-notes.md \
+            --prerelease
