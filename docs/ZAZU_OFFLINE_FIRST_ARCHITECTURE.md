@@ -1,3 +1,13 @@
+### Related asset identity in conflict snapshots — 2026-11-21
+
+**Implementation:** [1fdbb02](https://github.com/Leano-Jordan/ZazuEMP/commit/1fdbb0212c099df1f8403628b9e71423f35c5434).  
+**Regression:** [f53e17a](https://github.com/Leano-Jordan/ZazuEMP/commit/f53e17ab33e82d960dc40bc4a67e19bc8da349b8).
+
+- Asset-allocation conflict snapshots already constrained the allocation and asset identity rows to the current business, but did not validate the linked Asset record itself before returning its local identity and revision.
+- The snapshot builder now resolves the Asset and verifies its actual business ownership before returning related identity metadata.
+- Added a regression with a local allocation whose malformed tenant identity points to an asset owned by another business; the snapshot must return no related asset identity.
+- Exact-head CI pending.
+
 ### Bootstrap resolver complexity correction — 2026-11-21
 
 **Refactor:** [438d322](https://github.com/Leano-Jordan/ZazuEMP/commit/438d3220be5eb02078ed7e5f690c38161b612e25) + [e587bc0](https://github.com/Leano-Jordan/ZazuEMP/commit/e587bc078f1dba9ad4ac50141f021fbdb0207bbc).
