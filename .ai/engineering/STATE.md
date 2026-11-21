@@ -1,3 +1,20 @@
+## Director execution checkpoint — offline expense reconciliation — 2026-11-21
+
+**Current verified source/test head:** `3c8db9bd02fec06603d48b3050f7d306d7b41070` on `main`.  
+**Exact-head evidence:** Laravel [44902438027](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44902438027), Zazu Quality [44902438064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44902438064), Push-on-main [44902438499](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44902438499).
+
+- Laravel: **651 passed / 1 skipped / 4,480 assertions**.
+- Offline browser: **61 desktop Chromium + 7 mobile viewport + 1 phone-local attachment journey passed**.
+- PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS**.
+- Zazu Quality, Composer audit, secret scan and Push-on-main: **PASS**. PHPMD and Director Health passed on the immediately preceding PHP-identical source head; SonarCloud skipped.
+- Existing offline expense UI capture and sync now have browser coverage for job/supplier/purchase-order local-link preservation, canonical identity acknowledgement and queue drainage.
+- Server feature coverage verifies the actual offline handler, exact amount/currency/status, business-bound linked records, audit entry and idempotent replay.
+- No production source change was required for this target.
+
+**Next target:** business archive restore must refuse an existing trusted-device/sync workspace before importing any records or files.
+
+---
+
 ## Director execution checkpoint — offline payment reconciliation — 2026-11-21
 
 **Current verified source/test head:** `e1debd77c9d064f92895768f120ac752a34d897b` on `main`.  
