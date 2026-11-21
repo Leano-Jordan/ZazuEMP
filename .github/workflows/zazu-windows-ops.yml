@@ -261,6 +261,47 @@ jobs:
           }
           Write-Host 'PASS: Windows package installer validates runtime, creates a first-run environment, preserves existing data/configuration and migrates without demo seeding.'
 
+      - name: Verify daily owner-PC backup automation
+        shell: pwsh
+        run: |
+          $installer = Get-Content 'ops/windows/Install-ZazuBackupSchedule.ps1' -Raw
+          $runner = Get-Content 'ops/windows/Invoke-ZazuScheduledBackup.ps1' -Raw
+          $hostLauncher = Get-Content 'ops/windows/Start-ZazuDev.ps1' -Raw
+          $installScript = Get-Content 'ops/windows/Install-Zazu.ps1' -Raw
+          $envExample = Get-Content '.env.example' -Raw
+          foreach ($required in @('Register-ScheduledTask', '-Daily', "'2:00AM'", '-LogonType S4U', '-StartWhenAvailable', '-WakeToRun')) {
+            if (-not $installer.Contains($required)) { throw "Daily backup task installer is missing: $required" }
+          }
+          foreach ($required in @("'zazu:backup'", 'zazu-backups\daily', 'Select-Object -Skip 14', 'zazu-backup-scheduler-')) {
+            if (-not $runner.Contains($required)) { throw "Daily backup runner is missing: $required" }
+          }
+          foreach ($required in @('Install-ZazuBackupSchedule.ps1', 'Latest installation backup:', '26 hours ago', 'LOG_STACK=daily')) {
+            if (-not $hostLauncher.Contains($required)) { throw "Owner-PC startup safeguards are missing: $required" }
+          }
+          foreach ($source in @($installScript, $envExample)) {
+            if (-not $source.Contains('LOG_STACK=daily')) { throw 'Daily log rotation is not configured for installation.' }
+          }
+
+          # Exercise task registration with mocked Windows Task Scheduler cmdlets.
+          function New-ScheduledTaskAction { param($Execute, $Argument, $WorkingDirectory) [pscustomobject]@{ Execute=$Execute; Argument=$Argument; WorkingDirectory=$WorkingDirectory } }
+          function New-ScheduledTaskTrigger { param([switch]$Daily, $At) [pscustomobject]@{ Daily=$Daily.IsPresent; At=$At } }
+          function New-ScheduledTaskPrincipal { param($UserId, $LogonType, $RunLevel) [pscustomobject]@{ UserId=$UserId; LogonType=$LogonType; RunLevel=$RunLevel } }
+          function New-ScheduledTaskSettingsSet { param([switch]$StartWhenAvailable, [switch]$WakeToRun, $MultipleInstances, $ExecutionTimeLimit, [switch]$AllowStartIfOnBatteries, [switch]$DontStopIfGoingOnBatteries) [pscustomobject]@{ StartWhenAvailable=$StartWhenAvailable.IsPresent; WakeToRun=$WakeToRun.IsPresent; MultipleInstances=$MultipleInstances; ExecutionTimeLimit=$ExecutionTimeLimit; AllowStartIfOnBatteries=$AllowStartIfOnBatteries.IsPresent; DontStopIfGoingOnBatteries=$DontStopIfGoingOnBatteries.IsPresent } }
+          function Register-ScheduledTask { param($TaskName, $Action, $Trigger, $Principal, $Settings, $Description, [switch]$Force) $script:CapturedTask=[pscustomobject]@{ TaskName=$TaskName; Action=$Action; Trigger=$Trigger; Principal=$Principal; Settings=$Settings; Description=$Description; Force=$Force.IsPresent } }
+          $fixture = Join-Path $env:RUNNER_TEMP 'zazu-backup-task-fixture'
+          New-Item -ItemType Directory -Path $fixture -Force | Out-Null
+          New-Item -ItemType File -Path (Join-Path $fixture 'artisan') -Force | Out-Null
+          try {
+            & 'ops/windows/Install-ZazuBackupSchedule.ps1' -ProjectPath $fixture
+            if (-not $script:CapturedTask -or -not $script:CapturedTask.Trigger.Daily -or $script:CapturedTask.Trigger.At -ne '2:00AM') { throw 'Daily 02:00 backup trigger was not registered.' }
+            if ($script:CapturedTask.Principal.LogonType -ne 'S4U') { throw 'Backup task must not store a Windows password.' }
+            if (-not $script:CapturedTask.Settings.StartWhenAvailable -or -not $script:CapturedTask.Settings.WakeToRun) { throw 'Backup task must catch up and wake the PC when supported.' }
+            if (-not $script:CapturedTask.Action.Argument.Contains('Invoke-ZazuScheduledBackup.ps1')) { throw 'Backup task runner is not wired.' }
+          } finally {
+            Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          Write-Host 'PASS: Daily 02:00 S4U backup task, catch-up, runner, retention and daily logs are wired.'
+
       - name: Verify LAN HTTPS command wrappers
         shell: pwsh
         run: |
