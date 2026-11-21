@@ -17,6 +17,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | CLOSED — exact-head CI PASS | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
 | CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | CLOSED — exact-head CI PASS | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
 | CASE-ZAZU-0036 | Sync stale-device authorization | Conflict listing/resolution or attachment operations proceed from a middleware snapshot after revocation; a stale token may revoke a re-paired device | CLOSED — exact-head Laravel/PHPMD/Psalm PASS | Several endpoints did not share durable business/device lock and token-hash revalidation | Stale-snapshot regression tests for conflict listing/resolution, attachment upload/list and replacement-token revocation |
+| CASE-ZAZU-0037 | LAN host outage leaves phone on stale page | Zazu host stops while Wi-Fi remains connected; browser receives no offline event and visible server-rendered page remains stale | OPEN — monitor and regression committed; exact-head browser pending | Origin availability was only rechecked during UI render/events; no periodic health monitor existed | Simulated /up 503→200 on desktop and phone viewport, then physical Android host-stop/restart drill |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -706,3 +707,18 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression coverage added:** revoked-snapshot conflict listing, conflict resolution, attachment upload, attachment listing, and stale-token attempt to revoke a replacement credential.
 
 **Verification boundary:** tests are committed but no exact-head pass is claimed yet. Bootstrap, pull and acknowledgement already had separate stale-snapshot controls and remain intact.
+
+
+### CASE-ZAZU-0037
+
+**Status:** OPEN — implementation and browser regression committed; exact-head browser verification pending.
+
+**Target:** Installed PWA while the phone remains connected to Wi-Fi but the Zazu LAN host becomes unavailable.
+
+**Failure fingerprint:** navigator.onLine remains true when the Wi-Fi interface is connected, even if the LAN host has stopped. The application previously rechecked HEAD /up only when selected UI render/event paths ran. A currently visible server-rendered page could therefore remain stale without a browser offline event.
+
+**Control implemented:** The offline directory runtime now checks HEAD /up every 10 seconds and on focus/network/visibility changes. It shows a non-destructive host-outage notice with an explicit link to the cached dashboard workspace and updates local-workspace visibility from actual origin reachability. It does not auto-navigate or discard form input.
+
+**Regression coverage:** Playwright simulates /up returning 503 while navigator.onLine remains true, then restoring 200. The test runs on desktop Chromium and Pixel 7 viewport.
+
+**Verification boundary:** exact-head browser run pending. Actual installed Android outage, force-close/restart and reconnect acceptance remain open; mobile viewport is not physical-device evidence.
