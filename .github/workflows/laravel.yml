@@ -236,3 +236,63 @@ jobs:
       run: npm run test:e2e -- --project=chromium-mobile e2e/pwa-offline.spec.js --grep "detects a stopped Zazu host"
     - name: Run phone-local attachment journey on mobile viewport
       run: npm run test:e2e -- --project=chromium-mobile e2e/offline-attachment-sync.spec.js --grep "operator creates an offline Work job, attaches a file from its directory row, then syncs it"
+
+  coverage-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up PHP with PCOV coverage driver
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240b1 # v2.37.2
+        with:
+          php-version: '8.4'
+          coverage: pcov
+
+      - name: Install PHP dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Prepare test database
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          php artisan key:generate
+          mkdir -p database build/coverage
+          touch database/database.sqlite
+          php artisan migrate --force
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+
+      - name: Run full test suite and collect application coverage
+        run: php artisan test --coverage-clover=build/coverage/clover.xml --coverage-text
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+
+      - name: Publish coverage report in workflow summary
+        if: always() && hashFiles('build/coverage/clover.xml') != ''
+        run: |
+          echo "## Zazu application test coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "The attached Clover report records which application lines were exercised by the full automated test suite. This is a visibility report, not a release gate or a claim that untested code is defective." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Clover coverage report
+        if: always() && hashFiles('build/coverage/clover.xml') != ''
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: zazu-application-coverage
+          path: build/coverage/clover.xml
+          if-no-files-found: error
+          retention-days: 14
+
