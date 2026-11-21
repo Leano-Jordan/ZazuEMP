@@ -356,7 +356,39 @@ jobs:
           }
 
           $runner = (Resolve-Path 'ops/windows/Invoke-ZazuScheduledBackup.ps1').Path
+          $installer = (Resolve-Path 'ops/windows/Install-ZazuBackupSchedule.ps1').Path
           $windowsPowerShell = Join-Path $PSHOME 'powershell.exe'
+
+          $sha = [System.Security.Cryptography.SHA256]::Create()
+          try {
+            $digest = $sha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($project.ToLowerInvariant()))
+          } finally {
+            $sha.Dispose()
+          }
+          $suffix = ([BitConverter]::ToString($digest) -replace '-', '').Substring(0, 10)
+          $taskName = 'ZazuEMP-DailyBackup-' + $suffix
+          & $windowsPowerShell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installer -ProjectPath $project
+          $installTaskExit = $LASTEXITCODE
+          if ($installTaskExit -ne 0) { throw "Scheduled backup task registration failed: $installTaskExit" }
+
+          try {
+            $task = Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
+            if ($task.Principal.LogonType -ne 'S4U') { throw 'Scheduled backup task must use S4U without a stored password.' }
+            if ($task.Principal.RunLevel -ne 'Limited') { throw 'Scheduled backup task must use the limited run level.' }
+            if (-not $task.Settings.StartWhenAvailable -or -not $task.Settings.WakeToRun) {
+              throw 'Scheduled backup task must catch up missed runs and request wake-to-run.'
+            }
+            if ($task.Settings.MultipleInstances -ne 'IgnoreNew') { throw 'Scheduled backup task must ignore overlapping runs.' }
+            if ([DateTime]::Parse($task.Triggers[0].StartBoundary).Hour -ne 2) {
+              throw 'Scheduled backup task must run at 02:00 local time.'
+            }
+            if ($task.Actions[0].Execute -notlike '*powershell.exe' -or $task.Actions[0].Arguments -notlike '*Invoke-ZazuScheduledBackup.ps1*') {
+              throw 'Scheduled backup task must invoke the installation-scoped PowerShell runner.'
+            }
+          } finally {
+            Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+          }
+
           & $windowsPowerShell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $runner -ProjectPath $project
           $successExit = $LASTEXITCODE
           if ($successExit -ne 0) { throw "Scheduled backup runner failed its success path: $successExit" }
