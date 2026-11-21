@@ -339,6 +339,13 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("async function sync()", $client);
         $this->assertStringContainsString("/api/sync/push", $client);
         $this->assertStringContainsString("/api/sync/pull?stream=business&limit=100", $client);
+        $this->assertStringContainsString("deliveryQuery.append('delivery_sequences[]', String(sequence));", $client);
+        $this->assertStringContainsString("'/api/sync/bootstrap?' + deliveryQueryString", $client);
+        $syncController = File::get(app_path('Http/Controllers/SyncController.php'));
+        $bootstrapBuilder = File::get(app_path('Support/Offline/SyncBootstrapPayloadBuilder.php'));
+        $this->assertStringContainsString("'delivery_sequences' => ['sometimes', 'array', 'max:100']", $syncController);
+        $this->assertStringContainsString('private function deliveryTargets(SyncDevice $device, array $deliverySequences)', $bootstrapBuilder);
+        $this->assertStringContainsString('$this->applyBoundedWorkingSet($query, Supplier::class, $business, $includedIds', $bootstrapBuilder);
         $this->assertStringContainsString("/api/sync/acknowledge", $client);
         $this->assertStringContainsString("status: 'failed'", $client);
         $this->assertStringContainsString('const remainingMutations = await pending();', $client);
