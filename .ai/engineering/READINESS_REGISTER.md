@@ -1,8 +1,18 @@
+## Director closure checkpoint — 2026-11-21 (CASE-ZAZU-0033 stale-write protection)
+
+**Verified source/test head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`. Laravel **634 passed / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery **PASS**; offline browser **59 desktop + 7 mobile + 1 phone-local Work/attachment/reconnect passed**; PHPMD, Zazu Quality, Composer audit, secret scan and application checks **PASS**. [Exact-head workflow] (https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44881431689).
+
+CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has paired-device rejection, same-device causal chains, conflict/rebase payload preservation, parent-revision propagation and business-isolation evidence. The final online writer review found and corrected the remaining primary-contact creation mass-update bypass; other identified bulk operations are paired with tracked parent updates or are restore/protocol writes outside existing domain identities.
+
+**The full offline sync workflow matrix remains OPEN and separate.** Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain OPEN. Evidence maturity remains **75/100**; no unsupported score uplift. V1 remains **NOT READY**.
+
+---
+
 ## Director source-audit increment — 2026-11-21 (primary-contact creation)
 
 - Confirmed and corrected a remaining online revision bypass in `CustomerContactController::store`: creating a new primary contact previously mass-updated the existing primary via a relationship query, bypassing nested Eloquent events.
 - The controller now locks and updates existing primary contact models individually; a new feature regression asserts the parent Customer sync revision advances and the primary-contact invariant remains intact.
-- Exact-head Laravel on `51a75eb` passed **634 / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD passed. Desktop/mobile offline-browser acceptance is still running. The new two-device stale-write regression is included in that Laravel pass. CASE-ZAZU-0033 remains OPEN because the complete writer inventory and end-to-end sync matrix are not yet closed. No score uplift; V1 remains NOT READY.
+- Exact-head Laravel on `51a75eb` passed **634 / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery and PHPMD passed. Desktop/mobile offline-browser acceptance is still running. The new two-device stale-write regression is included in that Laravel pass. CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED on exact-head evidence. The complete offline sync workflow matrix remains OPEN as a separate release gate. No score uplift; V1 remains NOT READY.
 
 ## Director disposition refresh — 2026-11-21 (receiver sync + bootstrap credential fence)
 
