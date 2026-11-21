@@ -1891,7 +1891,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             pushed = mutation ? {
                 entityType: mutation.entity_type,
                 localId: mutation.payload?.local_id,
-                eventLocalId: mutation.payload?.event_local_id,
+                eventLocalId: mutation.payload?.record?.event_local_id,
             } : null;
             await route.fulfill({
                 status: 200,
