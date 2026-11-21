@@ -62,6 +62,72 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         $this->assertGreaterThan($baselineLevel, $businessReadLevel);
     }
 
+    public function test_bootstrap_includes_delivered_aggregate_outside_the_bounded_supplier_window(): void
+    {
+        [$business, $customer, $sourceDevice] = $this->customerFixtureWithDevice();
+        $receivingDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        for ($index = 1; $index <= 500; $index++) {
+            Supplier::create([
+                'business_id' => $business->id,
+                'name' => sprintf('A-supplier-%04d', $index),
+            ]);
+        }
+
+        $deliveredSupplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Z-supplier-before-update',
+        ]);
+        $identity = app(SyncEntityIdentityRegistry::class)->identify($deliveredSupplier, 'supplier');
+        $deliveredSupplier->update(['name' => 'Z-supplier-updated-outside-window']);
+
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $sourceDevice,
+            'supplier',
+            $identity->entity_uuid,
+            'update',
+            [
+                'local_id' => $identity->entity_uuid,
+                'expected_revision' => 1,
+                'record' => ['name' => 'Z-supplier-updated-outside-window'],
+            ],
+        );
+        $mutation->update([
+            'status' => 'applied',
+            'result_revision' => (int) $identity->fresh()->revision,
+            'applied_at' => now(),
+        ]);
+        app(SyncMutationRecorder::class)->publish($mutation);
+
+        $delivery = \\App\\Models\\SyncDelivery::query()
+            ->where('business_id', $business->id)
+            ->where('destination_device_id', $receivingDevice->id)
+            ->where('sync_mutation_id', $mutation->id)
+            ->firstOrFail();
+
+        $builder = app(SyncBootstrapPayloadBuilder::class);
+        $ordinarySnapshot = $builder->build($receivingDevice);
+        $this->assertFalse(
+            collect($ordinarySnapshot['suppliers'])->contains(
+                fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $deliveredSupplier->id,
+            ),
+            'The supplier is deliberately outside the default 500-record alphabetical window.',
+        );
+
+        $deliverySnapshot = $builder->build($receivingDevice, [(int) $delivery->delivery_sequence]);
+        $included = collect($deliverySnapshot['suppliers'])->first(
+            fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $deliveredSupplier->id,
+        );
+
+        $this->assertNotNull($included, 'A delivered aggregate must be included even when it falls outside the normal window.');
+        $this->assertSame('Z-supplier-updated-outside-window', $included['record']['name']);
+        $this->assertSame(2, (int) $included['revision']);
+        $this->assertCount(501, $deliverySnapshot['suppliers']);
+    }
+
     public function test_nested_quote_item_and_inventory_movement_writes_advance_parent_revisions(): void
     {
         [$business, $customer] = $this->customerFixture();
