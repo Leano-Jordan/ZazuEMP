@@ -10,6 +10,7 @@ use App\Models\SyncMutation;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationHandler;
 use App\Support\Offline\SyncMutationRecorder;
+use App\Support\Offline\SyncConflictRecorder;
 use App\Support\Offline\SyncConflictResolutionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
