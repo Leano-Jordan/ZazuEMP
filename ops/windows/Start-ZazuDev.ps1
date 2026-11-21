@@ -281,6 +281,16 @@ if ($parsedVersion -lt [version]'8.4') {
     throw "Zazu requires PHP 8.4+. Found $phpVersion at $php."
 }
 
+# Idempotently keep the daily owner-PC backup task aligned with this installation path.
+$backupScheduleInstaller = Join-Path $PSScriptRoot 'Install-ZazuBackupSchedule.ps1'
+if (Test-Path $backupScheduleInstaller -PathType Leaf) {
+    try {
+        & $backupScheduleInstaller -ProjectPath $ProjectPath
+    } catch {
+        Write-Warning ("The daily backup task could not be confirmed: {0}" -f $_.Exception.Message)
+    }
+}
+
 if ($SecureCookies) {
     # A cached Laravel config would otherwise retain the HTTP installer setting.
     $configCache = Join-Path $ProjectPath 'bootstrap\cache\config.php'
@@ -414,6 +424,19 @@ function Prepare-ZazuDatabase([string]$PhpExecutable) {
 }
 
 Prepare-ZazuDatabase $php
+
+$dailyBackupDirectory = Join-Path $ProjectPath 'storage\\app\\zazu-backups\\daily'
+$latestDailyBackup = Get-ChildItem -Path $dailyBackupDirectory -Filter 'zazu-backup-*.zip' -File -ErrorAction SilentlyContinue |
+    Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+if (-not $latestDailyBackup) {
+    Write-Warning 'No routine installation backup was found. The daily task should create one at 02:00; keep a separate USB/cloud copy as well.'
+} else {
+    $backupAge = (Get-Date).ToUniversalTime() - $latestDailyBackup.LastWriteTimeUtc
+    Write-Host ("Latest installation backup: {0} ({1} hours ago)" -f $latestDailyBackup.Name, [math]::Floor($backupAge.TotalHours))
+    if ($backupAge.TotalHours -gt 26) {
+        Write-Warning 'The latest installation backup is overdue. Check the Zazu EMP Daily Backup task and copy a current archive to separate USB/cloud storage.'
+    }
+}
 
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'

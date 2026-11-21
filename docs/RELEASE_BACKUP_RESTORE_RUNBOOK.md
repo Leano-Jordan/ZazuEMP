@@ -22,6 +22,18 @@ Business-level export/restore is implemented separately through the owner-only E
 
 Backups may contain database records and private storage. Treat backup artifacts as sensitive.
 
+## Routine Windows owner-PC backup
+
+The Windows host launcher maintains a per-installation Task Scheduler task named `ZazuEMP-DailyBackup-<installation>`.
+
+- Runs `php artisan zazu:backup` daily at 02:00 and starts a missed run when Windows becomes available.
+- Runs under the Windows account that owns the installation; no password is stored in the task.
+- Writes complete, self-verified archives to `storage/app/zazu-backups/daily/`.
+- Retains the latest 14 successful archives; older archives in that dedicated daily folder are removed only after a new backup succeeds.
+- The host launcher prints the latest archive age and warns when no backup exists or it is more than 26 hours old.
+
+**Off-disk protection remains an operator action:** copy the newest archive to a separate USB drive or independently stored cloud-synchronised folder. The daily local copy is on the same PC/disk and does not protect against disk failure, theft or loss of the machine. Treat the archive as sensitive because it contains every business in the installation.
+
 ## Restore preflight
 
 1. Identify the intended installation-wide backup artifact and confirm explicit operator authority.

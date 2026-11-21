@@ -19,6 +19,11 @@ This document records boundaries that are explicit in the V1 scope and current r
 - Browser emulation is not physical-device proof. Installed PWA launch, storage survival across real device restarts, reconnect and duplicate-safe sync still require the bounded phone/tablet acceptance on a trusted HTTPS origin.
 - The phone/tablet acceptance result is **OPEN** until real devices and the tested release commit are recorded. Do not describe V1 as physically device-certified before then.
 
+## iOS compatibility boundary
+
+- V1 physical offline acceptance is Android-only. iPhone/iPad offline cold launch, storage persistence, background behaviour and reconnect synchronisation have not been tested or certified.
+- Do not promise iOS offline reliability or parity in V1. Online use may be available where supported, but offline behaviour remains unverified until a separate device acceptance pass is completed.
+
 ## Deliberately deferred product capabilities
 
 - Full enterprise identity/SSO.
