@@ -53,6 +53,14 @@
 - Added an adversarial regression for an invoice identity mapped to a Customer; the malformed mapping must produce no bootstrap targets.
 - Exact-head Laravel, PostgreSQL, quality and browser acceptance are pending for this latest change.
 
+### Bootstrap invoice guard complexity refactor — 2026-11-21
+
+**Refactor:** [ae61053](https://github.com/Leano-Jordan/ZazuEMP/commit/ae61053f04e2f36bc4b284a681c6f5cbdf4cfdec).
+
+- PHPMD flagged the bootstrap payload builder's total class complexity after the invoice quote-reference validation was added.
+- Extracted the invoice relationship sanitizer into SyncBootstrapInvoiceRelationGuard and injected it into the payload builder. No complexity rule was suppressed or raised.
+- Exact-head PHPMD and Laravel verification are running.
+
 ### Invoice bootstrap quote-version ownership — 2026-11-21
 
 **Implementation:** [1c88144](https://github.com/Leano-Jordan/ZazuEMP/commit/1c88144120e9c7c4a1094d2b27680cf661ab2fd0) + [a938757](https://github.com/Leano-Jordan/ZazuEMP/commit/a93875716f8d546302009d0a7639a30d6bedebe8).  
