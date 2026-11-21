@@ -117,7 +117,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         ]);
         app(SyncMutationRecorder::class)->publish($mutation);
 
-        $delivery = \\App\\Models\\SyncDelivery::query()
+        $delivery = \App\Models\SyncDelivery::query()
             ->where('business_id', $business->id)
             ->where('destination_device_id', $receivingDevice->id)
             ->where('sync_mutation_id', $mutation->id)
