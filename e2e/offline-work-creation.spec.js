@@ -519,6 +519,9 @@ test('offline workspace appears when the Zazu host is unreachable but the browse
         });
         await window.ZazuOffline.persist();
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        // Bring the app to the foreground after the simulated host outage so
+        // the single origin monitor performs an immediate health check.
+        window.dispatchEvent(new Event('focus'));
     }, customerName);
 
     const workspace = page.locator('[data-zazu-offline-workspace]');
