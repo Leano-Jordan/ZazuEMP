@@ -9,6 +9,10 @@
 - Added desktop/mobile outage acceptance, backup-limit boundary tests and an empty-private-storage restore integration regression. Exact-head run 44937037910 passed 673 Laravel tests (1 skipped, 4,575 assertions), PostgreSQL recovery smoke and desktop/mobile browser acceptance.
 - Windows V1 package workflow now also verifies populated private-media recovery and an empty-private-storage restore that removes stale target files; package, Windows PowerShell fresh install and both recovery cases passed in run 44937732880.
 
+- The authenticated mutation applier now checks the original credential and mutation ownership inside the domain-application transaction; conflict recording, bootstrap, pull and acknowledgement share the same business-first/device-row credential guard.
+- Added a stale-credential conflict-write regression and strengthened attachment reload acceptance to verify offline state, durable pre-reload storage and business-scoped IndexedDB continuity.
+- Exact-head [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7): Laravel **675 passed / 1 skipped / 4,581 assertions**; PostgreSQL migration/recovery, 63 desktop + 7 mobile + 1 host-outage + 1 phone-local attachment/reconnect browser journeys, PHPMD, Psalm, Zazu Quality, Director Health, populated upgrade/rollback, Windows package/fresh install and Push-on-main passed. No browser retries or flaky tests. SonarCloud skipped.
+
 
 ## 2026-11-21 — Transactional trusted-device authorization
 
