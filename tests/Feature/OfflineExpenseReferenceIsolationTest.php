@@ -15,6 +15,7 @@ use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationRecorder;
+use App\Support\Offline\SyncMutationRelatedIdentityResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -302,19 +303,20 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         ]);
 
         $mutationId = (string) Str::uuid();
+        $paymentUuid = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
             'payment',
-            (string) Str::uuid(),
+            $paymentUuid,
             'create',
             [
-                'local_id' => (string) Str::uuid(),
+                'local_id' => $paymentUuid,
                 'record' => ['invoice_local_id' => $invoiceUuid],
             ],
             $mutationId,
         );
 
-        $related = app(\\App\\Support\\Offline\\SyncMutationRelatedIdentityResolver::class)
+        $related = app(SyncMutationRelatedIdentityResolver::class)
             ->resolve($mutation);
 
         $this->assertSame([], $related);
