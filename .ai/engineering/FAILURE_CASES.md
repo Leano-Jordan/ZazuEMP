@@ -19,6 +19,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0036 | Sync stale-device authorization | Conflict listing/resolution or attachment operations proceed from a middleware snapshot after revocation; a stale token may revoke a re-paired device | CLOSED — exact-head Laravel/PHPMD/Psalm PASS | Several endpoints did not share durable business/device lock and token-hash revalidation | Stale-snapshot regression tests for conflict listing/resolution, attachment upload/list and replacement-token revocation |
 | CASE-ZAZU-0037 | LAN host outage leaves phone on stale page | Zazu host stops while Wi-Fi remains connected; browser receives no offline event and visible server-rendered page remains stale | CLOSED — exact-head desktop/mobile browser PASS; physical Android drill remains a release gate | Origin availability was only rechecked during UI render/events; concurrent probes could race network transitions | Exact-head 503→200 health transition tests on desktop and Pixel 7 viewport; physical Android cold-launch/stop-host/restart remains separate |
 | CASE-ZAZU-0038 | Backup archive exceeds restore acceptance limits | Backup accepts up to 50,000 private files plus metadata/database, but restore previously allowed only 50,000 ZIP entries; backup also lacked the restore 2 GiB total-size ceiling | OPEN — shared limits and boundary tests committed; exact-head CI pending | Backup and restore maintained separate, drifting archive limits | Shared entry/size policy, boundary tests and complete-ZIP verification before publishing |
+| CASE-ZAZU-0039 | Empty private-storage restore retains stale target files | Backup manifest declares private_storage but ZIP contains no file entries; restore skips the private directory swap and leaves files from the pre-restore installation | OPEN — fix and integration regression committed; exact-head CI pending | Restore inferred private-storage presence only from file entries; ZIP omits empty directories | Restore uses declared contents manifest and swaps in an empty private directory; integration test proves stale file removal |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -738,3 +739,16 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression coverage:** boundary tests cover 50,000/50,001 private files, 50,002/50,003 ZIP entries and exact/over-limit uncompressed sizes.
 
 **Verification boundary:** exact-head Laravel, quality and backup/restore round-trip CI pending. A real installation recovery drill remains an owner/operator release gate.
+
+
+### CASE-ZAZU-0039
+
+**Status:** OPEN — implementation and integration regression committed; exact-head CI pending.
+
+**Failure fingerprint:** A valid v2 backup always declares database and private storage. ZIP does not store empty directories by default. When the source private directory was empty, the archive had no storage/private entries; restore inferred private-storage presence only from payload entries and therefore left the target installation's old private files untouched.
+
+**Control implemented:** v2 restore now requires the declared contents list to include database and private_storage. The declaration controls the private-storage swap even when no payload files exist. Restore creates an empty staging directory and replaces the old private tree, preserving rollback behaviour.
+
+**Regression coverage:** create a valid backup with empty private storage, add a stale private file after backup, restore, and assert the database returns to its snapshot while the stale file is removed and the private directory is empty.
+
+**Verification boundary:** exact-head Laravel and backup/restore workflow pending. This closes the code path only after CI passes; owner-operated full restore and media verification remain mandatory.
