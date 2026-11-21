@@ -192,6 +192,10 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
     await page.evaluate(async () => window.ZazuOffline.ready);
     await expect.poll(
+        () => page.evaluate(() => navigator.onLine),
+        { message: 'The browser must remain disconnected across the cold page reload.' },
+    ).toBe(false);
+    await expect.poll(
         () => page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0)),
         { message: 'The cached Work page must retain its original business identity after an offline reload.' },
     ).toBe(originalBusinessId);
