@@ -19,10 +19,39 @@ class SyncMutationApplier
     }
 
     /**
+     * Trusted internal entrypoint for already-authorized application contexts.
+     * Request-originated sync must use applyAuthenticated().
+     *
+     * @internal
      * @param array<string, SyncMutationHandler> $handlers
      */
     public function apply(SyncMutation $mutation, array $handlers): SyncMutation
     {
+        return $this->applyWithinAuthorizationContext($mutation, $handlers, null);
+    }
+
+    /**
+     * Apply a recorded mutation only while the request's authenticated device
+     * still owns the same active credential under the application transaction.
+     *
+     * @param array<string, SyncMutationHandler> $handlers
+     */
+    public function applyAuthenticated(
+        SyncMutation $mutation,
+        array $handlers,
+        SyncDevice $authenticatedDevice,
+    ): SyncMutation {
+        return $this->applyWithinAuthorizationContext($mutation, $handlers, $authenticatedDevice);
+    }
+
+    /**
+     * @param array<string, SyncMutationHandler> $handlers
+     */
+    private function applyWithinAuthorizationContext(
+        SyncMutation $mutation,
+        array $handlers,
+        ?SyncDevice $authenticatedDevice,
+    ): SyncMutation {
         if (! $mutation->exists) {
             throw new LogicException('A persisted sync mutation is required.');
         }
@@ -39,23 +68,33 @@ class SyncMutationApplier
             ]);
         }
 
-        return DB::transaction(function () use ($mutation, $handler): SyncMutation {
+        return DB::transaction(function () use ($mutation, $handler, $authenticatedDevice): SyncMutation {
             // Keep lock order consistent with SyncMutationRecorder: business,
             // device, mutation, then aggregate identity and domain rows.
-            DB::table('businesses')->where('id', $mutation->business_id)->lockForUpdate()->first();
+            if ($authenticatedDevice !== null) {
+                abort_unless(
+                    (int) $mutation->business_id === (int) $authenticatedDevice->business_id
+                        && (int) $mutation->sync_device_id === (int) $authenticatedDevice->id,
+                    404,
+                );
 
-            $lockedDevice = SyncDevice::query()
-                ->where('business_id', $mutation->business_id)
-                ->whereKey($mutation->sync_device_id)
-                ->active()
-                ->lockForUpdate()
-                ->first();
+                app(SyncDeviceAccessGuard::class)->lockActive($authenticatedDevice);
+            } else {
+                DB::table('businesses')->where('id', $mutation->business_id)->lockForUpdate()->first();
 
-            abort_unless(
-                $lockedDevice,
-                401,
-                'This sync device was revoked before the offline change could be applied.'
-            );
+                $lockedDevice = SyncDevice::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->whereKey($mutation->sync_device_id)
+                    ->active()
+                    ->lockForUpdate()
+                    ->first();
+
+                abort_unless(
+                    $lockedDevice,
+                    401,
+                    'This sync device was revoked before the offline change could be applied.'
+                );
+            }
 
             $locked = SyncMutation::query()
                 ->whereKey($mutation->id)
