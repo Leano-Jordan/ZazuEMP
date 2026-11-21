@@ -6,7 +6,7 @@
 - PostgreSQL migration/registration/recovery smoke: **PASS** in the same run.
 - PHPMD [44880113352], Zazu Quality [44880113347], Director Health [44880113380], Push-on-main [44880113289], Composer audit, secret scan, application and Actions/Python/JavaScript analysis: **PASS**.
 - SonarCloud [44880113403]: **SKIPPED**, not counted.
-- Offline-browser acceptance in Laravel run [44880113367]: **still running** at this checkpoint; do not claim the cross-device browser contract has passed yet.
+- Offline-browser acceptance in Laravel run [44880113367](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44880113367): **59 desktop Chromium passed**, **7 mobile-viewport passed**, and **1 phone-local Work/attachment/reconnect journey passed**.
 
 ### Verified corrections
 - Receiver pull now sends the exact delivery prefix to bootstrap. Server resolves primary and related aggregates only for the authenticated business/device, includes those aggregates beyond the regular 500-record window and prioritizes recently revised records for the normal bounded refresh.
