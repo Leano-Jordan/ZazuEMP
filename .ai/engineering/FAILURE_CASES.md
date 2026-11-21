@@ -16,7 +16,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | CLOSED — exact-head CI PASS | Revision preconditions, causal chains and conflict preservation verified across paired devices | Broader offline workflow matrix tracked separately |
 | CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | CLOSED — exact-head CI PASS | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
 | CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | CLOSED — exact-head CI PASS | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
-| CASE-ZAZU-0036 | Sync stale-device authorization | Conflict listing/resolution or attachment operations proceed from a middleware snapshot after revocation; a stale token may revoke a re-paired device | OPEN — implementation committed, exact-head CI pending | Several endpoints did not share durable business/device lock and token-hash revalidation | Stale-snapshot regression tests for conflict listing/resolution, attachment upload/list and replacement-token revocation |
+| CASE-ZAZU-0036 | Sync stale-device authorization | Conflict listing/resolution or attachment operations proceed from a middleware snapshot after revocation; a stale token may revoke a re-paired device | CLOSED — exact-head Laravel/PHPMD/Psalm PASS | Several endpoints did not share durable business/device lock and token-hash revalidation | Stale-snapshot regression tests for conflict listing/resolution, attachment upload/list and replacement-token revocation |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -695,7 +695,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0036
 
-**Status:** OPEN — implementation and regression tests committed; exact-head CI verification pending.
+**Status:** CLOSED — exact-head Laravel, PHPMD and Psalm verification passed on `7d4b097`.
 
 **Target:** Sync conflict listing/resolution, private attachment upload/list/download and `/api/sync/revoke`.
 
