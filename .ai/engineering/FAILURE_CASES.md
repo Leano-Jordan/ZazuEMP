@@ -17,7 +17,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | CLOSED — exact-head CI PASS | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
 | CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | CLOSED — exact-head CI PASS | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
 | CASE-ZAZU-0036 | Sync stale-device authorization | Conflict listing/resolution or attachment operations proceed from a middleware snapshot after revocation; a stale token may revoke a re-paired device | CLOSED — exact-head Laravel/PHPMD/Psalm PASS | Several endpoints did not share durable business/device lock and token-hash revalidation | Stale-snapshot regression tests for conflict listing/resolution, attachment upload/list and replacement-token revocation |
-| CASE-ZAZU-0037 | LAN host outage leaves phone on stale page | Zazu host stops while Wi-Fi remains connected; browser receives no offline event and visible server-rendered page remains stale | OPEN — monitor and regression committed; exact-head browser pending | Origin availability was only rechecked during UI render/events; no periodic health monitor existed | Simulated /up 503→200 on desktop and phone viewport, then physical Android host-stop/restart drill |
+| CASE-ZAZU-0037 | LAN host outage leaves phone on stale page | Zazu host stops while Wi-Fi remains connected; browser receives no offline event and visible server-rendered page remains stale | CLOSED — exact-head desktop/mobile browser PASS; physical Android drill remains a release gate | Origin availability was only rechecked during UI render/events; concurrent probes could race network transitions | Exact-head 503→200 health transition tests on desktop and Pixel 7 viewport; physical Android cold-launch/stop-host/restart remains separate |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -711,7 +711,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0037
 
-**Status:** OPEN — implementation and browser regression committed; exact-head browser verification pending.
+**Status:** CLOSED — exact-head desktop/mobile browser acceptance passed. Physical Android operational acceptance remains an independent V1 release gate.
 
 **Target:** Installed PWA while the phone remains connected to Wi-Fi but the Zazu LAN host becomes unavailable.
 
@@ -721,4 +721,4 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Regression coverage:** Playwright simulates /up returning 503 while navigator.onLine remains true, then restoring 200. The test runs on desktop Chromium and Pixel 7 viewport.
 
-**Verification boundary:** exact-head browser run pending. Actual installed Android outage, force-close/restart and reconnect acceptance remain open; mobile viewport is not physical-device evidence.
+**Closure evidence:** exact-head workflow [44934728827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44934728827) passed 63 desktop Chromium tests, 7 mobile-viewport Work/customer tests, the Pixel 7 host-outage regression and the phone-local attachment/reconnect journey without failures or flaky retries. Laravel passed 670 / 1 skipped / 4,552 assertions; PostgreSQL migration/recovery smoke passed.\n\n**Remaining release gate:** actual installed Android host stop, force-close/restart, disconnected operation and reconnect must still be observed on the owner's physical phone. Browser viewport evidence does not close that gate.
