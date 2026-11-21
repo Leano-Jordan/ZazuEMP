@@ -1,3 +1,11 @@
+## Director deep-audit checkpoint — 2026-11-21 (customer-contact writer correction)
+
+- **Source head:** `5f8dd6bdfa22b17bc6d0f14eb065400101caa1ea` on `main`; exact-head CI pending.
+- Corrected a confirmed online revision bypass in primary-contact creation: existing primary contacts are now updated individually under lock instead of through a relationship mass update that bypassed Eloquent events.
+- Added a regression proving the parent Customer revision advances while preserving exactly one primary contact.
+- **Readiness remains 75/100; V1 remains NOT READY.** CASE-ZAZU-0033 remains OPEN until the exhaustive writer audit and full supported sync matrix are verified. Physical Android, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain separate owner gates.
+
+---
 ## Director execution checkpoint — 2026-11-21 (receiver reconciliation + bootstrap auth)
 
 **Application/test source head:** `559e66b87de8617f967b722b55b0fbfd9b116495` on `main`.
