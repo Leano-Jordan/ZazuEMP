@@ -348,3 +348,12 @@ It does not increase merely because:
 - an incomplete workflow was given a new UI.
 
 Source of truth for live status: `.ai/engineering/READINESS_REGISTER.md`.
+
+
+## Director checkpoint — 2026-11-21 (finance reporting integrity)
+
+**Verified `main` HEAD:** `c43ab8db309a2ccedd48d2298077e3a602b72a5d`.
+
+A finance dashboard defect was corrected: draft invoices were included in the invoiced aggregate. The aggregate now counts issued and paid invoices only. A focused regression verifies that a 999.00 draft is excluded from 100.00 issued plus 200.00 paid, yielding 300.00.
+
+Exact-head Laravel, offline browser acceptance, PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push on main passed. SonarCloud was skipped. **No score uplift is claimed** from this isolated correction. V1 remains **NOT READY**; physical Android acceptance, owner-operated recovery, populated live-business commercial reconciliation and POPIA operational controls remain release gates.
