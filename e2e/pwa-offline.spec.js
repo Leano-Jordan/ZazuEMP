@@ -3525,7 +3525,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         }, { quoteLocalId, jobLocalId, customerLocalId });
 
         await context.setOffline(true);
-        await page.getByRole('link', { name: 'Quotes', exact: true }).click();
+        await page.getByRole('region', { name: 'Offline workspace' }).getByRole('link', { name: 'Quotes', exact: true }).click();
         const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'LOCAL-QUOTE-ACCEPT-001' });
         await expect(quoteRow).toBeVisible();
         await quoteRow.getByRole('button', { name: 'View offline' }).click();
