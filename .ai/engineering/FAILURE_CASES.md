@@ -20,6 +20,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0037 | LAN host outage leaves phone on stale page | Zazu host stops while Wi-Fi remains connected; browser receives no offline event and visible server-rendered page remains stale | CLOSED — exact-head desktop/mobile browser PASS; physical Android drill remains a release gate | Origin availability was only rechecked during UI render/events; concurrent probes could race network transitions | Exact-head 503→200 health transition tests on desktop and Pixel 7 viewport; physical Android cold-launch/stop-host/restart remains separate |
 | CASE-ZAZU-0038 | Backup archive exceeds restore acceptance limits | Backup accepts up to 50,000 private files plus metadata/database, but restore previously allowed only 50,000 ZIP entries; backup also lacked the restore 2 GiB total-size ceiling | CLOSED — exact-head Laravel/PHPMD/Quality PASS; owner restore drill remains open | Backup and restore maintained separate, drifting archive limits | Shared entry/size policy, boundary tests and complete-ZIP verification before publishing |
 | CASE-ZAZU-0039 | Empty private-storage restore retains stale target files | Backup manifest declares private_storage but ZIP contains no file entries; restore skips the private directory swap and leaves files from the pre-restore installation | CLOSED — exact-head Laravel/PHPMD/Quality PASS; owner restore drill remains open | Restore inferred private-storage presence only from file entries; ZIP omits empty directories | Restore uses declared contents manifest and swaps in an empty private directory; integration test proves stale file removal |
+| CASE-ZAZU-0040 | Recorded mutation applies after credential replacement | Mutation is recorded while device credential is valid, then device is re-paired before the separate apply transaction; old request can still apply if only active status is checked | OPEN — authenticated applier and adversarial regression committed; exact-head CI pending | Mutation recorder revalidated token hash, but SyncMutationApplier only rechecked active status | Apply under same business/device lock and verify authenticated snapshot token hash before domain handler runs |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -752,3 +753,16 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression coverage:** create a valid backup with empty private storage, add a stale private file after backup, restore, and assert the database returns to its snapshot while the stale file is removed and the private directory is empty.
 
 **Closure evidence:** exact-head run [44937037910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937037910) passed Laravel **673 / 1 skipped / 4,575 assertions**, including the empty-private-storage backup/restore integration. PostgreSQL migration/recovery smoke, PHPMD and Zazu Quality passed. Owner-operated full restore and media verification remain mandatory.
+
+
+### CASE-ZAZU-0040
+
+**Status:** OPEN — implementation and adversarial regression committed; exact-head CI pending.
+
+**Failure fingerprint:** Sync push recorded the mutation under the middleware-authenticated device credential. The applier then started a separate transaction and checked only that the device ID was still active. If the device was re-paired between record and apply, the old request could apply its mutation against the replacement credential.
+
+**Control implemented:** The push processor now calls the explicit authenticated applier. It verifies the mutation belongs to the authenticated business/device and invokes the shared business-first/device-row credential guard inside the same transaction as the domain mutation. The internal applier path is marked trusted/internal and is not used by HTTP push.
+
+**Regression coverage:** record with the original credential, replace the stored credential, attempt apply with the stale authenticated snapshot, and assert 401, pending mutation status, zero attempts and no delivery.
+
+**Verification boundary:** exact-head Laravel, PHPMD, Psalm and Director Health pending. No exploit was demonstrated in a running installation; this was a source-level TOCTOU path closed with an adversarial regression.
