@@ -176,7 +176,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("'/finance/invoices/create'", $worker);
         $this->assertStringContainsString("|| /^\\/work\\/\\d+$/.test(pathname)", $worker);
         $this->assertSame(3, substr_count($worker, 'cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname))'));
-        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v58\';', $worker);
+        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v59\';', $worker);
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
             $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $dashboard);
         }
@@ -386,7 +386,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString("slice(0, 6)", $client);
         $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString("zazu-static-v58", $worker);
+        $this->assertStringContainsString("zazu-static-v59", $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
