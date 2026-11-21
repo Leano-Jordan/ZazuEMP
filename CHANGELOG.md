@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-11-21 — Receiver sync completeness and bootstrap authorization
+
+- Fixed a receiver reconciliation defect where a delivered aggregate outside a bounded bootstrap collection could be omitted from the local snapshot while its delivery cursor was still acknowledged.
+- Receiver bootstrap now accepts the exact delivery sequence prefix, resolves primary and related aggregates for the authenticated business/device, and includes those records before acknowledgement.
+- Normal bounded collections prioritize recently revised aggregates while keeping their existing display order and 500-record working-set limit.
+- Preserved explicitly pinned pairing selections; delivery-driven Customer/Work/Quote/Preparation entries cannot silently broaden a restricted workspace.
+- Hardened bootstrap against stale device-authentication snapshots: business-first and device-row locks, active-status revalidation, persisted token-hash comparison and 401 rejection after revocation or credential replacement.
+- Advanced the precached offline client to service-worker cache v58.
+- Exact-head source: 559e66b87de8617f967b722b55b0fbfd9b116495. Laravel: 632 passed / 1 skipped / 4,388 assertions; desktop Chromium: 59 passed; mobile viewport: 7 passed; phone-local attachment journey: 1 passed; PostgreSQL recovery, PHPMD, Zazu Quality, Composer audit, secret scan, Director Health and Push-on-main: PASS. SonarCloud skipped.
+- V1 remains NOT READY; evidence maturity is 75/100 (+2). Physical Android restart/reconnect, intended-installation recovery, live-business financial reconciliation, POPIA controls and the wider offline sync matrix remain open.
+
+
 ## 2026-11-17 — Job date rules, safer Windows startup and plain English
 
 - Centralised job date/time relationship checks for online saves and offline sync. Invalid date order is rejected; multi-day jobs may end at an earlier clock time on their final day.
