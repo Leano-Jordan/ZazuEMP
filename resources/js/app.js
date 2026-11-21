@@ -3096,6 +3096,7 @@ function setupZazuOfflineForms() {
                     actual_amount: get('actual_amount') || null,
                     status: get('status') || 'planned',
                     notes: get('notes') || null,
+                    pending_sync: true,
                 };
             } else if (entity === 'service') {
                 const state = window.ZazuOffline.getState();
