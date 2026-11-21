@@ -20,7 +20,7 @@ class EventCostController extends Controller
         $this->ensureBusiness($event, $request);
         $costs = $event->costs()->latest()->get();
 
-        $totalsByCurrency = $costs->groupBy('currency')->map(function ($currencyCosts) {
+        $totalsByCurrency = $costs->where('status', '!=', 'cancelled')->groupBy('currency')->map(function ($currencyCosts) {
             $projectedCents = $currencyCosts->sum(
                 fn (EventCost $cost) => Money::toCents((string) $cost->projected_amount)
             );
