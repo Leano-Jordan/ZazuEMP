@@ -9,7 +9,7 @@
 - Added a 10-second HEAD /up monitor, outage notice and non-destructive link to the cached dashboard workspace. It does not auto-navigate or discard an open form.
 - The same health result now controls dashboard local-workspace visibility; the notice explicitly states that only supported offline screens are available.
 - Added a regression that simulates /up returning 503 while navigator.onLine remains true, then restoring 200. It runs on desktop Chromium and Pixel 7 viewport.
-- Verification: quality checks passed on the implementation/style heads; Laravel and offline-browser acceptance are running on the latest test head. No pass is claimed for the new outage test until the exact-head run completes.
+- Verification on test head 41d7a25: Laravel **670 passed / 1 skipped / 4,552 assertions**, PostgreSQL migration/recovery smoke **PASS**, Zazu Quality **PASS**, Push-on-main **PASS**. The offline-browser acceptance job is still running; no pass is claimed for the new outage test until the exact-head run completes.
 - Physical Android acceptance remains open. Browser mobile emulation cannot establish installed-app cold launch, force-close/restart or real phone persistence.
 
 Next: close exact-head browser acceptance; fix any failures; then continue physical-device, owner-PC recovery and commercial acceptance gates. Main only; no branches.
