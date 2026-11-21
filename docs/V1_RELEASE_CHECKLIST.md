@@ -1,6 +1,24 @@
+## Offline quote-to-invoice sync acceptance — 2026-11-21
+
+**Exact source/test head:** `36a2f605481e3985b647dda710ead7bef157b70f` · [workflow 44898943264](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44898943264).
+
+- [x] Disconnected quote acceptance is queued and reflected in local state.
+- [x] An invoice is created locally from the newly accepted quote.
+- [x] Reconnect acknowledges both queued mutations and advances quote/Work revisions.
+- [x] The invoice receives its server identity using its actual generated local ID; its quote-local relationship is retained.
+- [x] Durable queue drains after both acknowledgements.
+- [x] Offline browser 60 desktop Chromium + 7 mobile viewport + 1 phone-local attachment journey passed.
+- [x] Laravel 649 passed / 1 skipped / 4,456 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery smoke passed.
+- [x] CASE-ZAZU-0037 / ENG-FIXTURE-007 closed as an F2/F3 test-fixture correction; production code was unchanged.
+- [ ] Full offline sync matrix and live-business commercial reconciliation remain OPEN; mocked browser acknowledgements do not replace live server persistence evidence.
+
+V1 remains NOT READY. Physical Android cold launch/restart/reconnect, intended-PC recovery and POPIA operational sign-off remain separate gates.
+
+---
+
 # Zazu EMP — V1 Release Checklist
 
-Latest application/test source verification: 2d0269b00a3a94ecfb392f04c06438ece6eda603 — 649 passed / 1 skipped / 4,456 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 59 desktop + 7 mobile + 1 phone-local journey PASS.
+Latest application/test source verification: 36a2f605481e3985b647dda710ead7bef157b70f — 649 passed / 1 skipped / 4,456 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 60 desktop + 7 mobile + 1 phone-local journey PASS.
 Latest Windows host-operations source: 365609b4d30ca4978ba9480cf3571bb792ad442b; Windows package/fresh-install PowerShell acceptance PASS [run 44892813237]. Exact-head PHPMD, Psalm, Zazu Quality, populated upgrade/rollback and Director Health all PASS [runs 44892813263, 44892813233, 44892813235, 44892813238, 44892813214].
 Disposition: **NOT READY** · Evidence maturity: **77/100**. Code implementation does not substitute for owner-PC recovery, physical Android or POPIA evidence.
 
