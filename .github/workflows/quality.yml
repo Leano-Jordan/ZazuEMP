@@ -41,6 +41,20 @@ jobs:
       - name: Test service-worker authentication cache races
         run: npm run test:service-worker
 
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup PHP and Composer
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: '8.4'
+      - name: Install locked PHP dependencies without application scripts
+        run: composer install --locked --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Enforce PHP formatting without modifying files
+        run: vendor/bin/pint --test
+
   composer-security-audit:
     runs-on: ubuntu-latest
     steps:
