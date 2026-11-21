@@ -22,6 +22,7 @@ use App\Models\SyncEntityIdentity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class SyncBootstrapPayloadBuilder
 {
@@ -180,25 +181,43 @@ class SyncBootstrapPayloadBuilder
      * receiver's unacknowledged delivery batch.
      */
     private function applyBoundedWorkingSet(
-        $query,
+        Builder $query,
         string $modelClass,
         Business $business,
         array $includedIds,
+        string $entityType,
         string $orderColumn,
         string $direction,
     ): void {
-        if ($includedIds !== []) {
-            $window = $modelClass::query()
-                ->select('id')
-                ->where('business_id', $business->id)
-                ->orderBy($orderColumn, $direction)
-                ->limit(500);
+        $record = new $modelClass();
+        $table = $record->getTable();
+        $revisionTimestamp = SyncEntityIdentity::query()
+            ->select('updated_at')
+            ->where('business_id', $business->id)
+            ->where('entity_type', $entityType)
+            ->where('record_type', $record->getMorphClass())
+            ->whereColumn('record_id', $table.'.id')
+            ->limit(1);
 
-            $query->where(function ($builder) use ($includedIds, $window): void {
+        // Choose the most recently changed 500 aggregates for synchronization.
+        // The final collection remains in its normal display order. Records
+        // without an identity yet fall back to their Eloquent updated_at.
+        $window = $modelClass::query()
+            ->select($table.'.id')
+            ->where($table.'.business_id', $business->id)
+            ->orderByRaw(
+                'COALESCE(('.$revisionTimestamp->toSql().'), '.$table.'.updated_at) DESC',
+                $revisionTimestamp->getBindings(),
+            )
+            ->orderByDesc($table.'.id')
+            ->limit(500);
+
+        if ($includedIds !== []) {
+            $query->where(function (Builder $builder) use ($includedIds, $window): void {
                 $builder->whereIn('id', $includedIds)->orWhereIn('id', $window);
             });
         } else {
-            $query->limit(500);
+            $query->whereIn('id', $window);
         }
 
         $query->orderBy($orderColumn, $direction);
@@ -254,7 +273,7 @@ class SyncBootstrapPayloadBuilder
     private function bootstrapSuppliers(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
         $query = Supplier::query()->where('business_id', $business->id);
-        $this->applyBoundedWorkingSet($query, Supplier::class, $business, $includedIds, 'name', 'asc');
+        $this->applyBoundedWorkingSet($query, Supplier::class, $business, $includedIds, 'supplier', 'name', 'asc');
 
         return $query->get()
             ->map(fn (Supplier $supplier) => [
@@ -268,7 +287,7 @@ class SyncBootstrapPayloadBuilder
     private function bootstrapPurchaseOrders(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
         $query = PurchaseOrder::query()->where('business_id', $business->id)->with('items');
-        $this->applyBoundedWorkingSet($query, PurchaseOrder::class, $business, $includedIds, 'created_at', 'desc');
+        $this->applyBoundedWorkingSet($query, PurchaseOrder::class, $business, $includedIds, 'purchase_order', 'created_at', 'desc');
 
         return $query->get()
             ->map(fn (PurchaseOrder $order) => [
@@ -287,7 +306,7 @@ class SyncBootstrapPayloadBuilder
     private function bootstrapInvoices(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
         $query = Invoice::query()->where('business_id', $business->id)->with(['items', 'payments', 'quoteVersion']);
-        $this->applyBoundedWorkingSet($query, Invoice::class, $business, $includedIds, 'id', 'desc');
+        $this->applyBoundedWorkingSet($query, Invoice::class, $business, $includedIds, 'invoice', 'id', 'desc');
 
         return $query->get()
             ->map(fn (Invoice $invoice) => [
@@ -313,7 +332,7 @@ class SyncBootstrapPayloadBuilder
     private function bootstrapInventoryItems(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
         $query = InventoryItem::query()->where('business_id', $business->id)->with('movements');
-        $this->applyBoundedWorkingSet($query, InventoryItem::class, $business, $includedIds, 'name', 'asc');
+        $this->applyBoundedWorkingSet($query, InventoryItem::class, $business, $includedIds, 'inventory_item', 'name', 'asc');
 
         return $query->get()
             ->map(fn (InventoryItem $item) => [
@@ -336,7 +355,7 @@ class SyncBootstrapPayloadBuilder
         $query = Asset::query()
             ->where('business_id', $business->id)
             ->with(['allocations' => fn ($query) => $query->where('status', 'allocated')]);
-        $this->applyBoundedWorkingSet($query, Asset::class, $business, $includedIds, 'name', 'asc');
+        $this->applyBoundedWorkingSet($query, Asset::class, $business, $includedIds, 'asset', 'name', 'asc');
 
         return $query->get()
             ->map(fn (Asset $asset) => [
@@ -356,7 +375,7 @@ class SyncBootstrapPayloadBuilder
     private function bootstrapCosts(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
         $query = EventCost::query()->where('business_id', $business->id)->with('event');
-        $this->applyBoundedWorkingSet($query, EventCost::class, $business, $includedIds, 'id', 'desc');
+        $this->applyBoundedWorkingSet($query, EventCost::class, $business, $includedIds, 'event_cost', 'id', 'desc');
 
         return $query->get()
             ->map(fn (EventCost $cost) => [
@@ -372,7 +391,7 @@ class SyncBootstrapPayloadBuilder
     private function bootstrapExpenses(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
         $query = FinanceExpense::query()->where('business_id', $business->id);
-        $this->applyBoundedWorkingSet($query, FinanceExpense::class, $business, $includedIds, 'id', 'desc');
+        $this->applyBoundedWorkingSet($query, FinanceExpense::class, $business, $includedIds, 'expense', 'id', 'desc');
 
         return $query->get()
             ->map(fn (FinanceExpense $expense) => [
