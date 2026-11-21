@@ -190,112 +190,22 @@ if ($environmentCreated) {
 
 # Rotate Laravel logs daily on fresh and existing installations. Preserve custom stacks.
 $environmentText = Get-Content $environmentPath -Raw
-$logStackMatch = [regex]::Match($environmentText, '(?m)^LOG_STACK=(.*)
-$requiredDirectories = @(
-    'database',
-    'storage\app\private',
-    'storage\framework\cache\data',
-    'storage\framework\sessions',
-    'storage\framework\views',
-    'storage\logs',
-    'bootstrap\cache'
-)
-foreach ($relativePath in $requiredDirectories) {
-    New-Item -ItemType Directory -Path (Join-Path $ProjectPath $relativePath) -Force | Out-Null
-}
-
-# Protect business data, secrets, sessions, logs, cache and private attachments
-# from broad inherited access on shared Windows folders.
-$restrictedPaths = @(
-    (Join-Path $ProjectPath 'storage\app\private'),
-    (Join-Path $ProjectPath 'storage\framework'),
-    (Join-Path $ProjectPath 'storage\logs'),
-    (Join-Path $ProjectPath 'database'),
-    (Join-Path $ProjectPath 'bootstrap\cache'),
-    $environmentPath
-)
-foreach ($restrictedPath in $restrictedPaths) {
-    Set-ZazuRestrictedAcl $restrictedPath
-}
-
-$databasePath = Join-Path $ProjectPath 'database\database.sqlite'
-if (-not (Test-Path $databasePath -PathType Leaf)) {
-    New-Item -ItemType File -Path $databasePath -Force | Out-Null
-}
-
-$keyLine = Get-Content $environmentPath | Where-Object { $_ -match '^APP_KEY=' } | Select-Object -First 1
-if ([string]::IsNullOrWhiteSpace($keyLine) -or $keyLine -eq 'APP_KEY=') {
-    Invoke-ZazuPhp @('key:generate', '--force')
-}
-
-Write-Host 'Preparing the local Zazu database...'
-Invoke-ZazuPhp @('migrate', '--force')
-
-Write-Host ''
-Write-Host 'Zazu EMP installation preparation completed.'
-Write-Host 'Application data will be stored in this installation folder.'
-Write-Host 'Next step: double-click Start-Zazu-Dev.cmd and open http://127.0.0.1:8000.'
-Write-Host 'For phone/tablet access, use the documented private-LAN HTTPS setup; do not expose the HTTP development port to the internet.'
-)
+$logStackMatch = [regex]::Match($environmentText, '(?m)^LOG_STACK=(.*)$')
 if (-not $logStackMatch.Success) {
     $environmentText = $environmentText.TrimEnd() + [Environment]::NewLine + 'LOG_STACK=daily' + [Environment]::NewLine
 } elseif ([string]::IsNullOrWhiteSpace($logStackMatch.Groups[1].Value) -or $logStackMatch.Groups[1].Value.Trim() -eq 'single') {
-    $environmentText = [regex]::Replace($environmentText, '(?m)^LOG_STACK=.*
-$requiredDirectories = @(
-    'database',
-    'storage\app\private',
-    'storage\framework\cache\data',
-    'storage\framework\sessions',
-    'storage\framework\views',
-    'storage\logs',
-    'bootstrap\cache'
-)
-foreach ($relativePath in $requiredDirectories) {
-    New-Item -ItemType Directory -Path (Join-Path $ProjectPath $relativePath) -Force | Out-Null
-}
-
-# Protect business data, secrets, sessions, logs, cache and private attachments
-# from broad inherited access on shared Windows folders.
-$restrictedPaths = @(
-    (Join-Path $ProjectPath 'storage\app\private'),
-    (Join-Path $ProjectPath 'storage\framework'),
-    (Join-Path $ProjectPath 'storage\logs'),
-    (Join-Path $ProjectPath 'database'),
-    (Join-Path $ProjectPath 'bootstrap\cache'),
-    $environmentPath
-)
-foreach ($restrictedPath in $restrictedPaths) {
-    Set-ZazuRestrictedAcl $restrictedPath
-}
-
-$databasePath = Join-Path $ProjectPath 'database\database.sqlite'
-if (-not (Test-Path $databasePath -PathType Leaf)) {
-    New-Item -ItemType File -Path $databasePath -Force | Out-Null
-}
-
-$keyLine = Get-Content $environmentPath | Where-Object { $_ -match '^APP_KEY=' } | Select-Object -First 1
-if ([string]::IsNullOrWhiteSpace($keyLine) -or $keyLine -eq 'APP_KEY=') {
-    Invoke-ZazuPhp @('key:generate', '--force')
-}
-
-Write-Host 'Preparing the local Zazu database...'
-Invoke-ZazuPhp @('migrate', '--force')
-
-Write-Host ''
-Write-Host 'Zazu EMP installation preparation completed.'
-Write-Host 'Application data will be stored in this installation folder.'
-Write-Host 'Next step: double-click Start-Zazu-Dev.cmd and open http://127.0.0.1:8000.'
-Write-Host 'For phone/tablet access, use the documented private-LAN HTTPS setup; do not expose the HTTP development port to the internet.'
-, 'LOG_STACK=daily')
+    $environmentText = [regex]::Replace($environmentText, '(?m)^LOG_STACK=.*$', 'LOG_STACK=daily')
 }
 if ($environmentText -notmatch '(?m)^LOG_DAILY_DAYS=') {
     $environmentText = $environmentText.TrimEnd() + [Environment]::NewLine + 'LOG_DAILY_DAYS=14' + [Environment]::NewLine
 }
 Set-Content -Path $environmentPath -Value $environmentText -Encoding UTF8
 
+
 $requiredDirectories = @(
     'database',
     'storage\app\private',
+    'storage\app\zazu-backups\daily',
     'storage\framework\cache\data',
     'storage\framework\sessions',
     'storage\framework\views',
@@ -310,6 +220,7 @@ foreach ($relativePath in $requiredDirectories) {
 # from broad inherited access on shared Windows folders.
 $restrictedPaths = @(
     (Join-Path $ProjectPath 'storage\app\private'),
+    (Join-Path $ProjectPath 'storage\app\zazu-backups'),
     (Join-Path $ProjectPath 'storage\framework'),
     (Join-Path $ProjectPath 'storage\logs'),
     (Join-Path $ProjectPath 'database'),

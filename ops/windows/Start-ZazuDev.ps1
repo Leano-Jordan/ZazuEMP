@@ -425,7 +425,7 @@ function Prepare-ZazuDatabase([string]$PhpExecutable) {
 
 Prepare-ZazuDatabase $php
 
-$dailyBackupDirectory = Join-Path $ProjectPath 'storage\\app\\zazu-backups\\daily'
+$dailyBackupDirectory = Join-Path $ProjectPath 'storage\app\zazu-backups\daily'
 $latestDailyBackup = Get-ChildItem -Path $dailyBackupDirectory -Filter 'zazu-backup-*.zip' -File -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
 if (-not $latestDailyBackup) {
