@@ -1,3 +1,23 @@
+## Offline payment reconciliation — 2026-11-21
+
+**Exact source/test head:** `e1debd77c9d064f92895768f120ac752a34d897b` on `main`.  
+**Laravel workflow:** [44901265394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44901265394).
+
+- The server-side offline payment handler is exercised with a real invoice and trusted device. A 25.00 ZAR payment is recorded once; invoice paid amount becomes 25.00, balance becomes 75.00, and the invoice sync identity advances from revision 1 to 2.
+- The server returns the invoice as a related identity for the payment command. Replaying an already-applied mutation does not create a second payment or advance the invoice revision again.
+- Browser acceptance verifies the offline payment receives its canonical payment identity and applies the related invoice revision acknowledgement; the durable mutation queue drains.
+- Laravel: **650 passed / 1 skipped / 4,466 assertions**.
+- Offline browser: **60 desktop Chromium + 7 mobile viewport + 1 phone-local attachment journey passed**.
+- PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS**.
+- Zazu Quality, Composer security audit, secret scan, PHPMD, Director Health and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- No production source change was required for this payment target; this batch closes the backend and browser verification gap.
+
+**Evidence boundary:** the browser acknowledgement is deterministic/mocked. The PHP feature test exercises the real server-side mutation handler and database transaction. The populated online commercial reconciliation remains a separate live-business acceptance gate. Physical Android cold launch/restart/reconnect, intended-PC recovery and POPIA operational sign-off remain separate gates. V1 remains **NOT READY**; no score increase is claimed.
+
+**Next engineering target:** exercise the existing offline expense workflow end-to-end, including its linked business records, canonical identity acknowledgement and duplicate-safe replay.
+
+---
+
 ## Offline quote-to-invoice sync acceptance — 2026-11-21
 
 **Exact source/test head:** `36a2f605481e3985b647dda710ead7bef157b70f` · [workflow 44898943264](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44898943264).
@@ -18,7 +38,7 @@ V1 remains NOT READY. Physical Android cold launch/restart/reconnect, intended-P
 
 # Zazu EMP — V1 Release Checklist
 
-Latest application/test source verification: 36a2f605481e3985b647dda710ead7bef157b70f — 649 passed / 1 skipped / 4,456 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 60 desktop + 7 mobile + 1 phone-local journey PASS.
+Latest application/test source verification: e1debd77c9d064f92895768f120ac752a34d897b — 650 passed / 1 skipped / 4,466 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 60 desktop + 7 mobile + 1 phone-local journey PASS.
 Latest Windows host-operations source: 365609b4d30ca4978ba9480cf3571bb792ad442b; Windows package/fresh-install PowerShell acceptance PASS [run 44892813237]. Exact-head PHPMD, Psalm, Zazu Quality, populated upgrade/rollback and Director Health all PASS [runs 44892813263, 44892813233, 44892813235, 44892813238, 44892813214].
 Disposition: **NOT READY** · Evidence maturity: **77/100**. Code implementation does not substitute for owner-PC recovery, physical Android or POPIA evidence.
 
