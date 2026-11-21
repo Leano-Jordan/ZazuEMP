@@ -1,3 +1,23 @@
+## Director execution checkpoint — related snapshot ownership completed — 2026-11-21
+
+**Latest implementation:** [1fdbb02](https://github.com/Leano-Jordan/ZazuEMP/commit/1fdbb0212c099df1f8403628b9e71423f35c5434).  
+**Latest adversarial regression:** [f53e17a](https://github.com/Leano-Jordan/ZazuEMP/commit/f53e17ab33e82d960dc40bc4a67e19bc8da349b8).  
+**Bootstrap fallback refactor:** [438d322](https://github.com/Leano-Jordan/ZazuEMP/commit/438d3220be5eb02078ed7e5f690c38161b612e25) + [e587bc0](https://github.com/Leano-Jordan/ZazuEMP/commit/e587bc078f1dba9ad4ac50141f021fbdb0207bbc).  
+**Primary acknowledgement guard:** [6b27c41](https://github.com/Leano-Jordan/ZazuEMP/commit/6b27c41912f5a4fe98f50e4bbf78f73c4dca422e) + [80f509d](https://github.com/Leano-Jordan/ZazuEMP/commit/80f509d6a910715aa1656650ba3625c72647e309) + [1c2d5e1](https://github.com/Leano-Jordan/ZazuEMP/commit/1c2d5e13d27d08fece18c878bcfb847a77b302f1).  
+**Regression fixture correction:** [2a18c86](https://github.com/Leano-Jordan/ZazuEMP/commit/2a18c867403c3096f4d170a2f7b45a77332df7e4).
+
+- The bootstrap fallback and primary push acknowledgement now reject identity rows whose morph target is not the expected model or whose resolved record is not owned by the current business.
+- The first PHPMD failure was a genuine complexity-threshold failure; it was corrected by extracting fallback validation and replacing the large match with a lookup table. The PHPMD run on [e587bc0](https://github.com/Leano-Jordan/ZazuEMP/commit/e587bc078f1dba9ad4ac50141f021fbdb0207bbc) passed.
+- The conflict snapshot path now validates the actual related Asset record before returning its identity metadata. A new regression constructs a local allocation pointing to a foreign-business Asset and expects no related identity in the snapshot.
+- Current exact test-head verification on [Laravel + PostgreSQL + browser run 44922365071](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922365071), [PHPMD run 44922365016](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922365016), [Zazu Quality run 44922365022](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922365022), and [Director Health run 44922365096](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922365096). At checkpoint: PHPMD in progress, Laravel and other checks queued; SonarCloud skipped.
+- Prior full offline acceptance run [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572) passed 659 / 1 skipped / 4,527 assertions, PostgreSQL recovery, desktop Chromium, mobile customer/Work, and phone-local attachment acceptance.
+
+**Evidence maturity:** 77/100 remains unchanged; V1 remains NOT READY. Do not award evidence points until the latest exact-head suite passes and the remaining operational acceptance gates are completed.
+
+**Next Director target:** close current CI, then continue review of bootstrap selection and conflict delivery for any remaining cross-tenant linked aggregates. Main only; no branch creation.
+
+---
+
 ## Director execution checkpoint — bootstrap + primary acknowledgement hardening — 2026-11-21
 
 **Current implementation head:** [e587bc0](https://github.com/Leano-Jordan/ZazuEMP/commit/e587bc078f1dba9ad4ac50141f021fbdb0207bbc).  
