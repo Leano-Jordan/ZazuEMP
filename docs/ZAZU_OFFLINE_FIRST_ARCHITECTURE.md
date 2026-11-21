@@ -53,6 +53,16 @@
 - Added an adversarial regression for an invoice identity mapped to a Customer; the malformed mapping must produce no bootstrap targets.
 - Exact-head Laravel, PostgreSQL, quality and browser acceptance are pending for this latest change.
 
+## Selected bootstrap nested relationship tenant isolation — 2026-11-21
+
+**Implementation:** [4cbd1f7](https://github.com/Leano-Jordan/ZazuEMP/commit/4cbd1f7d83dad9e3b6000b89ebe04028023e569e).  
+**Regression:** [530ff81](https://github.com/Leano-Jordan/ZazuEMP/commit/530ff81c47b9d7e82cef87bcdaf473353247f3b2).
+
+- Selected Work, Quote and Preparation records serialized nested Customer relations without explicitly constraining those related customers to the active business. The parent records were tenant-scoped, but a corrupted cross-business foreign key could still pull another business's Customer into the nested bootstrap payload.
+- Selected Work now loads only a Customer whose business_id matches the Work record. Selected Quote and Preparation bootstrap data constrain the related Event to the parent business and its nested Customer to that same business.
+- Added a full bootstrap regression with a local Work/Quote/Preparation set deliberately linked to a foreign-business Customer; none of the selected payloads may contain the foreign Customer or its local identity.
+- Exact-head Laravel, PHPMD, quality and Director Health checks are pending for the new nested relationship regression.
+
 ## Related offline identity acknowledgements and revision advancement — 2026-11-21
 
 **Related identity resolver:** [c919d4f](https://github.com/Leano-Jordan/ZazuEMP/commit/c919d4fc7fb611d835b966b6babc70288fe5263f).  
