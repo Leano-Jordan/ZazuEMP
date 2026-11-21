@@ -14,7 +14,7 @@
 Product: Zazu – Event Management Platform (Zazu EMP)
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main only
-Context updated: 2026-11-20
+Context updated: 2026-11-21
 
 ## Owner V1 shipping mandate — binding
 Primary objective: get a working Zazu V1 into the hands of the first real businesses. V1 is a practical first release, not an enterprise-scale perfection exercise.
@@ -26,6 +26,10 @@ Primary objective: get a working Zazu V1 into the hands of the first real busine
 - Offline V1 engineering is RESUMED. Bounded service-worker, IndexedDB, local attachments, sync, PWA installation and recovery work is authorized where it closes agreed V1 gaps.
 - Work directly on main. Never create branches. Do not introduce Render or AMPPS deployment workflows.
 - Never claim unobserved runtime, CI, browser or release evidence.
+
+
+## Founder commercial decision — 2026-11-21
+Zazu EMP has exactly three commercial tiers: **Basic (permanent Free), Intermediate (paid), Advanced (paid)**. These are also the canonical experience/entitlement names. The Founder approved the tier structure only; exact paid monthly prices, feature matrix and quotas remain unapproved. The old Starter/Team/Business and R499/R899/R1,499 proposal is withdrawn and must not be represented as current pricing. See DEC-027 in .ai/engineering/DECISION_LOG.md and the reconciled product specification/valuation.
 
 ## Product direction
 Zazu is a reusable commercial event-management platform for catering, event equipment hire, sound/DJ, baking, decor, rentals, photography/camera hire and related service businesses. Core flow: Business → Customer → Event/Job → Requirements → Quote → Confirmation/Deposit → Purchasing/Preparation → Execution → Payments/Completion.
@@ -45,6 +49,6 @@ Offline capability remains bounded: IndexedDB workspace and durable mutation que
 Sync protections include business-scoped stable record identity, mutation replay checks, ordered delivery, atomic apply/publication, retryable infrastructure handling and contiguous pull/acknowledgement. The pending queue is ordered by creation time; this is not a confirmed defect.
 **Revision-aware stale-write protection — IMPLEMENTED on main:** existing-record offline updates now carry server-owned aggregate revisions or same-device predecessor mutation IDs. The server rejects stale writes with an authoritative remote snapshot; keep-local uses a new immutable mutation ID against the latest revision, and use-server restores the authoritative record. CASE-ZAZU-0033 remains OPEN for broad workflow-matrix acceptance, complete replay/reconciliation evidence, and remaining runtime/physical checks. A focused regression passes on exact head for command-side revision propagation: quote acceptance → Work, payment → invoice, purchase receipt → purchase order/inventory, inventory movement → inventory item, and asset allocation → asset.
 **Writer audit:** the current source review has traced the customer, Work, quote, finance, purchasing, inventory, service/capability, supplier and asset write paths plus aggregate event hooks. No additional confirmed revision bypass has been found in the inspected paths. This is a bounded source audit, not yet a claim of exhaustive runtime proof. Keep payment, receipt, stock movement and asset-allocation idempotency/invariants intact.
-Other release gates remain OPEN: actual Android standalone offline cold launch/restart/reconnect; installed-PC recovery drill; populated commercial reconciliation; POPIA operational sign-off; ZAZU name clearance. **DB-001 is DORMANT / MONITORING:** Founder reports no recent recurrence; no root cause is claimed. Preserve the incident history and resume investigation only if it recurs or new evidence appears. The independent installation-recovery gate remains open. PC-to-phone pairing is CLOSED. V1 remains NOT READY; evidence maturity remains 73/100 with no uplift.
+Other release gates remain OPEN: actual Android standalone offline cold launch/restart/reconnect; installed-PC recovery drill; populated commercial reconciliation; POPIA operational sign-off; ZAZU name clearance. **DB-001 is DORMANT / MONITORING:** Founder reports no recent recurrence; no root cause is claimed. Preserve the incident history and resume investigation only if it recurs or new evidence appears. The independent installation-recovery gate remains open. PC-to-phone pairing is CLOSED. V1 remains NOT READY; evidence maturity is 77/100 following verified stale-write protection closure; V1 remains NOT READY.
 Current state: `.ai/engineering/STATE.md`. Sole readiness register: `.ai/engineering/READINESS_REGISTER.md`. Release acceptance: `docs/V1_RELEASE_CHECKLIST.md`.
 Historical context is preserved in `docs/archive/engineering/2026-11-17-state-register-memory-history.md`.
