@@ -1,3 +1,11 @@
+### Inventory movement primary identity compatibility — 2026-11-21
+
+**Implementation:** [3f8d2cd](https://github.com/Leano-Jordan/ZazuEMP/commit/3f8d2cd9bc70f718ff991eb9dc9503b204aa8a62).  
+**Regression:** [3be50c7](https://github.com/Leano-Jordan/ZazuEMP/commit/3be50c76bbb62c99b3834731157fac0c48072977).
+
+- The shared primary-acknowledgement validator now explicitly maps InventoryMovement identities to their expected model. Inventory movement mutations return a persisted movement model, unlike command-only quote acceptance and purchase receipt mutations.
+- Added a positive regression proving a valid business-owned InventoryMovement identity remains eligible for acknowledgement, protecting the legitimate offline sync path while rejecting malformed mappings.
+
 ### Related asset identity in conflict snapshots — 2026-11-21
 
 **Implementation:** [1fdbb02](https://github.com/Leano-Jordan/ZazuEMP/commit/1fdbb0212c099df1f8403628b9e71423f35c5434).  
