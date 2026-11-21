@@ -1864,6 +1864,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
         expect(local.mutationId).toEqual(expect.any(String));
         expect(local.payload).toMatchObject({
+            local_id: expect.any(String),
+            server_id: null,
+        });
+        expect(local.payload.record).toMatchObject({
             event_local_id: job.localId,
             category: expect.any(String),
             description: 'Offline transport and delivery',
