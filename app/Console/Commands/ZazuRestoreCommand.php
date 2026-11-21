@@ -74,7 +74,7 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
-            if ($zip->numFiles < 1 || $zip->numFiles > self::MAX_ARCHIVE_ENTRIES) {
+            if (!BackupArchiveLimits::canIncludeArchiveEntries($zip->numFiles)) {
                 $zip->close();
                 $this->error('The backup archive contains an invalid number of entries.');
                 return self::FAILURE;
@@ -179,7 +179,7 @@ class ZazuRestoreCommand extends Command
                 }
 
                 $size = (int) ($stat['size'] ?? 0);
-                if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
+                if (!BackupArchiveLimits::canIncludeUncompressedBytes($uncompressedBytes, $size)) {
                     $zip->close();
                     $this->error('The backup archive is too large to restore safely.');
                     return self::FAILURE;
