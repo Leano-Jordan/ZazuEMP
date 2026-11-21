@@ -461,6 +461,9 @@ class SyncBootstrapPayloadBuilder
                 ->with(['customer' => fn ($customer) => $customer->where('business_id', $businessId)])
                 ->first()
             : null;
+        if ($event) {
+            $this->sanitizeSelectedEventCustomer($event);
+        }
         $quote->setRelation('event', $event);
 
         $data = $quote->toArray();
@@ -477,6 +480,7 @@ class SyncBootstrapPayloadBuilder
         $event->loadMissing('requirements');
         $customer = $event->customer()->where('business_id', $event->business_id)->first();
         $event->setRelation('customer', $customer);
+        $this->sanitizeSelectedEventCustomer($event);
 
         $data = $event->toArray();
         $data['customer_local_id'] = $customer
@@ -493,6 +497,18 @@ class SyncBootstrapPayloadBuilder
         return $data;
     }
 
+    private function sanitizeSelectedEventCustomer(Event $event): void
+    {
+        if ($event->customer_id === null || $event->customer !== null) {
+            return;
+        }
+
+        $event->setAttribute('customer_id', null);
+        $event->setAttribute('customer_name', null);
+        $event->setAttribute('customer_phone', null);
+        $event->setAttribute('customer_email', null);
+    }
+
     private function selectedPreparationData(
         EventPreparationItem $preparation,
         SyncEntityIdentityRegistry $registry,
@@ -501,6 +517,9 @@ class SyncBootstrapPayloadBuilder
             ->where('business_id', $preparation->business_id)
             ->with(['customer' => fn ($customer) => $customer->where('business_id', $preparation->business_id)])
             ->first();
+        if ($event) {
+            $this->sanitizeSelectedEventCustomer($event);
+        }
         $preparation->setRelation('event', $event);
 
         $data = $preparation->toArray();
