@@ -1,3 +1,19 @@
+## Director execution checkpoint — bootstrap contact-data sanitization — 2026-11-21
+
+**Implementation:** [c187b52](https://github.com/Leano-Jordan/ZazuEMP/commit/c187b528109e7467d19120cc46ff378bb9914e3e).  
+**Regression:** [a235445](https://github.com/Leano-Jordan/ZazuEMP/commit/a2354452238a9f6bfdc5c16199ab23a48c7c98b0).
+
+- Tightened the selected Work/Quote/Preparation relationship fix: when a selected Event's customer_id points outside the active business, bootstrap now clears the foreign customer ID and denormalized customer name, phone and email fields as well as omitting the nested Customer relation.
+- Extended the end-to-end bootstrap regression to populate the corrupted Event with copied foreign customer contact details; the complete selected payload must not contain those details.
+- The preceding invoice quote-reference implementation/test head [c28588e](https://github.com/Leano-Jordan/ZazuEMP/commit/c28588eef0a39f827500035bb7d427a89518eb2d) passed Laravel **665 / 1 skipped / 4,543 assertions**, PostgreSQL migration/recovery, PHPMD, Zazu Quality, Composer security audit, secret scan and Director Health. Browser acceptance remains in progress on run [44923620655](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923620655).
+- Latest denormalized-contact regression is running CI on Laravel [44923983105](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923983105), Zazu Quality [44923983017](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923983017), and Director Health [44923983121](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923983121). Code-head PHPMD [44923966272](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923966272), Psalm [44923965972](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923965972), Windows package [44923965887](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923965887) and populated upgrade/rollback [44923965967](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923965967) are in progress. SonarCloud skipped.
+
+**Evidence maturity:** 77/100 unchanged; V1 NOT READY.
+
+**Next target:** verify current exact-head suite, then continue only where unscoped references or denormalized linked data can cross the business boundary. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — invoice quote-reference isolation — 2026-11-21
 
 **Implementation:** [1c88144](https://github.com/Leano-Jordan/ZazuEMP/commit/1c88144120e9c7c4a1094d2b27680cf661ab2fd0) + [a938757](https://github.com/Leano-Jordan/ZazuEMP/commit/a93875716f8d546302009d0a7639a30d6bedebe8).  
