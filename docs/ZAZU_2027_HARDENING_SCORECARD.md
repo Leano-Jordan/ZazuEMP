@@ -1,3 +1,24 @@
+## Director acceptance checkpoint — 2026-11-21
+
+**Current source/test head:** `b26df40e150fc3b81425db81fe9cb16040970547` on `main`.  
+**Laravel + browser + PostgreSQL:** [44903681914](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44903681914) · **Zazu Quality:** [44903681940](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44903681940) · **Push-on-main:** [44903681684](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44903681684).  
+**PHPMD / Director Health:** passed on immediately preceding PHP-identical source head `ed201e098892bce4a86b5383585616a31f26c589` ([PHPMD 44903058798](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44903058798), [Director Health 44903058803](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44903058803)). The b26 change after that head is browser-test-only.
+
+- Laravel: **652 passed / 1 skipped / 4,487 assertions**.
+- Offline browser: **61 desktop Chromium + 7 mobile viewport + 1 phone-local attachment journey passed; no flaky retries**.
+- PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS**.
+- Zazu Quality, Composer security audit, secret scan and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- Existing offline payment and expense flows now have server and browser reconciliation coverage. Expense acceptance preserves job/supplier/purchase-order identities, canonical server identity, audit record and idempotent replay.
+- Business archive restore now has a regression proving a target with trusted-device state is rejected before imported records or files are written.
+- Expired-session browser acceptance now tests the actual authentication barrier (visible sign-in modal) while preserving the trusted offline queue; it no longer assumes the service worker must change the URL when its cached-shell fallback is used.
+- Current service-worker static cache: `zazu-static-v60`.
+
+**Evidence disposition:** evidence maturity remains **77/100**, unchanged. These closures improve verification confidence but do not replace the open physical Android, intended-PC recovery, live populated-business commercial and POPIA operational acceptance gates. V1 remains **NOT READY**.
+
+**Next engineering target:** prove business archive restore rollback and file cleanup when a private-file write fails partway through restoration.
+
+---
+
 ## Director closure checkpoint — 2026-11-21 (CASE-ZAZU-0033 stale-write protection)
 
 **Verified source/test head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`. Laravel **634 passed / 1 skipped / 4,399 assertions**; PostgreSQL migration/recovery **PASS**; offline browser **59 desktop + 7 mobile + 1 phone-local Work/attachment/reconnect passed**; PHPMD, Zazu Quality, Composer audit, secret scan and application checks **PASS**. [Exact-head workflow](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44881431689).
