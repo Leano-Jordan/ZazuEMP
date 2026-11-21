@@ -343,169 +343,170 @@ class SyncController extends Controller
     public function uploadAttachment(Request $request): JsonResponse
     {
         return DB::transaction(function () use ($request): JsonResponse {
-                $device = $request->attributes->get('sync_device');
-                app(SyncDeviceAccessGuard::class)->lockActive($device);
-                $validated = $request->validate([
-                    'event_id' => ['required', 'integer', 'min:1'],
-                    'idempotency_key' => ['required', 'uuid'],
-                    'description' => ['nullable', 'string', 'max:255'],
-                    'file' => ['required', 'file', 'max:20480', 'mimetypes:image/jpeg,image/png,image/webp,application/pdf,text/plain,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+            $device = $request->attributes->get('sync_device');
+            app(SyncDeviceAccessGuard::class)->lockActive($device);
+
+            $validated = $request->validate([
+                'event_id' => ['required', 'integer', 'min:1'],
+                'idempotency_key' => ['required', 'uuid'],
+                'description' => ['nullable', 'string', 'max:255'],
+                'file' => ['required', 'file', 'max:20480', 'mimetypes:image/jpeg,image/png,image/webp,application/pdf,text/plain,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+            ]);
+
+            // Resolve the target event before checking the idempotency key. A
+            // reused key must never make an attachment appear to belong to another
+            // job, even when the caller is otherwise authorized for this business.
+            $event = Event::query()
+                ->where('business_id', $device->business_id)
+                ->findOrFail($validated['event_id']);
+
+            $existing = EventAttachment::query()
+                ->where('business_id', $device->business_id)
+                ->where('idempotency_key', $validated['idempotency_key'])
+                ->first();
+
+            if ($existing) {
+                return $this->existingAttachmentResponse($existing, $event, $request, $validated);
+            }
+
+            $path = $this->storePrivateAttachment($request->file('file'), (int) $event->id);
+
+            try {
+                $attachment = EventAttachment::create([
+                    'event_id' => $event->id,
+                    'business_id' => $event->business_id,
+                    'uploaded_by' => null,
+                    'original_name' => $request->file('file')->getClientOriginalName(),
+                    'disk' => 'private',
+                    'path' => $path,
+                    'mime_type' => $request->file('file')->getMimeType(),
+                    'size' => $request->file('file')->getSize(),
+                    'source' => 'sync',
+                    'description' => $validated['description'] ?? null,
+                    'idempotency_key' => $validated['idempotency_key'],
                 ]);
+            } catch (\Throwable $exception) {
+                Storage::disk('private')->delete($path);
 
-                // Resolve the target event before checking the idempotency key. A
-                // reused key must never make an attachment appear to belong to another
-                // job, even when the caller is otherwise authorized for this business.
-                $event = Event::query()
-                    ->where('business_id', $device->business_id)
-                    ->findOrFail($validated['event_id']);
-
-                $existing = EventAttachment::query()
+                // Another request may have won the unique idempotency-key insert.
+                // Return duplicate success only after verifying that it stored the
+                // exact same job and file payload.
+                $concurrent = EventAttachment::query()
                     ->where('business_id', $device->business_id)
                     ->where('idempotency_key', $validated['idempotency_key'])
                     ->first();
 
-                if ($existing) {
-                    return $this->existingAttachmentResponse($existing, $event, $request, $validated);
+                if ($concurrent) {
+                    return $this->existingAttachmentResponse($concurrent, $event, $request, $validated);
                 }
 
-                $path = $this->storePrivateAttachment($request->file('file'), (int) $event->id);
-
-                try {
-                    $attachment = EventAttachment::create([
-                        'event_id' => $event->id,
-                        'business_id' => $event->business_id,
-                        'uploaded_by' => null,
-                        'original_name' => $request->file('file')->getClientOriginalName(),
-                        'disk' => 'private',
-                        'path' => $path,
-                        'mime_type' => $request->file('file')->getMimeType(),
-                        'size' => $request->file('file')->getSize(),
-                        'source' => 'sync',
-                        'description' => $validated['description'] ?? null,
-                        'idempotency_key' => $validated['idempotency_key'],
-                    ]);
-                } catch (\Throwable $exception) {
-                    Storage::disk('private')->delete($path);
-
-                    // Another request may have won the unique idempotency-key insert.
-                    // Return duplicate success only after verifying that it stored the
-                    // exact same job and file payload.
-                    $concurrent = EventAttachment::query()
-                        ->where('business_id', $device->business_id)
-                        ->where('idempotency_key', $validated['idempotency_key'])
-                        ->first();
-
-                    if ($concurrent) {
-                        return $this->existingAttachmentResponse($concurrent, $event, $request, $validated);
-                    }
-
-                    throw $exception;
-                }
-
-                $device->update(['last_seen_at' => now()]);
-
-                return response()->json([
-                    'attachment' => $this->attachmentPayload($attachment),
-                    'duplicate' => false,
-                ], 201);
-                    });
-        }
-
-        /**
-         * Verify an idempotent retry without accepting a reused key for different data.
-         *
-         * @param array<string, mixed> $validated
-         */
-        private function existingAttachmentResponse(
-            EventAttachment $existing,
-            Event $event,
-            Request $request,
-            array $validated
-        ): JsonResponse {
-            $samePayload = $this->existingAttachmentPayloadMatches($existing, $event, $request, $validated);
-
-            if ($samePayload === null) {
-                return response()->json([
-                    'message' => 'The previous attachment could not be verified. Keep this upload queued and contact the workspace owner.',
-                ], 503);
+                throw $exception;
             }
 
-            if (! $samePayload) {
-                return response()->json([
-                    'message' => 'This idempotency key is already assigned to a different attachment. Keep the local file and create a new upload attempt.',
-                ], 409);
-            }
+            $device->update(['last_seen_at' => now()]);
 
             return response()->json([
-                'attachment' => $this->attachmentPayload($existing),
-                'duplicate' => true,
-            ]);
+                'attachment' => $this->attachmentPayload($attachment),
+                'duplicate' => false,
+            ], 201);
+        });
+    }
+
+    /**
+     * Verify an idempotent retry without accepting a reused key for different data.
+     *
+     * @param array<string, mixed> $validated
+     */
+    private function existingAttachmentResponse(
+        EventAttachment $existing,
+        Event $event,
+        Request $request,
+        array $validated
+    ): JsonResponse {
+        $samePayload = $this->existingAttachmentPayloadMatches($existing, $event, $request, $validated);
+
+        if ($samePayload === null) {
+            return response()->json([
+                'message' => 'The previous attachment could not be verified. Keep this upload queued and contact the workspace owner.',
+            ], 503);
         }
 
-        /**
-         * @param array<string, mixed> $validated
-         */
-        private function existingAttachmentPayloadMatches(
-            EventAttachment $existing,
-            Event $event,
-            Request $request,
-            array $validated
-        ): ?bool {
-            $incomingFile = $request->file('file');
+        if (! $samePayload) {
+            return response()->json([
+                'message' => 'This idempotency key is already assigned to a different attachment. Keep the local file and create a new upload attempt.',
+            ], 409);
+        }
 
-            if (
-                (int) $existing->event_id !== (int) $event->id
-                || $existing->original_name !== $incomingFile->getClientOriginalName()
-                || (int) $existing->size !== (int) $incomingFile->getSize()
-                || $existing->mime_type !== $incomingFile->getMimeType()
-                || $existing->description !== ($validated['description'] ?? null)
-            ) {
-                return false;
+        return response()->json([
+            'attachment' => $this->attachmentPayload($existing),
+            'duplicate' => true,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    private function existingAttachmentPayloadMatches(
+        EventAttachment $existing,
+        Event $event,
+        Request $request,
+        array $validated
+    ): ?bool {
+        $incomingFile = $request->file('file');
+
+        if (
+            (int) $existing->event_id !== (int) $event->id
+            || $existing->original_name !== $incomingFile->getClientOriginalName()
+            || (int) $existing->size !== (int) $incomingFile->getSize()
+            || $existing->mime_type !== $incomingFile->getMimeType()
+            || $existing->description !== ($validated['description'] ?? null)
+        ) {
+            return false;
+        }
+
+        return $this->attachmentFileContentMatches($existing, $incomingFile->getRealPath());
+    }
+
+    private function attachmentFileContentMatches(EventAttachment $existing, string|false $incomingPath): ?bool
+    {
+        if ($incomingPath === false) {
+            return null;
+        }
+
+        $incomingHash = hash_file('sha256', $incomingPath);
+        $existingStream = Storage::disk($existing->disk)->readStream($existing->path);
+
+        if (! is_resource($existingStream) || $incomingHash === false) {
+            if (is_resource($existingStream)) {
+                fclose($existingStream);
             }
 
-            return $this->attachmentFileContentMatches($existing, $incomingFile->getRealPath());
+            return null;
         }
 
-        private function attachmentFileContentMatches(EventAttachment $existing, string|false $incomingPath): ?bool
-        {
-            if ($incomingPath === false) {
-                return null;
-            }
+        $hashContext = hash_init('sha256');
+        hash_update_stream($hashContext, $existingStream);
+        fclose($existingStream);
 
-            $incomingHash = hash_file('sha256', $incomingPath);
-            $existingStream = Storage::disk($existing->disk)->readStream($existing->path);
+        return hash_equals(hash_final($hashContext), $incomingHash);
+    }
 
-            if (! is_resource($existingStream) || $incomingHash === false) {
-                if (is_resource($existingStream)) {
-                    fclose($existingStream);
-                }
+    private function storePrivateAttachment(UploadedFile $file, int $eventId): string
+    {
+        $path = $file->store('jobs/'.$eventId.'/attachments', 'private');
 
-                return null;
-            }
+        abort_unless(
+            is_string($path) && $path !== '',
+            503,
+            'Private attachment storage is unavailable. Keep the upload queued and retry.'
+        );
 
-            $hashContext = hash_init('sha256');
-            hash_update_stream($hashContext, $existingStream);
-            fclose($existingStream);
+        return $path;
+    }
 
-            return hash_equals(hash_final($hashContext), $incomingHash);
-        }
-
-        private function storePrivateAttachment(UploadedFile $file, int $eventId): string
-        {
-            $path = $file->store('jobs/'.$eventId.'/attachments', 'private');
-
-            abort_unless(
-                is_string($path) && $path !== '',
-                503,
-                'Private attachment storage is unavailable. Keep the upload queued and retry.'
-            );
-
-            return $path;
-        }
-
-        public function listAttachments(Request $request): JsonResponse
-        {
-            return DB::transaction(function () use ($request): JsonResponse {
+    public function listAttachments(Request $request): JsonResponse
+    {
+        return DB::transaction(function () use ($request): JsonResponse {
             $device = $request->attributes->get('sync_device');
             app(SyncDeviceAccessGuard::class)->lockActive($device);
             $eventId = $request->query('event_id');
@@ -524,7 +525,7 @@ class SyncController extends Controller
             return response()->json([
                 'attachments' => $query->get()->map(fn (EventAttachment $attachment) => $this->attachmentPayload($attachment))->values(),
             ]);
-            });
+        });
     }
 
     public function downloadAttachment(Request $request, EventAttachment $attachment)
