@@ -1,11 +1,11 @@
 ## Offline event-cost tenant isolation regression — 2026-11-21
 
-**Test source:** `9f1846cdf1da780883b199391ab4b3b96372d129` on `main`.
+**Current implementation/test source:** `4f4f585b301010bdd89e3cc8e9da865e948a9f3e` on `main` (resolver wording implementation: `f5655b1`).
 
 - Added a real server-side sync regression that creates a second business, registers that business's event identity, and submits it in an event-cost mutation from the first business's trusted device.
-- Acceptance requires validation rejection on `event_local_id`, leaves the mutation pending for explicit conflict handling, and creates no event-cost row in the receiving business.
-- The resolver is business-scoped at both the identity lookup and Event lookup. This test protects that boundary against future regressions.
-- Exact-head Laravel/quality/Director verification is pending.
+- The first test run exposed that the shared resolver reported this rejection under the generic `payload` validation key, not `event_local_id`. The rejection was correct; the test had assumed the wrong validation contract.
+- Replaced purchase-order-specific wording in the shared event resolver with domain-neutral offline-job messages, then made the regression assert the exact message, pending mutation state and absence of an event-cost row in the receiving business.
+- The resolver remains business-scoped at both the identity lookup and Event lookup. Exact-head Laravel/quality/browser verification is pending.
 
 **Evidence disposition:** this is targeted tenant-isolation regression coverage, not a full penetration test or a release-readiness score increase. Evidence maturity remains **77/100**; V1 remains **NOT READY**.
 
