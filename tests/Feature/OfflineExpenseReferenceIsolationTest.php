@@ -53,6 +53,57 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertNull($expense->purchase_order_id);
     }
 
+    public function test_offline_event_cost_rejects_a_foreign_business_event_identity(): void
+    {
+        $business = $this->business('Event cost owner business');
+        $foreignBusiness = $this->business('Foreign event cost business');
+        $device = $this->device($business);
+
+        $foreignEvent = Event::create([
+            'business_id' => $foreignBusiness->id,
+            'reference' => 'FOREIGN-EVENT-COST',
+            'name' => 'Foreign event cost job',
+            'status' => 'confirmed',
+        ]);
+        $foreignEventIdentity = app(SyncEntityIdentityRegistry::class)
+            ->identify($foreignEvent, 'job')
+            ->entity_uuid;
+
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'event_cost',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'event_local_id' => $foreignEventIdentity,
+                    'category' => 'Food',
+                    'description' => 'Cross-business event cost attempt',
+                    'currency' => 'ZAR',
+                    'projected_amount' => '100.00',
+                    'actual_amount' => null,
+                    'status' => 'planned',
+                ],
+            ],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'event_cost' => app(OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('An offline event cost must reject a job identity owned by another business.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('event_local_id', $exception->errors());
+            $this->assertSame('pending', $mutation->fresh()->status);
+        }
+
+        $this->assertSame(0, \App\Models\EventCost::query()
+            ->where('business_id', $business->id)
+            ->count());
+    }
+
     public function test_offline_expense_rejects_foreign_event_supplier_and_purchase_order_identities(): void
     {
         $business = $this->business('Expense owner business');
