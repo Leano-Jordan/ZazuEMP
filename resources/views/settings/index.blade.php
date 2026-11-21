@@ -399,6 +399,7 @@
                                 {{ ucfirst($device->device_type ?: 'device') }}
                                 · {{ ucfirst($device->status) }}
                                 · Last seen {{ $device->last_seen_at?->diffForHumans() ?? 'Never' }}
+                                · Approved by {{ $device->approvedBy?->name ?? 'Approver not recorded (legacy device)' }}
                             </p>
                         </div>
                         @if ($device->status !== 'revoked' && $device->revoked_at === null)

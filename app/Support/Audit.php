@@ -21,8 +21,8 @@ class Audit
             $businessId = $syncDevice?->business_id ?? app(CurrentBusiness::class)->id($user);
         }
 
-        $actorUserId = $user?->getAuthIdentifier() ?? $deviceActorId;
-        if (! $user && $syncDevice) {
+        $actorUserId = $syncDevice ? $deviceActorId : $user?->getAuthIdentifier();
+        if ($syncDevice) {
             $metadata = array_merge($metadata, [
                 'actor_source' => 'owner_approved_sync_device',
                 'sync_device_id' => (int) $syncDevice->getKey(),

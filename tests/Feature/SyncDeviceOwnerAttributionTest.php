@@ -61,7 +61,9 @@ class SyncDeviceOwnerAttributionTest extends TestCase
             'currency' => 'ZAR',
         ]);
         $owner = User::factory()->create();
+        $staff = User::factory()->create();
         $business->users()->attach($owner->id, ['role' => 'owner']);
+        $business->users()->attach($staff->id, ['role' => 'staff']);
         $device = SyncDevice::create([
             'business_id' => $business->id,
             'approved_by_user_id' => $owner->id,
@@ -72,7 +74,7 @@ class SyncDeviceOwnerAttributionTest extends TestCase
             'metadata' => ['sync_token_hash' => hash('sha256', 'sync-attribution-token')],
         ]);
 
-        Auth::logout();
+        Auth::login($staff);
         $syncRequest = Request::create('/api/sync/push', 'POST');
         $syncRequest->attributes->set('sync_device', $device);
         $this->app->instance('request', $syncRequest);

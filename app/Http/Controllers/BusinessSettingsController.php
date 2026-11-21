@@ -31,7 +31,7 @@ class BusinessSettingsController extends Controller
             'currentTier' => $entitlements->currentTier($business),
             'isTrial' => $entitlements->isTrial($business),
             'trialEndsAt' => $entitlements->trialEndsAt($business),
-            'syncDevices' => SyncDevice::query()->where('business_id', $business->id)->latest('id')->limit(20)->get(),
+            'syncDevices' => SyncDevice::query()->with('approvedBy:id,name')->where('business_id', $business->id)->latest('id')->limit(20)->get(),
             'currencies' => config('zazu.currencies'),
             'taxRegimes' => config('zazu.tax.regimes'),
             'vatStatuses' => config('zazu.tax.vat_statuses'),
