@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Http\\Controllers\\SyncController;
-use App\\Models\\Business;
-use App\\Models\\SyncConflict;
-use App\\Models\\SyncDevice;
-use App\\Support\\Offline\\SyncConflictResolutionService;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Str;
-use Symfony\\Component\\HttpKernel\\Exception\\HttpException;
-use Tests\\TestCase;
+use App\Http\Controllers\SyncController;
+use App\Models\Business;
+use App\Models\SyncConflict;
+use App\Models\SyncDevice;
+use App\Support\Offline\SyncConflictResolutionService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Tests\TestCase;
 
 class SyncDeviceAuthorizationRaceTest extends TestCase
 {
