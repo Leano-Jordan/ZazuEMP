@@ -1859,6 +1859,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     projectedAmount: cost.projected_amount,
                     actualAmount: cost.actual_amount,
                     status: cost.status,
+                    pendingSync: cost.pending_sync,
                 } : null,
             };
         });
@@ -1882,6 +1883,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             projectedAmount: '320.00',
             actualAmount: '295.50',
             status: 'incurred',
+            pendingSync: true,
         });
 
         let pushed = null;
