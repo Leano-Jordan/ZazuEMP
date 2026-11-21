@@ -282,6 +282,30 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertSame('Customer behind mismatched identity', $customer->fresh()->name);
     }
 
+    public function test_sync_snapshot_does_not_serialize_a_foreign_business_record(): void
+    {
+        $business = $this->business('Snapshot identity business');
+        $foreignBusiness = $this->business('Snapshot record owner');
+        $foreignCustomer = Customer::create([
+            'business_id' => $foreignBusiness->id,
+            'name' => 'Private foreign customer data',
+            'notes' => 'Must never appear in a conflict snapshot',
+        ]);
+        $identity = SyncEntityIdentity::create([
+            'business_id' => $business->id,
+            'entity_type' => 'customer',
+            'entity_uuid' => (string) Str::uuid(),
+            'record_type' => $foreignCustomer->getMorphClass(),
+            'record_id' => $foreignCustomer->id,
+        ]);
+
+        $snapshot = app(\\App\\Support\\Offline\\SyncEntitySnapshotBuilder::class)->build($identity);
+
+        $this->assertTrue($snapshot['deleted']);
+        $this->assertSame([], $snapshot['record']);
+        $this->assertSame([], $snapshot['related']);
+    }
+
     private function business(string $name): Business
     {
         return Business::create([
