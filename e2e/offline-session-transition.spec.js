@@ -184,6 +184,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
     await expect.poll(() => dialogs.length).toBe(3);
     expect(dialogs[2].type).toBe('confirm');
     expect(dialogs[2].message).toContain('business-scoped offline workspace and any queued changes or attachments will remain on this device');
+    expect(dialogs[2].message).toContain('offline changes are attributed to the approving owner');
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true })).toBeVisible();
 

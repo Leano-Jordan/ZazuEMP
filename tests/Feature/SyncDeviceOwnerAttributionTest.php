@@ -91,4 +91,22 @@ class SyncDeviceOwnerAttributionTest extends TestCase
         $this->assertSame('owner_approved_sync_device', $audit->metadata['actor_source']);
         $this->assertSame($device->id, $audit->metadata['sync_device_id']);
     }
+    public function test_settings_warns_that_trusted_device_changes_are_attributed_to_the_approving_owner(): void
+    {
+        $business = Business::create([
+            'name' => 'Trusted Device Warning Business',
+            'slug' => 'trusted-device-warning-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $owner = User::factory()->create();
+        $business->users()->attach($owner->id, ['role' => 'owner']);
+
+        $this->actingAs($owner)
+            ->get(route('settings.index'))
+            ->assertOk()
+            ->assertSee('Offline changes from this device are attributed to the approving owner')
+            ->assertSee('staff permissions are not re-checked for each offline mutation');
+    }
+
 }
