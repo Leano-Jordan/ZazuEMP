@@ -7,6 +7,7 @@ use App\Models\AssetAllocation;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\InventoryItem;
+use App\Models\Invoice;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
@@ -238,7 +239,7 @@ final class SyncMutationRelatedIdentityResolver
             'customer' => Customer::class,
             'job' => Event::class,
             'quote' => Quote::class,
-            'invoice' => \\App\\Models\\Invoice::class,
+            'invoice' => Invoice::class,
             'purchase_order' => PurchaseOrder::class,
             'purchase_order_item' => PurchaseOrderItem::class,
             'inventory_item' => InventoryItem::class,
