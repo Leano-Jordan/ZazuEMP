@@ -62,7 +62,7 @@
 - Bootstrap now eager-loads the QuoteVersion's Quote and Event, verifies that the version belongs to the invoice's own quote and that the quote's event belongs to the active business, then removes the nested Quote relation before serialization.
 - Foreign quote references and quote versions are removed from the serialized invoice; deposit-required values safely fall back to zero rather than importing another business's commercial terms.
 - Added a regression with a local invoice deliberately pointing at a foreign QuoteVersion; bootstrap must omit the foreign version and deposit amount.
-- Exact-head CI pending.
+- Exact-head Laravel: **665 passed / 1 skipped / 4,543 assertions** ([run 44923620655](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44923620655)); PostgreSQL migration/recovery smoke, PHPMD, Zazu Quality, Director Health, Composer security audit and secret scan **PASS**. The matching desktop/mobile offline-browser acceptance job is still running. SonarCloud skipped.
 
 ## Selected bootstrap nested relationship tenant isolation — 2026-11-21
 
