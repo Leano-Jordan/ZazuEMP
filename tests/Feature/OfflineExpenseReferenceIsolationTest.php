@@ -9,9 +9,11 @@ use App\Models\FinanceExpense;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\SyncDevice;
+use App\Models\SyncDelivery;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
 use App\Support\Offline\OfflineDomainMutationHandler;
+use App\Support\Offline\SyncBootstrapDeliveryTargetResolver;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationRecorder;
@@ -321,6 +323,45 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             ->resolve($mutation);
 
         $this->assertSame([], $related);
+    }
+
+    public function test_bootstrap_delivery_fallback_rejects_wrong_morph_identity_targets(): void
+    {
+        $business = $this->business('Bootstrap identity type business');
+        $device = $this->device($business);
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Not an invoice',
+        ]);
+        $invoiceUuid = (string) Str::uuid();
+        SyncEntityIdentity::create([
+            'business_id' => $business->id,
+            'entity_type' => 'invoice',
+            'entity_uuid' => $invoiceUuid,
+            'record_type' => $customer->getMorphClass(),
+            'record_id' => $customer->id,
+        ]);
+
+        $mutationUuid = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'invoice',
+            $mutationUuid,
+            'create',
+            ['local_id' => $mutationUuid, 'record' => ['number' => 'INV-INVALID']],
+        );
+        $mutation->update(['status' => 'applied']);
+        SyncDelivery::create([
+            'business_id' => $business->id,
+            'sync_mutation_id' => $mutation->id,
+            'destination_device_id' => $device->id,
+            'stream' => 'business',
+            'delivery_sequence' => 1,
+        ]);
+
+        $targets = app(SyncBootstrapDeliveryTargetResolver::class)->resolve($device, [1]);
+
+        $this->assertSame([], $targets);
     }
 
     public function test_sync_snapshot_rejects_a_same_business_identity_with_wrong_morph_type(): void
