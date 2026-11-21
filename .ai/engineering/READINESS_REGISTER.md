@@ -35,9 +35,9 @@
 
 # Zazu EMP — V1 Readiness Register
 
-Last verified application-code baseline: 041314fd80147758dd2edb33c187b16328aea938
+Last verified application-code baseline: 559e66b87de8617f967b722b55b0fbfd9b116495
 Release disposition: NOT READY
-Evidence maturity: 73/100 unchanged; no uplift claimed.
+Evidence maturity: 75/100 (+2) for exact-head receiver reconciliation and bootstrap authorization evidence; V1 remains NOT READY.
 
 ## Director source audit refresh — 2026-11-20
 
