@@ -28,7 +28,7 @@ test('public landing and authentication surfaces meet serious WCAG accessibility
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
     await expectNoSeriousAccessibilityViolations(page, 'registration modal');
 
-    await navigation.getByRole('button', { name: 'Log in', exact: true }).click();
+    await page.locator('[data-auth-modal-switch="login"]').click();
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
     await expectNoSeriousAccessibilityViolations(page, 'login modal');
 });
