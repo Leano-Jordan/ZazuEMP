@@ -1,3 +1,31 @@
+# Exact-main verification — 2026-11-22
+
+**Repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified HEAD:** [aa93a470](https://github.com/Leano-Jordan/ZazuEMP/commit/aa93a4701f562f72bf91a8b26e49eea80ee2ad64).
+
+The exact HEAD completed its push-triggered engineering checks successfully:
+
+- **Laravel:** 678 passed / 1 skipped / 4,655 assertions — [run 44954694947](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44954694947).
+- **Offline browser acceptance:** 63 desktop Chromium, 7 mobile-viewport workflows, 1 simulated LAN host-outage journey and 1 phone-local attachment/reconnect journey passed. The dedicated public/auth accessibility scan also passed (1 test) in the same run. These are browser/emulation results, not physical-phone proof.
+- **PostgreSQL:** complete migration, rollback/reapplication, account/workspace registration, backup/restore and private-file recovery smoke passed in [run 44954694947](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44954694947).
+- **Windows:** installation candidate build and fresh Windows PowerShell install/recovery checks passed in [run 44954695096](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44954695096).
+- **Quality gates:** npm dependency audit, Composer security audit, secret-history scan, maintained-document validation (32 local links across 172 Markdown files), production build, compressed asset budgets and service-worker authentication/cache tests passed in [run 44954694991](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44954694991).
+- **Measured bundle guardrails:** JavaScript 23.6 KiB gzip against 64 KiB; CSS 67.2 KiB gzip against 100 KiB. These are transfer-size budgets only, not runtime latency or device resource benchmarks.
+- **Coverage report:** generated and uploaded by [run 44954694947](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44954694947); the report is visibility evidence, not a release gate.
+- **Analysis:** JavaScript/TypeScript, Actions and Python CodeQL jobs passed. SonarCloud and the Windows prerelease publish job were skipped; neither is counted as a pass or release approval.
+
+**Score disposition:** evidence maturity remains **77/100**. The latest checks strengthen exact-main confidence but do not justify a numerical uplift: no new real-device, live-business or operator recovery evidence has been supplied. V1 remains **NOT READY**.
+
+**Open owner/operational release gates:**
+1. Physical Android installed-app cold launch, stop-host while Wi-Fi remains connected, supported disconnected work, force-close/restart and reconnect.
+2. Actual owner-PC scheduled backup observation, independent off-disk copy and controlled full installation restore including representative private media.
+3. Populated live-business quote → invoice → payment → expenses/costs → profit reconciliation.
+4. POPIA operational sign-off and completion of the required customer/privacy operational controls.
+5. ZAZU name clearance.
+
+**Engineering boundary:** the browser suite's simulated phone and host-outage tests must not be described as physical-device acceptance. Automated PostgreSQL/Windows recovery must not be described as the owner's installed-PC recovery drill. Do not claim app-wide offline parity.
+
+---
+
 ## Offline mutation operation validation — exact-head Laravel / PHPMD / PostgreSQL PASS — 2026-11-21
 
 **Application code/test head:** [e95dd5c](https://github.com/Leano-Jordan/ZazuEMP/commit/e95dd5cd8966c7457de70e9a4bc882709db7d30b).
@@ -8,7 +36,7 @@
 - Expanded all-handler Laravel regression: **676 passed / 1 skipped / 4,647 assertions** [workflow 44948063650](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063650).
 - PHPMD: **PASS** [run 44948063618](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063618); Zazu Quality: **PASS** [run 44948063564](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063564).
 - PostgreSQL migration, registration and backup/restore/private-file recovery smoke: **PASS** in [Laravel workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
-- Runtime-identical browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries on [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747). A repeat browser run on test-only head `0e619e9` was still running; no result is claimed for that repeat.n:** V1 remains **NOT READY**. This targeted server-side integrity closure does not close the full offline sync matrix or any owner-operated physical acceptance gate.
+- Runtime-identical browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries on [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747). V1 remains **NOT READY**. This targeted server-side integrity closure does not close the full offline sync matrix or any owner-operated physical acceptance gate.
 
 ---
 
@@ -381,7 +409,7 @@ Shared transport: `resources/js/app.js::setupZazuOfflineForms` and the local cus
 - [x] Serialized-asset date availability — online/offline tests pass for non-overlap, overlap, open-ended dates and independent returns at 00af9adda.
 
 ## Current release position
-V1 remains NOT READY. Latest full application-code verification baseline is 526bdf3: Laravel 607 passed / 1 skipped / 4,158 assertions; PostgreSQL migration/registration/backup/restore/private-file recovery passed; offline browser 51 desktop + 6 mobile-viewport + 1 phone-local Work/attachment journey passed. PHPMD, Psalm, Windows V1 package and populated upgrade/rollback passed on application-equivalent parent 30e70e9. Latest completed repository workflows observed on documentation head 91f41ec: Rosscore Director Health, Zazu Quality, Director Contract Lint and Push-on-main passed; SonarCloud was skipped. These are historical exact-head results, not a fresh full application run on later documentation-only commits. The owner-operated acceptance gates and DB-001 remain open. Evidence maturity remains 73/100; no score uplift.
+V1 remains **NOT READY**. The latest exact-main verification is recorded at the top of this checklist for HEAD `aa93a470`: Laravel 678 passed / 1 skipped / 4,655 assertions; PostgreSQL migration/rollback/registration/recovery smoke passed; offline browser acceptance passed (63 desktop, 7 mobile viewport, 1 simulated host outage, 1 phone-local attachment/reconnect); Windows fresh-install acceptance passed; quality, dependency, secret, documentation-integrity and compressed frontend bundle-budget checks passed. SonarCloud and prerelease publishing were skipped. Evidence maturity remains **77/100**, unchanged because physical-device, owner-PC recovery, live-business commercial and POPIA/brand acceptance remain open.
 
 
 ## Scheduling exact-head acceptance closure
