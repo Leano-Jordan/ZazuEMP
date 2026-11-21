@@ -31,17 +31,36 @@ final class ZazuBackupStatus
     public function inspect(): array
     {
         $directory = $this->directory ?? storage_path('app/zazu-backups/daily');
-        $local = $this->localArchiveStatus($directory);
-        $secondary = $this->secondaryCopyStatus($directory);
-        $healthy = $local['status'] === 'healthy' && $secondary['secondary_status'] === 'healthy';
 
+        return $this->combineBackupStatus(
+            $this->localArchiveStatus($directory),
+            $this->secondaryCopyStatus($directory),
+        );
+    }
+
+    /**
+     * @param array{status:string,latest_at:?string,age_hours:?int,message:string} $local
+     * @param array{secondary_status:string,secondary_at:?string,secondary_age_hours:?int,secondary_message:string} $secondary
+     * @return array<string, mixed>
+     */
+    private function combineBackupStatus(array $local, array $secondary): array
+    {
         return [
-            'status' => $healthy ? 'healthy' : 'attention',
+            'status' => $this->isBackupProtectionHealthy($local, $secondary) ? 'healthy' : 'attention',
             'latest_at' => $local['latest_at'],
             'age_hours' => $local['age_hours'],
             'message' => $local['message'],
             ...$secondary,
         ];
+    }
+
+    /**
+     * @param array{status:string} $local
+     * @param array{secondary_status:string} $secondary
+     */
+    private function isBackupProtectionHealthy(array $local, array $secondary): bool
+    {
+        return $local['status'] === 'healthy' && $secondary['secondary_status'] === 'healthy';
     }
 
     /**
@@ -95,13 +114,9 @@ final class ZazuBackupStatus
     private function secondaryCopyStatus(string $directory): array
     {
         $state = $this->readSecondaryState($directory);
-        $lastSuccessfulAt = is_string($state['last_successful_at'] ?? null)
-            ? $state['last_successful_at']
-            : null;
+        $lastSuccessfulAt = $this->lastSuccessfulTimestamp($state);
         $ageHours = $this->ageHours($lastSuccessfulAt);
-        $verified = ($state['status'] ?? null) === 'verified'
-            && $ageHours !== null
-            && $ageHours <= self::MAX_AGE_HOURS;
+        $verified = $this->isVerifiedSecondaryCopy($state, $ageHours);
 
         return [
             'secondary_status' => $verified ? 'healthy' : 'attention',
@@ -109,6 +124,26 @@ final class ZazuBackupStatus
             'secondary_age_hours' => $ageHours,
             'secondary_message' => $this->secondaryMessage($state['status'] ?? null, $verified, $ageHours),
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     */
+    private function lastSuccessfulTimestamp(array $state): ?string
+    {
+        $timestamp = $state['last_successful_at'] ?? null;
+
+        return is_string($timestamp) ? $timestamp : null;
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     */
+    private function isVerifiedSecondaryCopy(array $state, ?int $ageHours): bool
+    {
+        return ($state['status'] ?? null) === 'verified'
+            && $ageHours !== null
+            && $ageHours <= self::MAX_AGE_HOURS;
     }
 
     /**
@@ -155,7 +190,7 @@ final class ZazuBackupStatus
             'failed' => 'The independent backup copy failed on the last scheduled run. Check the USB drive or synced-folder destination.',
             'not_configured' => 'No independent backup destination is configured. The only archive copy remains on this PC.',
             'verified' => 'The last independent backup copy is overdue. Check that its destination is available.',
-            default => 'No independent backup copy has been verified on this installation.',
+            default => 'No independent backup destination is configured; no independent backup copy has been verified on this installation.',
         };
     }
 }
