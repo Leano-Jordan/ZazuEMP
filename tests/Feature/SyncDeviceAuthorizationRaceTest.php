@@ -74,6 +74,22 @@ class SyncDeviceAuthorizationRaceTest extends TestCase
         );
     }
 
+    public function test_revoked_device_snapshot_cannot_list_conflicts(): void
+    {
+        [, $device, $snapshot] = $this->deviceFixture();
+        $device->update(['status' => 'revoked', 'revoked_at' => now()]);
+
+        $request = Request::create('/api/sync/conflicts', 'GET');
+        $request->attributes->set('sync_device', $snapshot);
+
+        try {
+            app(SyncController::class)->listConflicts($request);
+            $this->fail('A revoked device must not read conflict details using a stale snapshot.');
+        } catch (HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+    }
+
     public function test_attachment_listing_rejects_a_revoked_device_snapshot(): void
     {
         [$business, $device, $snapshot] = $this->deviceFixture();
