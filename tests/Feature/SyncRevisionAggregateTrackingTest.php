@@ -62,6 +62,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         $this->assertGreaterThan($baselineLevel, $businessReadLevel);
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_bootstrap_refreshes_revised_and_delivered_suppliers_outside_the_bounded_window(): void
     {
         [$business, $customer, $sourceDevice] = $this->customerFixtureWithDevice();
