@@ -1,3 +1,20 @@
+## Director execution checkpoint — selected bootstrap nested tenant boundary — 2026-11-21
+
+**Implementation:** [4cbd1f7](https://github.com/Leano-Jordan/ZazuEMP/commit/4cbd1f7d83dad9e3b6000b89ebe04028023e569e).  
+**Regression:** [530ff81](https://github.com/Leano-Jordan/ZazuEMP/commit/530ff81c47b9d7e82cef87bcdaf473353247f3b2).
+
+- Found another concrete tenant boundary in bootstrap serialization: selected Work, Quote and Preparation records loaded nested Customer relationships without constraining the customer to the active business.
+- Work now constrains its customer relationship by business_id. Quote and Preparation constrain the related Event and nested Customer to the same business before serialization.
+- Added an end-to-end bootstrap regression using a local Work/Quote/Preparation set deliberately linked to a foreign Customer. The foreign Customer name and identity must not appear in any selected payload.
+- PHPMD passed on the preceding split-test head [1e67154](https://github.com/Leano-Jordan/ZazuEMP/commit/1e67154405fa6fb96f7d0bafd67694274cb47025); Director Health passed there as well. The latest selected-relationship regression is queued on [Laravel run 44922914337](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922914337), [PHPMD run 44922914398](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922914398), [Zazu Quality run 44922914336](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922914336), and [Director Health run 44922914334](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44922914334). SonarCloud skipped.
+- Prior full offline acceptance [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572) remains green for desktop Chromium, mobile customer/Work and phone-local attachments. Latest bootstrap relationship changes still require their own exact-head verification.
+
+**Evidence maturity:** 77/100 unchanged. V1 remains NOT READY.
+
+**Next target:** close exact-head tests and quality checks, then continue reviewing selected-record relationships and conflict/pull serialization for tenant leaks. Main only; no branch creation.
+
+---
+
 ## Director execution checkpoint — offline identity acknowledgement compatibility — 2026-11-21
 
 **Latest code:** [3f8d2cd](https://github.com/Leano-Jordan/ZazuEMP/commit/3f8d2cd9bc70f718ff991eb9dc9503b204aa8a62) adds the InventoryMovement model to the shared primary identity guard.  
