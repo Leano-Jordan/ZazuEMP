@@ -481,7 +481,7 @@ jobs:
 
   publish-prerelease:
     name: Publish verified Windows candidate as a GitHub prerelease
-    if: github.event_name == 'workflow_dispatch' && inputs.release_version != ''
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.release_version != ''
     needs: [package, windows-fresh-install-smoke]
     runs-on: ubuntu-latest
     permissions:
@@ -529,7 +529,7 @@ jobs:
             exit 1
           fi
 
-      - name: Publish immutable tested candidate as a prerelease
+      - name: Publish versioned tested candidate as a prerelease
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.release.outputs.tag }}
