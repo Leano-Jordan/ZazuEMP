@@ -3,11 +3,11 @@
 **Code/test head:** [e95dd5c](https://github.com/Leano-Jordan/ZazuEMP/commit/e95dd5cd8966c7457de70e9a4bc882709db7d30b).
 
 - Confirmed and corrected inconsistent operation validation in the customer, job and service offline mutation handlers.
-- Unsupported delete commands are now rejected before any domain write; regression covers all three handlers.
-- Exact-head Laravel: **676 passed / 1 skipped / 4,593 assertions**.
-- PHPMD: **PASS** [44947482711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482711).
+- Unsupported delete commands are now rejected before any domain write; expanded regression exercises all 17 registered offline entity handlers and verifies no domain records are written.
+- Expanded Laravel regression: **676 passed / 1 skipped / 4,647 assertions** [workflow 44948063650](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063650).
+- PHPMD: **PASS** [44948063618](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063618); Zazu Quality: **PASS** [44948063564](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44948063564).
 - PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS** in [Laravel workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
-- Offline browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries. All three jobs passed in [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747).
+- Runtime-identical offline browser acceptance: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries in [workflow 44947482747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44947482747). A repeat browser run on test-only head `0e619e9` was still running; no result is claimed for that repeat.
 
 **Score disposition:** evidence maturity remains **77/100**. This focused integrity fix is not a weighted-score uplift and does not close the broader offline sync matrix. V1 remains **NOT READY**.
 
