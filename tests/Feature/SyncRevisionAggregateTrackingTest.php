@@ -62,7 +62,7 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         $this->assertGreaterThan($baselineLevel, $businessReadLevel);
     }
 
-    public function test_bootstrap_includes_delivered_aggregate_outside_the_bounded_supplier_window(): void
+    public function test_bootstrap_refreshes_revised_and_delivered_suppliers_outside_the_bounded_window(): void
     {
         [$business, $customer, $sourceDevice] = $this->customerFixtureWithDevice();
         $receivingDevice = SyncDevice::create([
@@ -70,19 +70,34 @@ class SyncRevisionAggregateTrackingTest extends TestCase
             'installation_id' => (string) Str::uuid(),
         ]);
 
+        $deliveredSupplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Z-supplier-before-update',
+        ]);
+        $workingSetSuppliers = [];
         for ($index = 1; $index <= 500; $index++) {
-            Supplier::create([
+            $workingSetSuppliers[] = Supplier::create([
                 'business_id' => $business->id,
                 'name' => sprintf('A-supplier-%04d', $index),
             ]);
         }
 
-        $deliveredSupplier = Supplier::create([
-            'business_id' => $business->id,
-            'name' => 'Z-supplier-before-update',
-        ]);
-        $identity = app(SyncEntityIdentityRegistry::class)->identify($deliveredSupplier, 'supplier');
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $identity = $registry->identify($deliveredSupplier, 'supplier');
+        foreach ($workingSetSuppliers as $supplier) {
+            $registry->identify($supplier, 'supplier');
+        }
+
+        // An ordinary online edit does not create a SyncDelivery. Its aggregate
+        // revision timestamp must still promote it into the next bounded refresh.
         $deliveredSupplier->update(['name' => 'Z-supplier-updated-outside-window']);
+        $builder = app(SyncBootstrapPayloadBuilder::class);
+        $onlineSnapshot = $builder->build($receivingDevice);
+        $onlineIncluded = collect($onlineSnapshot['suppliers'])->first(
+            fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $deliveredSupplier->id,
+        );
+        $this->assertNotNull($onlineIncluded, 'Recently revised online aggregates must bubble into the bounded refresh.');
+        $this->assertSame(2, (int) $onlineIncluded['revision']);
 
         $mutation = app(SyncMutationRecorder::class)->record(
             $sourceDevice,
@@ -102,19 +117,26 @@ class SyncRevisionAggregateTrackingTest extends TestCase
         ]);
         app(SyncMutationRecorder::class)->publish($mutation);
 
-        $delivery = \App\Models\SyncDelivery::query()
+        $delivery = \\App\\Models\\SyncDelivery::query()
             ->where('business_id', $business->id)
             ->where('destination_device_id', $receivingDevice->id)
             ->where('sync_mutation_id', $mutation->id)
             ->firstOrFail();
 
-        $builder = app(SyncBootstrapPayloadBuilder::class);
+        // Simulate an old identity timestamp to prove the explicit delivery
+        // reference remains sufficient even when it is outside the top 500.
+        DB::table('sync_entity_identities')
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'supplier')
+            ->where('entity_uuid', $identity->entity_uuid)
+            ->update(['updated_at' => now()->subYear()]);
+
         $ordinarySnapshot = $builder->build($receivingDevice);
         $this->assertFalse(
             collect($ordinarySnapshot['suppliers'])->contains(
                 fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $deliveredSupplier->id,
             ),
-            'The supplier is deliberately outside the default 500-record alphabetical window.',
+            'The supplier is deliberately outside the default 500-record revision-ranked window.',
         );
 
         $deliverySnapshot = $builder->build($receivingDevice, [(int) $delivery->delivery_sequence]);
