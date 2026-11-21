@@ -39,7 +39,9 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
 
     const attachmentForm = page.locator('[data-zazu-offline-attachment-form]');
     const eventId = Number(await attachmentForm.getAttribute('data-zazu-event-id'));
+    const originalBusinessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0));
     expect(eventId).toBeGreaterThan(0);
+    expect(originalBusinessId).toBeGreaterThan(0);
 
     await page.evaluate(async token => {
         await window.ZazuOffline.ready;
@@ -175,7 +177,6 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     await attachmentForm.getByRole('button', { name: 'Add to job' }).click();
     await expect(attachmentForm.locator('[data-zazu-offline-attachment-status]')).toContainText('saved on this phone');
 
-    const originalBusinessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0));
     const beforeReload = await page.evaluate(async id => ({
         businessId: Number(document.body.dataset.zazuBusinessId || 0),
         recordCount: (await window.ZazuOffline.loadAttachments(id)).length,
@@ -190,8 +191,17 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
     await page.evaluate(async () => window.ZazuOffline.ready);
-    const reloadedBusinessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0));
-    expect(reloadedBusinessId).toBe(originalBusinessId);
+    await expect.poll(
+        () => page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0)),
+        { message: 'The cached Work page must retain its original business identity after an offline reload.' },
+    ).toBe(originalBusinessId);
+    await expect.poll(
+        async () => page.evaluate(async id => (await window.ZazuOffline.loadAttachments(id)).length, eventId),
+        {
+            timeout: 10_000,
+            message: 'The phone-local attachment should be readable after the offline page reload.',
+        },
+    ).toBe(1);
 
     const pending = await page.evaluate(async id => window.ZazuOffline.loadAttachments(id), eventId);
     expect(pending).toHaveLength(1);
