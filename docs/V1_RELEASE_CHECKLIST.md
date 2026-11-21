@@ -1,7 +1,7 @@
 # Zazu EMP — V1 Release Checklist
 
 Latest application/test source verification: d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb — 643 passed / 1 skipped / 4,424 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 59 desktop + 7 mobile + 1 phone-local journey PASS.
-Latest Windows host-operations source: f589d2acecf775df2b69846aea45abd16709a33b; Windows package PASS and the daily-backup script contract checks PASS on the subsequent workflow-only head fb2c31467d548dfb3dfb3a0ea55d786cc13206f2.
+Latest Windows host-operations source: 365609b4d30ca4978ba9480cf3571bb792ad442b; Windows Ops contract checks PASS [run 44888885270], Windows package/fresh-install recovery PASS [run 44888885245], and Zazu Quality PASS [run 44888885301] on the same source head.
 Disposition: **NOT READY** · Evidence maturity: **77/100**. Code implementation does not substitute for owner-PC recovery, physical Android or POPIA evidence.
 
 ## Operational reliability implementation — 2026-11-21
@@ -14,7 +14,7 @@ Disposition: **NOT READY** · Evidence maturity: **77/100**. Code implementation
 - [x] Trust and logout prompts disclose that device sync changes are attributed to the approving owner, not necessarily the operator.
 - [x] Shared-device/per-user authority limitation and legacy-device attribution boundary recorded in docs/V1_KNOWN_LIMITATIONS.md.
 - [x] Query-builder mass-write guard for revision-tracked aggregates added.
-- [x] Existing PC installs migrate to LOG_STACK=daily at startup; 14-day log retention is configured.
+- [x] Existing PC installs migrate to LOG_STACK=daily at startup; 14-day log retention is configured, and startup invalidates a stale Laravel config cache before serving so the setting takes effect.
 - [x] New registrations and password resets require at least 10 characters; no online breached-password service is required.
 - [x] iOS offline limitations are explicitly documented; V1 physical offline acceptance is Android-only.
 - [ ] Physical Android cold-launch/restart/reconnect acceptance.
