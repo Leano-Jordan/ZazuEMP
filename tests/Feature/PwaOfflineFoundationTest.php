@@ -344,7 +344,10 @@ class PwaOfflineFoundationTest extends TestCase
         $syncController = File::get(app_path('Http/Controllers/SyncController.php'));
         $bootstrapBuilder = File::get(app_path('Support/Offline/SyncBootstrapPayloadBuilder.php'));
         $this->assertStringContainsString("'delivery_sequences' => ['sometimes', 'array', 'max:100']", $syncController);
-        $this->assertStringContainsString('private function deliveryTargets(SyncDevice $device, array $deliverySequences)', $bootstrapBuilder);
+        $this->assertStringContainsString('SyncBootstrapDeliveryTargetResolver::class)->resolve($device, $deliverySequences)', $bootstrapBuilder);
+        $deliveryTargetResolver = File::get(app_path('Support/Offline/SyncBootstrapDeliveryTargetResolver.php'));
+        $this->assertStringContainsString('where(\'destination_device_id\', $device->id)', $deliveryTargetResolver);
+        $this->assertStringContainsString('where(\'business_id\', $device->business_id)', $deliveryTargetResolver);
         $this->assertStringContainsString('$this->applyBoundedWorkingSet($query, Supplier::class, $business, $includedIds', $bootstrapBuilder);
         $this->assertStringContainsString("/api/sync/acknowledge", $client);
         $this->assertStringContainsString("status: 'failed'", $client);
