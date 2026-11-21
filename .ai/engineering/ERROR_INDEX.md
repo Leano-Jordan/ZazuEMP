@@ -133,3 +133,4 @@ When a confirmed mechanism has no existing code:
 ## Runtime catalog boundary
 
 The runtime catalog remains authoritative for safe operator-facing errors. Engineering codes belong in internal diagnostics and repository records unless a deliberate product decision exposes them.
+| ENG-FIXTURE-007 | CASE-ZAZU-0037 | Offline invoice sync acknowledgement targets the seeded invoice instead of the newly created local invoice | F2/F3 | CORRECTED — exact-head browser verification pending |
