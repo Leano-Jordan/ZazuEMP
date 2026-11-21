@@ -1,3 +1,15 @@
+## Director execution checkpoint — empty private-storage restore correctness — 2026-11-21
+
+**Implementation:** [1906fd4](https://github.com/Leano-Jordan/ZazuEMP/commit/1906fd4da1876df66d745a57be9c3bd1d1714c48).  
+**Regression:** [1cb1154](https://github.com/Leano-Jordan/ZazuEMP/commit/1cb1154b4b813dca0cf04fe401dbdf38375a5808).
+
+- Found a recovery edge case: a valid backup declares database and private storage even when private storage is empty. ZIP files omit empty directories, so restore previously saw no private payload entry and left old private files on the target installation.
+- Restore now uses the v2 contents manifest as the authority for whether private storage is part of the snapshot, creates an empty staging directory when required, and swaps it in just like a populated private-storage snapshot.
+- Added an integration regression that backs up an empty private directory, creates a stale private file after backup, restores, and verifies the stale file is removed while the database returns to its backed-up state.
+- Exact-head Laravel/backup/restore verification pending. No pass is claimed until CI completes.
+
+---
+
 ## Director execution checkpoint — backup/restore capacity alignment — 2026-11-21
 
 **Implementation:** [84dba32](https://github.com/Leano-Jordan/ZazuEMP/commit/84dba32ae96ececf6c1dd71034d79d0b93070b7e).  
