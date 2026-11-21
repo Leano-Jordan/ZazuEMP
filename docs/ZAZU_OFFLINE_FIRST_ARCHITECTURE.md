@@ -19,7 +19,7 @@
 - The related asset-allocation lookup is also constrained by the identity's business ID.
 - Added a regression proving that a foreign Customer's name and notes are not serialized by a snapshot built from a mismatched identity.
 - The first adversarial test attempt hit the expected-revision gate before reaching the handler. The regression now supplies the identity's current revision so it exercises the ownership guard itself.
-- Exact-head CI remains pending.
+- Exact source-head Laravel: **659 passed / 1 skipped / 4,527 assertions** ([run 44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572)); PostgreSQL migration/recovery smoke **PASS**. The matching offline-browser acceptance job is still running.
 
 ### Offline linked-identity morph-type validation — 2026-11-21
 
@@ -30,7 +30,7 @@
 - Applied to customer/job/quote/invoice and other shared identity resolution, plus direct event, supplier, purchase-order and purchase-order-item lookups in the mutation handler.
 - Added an adversarial same-business ID-collision regression: a UUID marked as a customer but carrying the Event morph type must not resolve to a Customer merely because the numeric IDs coincide.
 - This closes an identity type-confusion path separately from the cross-business ownership check above.
-- Exact-head Laravel and quality verification remains pending.
+- Exact source-head Laravel: **659 passed / 1 skipped / 4,527 assertions** ([run 44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572)); PostgreSQL migration/recovery smoke **PASS**; Zazu Quality, PHPMD and Director Health **PASS**. The matching offline-browser acceptance job is still running. SonarCloud is skipped.
 
 ## Offline event-cost local sync-state reconciliation — 2026-11-21
 
