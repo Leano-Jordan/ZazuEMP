@@ -121,6 +121,21 @@ if (-not (Test-Path $environment -PathType Leaf)) {
     throw "The .env file is missing. Complete the existing local setup before starting Zazu."
 }
 
+# Migrate existing owner-PC installations from the default single-file log
+# channel without touching custom stack configurations.
+$environmentText = Get-Content $environment -Raw
+$logStackMatch = [regex]::Match($environmentText, '(?m)^LOG_STACK=(.*)$')
+if (-not $logStackMatch.Success) {
+    $environmentText = $environmentText.TrimEnd() + [Environment]::NewLine + 'LOG_STACK=daily' + [Environment]::NewLine
+} elseif ([string]::IsNullOrWhiteSpace($logStackMatch.Groups[1].Value) -or $logStackMatch.Groups[1].Value.Trim() -eq 'single') {
+    $environmentText = [regex]::Replace($environmentText, '(?m)^LOG_STACK=.*$', 'LOG_STACK=daily')
+}
+if ($environmentText -notmatch '(?m)^LOG_DAILY_DAYS=') {
+    $environmentText = $environmentText.TrimEnd() + [Environment]::NewLine + 'LOG_DAILY_DAYS=14' + [Environment]::NewLine
+}
+Set-Content -Path $environment -Value $environmentText -Encoding UTF8
+
+
 function Prepare-ZazuBuiltAssets {
     $publicDirectory = Join-Path $ProjectPath 'public'
     $hotFile = Join-Path $publicDirectory 'hot'
