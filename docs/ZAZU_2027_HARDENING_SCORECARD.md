@@ -1,3 +1,19 @@
+## Director closure checkpoint — stale sync-device authorization — 2026-11-21
+
+**Verified application code head:** [7d4b097](https://github.com/Leano-Jordan/ZazuEMP/commit/7d4b097a13d02f3d5369bf8e75e2dc85c361beb7) on `main`.
+
+- Closed CASE-ZAZU-0036 / REG-027: conflict listing/resolution, attachment upload/list/download and self-revocation now revalidate active device status and persisted token hash under a business-first/device-row lock inside the operation transaction.
+- A stale bearer credential cannot revoke a replacement credential after device re-pairing.
+- Five stale-snapshot regression tests added.
+- Laravel [44931555043](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555043): **670 passed / 1 skipped / 4,552 assertions**.
+- Offline browser in the same run: **62 desktop Chromium + 7 mobile viewport + 1 phone-local Work/attachment/reconnect passed**.
+- PostgreSQL migration/recovery, PHPMD [44931555002](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555002), Psalm [44931555131](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555131), Zazu Quality [44931555024](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555024), populated upgrade/rollback [44931555044](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931555044), Director Health [44931554979](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931554979), and Windows V1 package [44931554910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44931554910): **PASS**. SonarCloud skipped.
+- **Evidence maturity remains 77/100; no score uplift claimed.** Automated browser coverage does not replace physical Android cold-launch/restart/reconnect, actual owner-PC off-disk restore, live populated-business financial reconciliation, POPIA operational sign-off or ZAZU name clearance. V1 remains **NOT READY**.
+
+**Next engineering target:** continue the offline account/session transition adversarial review and complete the supported offline workflow matrix. Keep physical-device and owner-operated recovery evidence separate from automated CI.
+
+---
+
 ## Director acceptance checkpoint — 2026-11-21
 
 **Current source/test head:** `e45cab97cbcdbc3f989bf3843d751bb0f373c305` on `main`.  
