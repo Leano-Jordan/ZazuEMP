@@ -13,7 +13,7 @@
     "check:performance": "node scripts/check-bundle-budget.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^26.6.3",
     "concurrently": "^10.0.6",
