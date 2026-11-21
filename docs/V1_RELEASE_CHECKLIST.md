@@ -23,11 +23,11 @@
 
 ---
 
-## Empty private-storage restore — implementation checkpoint 2026-11-21
+## Empty private-storage restore — automated verification PASS — 2026-11-21
 
 - Restore now treats the v2 manifest declaration as authoritative even when private storage contains zero files.
 - An empty staging directory replaces stale target private files; rollback remains in the existing guarded path.
-- Added a database + empty-private-storage integration regression proving stale files are removed. Exact-head CI pending.
+- Added a database + empty-private-storage integration regression proving stale files are removed. Exact-head Laravel/PostgreSQL run [44937037910](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937037910) passed; Windows populated and empty-private-storage restore passed [44937732880](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44937732880).
 - Owner-operated restore and private-media acceptance remain open.
 
 ---
