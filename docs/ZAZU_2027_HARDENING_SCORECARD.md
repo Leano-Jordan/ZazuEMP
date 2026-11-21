@@ -1,3 +1,24 @@
+## Director execution checkpoint — 2026-11-21 (receiver sync completeness)
+
+**Application/test source head:** `472e301065a5301c80f0ffbb97f82b61c24575ba` on `main`.  
+**Verification:** exact-head Laravel, PostgreSQL migration/recovery, offline-browser, PHPMD and quality workflows are pending at the time of this checkpoint. No pass is claimed yet.
+
+### Confirmed engineering correction
+The receiver pull/bootstrap/acknowledgement sequence could acknowledge a contiguous delivery prefix after applying an ordinary bounded bootstrap that omitted an affected aggregate outside a capped collection. Fixed on `main` by sending exact receiver delivery sequences with bootstrap, resolving the batch's primary and related records within business/device scope, and including those records beyond the normal 500-record working set before acknowledgement. Normal capped refreshes now prioritize recently revised aggregates using sync-identity update time, with a record timestamp fallback, while preserving display ordering. Static cache advanced to `zazu-static-v58`.
+
+Regression coverage now targets:
+- Recent online updates promoting older supplier records into the bounded refresh.
+- Explicit delivery inclusion outside the bound and denial of the same sequence to another device.
+- Second-device quote → acceptance → invoice → payment snapshot reconciliation.
+- Purchase receipt → purchase-order and all affected inventory snapshot reconciliation.
+- Browser ordering of pull → exact-sequence bootstrap → acknowledgement.
+
+**Failure record:** CASE-ZAZU-0034 / ENG-DATA-004. Implementation and tests are committed; exact-head evidence is pending. CASE-ZAZU-0033 remains a separate open gate for exhaustive writer coverage and stale-write matrix completion.
+
+**Readiness:** remains **73/100**, unchanged pending exact-head verification. V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational controls remain open. ZAZU name clearance remains deferred. No production deployment or live data changes.
+
+---
+
 ## Director execution checkpoint — 2026-11-21 (online revision coverage)
 
 **Verified application/test HEAD:** `ecc6ba1e973839af2b6fe0caa25fbd927f961ab3` on `main`.
