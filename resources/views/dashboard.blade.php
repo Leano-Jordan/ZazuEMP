@@ -9,6 +9,18 @@
         </section>
     @endif
 
+    @if ($isOwner && $backupStatus && $backupStatus['status'] !== 'healthy')
+        <section class="zazu-dash-queue-state is-warning mt-4" role="alert" aria-labelledby="zazu-backup-warning-title">
+            <strong id="zazu-backup-warning-title">Backup protection needs attention</strong>
+            <span>{{ $backupStatus['message'] }}</span>
+            @if ($backupStatus['latest_at'])
+                <span>Latest on-PC archive: {{ $backupStatus['age_hours'] }} hours old ({{ $backupStatus['latest_at'] }}).</span>
+            @endif
+            <span>{{ $backupStatus['secondary_message'] }}</span>
+            <small>These archives cover the entire installation. Restoring one affects every business on this PC and remains an installation-operator task.</small>
+        </section>
+    @endif
+
     <section class="zazu-dash-hero">
         <div class="zazu-dash-hero-main">
             <span class="zazu-dash-greeting">{{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}</span>

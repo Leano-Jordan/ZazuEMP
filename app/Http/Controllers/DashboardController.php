@@ -15,13 +15,14 @@ use App\Support\CurrentBusiness;
 use App\Support\PermissionService;
 use App\Support\ExperienceLevel;
 use App\Support\NicheFocus;
+use App\Support\ZazuBackupStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request, NicheFocus $niches): View
+    public function __invoke(Request $request, NicheFocus $niches, ZazuBackupStatus $backupStatusService): View
     {
         $business = app(CurrentBusiness::class)->model($request->user());
         $businessId = $business->id;
@@ -102,6 +103,7 @@ class DashboardController extends Controller
         }
 
         $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
+        $backupStatus = $isOwner ? $backupStatusService->inspect() : null;
 
         return view('dashboard', compact(
             'metrics',
@@ -109,6 +111,7 @@ class DashboardController extends Controller
             'upcoming',
             'business',
             'isOwner',
+            'backupStatus',
             'workspaceTools',
             'experienceLevel',
             'primaryNiche',
