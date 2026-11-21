@@ -1,3 +1,19 @@
+## Director execution checkpoint — live host-outage detection for offline PWA — 2026-11-21
+
+**Implementation:** [ae2a900](https://github.com/Leano-Jordan/ZazuEMP/commit/ae2a90080590f4aad8bfffc459e211f6b98c0bf8).  
+**UI styling:** [87521db](https://github.com/Leano-Jordan/ZazuEMP/commit/87521dbc6996bcfb8d7eb31b3e3a235fcdfedf5d).  
+**Desktop regression:** [3fe87a0](https://github.com/Leano-Jordan/ZazuEMP/commit/3fe87a062f9e079a0ad08caa0f09915eb14f3f22).  
+**Phone-viewport coverage:** [41d7a25](https://github.com/Leano-Jordan/ZazuEMP/commit/41d7a256f80b1e1d98cbb43509f81dc26cd600ec).
+
+- Root cause found in the current UI lifecycle: origin reachability was checked during render/event paths, but no periodic check ran while Wi-Fi remained connected. A stopped LAN host therefore did not trigger the browser's offline event and the visible page could remain a stale server snapshot.
+- Added a 10-second HEAD /up monitor, outage notice and non-destructive link to the cached dashboard workspace. It does not auto-navigate or discard an open form.
+- The same health result now controls dashboard local-workspace visibility; the notice explicitly states that only supported offline screens are available.
+- Added a regression that simulates /up returning 503 while navigator.onLine remains true, then restoring 200. It runs on desktop Chromium and Pixel 7 viewport.
+- Verification: quality checks passed on the implementation/style heads; Laravel and offline-browser acceptance are running on the latest test head. No pass is claimed for the new outage test until the exact-head run completes.
+- Physical Android acceptance remains open. Browser mobile emulation cannot establish installed-app cold launch, force-close/restart or real phone persistence.
+
+Next: close exact-head browser acceptance; fix any failures; then continue physical-device, owner-PC recovery and commercial acceptance gates. Main only; no branches.
+
 ## Director execution checkpoint — transactional trusted-device authorization — 2026-11-21
 
 **Current code head:** [7d4b097](https://github.com/Leano-Jordan/ZazuEMP/commit/7d4b097a13d02f3d5369bf8e75e2dc85c361beb7).  
