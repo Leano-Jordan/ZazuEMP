@@ -17,11 +17,9 @@ use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncDevice;
-use App\Models\SyncDelivery;
 use App\Models\SyncEntityIdentity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 
 class SyncBootstrapPayloadBuilder
@@ -47,7 +45,7 @@ class SyncBootstrapPayloadBuilder
                 ->lockForUpdate()
                 ->firstOrFail();
             $registry = app(SyncEntityIdentityRegistry::class);
-            $deliveryTargets = $this->deliveryTargets($device, $deliverySequences);
+            $deliveryTargets = app(SyncBootstrapDeliveryTargetResolver::class)->resolve($device, $deliverySequences);
 
             return [
                 'version' => 1,
@@ -87,95 +85,6 @@ class SyncBootstrapPayloadBuilder
      * @param array<int, mixed> $deliverySequences
      * @return array<string, array<int, mixed>>
      */
-    private function deliveryTargets(SyncDevice $device, array $deliverySequences): array
-    {
-        $sequences = array_values(array_unique(array_filter(
-            array_map(static fn ($sequence): int => (int) $sequence, $deliverySequences),
-            static fn (int $sequence): bool => $sequence > 0,
-        )));
-
-        if ($sequences === []) {
-            return [];
-        }
-
-        $deliveries = SyncDelivery::query()
-            ->where('business_id', $device->business_id)
-            ->where('destination_device_id', $device->id)
-            ->where('stream', 'business')
-            ->whereIn('delivery_sequence', $sequences)
-            ->with('mutation')
-            ->get();
-
-        $targets = [];
-        $resolver = app(SyncMutationRelatedIdentityResolver::class);
-        foreach ($deliveries as $delivery) {
-            $mutation = $delivery->mutation;
-            if (! $mutation) {
-                continue;
-            }
-
-            $identities = $resolver->resolve($mutation);
-            if ($identities === []) {
-                $localId = $mutation->payload['local_id'] ?? $mutation->entity_id;
-                if (is_string($localId) && Str::isUuid($localId)) {
-                    $identity = SyncEntityIdentity::query()
-                        ->where('business_id', $device->business_id)
-                        ->where('entity_type', $mutation->entity_type)
-                        ->where('entity_uuid', Str::lower($localId))
-                        ->first();
-
-                    if ($identity) {
-                        $identities[] = [
-                            'entity_type' => $identity->entity_type,
-                            'server_id' => (int) $identity->record_id,
-                        ];
-                    }
-                }
-            }
-
-            foreach ($identities as $identity) {
-                $type = (string) ($identity['entity_type'] ?? '');
-                $recordId = (int) ($identity['server_id'] ?? 0);
-                if ($recordId < 1) {
-                    continue;
-                }
-
-                $collection = match ($type) {
-                    'supplier' => 'supplier',
-                    'purchase_order' => 'purchase_order',
-                    'invoice' => 'invoice',
-                    'expense' => 'expense',
-                    'inventory_item' => 'inventory_item',
-                    'asset' => 'asset',
-                    'event_cost' => 'event_cost',
-                    default => null,
-                };
-
-                if ($collection !== null) {
-                    $targets[$collection][] = $recordId;
-                }
-
-                if (in_array($type, ['customer', 'job', 'quote', 'preparation'], true)) {
-                    $targets['selected'][] = ['type' => $type, 'id' => $recordId];
-                }
-            }
-        }
-
-        foreach ($targets as $key => $ids) {
-            if ($key === 'selected') {
-                $unique = [];
-                foreach ($ids as $item) {
-                    $unique[$item['type'].':'.$item['id']] = $item;
-                }
-                $targets[$key] = array_values($unique);
-            } else {
-                $targets[$key] = array_values(array_unique(array_map('intval', $ids)));
-            }
-        }
-
-        return $targets;
-    }
-
     /**
      * Apply the normal bounded window plus any aggregates required by a
      * receiver's unacknowledged delivery batch.
