@@ -10,7 +10,7 @@
 - PHPMD, Zazu Quality, Composer audit, secret scan and application checks: **PASS**. SonarCloud was skipped.
 - CASE-ZAZU-0033 / ENG-DATA-003: **CLOSED** on exact-head evidence; the full offline sync matrix remains OPEN.
 
-**CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED**; the full supported offline sync matrix remains OPEN. Evidence maturity remains **75/100**; V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain owner gates.
+**CASE-ZAZU-0033 / ENG-DATA-003 is CLOSED**; the full supported offline sync matrix remains OPEN. Evidence maturity is now **77/100 (+2)** for verified stale-write protection; V1 remains **NOT READY**. Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain owner gates.
 
 ---
 
