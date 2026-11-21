@@ -11,6 +11,7 @@ use App\Models\EventPreparationItem;
 use App\Models\FinanceExpense;
 use App\Models\Event;
 use App\Models\InventoryItem;
+use App\Models\InventoryMovement;
 use App\Models\Invoice;
 use App\Models\PurchaseOrder;
 use App\Models\Payment;
@@ -255,6 +256,7 @@ final class SyncMutationRelatedIdentityResolver
             'purchase_order' => PurchaseOrder::class,
             'purchase_order_item' => PurchaseOrderItem::class,
             'inventory_item' => InventoryItem::class,
+            'inventory_movement' => InventoryMovement::class,
             'asset' => Asset::class,
             'asset_allocation' => AssetAllocation::class,
             'supplier' => Supplier::class,
