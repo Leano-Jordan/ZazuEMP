@@ -91,9 +91,11 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const bootstrapDeliverySequences = [];
         const acknowledgedSequences = [];
+        const requestOrder = [];
         await page.route('**/api/sync/**', async route => {
             const url = new URL(route.request().url());
             if (url.pathname === '/api/sync/pull') {
+                requestOrder.push('pull');
                 const mutations = acknowledgedSequences.length === 0
                     ? [{ id: 'receiver-delivery-mutation', entity_type: 'supplier', entity_id: 'receiver-delivery-supplier', delivery_sequence: 17 }]
                     : [];
@@ -105,7 +107,9 @@ test.describe('Zazu installed PWA offline shell', () => {
                 return;
             }
             if (url.pathname === '/api/sync/bootstrap') {
-                bootstrapDeliverySequences.push(url.searchParams.getAll('delivery_sequences[]'));
+                const sequences = url.searchParams.getAll('delivery_sequences[]');
+                bootstrapDeliverySequences.push(sequences);
+                requestOrder.push('bootstrap:' + sequences.join(','));
                 await route.fulfill({
                     status: 200,
                     contentType: 'application/json',
@@ -114,7 +118,9 @@ test.describe('Zazu installed PWA offline shell', () => {
                 return;
             }
             if (url.pathname === '/api/sync/acknowledge') {
-                acknowledgedSequences.push(Number(route.request().postDataJSON()?.sequence || 0));
+                const sequence = Number(route.request().postDataJSON()?.sequence || 0);
+                acknowledgedSequences.push(sequence);
+                requestOrder.push('acknowledge:' + sequence);
                 await route.fulfill({
                     status: 200,
                     contentType: 'application/json',
@@ -131,9 +137,11 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await page.context().setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => acknowledgedSequences.length).toBe(1);
 
         expect(bootstrapDeliverySequences[0]).toEqual(['17']);
         expect(acknowledgedSequences).toEqual([17]);
+        expect(requestOrder.slice(0, 3)).toEqual(['pull', 'bootstrap:17', 'acknowledge:17']);
     });
 
     test('does not register a fresh browser device without explicit owner approval', async ({ page }, testInfo) => {
