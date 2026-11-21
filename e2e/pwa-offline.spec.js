@@ -2866,6 +2866,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const jobLocalId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
         const customerLocalId = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
         const quoteLocalId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+        const invoiceLocalId = 'abababab-abab-4bab-8bab-abababababab';
         const paymentLocalId = 'acacacac-acac-4cac-8cac-acacacacacac';
         const jobServerId = 88101;
         const quoteServerId = 88201;
@@ -2950,7 +2951,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                         },
                     ],
                     invoices: [{
-                        local_id: createdInvoiceLocalId,
+                        local_id: invoiceLocalId,
                         server_id: 88401,
                         record: {
                             id: 88401,
@@ -3439,7 +3440,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 status: 'sent',
             }];
             state.invoices = [{
-                local_id: createdInvoiceLocalId,
+                local_id: invoiceLocalId,
                 number: 'INV-OFFLINE-TEMP-LOCAL',
                 status: 'issued',
                 currency: 'ZAR',
