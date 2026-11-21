@@ -1,6 +1,6 @@
 ## Director deep-audit increment — 2026-11-21 (customer-contact create revision bypass)
 
-**Implementation head:** `5f8dd6bdfa22b17bc6d0f14eb065400101caa1ea` on `main`; exact-head CI is running.
+**Source/test head:** `51a75eb1d06017211bd7808093d1863c930b6d71` on `main`. Laravel **634 passed / 1 skipped / 4,399 assertions**, PostgreSQL migration/recovery smoke **PASS**, PHPMD **PASS**; desktop/mobile browser acceptance is still running. Added an explicit two-paired-device stale-write regression: device B commits revision 2, device A's revision-1 edit is rejected with the authoritative remote snapshot and its local payload preserved.
 
 - The repository-wide online-writer review found a second primary-contact mass-update bypass in `CustomerContactController::store`. The update-contact path had already been converted to per-model writes, but creating a replacement primary still used a relationship query-builder update that skipped `CustomerContact` model events and therefore left the registered Customer aggregate revision unchanged.
 - Replaced that mass update with a locked collection of currently-primary contact models and per-model updates. Each affected contact now emits the nested-model event that advances the parent Customer revision.
