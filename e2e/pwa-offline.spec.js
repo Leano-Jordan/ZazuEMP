@@ -75,7 +75,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
     test('detects a stopped Zazu host while Wi-Fi remains connected and exposes the local workspace', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
-        test.skip(testInfo.project.name !== 'chromium', 'Origin-outage monitor contract runs once.');
+        test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Origin-outage monitor contract runs on desktop and phone viewport.');
 
         let originAvailable = true;
         await page.route('**/up', async route => {
