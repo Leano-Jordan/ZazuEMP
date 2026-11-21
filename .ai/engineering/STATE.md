@@ -1,3 +1,20 @@
+## Director execution checkpoint — offline payment reconciliation — 2026-11-21
+
+**Current verified source/test head:** `e1debd77c9d064f92895768f120ac752a34d897b` on `main`.  
+**Exact-head evidence:** Laravel [44901265394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44901265394), Zazu Quality [44901265498](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44901265498), PHPMD [44901265404](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44901265404), Director Health [44901265367](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44901265367), Push-on-main [44901264787](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44901264787).
+
+- Laravel: **650 passed / 1 skipped / 4,466 assertions**.
+- Offline browser: **60 desktop Chromium + 7 mobile viewport + 1 phone-local attachment journey passed**.
+- PostgreSQL migration/registration/backup/restore/private-file recovery smoke: **PASS**.
+- Zazu Quality, Composer audit, secret scan, PHPMD, Director Health and Push-on-main: **PASS**. SonarCloud skipped.
+- Offline payment server application now has a feature regression proving exact payment amount, invoice paid/balance calculations, related invoice revision advancement, and no duplicate payment/revision change on replay.
+- Browser regression proves payment canonical identity and parent invoice revision reconciliation.
+- No production code change was required for the payment target. The prior receipt acknowledgement reconciliation code remains covered by the same passing browser suite.
+
+**Next target:** verify the existing offline expense flow through UI capture, server application, linked-record ownership, canonical identity acknowledgement and idempotent replay.
+
+---
+
 ## Director operational reliability checkpoint — 2026-11-21
 
 **Latest code/operations verification head:** 2d0269b00a3a94ecfb392f04c06438ece6eda603 on main.  
