@@ -1,22 +1,23 @@
 ## Director operational reliability checkpoint — 2026-11-21
 
-**Latest code/operations verification head:** 365609b4d30ca4978ba9480cf3571bb792ad442b on main.  
-**Application/test source head:** d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb. **Windows host-operations source head:** 365609b4d30ca4978ba9480cf3571bb792ad442b.
+**Latest code/operations verification head:** 2d0269b00a3a94ecfb392f04c06438ece6eda603 on main.  
+**Application/test source head:** 2d0269b00a3a94ecfb392f04c06438ece6eda603. **Windows host-operations source head:** 365609b4d30ca4978ba9480cf3571bb792ad442b.
 
-- Laravel: **643 passed / 1 skipped / 4,424 assertions**. [Run 44885232020](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44885232020)
-- PostgreSQL migration and recovery smoke: **PASS**; full Laravel suite remains SQLite-backed.
-- Offline browser: **59 desktop Chromium + 7 mobile-viewport + 1 phone-local Work/attachment/reconnect passed** in the same run.
-- PHPMD, Psalm, Zazu Quality and populated upgrade/rollback: **PASS**. SonarCloud was skipped.
-- Windows V1 package: **PASS** [run 44888885245](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44888885245). Windows Ops script checks: **PASS** [run 44888885270](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44888885270). Zazu Quality: **PASS** [run 44888885301](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44888885301).
+- Laravel: **649 passed / 1 skipped / 4,456 assertions**. [Exact-head run 44892813216](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44892813216)
+- PostgreSQL migration/recovery smoke: **PASS**; full Laravel suite remains SQLite-backed.
+- Offline browser: **59 desktop Chromium + 7 mobile-viewport + 1 phone-local Work/attachment/reconnect passed** in the exact-head run.
+- PHPMD: **PASS** [run 44892813263](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44892813263). Psalm: **PASS** [run 44892813233](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44892813233). Zazu Quality: **PASS** [run 44892813235](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44892813235). Populated upgrade/rollback: **PASS** [run 44892813238](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44892813238).
+- Windows V1 package and fresh-install PowerShell acceptance: **PASS** [run 44892813237](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44892813237). Director Health: **PASS** [run 44892813214](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44892813214). SonarCloud was skipped.
 
 ### Implemented
 - Windows host startup now installs/refreshes an idempotent daily 02:00 Task Scheduler backup task. It runs under S4U without storing the Windows password, catches up after missed runs, and writes zazu:backup archives to the protected storage/app/zazu-backups/daily directory.
-- The runner retains the newest 14 successful archives and records bounded scheduler logs. Startup warns if no archive exists or the latest is more than 26 hours old; the Founder Control Centre displays the latest archive age and warns when missing/stale.
+- The runner retains the newest 14 successful archives and records bounded scheduler logs. Startup warns if no archive exists or the latest is more than 26 hours old; both the business-owner dashboard and Founder Control Centre display missing/stale backup warnings. An optional independent USB/synced-folder destination is copied and SHA-256 verified by the scheduled runner, with bounded retention and visible failure status.
 - The restore runbook requires a separate USB/cloud-folder copy. Same-PC backups are not disk-failure protection.
-- sync_devices.approved_by_user_id records the owner who approved a trusted device. Sync audit entries use that owner as actor, even if a staff web session is present; Settings shows the approver and trust/logout prompts disclose the attribution boundary.
+- sync_devices.approved_by_user_id records the owner who approved a trusted device. Sync audit entries use that owner as actor, even if a staff web session is present; Settings shows the approver, offers explicit owner re-approval for active legacy devices with no inferred historical actor, and the audit screen labels trusted-device activity as approved by the recorded owner.
 - The accepted limitation is explicit: a trusted device is a shared business-scoped workspace, not per-staff authentication. Normal staff permissions are not rechecked per offline mutation.
 - A regression guard now rejects query-builder mass writes to revision-tracked aggregate tables. New registrations and password resets require 10 characters; no internet-dependent breached-password lookup is used. Daily log rotation is applied to existing installs at startup.
 - The Windows launcher clears an existing Laravel config cache when daily logging is selected or HTTPS-only cookies are enabled, before the server starts. Windows Ops CI checks the cache-clear ordering so a stale cache cannot mask the `.env` logging policy.
+- The backup-health refactor now keeps the owner-facing USB/cloud guidance and explicit unconfigured-destination warning while splitting health aggregation into PHPMD-compliant methods. Exact-head Laravel and PHPMD both pass.
 
 ### Still open — do not mark V1 ready
 - Run the scheduled backup on the actual owner PC, copy an archive off-disk, and complete the controlled restore drill.

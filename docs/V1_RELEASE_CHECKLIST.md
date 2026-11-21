@@ -1,19 +1,22 @@
 # Zazu EMP — V1 Release Checklist
 
-Latest application/test source verification: d6c1d577b6ed0bd18bef5d1c869ccc00782b35cb — 643 passed / 1 skipped / 4,424 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 59 desktop + 7 mobile + 1 phone-local journey PASS.
-Latest Windows host-operations source: 365609b4d30ca4978ba9480cf3571bb792ad442b; Windows Ops contract checks PASS [run 44888885270], Windows package/fresh-install recovery PASS [run 44888885245], and Zazu Quality PASS [run 44888885301] on the same source head.
+Latest application/test source verification: 2d0269b00a3a94ecfb392f04c06438ece6eda603 — 649 passed / 1 skipped / 4,456 assertions; PostgreSQL migration/recovery smoke PASS; offline browser 59 desktop + 7 mobile + 1 phone-local journey PASS.
+Latest Windows host-operations source: 365609b4d30ca4978ba9480cf3571bb792ad442b; Windows package/fresh-install PowerShell acceptance PASS [run 44892813237]. Exact-head PHPMD, Psalm, Zazu Quality, populated upgrade/rollback and Director Health all PASS [runs 44892813263, 44892813233, 44892813235, 44892813238, 44892813214].
 Disposition: **NOT READY** · Evidence maturity: **77/100**. Code implementation does not substitute for owner-PC recovery, physical Android or POPIA evidence.
 
 ## Operational reliability implementation — 2026-11-21
 
 - [x] Daily 02:00 Windows backup task, missed-run catch-up, 14-archive retention and protected local destination implemented.
-- [x] Startup backup-age warning and Founder Control Centre missing/stale archive warning implemented.
-- [x] Off-disk USB/cloud-folder copy and recovery-drill procedure documented.
+- [x] Startup backup-age warning, business-owner dashboard banner and Founder Control Centre missing/stale archive warning implemented.
+- [x] Optional independent USB/synced-folder copy configured by `ZAZU_BACKUP_SECONDARY_PATH`, SHA-256 verified by the runner, with 14-archive retention and failure status; recovery-drill procedure documented.
 - [ ] Observe the scheduled backup on the owner's actual PC, copy an archive off-disk and pass the controlled restore drill.
 - [x] Owner approver recorded on each newly paired/re-registered device; sync audit entries use the approver as actor.
+- [x] Active legacy devices with no recorded approver can be explicitly re-approved by a business owner; historical activity remains unattributed rather than guessed.
+- [x] Activity audit labels trusted-device changes as performed via a trusted device approved by the recorded owner.
 - [x] Trust and logout prompts disclose that device sync changes are attributed to the approving owner, not necessarily the operator.
 - [x] Shared-device/per-user authority limitation and legacy-device attribution boundary recorded in docs/V1_KNOWN_LIMITATIONS.md.
 - [x] Query-builder mass-write guard for revision-tracked aggregates added.
+- [x] Backup status health calculation refactored below PHPMD complexity thresholds; owner warning and independent-copy status regressions covered by Laravel tests.
 - [x] Existing PC installs migrate to LOG_STACK=daily at startup; 14-day log retention is configured, and startup invalidates a stale Laravel config cache before serving so the setting takes effect.
 - [x] New registrations and password resets require at least 10 characters; no online breached-password service is required.
 - [x] iOS offline limitations are explicitly documented; V1 physical offline acceptance is Android-only.
