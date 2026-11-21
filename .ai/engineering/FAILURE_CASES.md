@@ -672,3 +672,21 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** Exact-head source/test commit `36a2f605481e3985b647dda710ead7bef157b70f`: offline browser **60 passed**, mobile viewport **7 passed**, phone-local attachment journey **1 passed**; Laravel **649 passed / 1 skipped / 4,456 assertions**; PostgreSQL migration/registration/backup/restore/private-file recovery **PASS**. Zazu Quality, Composer audit, secret scan, application and Actions/Python/JavaScript analysis passed. Documentation-head runs also passed Zazu Quality, Director Health, Director Contract Lint and Push-on-main. The corrected invoice reconciliation test passed without retry.
 
 **Loop prevention:** A sync identity acknowledgement must reference the local ID carried by the mutation under test. Never reuse a bootstrap fixture's identity for a newly created local record. Keep fixture identities scoped to their individual test.
+
+
+### CASE-ZAZU-0038
+
+**Status:** CLOSED — exact-head browser verification passed.  
+**Engineering diagnostic code:** ENG-CONTRACT-007.  
+**First observed:** 2026-11-21.  
+**Target:** `e2e/offline-session-transition.spec.js` — expired web session requires sign-in without erasing the trusted offline workspace.
+
+**Failure fingerprint:** After clearing web cookies and navigating to `/dashboard`, the browser test required the URL to leave `/dashboard` within five seconds. On one run the service worker's four-second network fetch timeout used its cached-dashboard fallback, leaving the URL unchanged; the test failed before reaching its existing auth-modal assertion. The same test passed on retry.
+
+**Classification:** F2/F8 — verification contract mismatch with a non-deterministic service-worker navigation fallback. The worker intentionally preserves the cached app shell when the network request times out. The security invariant is that the sign-in gate is visible and the user must authenticate before continuing; the URL alone is not a reliable indicator when the cached route is retained. No application defect was established.
+
+**Correction:** Removed the URL-only redirect assertion. The test still requires the sign-in modal, performs a fresh login, and verifies that the trusted paired workspace and queued local mutation survive.
+
+**Verification:** Exact source/test head `b26df40e150fc3b81425db81fe9cb16040970547`: offline browser **61 desktop Chromium + 7 mobile viewport + 1 phone-local attachment passed with no flaky retries**; Laravel **652 passed / 1 skipped / 4,487 assertions**; PostgreSQL migration/recovery, Zazu Quality and Push-on-main passed.
+
+**Loop prevention:** For service-worker-controlled routes, assert the authentication gate and preserved local state, not a URL transition that can legitimately differ during cached-shell fallback.
