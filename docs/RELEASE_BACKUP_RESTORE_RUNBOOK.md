@@ -1,3 +1,18 @@
+## Windows scheduled-backup runtime verification — CI PASS — 2026-11-21
+
+The Windows Ops workflow now runs the installer and runner, not only source-text checks. On a Windows PowerShell 5.1 runner it:
+
+- registers a real temporary Task Scheduler task and verifies S4U/limited principal, daily 02:00 trigger, StartWhenAvailable, WakeToRun and IgnoreNew overlap handling;
+- executes the backup runner against an isolated fixture installation;
+- verifies local and secondary retention both stop at 14 archives and the copied archive matches by SHA-256;
+- simulates an unavailable secondary drive and verifies the run is marked failed without erasing the last successful-copy timestamp.
+
+[Workflow 44941196865](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44941196865) passed on [db5f25e](https://github.com/Leano-Jordan/ZazuEMP/commit/db5f25e1f6b54fb28909738508ef935792a419cb).
+
+This remains Windows CI evidence. The actual owner PC must still demonstrate a scheduled run, an independent off-disk copy and a controlled restore of the intended installation with representative private media.
+
+---
+
 ## Empty private-storage restore correctness — automated verification PASS — 2026-11-21
 
 **Implementation:** [1906fd4](https://github.com/Leano-Jordan/ZazuEMP/commit/1906fd4da1876df66d745a57be9c3bd1d1714c48).  
