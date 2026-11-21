@@ -7,12 +7,13 @@ use App\Models\FounderSupportSession;
 use App\Models\PlatformLicenseCustomer;
 use App\Support\ZazuIncidentSummary;
 use App\Support\ZazuSentinelHealth;
+use App\Support\ZazuBackupStatus;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class SentinelController extends Controller
 {
-    public function index(Request $request, ZazuIncidentSummary $incidents, ZazuSentinelHealth $healthService): View
+    public function index(Request $request, ZazuIncidentSummary $incidents, ZazuSentinelHealth $healthService, ZazuBackupStatus $backupStatus): View
     {
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:120'],
@@ -37,6 +38,7 @@ final class SentinelController extends Controller
 
         return view('admin.sentinel', [
             'health' => $health,
+            'backupStatus' => $backupStatus->inspect(),
             'summaries' => $summaries,
             'timeline' => $timeline,
             'selectedFingerprint' => $selected,

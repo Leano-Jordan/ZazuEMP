@@ -337,6 +337,25 @@
             </div>
         </section>
 
+        <section class="sentinel-panel" id="installation-backup" aria-label="Installation backup status">
+            <div class="sentinel-health-overall">
+                <div>
+                    <h3>Installation backup</h3>
+                    <p class="sentinel-muted">Latest full-installation archive, including every business and private file.</p>
+                </div>
+                <span class="sentinel-pill">{{ strtoupper($backupStatus['status']) }}</span>
+            </div>
+            @if($backupStatus['latest_at'])
+                <p><strong>Last backup:</strong> {{ $backupStatus['latest_at'] }} ({{ $backupStatus['age_hours'] }} hours ago)</p>
+                @if($backupStatus['status'] === 'attention')
+                    <p class="sentinel-health-attention">Backup overdue. Check the Windows scheduled task and create a fresh backup.</p>
+                @endif
+            @else
+                <p class="sentinel-health-failed">No scheduled backup has been recorded on this installation.</p>
+            @endif
+            <p class="sentinel-muted sentinel-retention-note">The daily task retains 14 local archives. Copy the latest archive to separate USB/cloud storage; a backup on this PC cannot protect against disk failure. A recent archive does not replace the controlled restore drill.</p>
+        </section>
+
         <section class="sentinel-panel" id="incident-patterns">
             <h3>Search failure patterns</h3>
             <form method="GET" action="{{ route('admin.sentinel') }}" class="sentinel-search">
