@@ -99,6 +99,14 @@ final class SyncEntitySnapshotBuilder
             return [];
         }
 
+        $asset = $assetIdentity->record;
+        if (
+            ! $asset instanceof Asset
+            || ! $this->recordBelongsToBusiness($asset, (int) $identity->business_id)
+        ) {
+            return [];
+        }
+
         return [
             'entity_type' => 'asset',
             'local_id' => $assetIdentity->entity_uuid,
