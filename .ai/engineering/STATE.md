@@ -1,16 +1,20 @@
-## Director execution checkpoint — authenticated mutation-apply boundary — 2026-11-21
+## Director execution checkpoint — trusted-device credential race closure — 2026-11-21
 
-**Implementation:** [e66da83](https://github.com/Leano-Jordan/ZazuEMP/commit/e66da83a38f449482d83e9be9ffa6b4449830158).  
-**Push integration:** [d31aee2](https://github.com/Leano-Jordan/ZazuEMP/commit/d31aee2d2b03ce983c7d6370a53d17b7f3d77da4).  
-**Regression:** [b65ccfd](https://github.com/Leano-Jordan/ZazuEMP/commit/b65ccfd8dd99bd9b9effd964c0926889759e413e).
+**Verified code/test head:** [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7).
 
-- Found a second TOCTOU window after mutation recording: the push processor recorded under the middleware-authenticated credential, then applied the mutation in a separate transaction that checked only whether the device remained active. A credential replacement between those transactions could therefore allow the old request to apply its recorded mutation.
-- Added an explicit authenticated applier entrypoint. It verifies the mutation's business/device ownership and locks/revalidates the same active credential inside the transaction that applies the domain change.
-- The push processor now uses only the authenticated entrypoint. The trusted/internal applier remains explicitly marked internal for direct domain tests.
-- Added an adversarial regression: record a mutation with the original credential, replace the credential, attempt application with the stale snapshot, and verify HTTP 401, mutation still pending, zero attempts and no delivery.
-- Exact-head Laravel, PHPMD, Psalm and Director Health verification pending. No pass is claimed until CI completes.
+- Closed the post-record mutation-apply race: HTTP push now applies only through the authenticated applier, which verifies business/device ownership and revalidates the original credential under the business-first/device-row lock in the same transaction as the domain mutation.
+- Closed the conflict-write sibling race: request-originated conflict recording now uses the same guard. A re-paired device's stale middleware snapshot cannot create or update conflict state.
+- Centralized the same guard for bootstrap, pull and acknowledgement, so these paths share one active-device and persisted-token comparison rather than maintaining subtly different copies.
+- Added adversarial regressions proving stale apply returns 401 with the mutation still pending and no delivery, and stale conflict recording returns 401 with no conflict row. Existing bootstrap/pull/ack revocation checks remain in place.
+- Strengthened the attachment reconnect browser test to assert the phone is actually offline, the attachment is durably present before reload, and the same business-scoped storage partition is used after reload. The exact-head rerun had no flaky retries.
+- Laravel: **675 passed / 1 skipped / 4,581 assertions**. PostgreSQL migration/recovery smoke: **PASS**. Offline browser: **63 desktop Chromium + 7 mobile viewport + 1 mobile LAN-host-outage + 1 phone-local attachment/reconnect passed**, no failures or flaky retries.
+- PHPMD, Psalm, Zazu Quality (secret scan, Composer security audit and application checks), Director Health, populated upgrade/rollback, Windows V1 package/fresh install and Push-on-main: **PASS**. SonarCloud: **SKIPPED**, not counted as a pass.
+- CASE-ZAZU-0040 is closed at source/automated-test level. No exploit was demonstrated in a running installation; this was a source-level time-of-check/time-of-use path closed with adversarial regression coverage.
+
+**Remaining V1 gates — do not mark release-ready yet:** physical Android installed-app cold launch/host-stop/force-close/restart/reconnect; actual owner-PC off-disk backup and controlled full restore with private media; populated live-business quote-to-payment-to-profit reconciliation; POPIA operational sign-off; ZAZU name clearance. Browser mobile emulation is not physical-device proof. Evidence maturity remains **77/100**; no score uplift.
 
 ---
+
 
 ## Director execution checkpoint — empty private-storage restore correctness — 2026-11-21
 
