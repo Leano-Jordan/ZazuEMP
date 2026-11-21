@@ -119,7 +119,7 @@ class OfflineBootstrapRelationshipIsolationTest extends TestCase
         $invoice = Invoice::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
-            'quote_id' => null,
+            'quote_id' => $foreignQuote->id,
             'quote_version_id' => $foreignVersion->id,
             'number' => 'INV-BOOTSTRAP-001',
             'status' => 'draft',
@@ -136,6 +136,8 @@ class OfflineBootstrapRelationshipIsolationTest extends TestCase
         $payload = app(SyncBootstrapPayloadBuilder::class)->build($device);
         $record = collect($payload['invoices'])->firstWhere('server_id', $invoice->id)['record'];
 
+        $this->assertNull($record['quote_id']);
+        $this->assertNull($record['quote_version_id']);
         $this->assertNull($record['quote_version']);
         $this->assertSame('0.00', $record['deposit_required']);
         $this->assertStringNotContainsString('Foreign quote event', json_encode($record));
