@@ -378,38 +378,21 @@ class SyncController extends Controller
                 $path = $this->storePrivateAttachment($request->file('file'), (int) $event->id);
                 $storedPath = $path;
 
-                try {
-                    $attachment = EventAttachment::create([
-                        'event_id' => $event->id,
-                        'business_id' => $event->business_id,
-                        'uploaded_by' => null,
-                        'original_name' => $request->file('file')->getClientOriginalName(),
-                        'disk' => 'private',
-                        'path' => $path,
-                        'mime_type' => $request->file('file')->getMimeType(),
-                        'size' => $request->file('file')->getSize(),
-                        'source' => 'sync',
-                        'description' => $validated['description'] ?? null,
-                        'idempotency_key' => $validated['idempotency_key'],
-                    ]);
-                } catch (\Throwable $exception) {
-                    Storage::disk('private')->delete($path);
-                    $storedPath = null;
-
-                    // Another request may have won the unique idempotency-key insert.
-                    // Return duplicate success only after verifying that it stored the
-                    // exact same job and file payload.
-                    $concurrent = EventAttachment::query()
-                        ->where('business_id', $device->business_id)
-                        ->where('idempotency_key', $validated['idempotency_key'])
-                        ->first();
-
-                    if ($concurrent) {
-                        return $this->existingAttachmentResponse($concurrent, $event, $request, $validated);
-                    }
-
-                    throw $exception;
-                }
+                // The business-row lock above serializes the idempotency lookup
+                // and insert across trusted-device uploads for this workspace.
+                $attachment = EventAttachment::create([
+                    'event_id' => $event->id,
+                    'business_id' => $event->business_id,
+                    'uploaded_by' => null,
+                    'original_name' => $request->file('file')->getClientOriginalName(),
+                    'disk' => 'private',
+                    'path' => $path,
+                    'mime_type' => $request->file('file')->getMimeType(),
+                    'size' => $request->file('file')->getSize(),
+                    'source' => 'sync',
+                    'description' => $validated['description'] ?? null,
+                    'idempotency_key' => $validated['idempotency_key'],
+                ]);
 
                 $device->update(['last_seen_at' => now()]);
 
