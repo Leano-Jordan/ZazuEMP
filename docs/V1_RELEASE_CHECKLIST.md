@@ -1,3 +1,12 @@
+## Windows backup scheduler and runner — runtime CI PASS — 2026-11-21
+
+- Windows PowerShell 5.1 CI registers a temporary Task Scheduler task and verifies S4U/limited privileges, daily 02:00 trigger, missed-run catch-up, wake-to-run and IgnoreNew overlap behaviour.
+- The backup runner is executed against an isolated fixture: local/secondary retention capped at 14, SHA-256 copy equality, and a simulated unavailable secondary drive that preserves the previous successful-copy timestamp while marking the latest attempt failed.
+- [Windows Ops workflow 44941196865](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44941196865) passed on [db5f25e](https://github.com/Leano-Jordan/ZazuEMP/commit/db5f25e1f6b54fb28909738508ef935792a419cb).
+- This closes the Windows automation runtime CI gap, **not** the owner-PC release gate. The real PC must still run the task, produce an independent off-disk copy and pass a controlled full restore with private media.
+
+---
+
 ## Trusted-device credential boundary — exact-head acceptance PASS — 2026-11-21
 
 **Verified code/test head:** [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7).
