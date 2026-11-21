@@ -8,7 +8,7 @@
 - The app now polls the lightweight health route every 10 seconds and on focus/network/visibility changes. A host outage displays a non-destructive notice with a link to the cached dashboard workspace; the dashboard reveals the local IndexedDB workspace using the same origin-availability result.
 - The notice does not auto-redirect or discard unsaved form input, and it explicitly limits the offline promise to supported screens.
 - Playwright regression simulates host 503→200 while navigator.onLine stays true on desktop Chromium and Pixel 7 viewport.
-- Exact-head browser verification is pending. Actual installed Android stop-host/force-close/restart/reconnect acceptance remains mandatory.
+- Exact-head Laravel passed **670 / 1 skipped / 4,552 assertions**, PostgreSQL migration/recovery smoke and Zazu Quality passed on [41d7a25](https://github.com/Leano-Jordan/ZazuEMP/commit/41d7a256f80b1e1d98cbb43509f81dc26cd600ec). The offline-browser acceptance job is still running. Actual installed Android stop-host/force-close/restart/reconnect acceptance remains mandatory.
 
 ---
 
