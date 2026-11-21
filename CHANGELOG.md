@@ -5,7 +5,7 @@
 - Added a shared transactional device guard that locks business then device, rechecks active status and verifies the authenticated token hash against persisted credentials.
 - Applied the guard to conflict listing/resolution and attachment upload/list/download so revocation cannot race these operations after middleware authentication.
 - Device revocation now rejects a stale authenticated snapshot if the installation has already been re-paired with a replacement credential.
-- Added five focused stale-device authorization regression tests. On code head `7d4b097`, Laravel passed **670 / 1 skipped / 4,552 assertions**, PostgreSQL migration/recovery, PHPMD, Psalm, populated upgrade/rollback and Director Health passed. Offline-browser and Windows package acceptance were still running at the checkpoint; SonarCloud was skipped.
+- Added five focused stale-device authorization regression tests. On code head `7d4b097`, Laravel passed **670 / 1 skipped / 4,552 assertions**, PostgreSQL migration/recovery, PHPMD, Psalm, populated upgrade/rollback and Director Health passed. Offline-browser acceptance passed: **62 desktop Chromium**, **7 mobile viewport**, and **1 phone-local Work/attachment/reconnect** journey. Windows V1 package passed. SonarCloud was skipped.
 
 
 ## 2026-11-21 — Receiver sync completeness and bootstrap authorization
