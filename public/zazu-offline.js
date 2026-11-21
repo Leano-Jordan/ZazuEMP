@@ -1735,15 +1735,13 @@
         }
 
         const remainingMutations = await pending();
-        const unresolvedMutations = (await allMutations()).filter(item =>
-            ['pending', 'failed'].includes(item.status)
-        );
+        const openConflicts = (state.conflicts || []).filter(conflict => conflict.status === 'open');
 
         for (const related of relatedReconciliations) {
             if (related.record?.pending_sync !== true) continue;
 
             const sourcePayload = related.sourceMutation.payload?.record || {};
-            const stillPending = unresolvedMutations.some(item => {
+            const stillPending = remainingMutations.some(item => {
                 const payload = item.payload?.record || {};
                 const localId = payload.local_id || item.entity_id;
 
@@ -1764,6 +1762,19 @@
                 }
 
                 return false;
+            }) || openConflicts.some(conflict => {
+                if (related.entityType === 'purchase_order') {
+                    return conflict.entity_type === 'purchase_receipt';
+                }
+
+                if (related.entityType === 'inventory_item') {
+                    return related.sourceMutation.entity_type === 'purchase_receipt'
+                        ? conflict.entity_type === 'purchase_receipt'
+                        : conflict.entity_type === 'inventory_movement';
+                }
+
+                return conflict.entity_type === related.entityType
+                    && conflict.entity_id === related.localId;
             });
 
             if (!stillPending) {
