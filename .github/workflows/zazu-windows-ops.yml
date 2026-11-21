@@ -281,8 +281,19 @@ jobs:
           foreach ($source in @($installScript, $envExample)) {
             if (-not $source.Contains('LOG_STACK=daily')) { throw 'Daily log rotation is not configured for installation.' }
           }
+          $dailyLogIndex = $hostLauncher.IndexOf('$usesDailyLogStack =')
+          $cachePathIndex = $hostLauncher.IndexOf('$configCache = Join-Path $ProjectPath ''bootstrap\cache\config.php''')
+          $cacheClearIndex = $hostLauncher.IndexOf('& $php $artisan ''config:clear'' ''--no-interaction''')
+          $serverStartIndex = $hostLauncher.IndexOf('$process = Start-Process -FilePath $php')
+          if ($dailyLogIndex -lt 0 -or $cachePathIndex -lt $dailyLogIndex -or $cacheClearIndex -lt $cachePathIndex -or $serverStartIndex -lt $cacheClearIndex) {
+            throw 'Daily-log configuration must clear an existing Laravel config cache before the PHP server starts.'
+          }
+          $cacheBlock = $hostLauncher.Substring($dailyLogIndex, $serverStartIndex - $dailyLogIndex)
+          foreach ($required in @('$usesDailyLogStack -or $SecureCookies', 'Test-Path $configCache', 'config:clear', 'Could not clear stale Laravel configuration cache')) {
+            if (-not $cacheBlock.Contains($required)) { throw "Cached logging configuration safeguard is missing: $required" }
+          }
 
-          Write-Host 'PASS: Daily 02:00 S4U backup task, catch-up, runner, retention and daily logs are wired.'
+          Write-Host 'PASS: Daily 02:00 S4U backup task, catch-up, runner, retention, daily logs and cached-config invalidation are wired.'
 
       - name: Verify LAN HTTPS command wrappers
         shell: pwsh
