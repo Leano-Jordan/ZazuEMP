@@ -1,3 +1,19 @@
+## Director execution checkpoint — backup/restore capacity alignment — 2026-11-21
+
+**Implementation:** [84dba32](https://github.com/Leano-Jordan/ZazuEMP/commit/84dba32ae96ececf6c1dd71034d79d0b93070b7e).  
+**Shared policy:** [4824469](https://github.com/Leano-Jordan/ZazuEMP/commit/48244694d5419df50ce9cdd3938f65aaf77d02eb).  
+**Regression:** [675742e](https://github.com/Leano-Jordan/ZazuEMP/commit/675742eef40a819b6e509ea168303a8d239fd584).
+
+- Found a restore incompatibility: backup allowed 50,000 private files plus database and manifest (50,002 ZIP entries), while restore capped the archive at 50,000 entries. Backup could therefore publish an archive its own restore command rejected.
+- Restore also capped total uncompressed archive content at 2 GiB, while backup did not enforce the same total before publication.
+- Added one shared archive-limit policy, aligned entry counts, enforced the 2 GiB payload ceiling during backup staging, and rechecked the complete ZIP including its manifest before publishing.
+- Added boundary tests for maximum private files, ZIP entries and uncompressed bytes.
+- **Verification:** exact-head Laravel, quality and backup/restore round-trip CI pending. No pass is claimed until the run completes.
+
+Next: close the exact-head recovery checks, then continue V1 recovery and commercial acceptance. Main only; no branches.
+
+---
+
 ## Director execution checkpoint — LAN host-outage offline acceptance CLOSED — 2026-11-21
 
 **Verified source/test head:** [7df9d7c](https://github.com/Leano-Jordan/ZazuEMP/commit/7df9d7c176cb5fe931bf62617d2908cc74e8d041).  
