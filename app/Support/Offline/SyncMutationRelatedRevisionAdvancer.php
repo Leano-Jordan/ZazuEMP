@@ -5,6 +5,7 @@ namespace App\Support\Offline;
 use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use App\Models\Quote;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
