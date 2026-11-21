@@ -178,7 +178,7 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('500.00', $cost->actual_amount);
         $this->assertSame($event->id, $cost->event_id);
 
-        $profitability = app(\\App\\Services\\EventProfitabilityService::class);
+        $profitability = app(\App\Services\EventProfitabilityService::class);
         $contribution = $profitability->forBusiness($business)->firstWhere('event_id', $event->id);
         $this->assertNotNull($contribution);
         $this->assertSame(50000, $contribution['actual_cost_cents']);
