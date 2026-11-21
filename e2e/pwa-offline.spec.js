@@ -1199,6 +1199,24 @@ test.describe('Zazu installed PWA offline shell', () => {
         // workspace before selecting the server-backed job used by this test.
         await trustCurrentDevice(page);
         await page.evaluate(() => window.ZazuOffline.sync());
+        const workspaceDiagnostic = await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            return {
+                businessId: Number(document.body.dataset.zazuBusinessId),
+                business: state.business,
+                localDirty: Boolean(state.local_dirty),
+                paired: Boolean(state.sync?.token),
+                jobCount: (state.jobs || []).length,
+                jobs: (state.jobs || []).slice(0, 5).map(record => ({
+                    id: record.id ?? null,
+                    serverId: record.server_id ?? null,
+                    localId: record.local_id ?? null,
+                    name: record.name ?? null,
+                })),
+                pendingCount: (await window.ZazuOffline.pending()).length,
+            };
+        });
+        console.log('Event-cost offline workspace diagnostic:', JSON.stringify(workspaceDiagnostic));
         await expect.poll(() => page.evaluate(() => (
             window.ZazuOffline.getState().jobs || []
         ).some(record => record.local_id && Number(record.id ?? record.server_id) > 0))).toBe(true);
