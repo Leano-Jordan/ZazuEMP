@@ -1,3 +1,21 @@
+## Director execution checkpoint — bootstrap delivery fallback hardened — 2026-11-21
+
+**Latest implementation:** [cb944b2](https://github.com/Leano-Jordan/ZazuEMP/commit/cb944b2fe0b3c74caec4eee99b0feda1a2188183) + [3d1586c](https://github.com/Leano-Jordan/ZazuEMP/commit/3d1586c04ba35e70e292a433f038e3b7ed3828d6).  
+**Regression:** [604cb07](https://github.com/Leano-Jordan/ZazuEMP/commit/604cb07b2c1a226056d413a559859514297f3d7a).
+
+- Extended the related identity audit to the bootstrap delivery target resolver. Its fallback previously returned a raw server ID from a tenant-scoped identity row without checking the polymorphic target model or revalidating the record's business ownership.
+- Fallback resolution now uses an explicit entity-to-model mapping, requires the matching morph type, resolves the record, and confirms tenant ownership before returning a target.
+- Added a regression where an invoice identity points to a Customer and must not create an invoice bootstrap target.
+- Documentation updated in docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md.
+- Prior full acceptance remains green on run [44919777572](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44919777572): 659 passed / 1 skipped / 4,527 assertions; PostgreSQL recovery; desktop Chromium; mobile customer/Work; phone-local attachments.
+- The current bootstrap/related-identity regression head is running CI under [Laravel run 44921815863](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815863), [Zazu Quality run 44921815750](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44921815750), and [Director Health run 44921815750 family / 44921815750 not applicable]. Do not count the new work verified until Laravel, PostgreSQL, browser acceptance, quality and security checks finish. SonarCloud is skipped by current workflow configuration.
+
+**Evidence maturity:** 77/100 remains the last independently recorded baseline; V1 remains NOT READY.
+
+**Next target:** verify the current CI; then continue reviewing device-scoped bootstrap, pull acknowledgement and conflict delivery paths for raw identity dereferences. Main only; no branch creation.
+
+---
+
 ## Director execution checkpoint — related offline identity paths hardened — 2026-11-21
 
 **Implementation commits:** [c919d4f](https://github.com/Leano-Jordan/ZazuEMP/commit/c919d4fc7fb611d835b966b6babc70288fe5263f), [043de08](https://github.com/Leano-Jordan/ZazuEMP/commit/043de08cf28389e2a4b4ff07f24971f95835922d), [e21fe2b](https://github.com/Leano-Jordan/ZazuEMP/commit/e21fe2b5a77948602d2b42984b4ba3a530f26e86), [683e920](https://github.com/Leano-Jordan/ZazuEMP/commit/683e9208b7dfc1fdd1fbf630c2b77e23132c6b1f), [1d18c90](https://github.com/Leano-Jordan/ZazuEMP/commit/1d18c90c46462e2af8c32ba77b56603c54611c72).  
