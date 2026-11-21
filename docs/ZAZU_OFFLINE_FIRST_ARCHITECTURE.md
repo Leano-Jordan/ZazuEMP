@@ -4,7 +4,7 @@
 **Push integration:** [d31aee2](https://github.com/Leano-Jordan/ZazuEMP/commit/d31aee2d2b03ce983c7d6370a53d17b7f3d77da4).  
 **Regression:** [b65ccfd](https://github.com/Leano-Jordan/ZazuEMP/commit/b65ccfd8dd99bd9b9effd964c0926889759e413e).
 
-The push path previously revalidated a device credential when recording a mutation, but the separate apply transaction checked only device active status. The applier now has an explicit authenticated entrypoint that verifies business/device ownership and revalidates the middleware token hash under the same transaction lock as domain application. The push processor uses that entrypoint. An adversarial test proves a mutation recorded before re-pairing remains pending and is not delivered when the stale snapshot attempts application. Exact-head CI pending.
+The push path previously revalidated a device credential when recording a mutation, but the separate apply transaction checked only device active status. The applier now has an explicit authenticated entrypoint that verifies business/device ownership and revalidates the middleware token hash under the same transaction lock as domain application. The push processor uses that entrypoint. Conflict recording, bootstrap, pull and acknowledgement use the same shared business-first/device-row guard. Adversarial tests prove a stale apply remains pending with no delivery and stale conflict recording creates no conflict row. Exact-head Laravel, PHPMD, Psalm, Zazu Quality and offline browser acceptance passed on [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7), including 675 Laravel tests (1 skipped, 4,581 assertions).
 
 ---
 
