@@ -235,3 +235,13 @@ An offline mutation may be based on an older business-record snapshot than the s
 **Regression controls:** 500-record supplier-window test, recently revised online supplier promotion, exact delivery inclusion and non-recipient isolation; cross-device commercial and receipt/inventory reconciliation; browser pull → targeted bootstrap → acknowledgement ordering.
 
 **Status:** IMPLEMENTED ON MAIN — exact-head CI verification pending. Do not mark the case closed until Laravel, PostgreSQL, offline-browser, PHPMD and quality workflows pass on the same code head.
+
+## REG-026 — Bootstrap accepts a stale authenticated device snapshot
+
+**Failure:** The bootstrap controller trusted the sync-device model attached by authentication middleware and did not re-read the durable device state. A request authenticated just before revocation or credential replacement could still receive the business bootstrap. Its prior device activity update also occurred before the builder's business lock, violating the canonical business-first lock order.
+
+**Control:** bootstrap must lock the business first, then re-read and lock the active destination device, compare the persisted token hash with the middleware-authenticated snapshot, update device activity under that lock and build the snapshot before releasing the transaction. Any revoked or replaced device returns 401 before business data is returned.
+
+**Regression controls:** stale middleware snapshot after revocation; stale snapshot after sync-token replacement. Existing pull/ack revocation tests remain in place.
+
+**Status:** IMPLEMENTED ON MAIN — exact-head Laravel, PostgreSQL, PHPMD, quality and offline-browser verification pending. No security-gate closure is claimed until the new exact-head run passes.
