@@ -4,7 +4,7 @@
 
 CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has paired-device rejection, same-device causal chains, conflict/rebase payload preservation, parent-revision propagation and business-isolation evidence. The final online writer review found and corrected the remaining primary-contact creation mass-update bypass; other identified bulk operations are paired with tracked parent updates or are restore/protocol writes outside existing domain identities.
 
-**The full offline sync workflow matrix remains OPEN and separate.** Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain OPEN. Evidence maturity remains **75/100**; no unsupported score uplift. V1 remains **NOT READY**.
+**The full offline sync workflow matrix remains OPEN and separate.** Physical Android cold launch/restart/reconnect, intended-installation recovery, live-business commercial reconciliation and POPIA operational sign-off remain OPEN. Evidence maturity: **77/100 (+2)**. The uplift is for exact-head closure of CASE-ZAZU-0033: paired-device stale-write rejection, same-device causal/rebase coverage, online writer audit correction and passing Laravel/PostgreSQL/browser acceptance. This is engineering evidence maturity, not release readiness. V1 remains **NOT READY**.
 
 ---
 
