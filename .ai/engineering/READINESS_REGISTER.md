@@ -1,3 +1,16 @@
+## Director execution checkpoint — event-cost offline bootstrap correction — 2026-11-21
+
+**Application/test code head:** `86f03861cd640aaefa2a6b08f022d0a5b1f17e45` on `main`.  
+**Implementation:** [4971ce1](https://github.com/Leano-Jordan/ZazuEMP/commit/4971ce12c7c968edf5fcdae4d269f4c0bb079aa2) adds the missing explicit device trust + workspace sync + server-backed Work wait to the actual failing event-cost test. [86f0386](https://github.com/Leano-Jordan/ZazuEMP/commit/86f03861cd640aaefa2a6b08f022d0a5b1f17e45) removes diagnostic logging that had been added to an unrelated test.
+
+**Root cause:** the event-cost test deferred initial sync, waited only for local IndexedDB readiness, and then assumed a server-backed Work record had already been hydrated. The earlier attempted correction modified a different test, which is why the failure persisted. No production bootstrap defect has been established by this assertion.
+
+**Verification:** previous exact run [44908353460](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44908353460) still failed at the event-cost test's missing-job assertion; Laravel and PostgreSQL jobs passed. No Actions run or commit status was available yet for the correction commit when this checkpoint was written. Exact-head offline browser verification is **PENDING**; the original event-cost acceptance assertions remain unchanged.
+
+**Evidence maturity:** **77/100, unchanged**. No score uplift. V1 remains **NOT READY**.
+
+---
+
 ## Director acceptance checkpoint — 2026-11-21
 
 **Current source/test head:** `e45cab97cbcdbc3f989bf3843d751bb0f373c305` on `main`.  
