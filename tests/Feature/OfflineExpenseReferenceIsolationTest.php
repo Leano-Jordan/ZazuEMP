@@ -16,6 +16,7 @@ use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationRecorder;
 use App\Support\Offline\SyncMutationRelatedIdentityResolver;
+use App\Support\Offline\SyncEntitySnapshotBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -341,7 +342,7 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             'record_id' => $event->id,
         ]);
 
-        $snapshot = app(\\App\\Support\\Offline\\SyncEntitySnapshotBuilder::class)->build($identity);
+        $snapshot = app(SyncEntitySnapshotBuilder::class)->build($identity);
 
         $this->assertTrue($snapshot['deleted']);
         $this->assertSame([], $snapshot['record']);
