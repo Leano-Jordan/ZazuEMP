@@ -1,3 +1,23 @@
+## Director execution checkpoint — LAN host-outage offline acceptance CLOSED — 2026-11-21
+
+**Verified source/test head:** [7df9d7c](https://github.com/Leano-Jordan/ZazuEMP/commit/7df9d7c176cb5fe931bf62617d2908cc74e8d041).  
+**Runtime implementation:** [96e57e4](https://github.com/Leano-Jordan/ZazuEMP/commit/96e57e4674b93c028b8aa5ffb2805d12b15a0457).  
+**Exact-head Laravel + desktop/mobile browser + PostgreSQL:** [run 44934728827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44934728827).
+
+- Laravel: **670 passed / 1 skipped / 4,552 assertions**.
+- PostgreSQL migration/recovery smoke: **PASS**.
+- Offline browser: **63 desktop Chromium passed**, **7 mobile-viewport Work/customer acceptance passed**, **1 Pixel 7 viewport host-outage monitor test passed**, and **1 phone-local Work attachment/reconnect journey passed**. No failures or flaky retries in the final exact-head run.
+- Zazu Quality [44934728822], Director Health [44934728782], Director Contract Lint [44934728823] and Push-on-main [44934728600]: **PASS**.
+- Windows V1 package and fresh-install acceptance passed on the same runtime implementation head [run 44934642257](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44934642257).
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- CASE-ZAZU-0037 is CLOSED for the simulated LAN host-outage UI defect. Physical Android acceptance remains an independent open release gate.
+
+**Correction history:** the first browser attempt exposed a race between concurrent origin probes and offline-state changes. The runtime now uses one shared origin-availability state, queues transitions while a probe is in flight, and refreshes on focus. The final exact-head desktop/mobile run passed without retries.
+
+**Remaining V1 gates:** physical Android installed-app cold launch/stop-host/force-close/restart/reconnect; actual owner-PC off-disk backup and full restore drill; populated live-business quote-to-payment-to-profit reconciliation; POPIA operational sign-off; ZAZU name clearance. Evidence maturity remains **77/100**; no score uplift from simulated browser evidence. V1 remains **NOT READY**.
+
+---
+
 ## Director execution checkpoint — live host-outage detection for offline PWA — 2026-11-21
 
 **Implementation:** [ae2a900](https://github.com/Leano-Jordan/ZazuEMP/commit/ae2a90080590f4aad8bfffc459e211f6b98c0bf8).  
