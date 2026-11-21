@@ -61,7 +61,7 @@
 - The first snapshot tenant guard only mapped the most common aggregate models. Applying a fail-closed unknown-type default would have incorrectly marked valid snapshots for other offline mutation models as deleted.
 - Expanded the expected morph-type map to cover the complete persisted offline mutation model set: service, customer, job, supplier, preparation, quote, invoice, payment, purchase order/item, inventory item/movement, expense, event cost, asset and asset allocation.
 - Added a positive regression proving a valid InventoryMovement identity remains a live conflict snapshot, not a synthetic deleted record.
-- Exact-head CI pending.
+- Exact-head Laravel: **665 passed / 1 skipped / 4,545 assertions** ([run 44924557047](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44924557047)); PostgreSQL migration/recovery, PHPMD, Zazu Quality, Director Health, Composer security audit and secret scan **PASS**. The matching desktop/mobile offline-browser acceptance remains in progress. SonarCloud skipped.
 
 ### Bootstrap invoice guard complexity refactor — 2026-11-21
 
