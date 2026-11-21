@@ -207,22 +207,12 @@ class SyncBootstrapPayloadBuilder
 
     private function bootstrapInvoices(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        $query = Invoice::query()->where('business_id', $business->id)->with(['items', 'payments', 'quoteVersion.quote.event']);
+        $query = Invoice::query()->where('business_id', $business->id)->with(['items', 'payments', 'quote.event', 'quoteVersion.quote.event']);
         $this->applyBoundedWorkingSet($query, Invoice::class, $business, $includedIds, 'invoice', 'id', 'desc');
 
         return $query->get()
             ->map(function (Invoice $invoice) use ($business, $registry): array {
-                $quoteVersion = $invoice->quoteVersion;
-                if (
-                    ! $quoteVersion
-                    || (int) $quoteVersion->quote_id !== (int) $invoice->quote_id
-                    || (int) ($quoteVersion->quote?->event?->business_id ?? 0) !== (int) $business->id
-                ) {
-                    $quoteVersion = null;
-                } else {
-                    $quoteVersion->unsetRelation('quote');
-                }
-                $invoice->setRelation('quoteVersion', $quoteVersion);
+                $this->sanitizeInvoiceQuoteRelations($invoice, $business);
 
                 return [
                 ...$this->identityPayload($invoice, 'invoice', $registry),
@@ -243,6 +233,33 @@ class SyncBootstrapPayloadBuilder
             ];
             })
             ->values();
+    }
+
+    private function sanitizeInvoiceQuoteRelations(Invoice $invoice, Business $business): void
+    {
+        $quote = $invoice->quote;
+        if (! $quote || (int) ($quote->event?->business_id ?? 0) !== (int) $business->id) {
+            $invoice->setAttribute('quote_id', null);
+            $invoice->setAttribute('quote_version_id', null);
+            $invoice->setRelation('quote', null);
+            $invoice->setRelation('quoteVersion', null);
+            return;
+        }
+
+        $invoice->setRelation('quote', null);
+        $quoteVersion = $invoice->quoteVersion;
+        if (
+            ! $quoteVersion
+            || (int) $quoteVersion->quote_id !== (int) $quote->id
+            || (int) ($quoteVersion->quote?->event?->business_id ?? 0) !== (int) $business->id
+        ) {
+            $invoice->setAttribute('quote_version_id', null);
+            $quoteVersion = null;
+        } else {
+            $quoteVersion->unsetRelation('quote');
+        }
+
+        $invoice->setRelation('quoteVersion', $quoteVersion);
     }
 
     private function bootstrapInventoryItems(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
