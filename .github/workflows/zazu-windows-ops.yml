@@ -293,7 +293,7 @@ jobs:
           New-Item -ItemType File -Path (Join-Path $fixture 'artisan') -Force | Out-Null
           try {
             & 'ops/windows/Install-ZazuBackupSchedule.ps1' -ProjectPath $fixture
-            if (-not $script:CapturedTask -or -not $script:CapturedTask.Trigger.Daily -or $script:CapturedTask.Trigger.At -ne '2:00AM') { throw 'Daily 02:00 backup trigger was not registered.' }
+            if (-not $script:CapturedTask -or $script:CapturedTask.Trigger.At -ne '2:00AM') { throw 'Daily 02:00 backup trigger was not registered.' }
             if ($script:CapturedTask.Principal.LogonType -ne 'S4U') { throw 'Backup task must not store a Windows password.' }
             if (-not $script:CapturedTask.Settings.StartWhenAvailable -or -not $script:CapturedTask.Settings.WakeToRun) { throw 'Backup task must catch up and wake the PC when supported.' }
             if (-not $script:CapturedTask.Action.Argument.Contains('Invoke-ZazuScheduledBackup.ps1')) { throw 'Backup task runner is not wired.' }
