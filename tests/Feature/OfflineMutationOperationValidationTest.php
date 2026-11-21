@@ -47,6 +47,20 @@ class OfflineMutationOperationValidationTest extends TestCase
                 'currency' => 'ZAR',
                 'category' => 'Catering',
             ],
+            'supplier' => [],
+            'preparation' => [],
+            'purchase_order' => [],
+            'quote' => [],
+            'quote_acceptance' => [],
+            'invoice' => [],
+            'payment' => [],
+            'expense' => [],
+            'purchase_receipt' => [],
+            'inventory_item' => [],
+            'inventory_movement' => [],
+            'event_cost' => [],
+            'asset' => [],
+            'asset_allocation' => [],
         ];
 
         foreach ($cases as $entityType => $record) {
@@ -72,8 +86,24 @@ class OfflineMutationOperationValidationTest extends TestCase
             $this->assertSame(0, $mutation->fresh()->attempts);
         }
 
-        $this->assertDatabaseCount('customers', 0);
-        $this->assertDatabaseCount('events', 0);
-        $this->assertDatabaseCount('business_capabilities', 0);
+        foreach ([
+            'customers',
+            'events',
+            'business_capabilities',
+            'suppliers',
+            'event_preparation_items',
+            'purchase_orders',
+            'quotes',
+            'invoices',
+            'payments',
+            'finance_expenses',
+            'inventory_items',
+            'inventory_movements',
+            'event_costs',
+            'assets',
+            'asset_allocations',
+        ] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
     }
 }
