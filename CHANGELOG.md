@@ -14,6 +14,15 @@
 - Exact-head [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7): Laravel **675 passed / 1 skipped / 4,581 assertions**; PostgreSQL migration/recovery, 63 desktop + 7 mobile + 1 host-outage + 1 phone-local attachment/reconnect browser journeys, PHPMD, Psalm, Zazu Quality, Director Health, populated upgrade/rollback, Windows package/fresh install and Push-on-main passed. No browser retries or flaky tests. SonarCloud skipped.
 
 
+
+## 2026-11-21 — Windows scheduled backup runtime acceptance
+
+- Windows Ops CI now creates and inspects a real temporary Task Scheduler task under Windows PowerShell 5.1, verifying S4U/limited privileges, daily 02:00 trigger, catch-up/wake settings and overlap protection.
+- The same workflow runs the backup runner against a temporary fixture, checks 14-archive local and secondary retention, SHA-256 copy equality, and preservation of the previous verified timestamp when the secondary drive is unavailable.
+- [Windows Ops workflow 44941196865](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44941196865) passed on [db5f25e](https://github.com/Leano-Jordan/ZazuEMP/commit/db5f25e1f6b54fb28909738508ef935792a419cb). The intended owner PC's real scheduled run, off-disk copy and controlled restore remain open.
+
+
+
 ## 2026-11-21 — Transactional trusted-device authorization
 
 - Added a shared transactional device guard that locks business then device, rechecks active status and verifies the authenticated token hash against persisted credentials.
