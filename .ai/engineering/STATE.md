@@ -13,7 +13,6 @@
 - Explicit pairing selections remain pinned: delivery-driven customer, Work, quote and preparation records are included only when the owner had already selected them.
 - The ordinary bounded collections now select their working set by latest sync-identity update time (fallback to record `updated_at`) and retain their existing display order.
 - The client only acknowledges after the complete bootstrap snapshot has been applied locally. The service-worker static cache is `zazu-static-v58` so installed clients fetch the updated cache-first offline client.
-- Explicit pairing selections are preserved: delivery-driven customer, Work, quote and preparation records are included only when already present in that device's pinned selection.
 - Bootstrap access now uses the canonical business → device lock order, re-reads the active device and compares the persisted sync-token hash against the middleware-authenticated snapshot before updating last-seen activity and building data. Revoked/replaced devices return 401.
 
 ### Added regression coverage
@@ -24,7 +23,7 @@
 - Purchase receipt reconciliation asserts both the purchase-order state and every affected inventory aggregate.
 - Browser acceptance asserts pull → targeted bootstrap → acknowledgement ordering and the exact sequence query value.
 
-**Failure record:** CASE-ZAZU-0034 / ENG-DATA-004, registered as an F1/F7 receiver-reconciliation defect. CASE-ZAZU-0033 (stale-write preconditions and full writer audit) remains separate and OPEN.
+**Failure records:** CASE-ZAZU-0034 / ENG-DATA-004 (receiver snapshot omission) and CASE-ZAZU-0035 / ENG-AUTH-001 (bootstrap stale-device authorization). CASE-ZAZU-0033 (stale-write preconditions and full writer audit) remains separate and OPEN.
 
 **V1 disposition:** NOT READY. Evidence maturity remains **73/100** pending exact-head verification and broader owner acceptance. Physical Android cold launch/restart/reconnect, intended-installation recovery drill, live-business commercial reconciliation and POPIA operational sign-off remain independent gates. ZAZU name clearance remains deferred by owner direction. No production data was changed and no branches were created.
 
