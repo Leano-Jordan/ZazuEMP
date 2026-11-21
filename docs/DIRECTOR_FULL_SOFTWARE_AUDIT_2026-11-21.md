@@ -216,9 +216,9 @@ Root cause in the test setup:
 
 The same failure appeared on consecutive source heads. It is therefore a deterministic setup defect, not a transient flake. The failure occurs before the cost form is submitted; it is not evidence that the production event-cost mutation or reconciliation path itself is broken.
 
-**Correction committed on main:** `1f658f4abb98dbe47325255caa330c6057594927`. The test now explicitly trusts the device, invokes synchronization, and waits until a server-backed job is present locally before entering the offline cost journey. The assertion was retained; the test was not skipped or weakened.
+**First attempted correction (not accepted as fixed):** `1f658f4abb98dbe47325255caa330c6057594927`. It explicitly trusted the device, invoked synchronization and waited for a server-backed job, while retaining the assertion. Exact-head run [44907862242](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862242) still failed at the same missing-job assertion. Therefore this change did not close the failure and must not be reported as a successful fix.
 
-Exact-head verification is running as [Laravel workflow 44907862242](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862242). At the time this addendum was written, that run had not yet completed; no pass is claimed here. Its Zazu Quality run [44907862245](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862245) passed; SonarCloud [44907862244](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44907862244) was skipped.
+**Diagnostic follow-up:** commit `4272f7157b62d88d6c534f577b739f5f3b231dda` adds a bounded diagnostic record for active business ID/name, local-dirty state, pairing state, cached job identities and pending queue count immediately before the assertion. [Exact-head workflow 44908353460](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44908353460) was still in progress at the time of this update. No pass is claimed. The diagnostic output is required before selecting the next correction.
 
 ### 11.3 Documentation and decision-control defects
 
