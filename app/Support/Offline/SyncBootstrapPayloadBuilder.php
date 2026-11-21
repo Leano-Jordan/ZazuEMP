@@ -21,6 +21,7 @@ use App\Models\SyncDelivery;
 use App\Models\SyncEntityIdentity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class SyncBootstrapPayloadBuilder
 {
@@ -115,11 +116,11 @@ class SyncBootstrapPayloadBuilder
             $identities = $resolver->resolve($mutation);
             if ($identities === []) {
                 $localId = $mutation->payload['local_id'] ?? $mutation->entity_id;
-                if (is_string($localId)) {
+                if (is_string($localId) && Str::isUuid($localId)) {
                     $identity = SyncEntityIdentity::query()
                         ->where('business_id', $device->business_id)
                         ->where('entity_type', $mutation->entity_type)
-                        ->where('entity_uuid', $localId)
+                        ->where('entity_uuid', Str::lower($localId))
                         ->first();
 
                     if ($identity) {
