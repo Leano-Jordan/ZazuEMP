@@ -75,6 +75,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-FIXTURE-005 | CASE-ZAZU-0030 | Offline startup readiness test accesses ZazuOffline before runtime exposure | F2/F3/F8 | CORRECTED — exact-head rerun pending |
 | ENG-FIXTURE-006 | CASE-ZAZU-0031 | Offline customer edit fixture coupled to seeded/cached directory assumptions | F2/F3 | CLOSED — exact-head browser and supporting CI passed |
 | ENG-FIXTURE-007 | CASE-ZAZU-0037 | Offline invoice sync acknowledgement targets the seeded invoice instead of the newly created local invoice | F2/F3 | CLOSED — exact-head browser/Laravel/PostgreSQL/quality verification passed |
+| ENG-CONTRACT-007 | CASE-ZAZU-0038 | Expired-session URL assertion conflicts with service-worker cached-shell fallback | F2/F8 | CLOSED — exact-head browser acceptance passed without flaky retries on b26df40e |
 
 
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
