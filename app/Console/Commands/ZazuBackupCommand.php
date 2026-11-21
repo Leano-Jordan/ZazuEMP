@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\BackupArchiveLimits;
 use App\Support\PostgresBackupSupport;
 
 use Illuminate\Console\Command;
@@ -15,7 +16,6 @@ use ZipArchive;
 class ZazuBackupCommand extends Command
 {
     private const FORMAT_VERSION = 2;
-    private const MAX_PRIVATE_FILES = 50000;
 
     protected $signature = 'zazu:backup {--output= : Destination directory for the backup archive}';
     protected $description = 'Create a portable Zazu database and private-storage backup';
@@ -223,7 +223,7 @@ class ZazuBackupCommand extends Command
         }
 
         $files = File::allFiles($privateRoot);
-        if (count($files) > self::MAX_PRIVATE_FILES) {
+        if (count($files) > BackupArchiveLimits::MAX_PRIVATE_FILES) {
             $this->error('Private storage contains too many files for one backup.');
             return false;
         }
@@ -250,8 +250,17 @@ class ZazuBackupCommand extends Command
     private function buildChecksums(string $work): ?array
     {
         $checksums = [];
+        $totalBytes = 0;
 
         foreach (File::allFiles($work) as $file) {
+            $size = $file->getSize();
+            if ($size < 0 || $size > BackupArchiveLimits::MAX_UNCOMPRESSED_BYTES
+                || $totalBytes > BackupArchiveLimits::MAX_UNCOMPRESSED_BYTES - $size) {
+                $this->error('Backup payload exceeds the 2 GB restore limit; no archive was published.');
+                return null;
+            }
+            $totalBytes += $size;
+
             $relative = str_replace('\\', '/', $file->getRelativePathname());
             $checksum = hash_file('sha256', $file->getPathname());
 
@@ -282,7 +291,7 @@ class ZazuBackupCommand extends Command
         }
 
         try {
-            if ($zip->numFiles < 2 || $zip->numFiles > self::MAX_PRIVATE_FILES + 2) {
+            if ($zip->numFiles < 2 || $zip->numFiles > BackupArchiveLimits::MAX_ARCHIVE_ENTRIES) {
                 return false;
             }
 
