@@ -2,6 +2,17 @@
 
 Durable decisions governing the Zazu engineering system.
 
+## DEC-027 — Founder confirmation of the three commercial tiers
+
+- **Date:** 2026-11-21
+- **Status:** ACTIVE
+- **Authority:** Explicit Founder decision in the current Director session.
+- **Decision:** Zazu EMP has exactly three commercial workspace tiers: **Basic**, **Intermediate** and **Advanced**. Basic is the permanent Free tier; Intermediate and Advanced are paid tiers. These same three names are the canonical experience-level labels and signed entitlement identifiers (basic, intermediate, advanced).
+- **Pricing boundary:** The Founder approved the three-tier structure and names only. No monthly rand price, module allocation, user/storage/event quota, or other numerical limit was approved in this decision. The Starter/Team/Business names and R499/R899/R1,499 amounts in the 2026-11-11 valuation are superseded as an unapproved proposal, not adopted pricing. Earlier four-tier price hypotheses are also not current policy.
+- **Entitlement invariants:** Basic remains available indefinitely. Eligible new workspaces receive the existing 30-day Advanced trial, then fall back to Basic unless a valid paid entitlement is installed. Expiry/revocation must not lock the workspace, delete or withhold customer-owned data, or weaken roles, permissions or business isolation.
+- **Implementation boundary:** Do not infer paid feature gates or quotas from tier labels. Publish or enforce a feature matrix only after the Founder approves its contents and downgrade behaviour.
+- **Reason:** Resolve conflicting commercial naming without inventing prices or compromising the existing offline-first/data-continuity contract.
+
 ## DEC-001 — Repository isolation
 **Date:** 2026-09-28  
 **Decision:** Current Zazu repository state and explicit owner instruction outrank historical conversation memory and external project context.  
