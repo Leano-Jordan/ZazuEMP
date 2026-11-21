@@ -654,3 +654,21 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** The corrected test and regression family must pass on the exact main commit before this case is fully accepted. The 59 other tests passed in the reported run; that does not substitute for the corrected test's execution.
 
 **Loop prevention:** For offline actions that dispatch a state-updated event, assert durable state after the resulting render. Only assert transient status content when the UI explicitly preserves that node across render.
+
+
+### CASE-ZAZU-0037
+
+**Status:** CORRECTED — exact-head browser verification pending.  
+**Engineering diagnostic code:** ENG-FIXTURE-007.  
+**First observed:** 2026-11-21.  
+**Target:** `e2e/pwa-offline.spec.js` — offline quote acceptance → invoice creation → reconnect identity reconciliation.
+
+**Failure fingerprint:** The test created a new invoice with a runtime-generated local ID, but the mocked server acknowledgement reused the fixed local ID of a separate invoice loaded by the pairing bootstrap. The reconciler therefore attached the returned server identity to the seeded invoice. The final assertion observed the seeded invoice's absent `quote_local_id`, while the newly created invoice remained unacknowledged.
+
+**Classification:** F2/F3 — browser test identity/fixture defect. The failed field was `invoiceQuoteLocalId` (expected the quote's local ID; actual `undefined`). Quote status/revision, linked Work status/revision, invoice server identity/revision on the incorrectly targeted seeded record, and queue drain all matched their assertions. No production defect was established.
+
+**Correction:** Capture the actual `local_id` from the queued offline invoice mutation, use that same ID in the mocked acknowledgement, and inspect the same created invoice after reconciliation. Keep the pre-existing bootstrap invoice on its own fixed fixture identity. Restore the independent Work test's own invoice identity after isolating the variable scope. No production source changed.
+
+**Verification:** Exact-head browser, Laravel, PostgreSQL, quality and analysis checks are pending on commit `36a2f605481e3985b647dda710ead7bef157b70f`. Do not close this case until the browser acceptance test passes on that exact head.
+
+**Loop prevention:** A sync identity acknowledgement must reference the local ID carried by the mutation under test. Never reuse a bootstrap fixture's identity for a newly created local record. Keep fixture identities scoped to their individual test.
