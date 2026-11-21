@@ -344,13 +344,12 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             'record_id' => $customer->id,
         ]);
 
-        $mutationUuid = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
             'invoice',
-            $mutationUuid,
-            'create',
-            ['local_id' => $mutationUuid, 'record' => ['number' => 'INV-INVALID']],
+            $invoiceUuid,
+            'update',
+            ['local_id' => $invoiceUuid, 'expected_revision' => 2, 'record' => ['number' => 'INV-INVALID']],
         );
         $mutation->update(['status' => 'applied']);
         SyncDelivery::create([
