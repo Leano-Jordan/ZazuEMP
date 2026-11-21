@@ -74,6 +74,44 @@ class SyncDeviceAuthorizationRaceTest extends TestCase
         );
     }
 
+    public function test_recorded_mutation_cannot_apply_after_device_credential_replacement(): void
+    {
+        [, $device, $snapshot] = $this->deviceFixture();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $snapshot,
+            'test_atomic_publish',
+            'entity-1',
+            'upsert',
+            ['value' => 'must remain pending'],
+        );
+
+        $metadata = $device->metadata ?? [];
+        $metadata['sync_token_hash'] = hash('sha256', 'replacement-token-after-record');
+        $device->update(['metadata' => $metadata]);
+
+        $handler = new class implements SyncMutationHandler {
+            public function apply(SyncMutation $mutation): void
+            {
+                throw new \\RuntimeException('The domain handler must not run for a replaced device credential.');
+            }
+        };
+
+        try {
+            app(SyncMutationApplier::class)->applyAuthenticated(
+                $mutation,
+                ['test_atomic_publish' => $handler],
+                $snapshot,
+            );
+            $this->fail('A mutation recorded before re-pairing must not apply under a stale authenticated credential.');
+        } catch (HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+
+        $this->assertSame('pending', $mutation->fresh()->status);
+        $this->assertSame(0, (int) $mutation->fresh()->attempts);
+        $this->assertDatabaseCount('sync_deliveries', 0);
+    }
+
     public function test_revoked_device_snapshot_cannot_list_conflicts(): void
     {
         [, $device, $snapshot] = $this->deviceFixture();
