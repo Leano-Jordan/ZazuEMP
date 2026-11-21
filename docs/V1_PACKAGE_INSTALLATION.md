@@ -1,3 +1,11 @@
+## Windows scheduled-backup runtime verification — 2026-11-21
+
+The Windows Ops workflow now exercises the scheduled-backup installer and runner on a Windows PowerShell 5.1 runner. It creates and inspects a temporary S4U Task Scheduler task, verifies the daily 02:00/catch-up/wake/overlap settings, runs the backup fixture, verifies 14-archive local/secondary retention and SHA-256 equality, then simulates an unavailable secondary drive and confirms the prior success timestamp is preserved. [Workflow 44941196865](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44941196865) passed.
+
+This does not prove the intended owner PC's task has run or that its USB/cloud-sync copy is off-disk. Complete the operator drill in [RELEASE_BACKUP_RESTORE_RUNBOOK.md](RELEASE_BACKUP_RESTORE_RUNBOOK.md).
+
+---
+
 ## Windows recovery acceptance — 2026-11-21
 
 The Windows V1 package workflow now exercises two installation-wide recovery cases on Windows PowerShell:
