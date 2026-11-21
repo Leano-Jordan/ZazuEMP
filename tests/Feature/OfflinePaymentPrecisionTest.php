@@ -246,7 +246,7 @@ class OfflinePaymentPrecisionTest extends TestCase
 
         $payment = Payment::query()
             ->where('business_id', $business->id)
-            ->where('idempotency_key', $mutationId)
+            ->where('idempotency_key', $mutation->mutation_id)
             ->firstOrFail();
         $reconciledInvoice = $invoice->fresh();
 
