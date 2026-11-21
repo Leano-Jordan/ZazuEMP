@@ -56,7 +56,7 @@ class SyncMutationApplier
             throw new LogicException('A persisted sync mutation is required.');
         }
 
-        if ($mutation->status !== 'pending') {
+        if ($authenticatedDevice === null && $mutation->status !== 'pending') {
             return $mutation;
         }
 
