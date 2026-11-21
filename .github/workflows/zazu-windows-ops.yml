@@ -275,7 +275,7 @@ jobs:
           foreach ($required in @("'zazu:backup'", 'zazu-backups\daily', 'Select-Object -Skip 14', 'zazu-backup-scheduler-')) {
             if (-not $runner.Contains($required)) { throw "Daily backup runner is missing: $required" }
           }
-          foreach ($required in @('Install-ZazuBackupSchedule.ps1', 'Latest installation backup:', '26 hours ago', 'LOG_STACK=daily')) {
+          foreach ($required in @('Install-ZazuBackupSchedule.ps1', 'Latest installation backup:', 'TotalHours -gt 26', 'LOG_STACK=daily')) {
             if (-not $hostLauncher.Contains($required)) { throw "Owner-PC startup safeguards are missing: $required" }
           }
           foreach ($source in @($installScript, $envExample)) {
