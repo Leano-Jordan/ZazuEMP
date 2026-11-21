@@ -2,7 +2,7 @@
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.  
 **Application/test source head:** `559e66b87de8617f967b722b55b0fbfd9b116495`.  
-**Exact-head verification — `559e66b`:** Laravel **632 passed / 1 skipped / 4,388 assertions**; PostgreSQL migration/recovery smoke **PASS**; PHPMD, Zazu Quality, secret scan, Composer security audit, application, Director Health, Push-on-main and Actions/Python/JavaScript analysis **PASS**. SonarCloud **SKIPPED**, not counted. Offline-browser acceptance remains in progress; do not close the cross-device browser gate until its result is observed.
+**Exact-head verification — `559e66b`:** Laravel **632 passed / 1 skipped / 4,388 assertions**; offline browser **59 desktop Chromium passed**, **7 mobile-viewport passed**, and **1 phone-local Work/attachment/reconnect journey passed**; PostgreSQL migration, registration, backup/restore and private-file recovery smoke **PASS**. PHPMD, Zazu Quality, secret scan, Composer security audit, application, Director Health, Push-on-main and Actions/Python/JavaScript analysis **PASS**. SonarCloud **SKIPPED**, not counted.
 
 ### Confirmed defect and correction
 - The receiver pulled an ordered delivery prefix, then applied the ordinary bounded bootstrap and acknowledged the prefix. A delivered aggregate outside a capped 500-record collection or a selected-record window could be omitted from the stored snapshot while the receiver's cursor advanced.
@@ -25,7 +25,7 @@
 
 **Failure records:** CASE-ZAZU-0034 / ENG-DATA-004 (receiver snapshot omission) and CASE-ZAZU-0035 / ENG-AUTH-001 (bootstrap stale-device authorization). CASE-ZAZU-0033 (stale-write preconditions and full writer audit) remains separate and OPEN.
 
-**V1 disposition:** NOT READY. Evidence maturity remains **73/100** pending exact-head verification and broader owner acceptance. Physical Android cold launch/restart/reconnect, intended-installation recovery drill, live-business commercial reconciliation and POPIA operational sign-off remain independent gates. ZAZU name clearance remains deferred by owner direction. No production data was changed and no branches were created.
+**V1 disposition:** NOT READY. Evidence maturity is now **75/100 (+2)** for the newly verified receiver reconciliation and bootstrap authorization controls. This is automated evidence maturity, not a production-readiness claim; broader sync matrix and owner acceptance remain open. Physical Android cold launch/restart/reconnect, intended-installation recovery drill, live-business commercial reconciliation and POPIA operational sign-off remain independent gates. ZAZU name clearance remains deferred by owner direction. No production data was changed and no branches were created.
 
 ---
 
