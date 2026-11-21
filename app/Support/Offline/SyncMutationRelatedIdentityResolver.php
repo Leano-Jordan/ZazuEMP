@@ -5,6 +5,10 @@ namespace App\Support\Offline;
 use App\Models\Asset;
 use App\Models\AssetAllocation;
 use App\Models\Customer;
+use App\Models\BusinessCapability;
+use App\Models\EventCost;
+use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
 use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\Invoice;
@@ -211,6 +215,11 @@ final class SyncMutationRelatedIdentityResolver
             ->first();
     }
 
+    public function isSafeIdentity(SyncEntityIdentity $identity): bool
+    {
+        return $this->safeRecord($identity) !== null;
+    }
+
     private function safeRecord(SyncEntityIdentity $identity): ?Model
     {
         $expectedType = $this->expectedMorphType($identity->entity_type);
@@ -236,6 +245,7 @@ final class SyncMutationRelatedIdentityResolver
     private function expectedMorphType(string $entityType): ?string
     {
         $model = match ($entityType) {
+            'service' => BusinessCapability::class,
             'customer' => Customer::class,
             'job' => Event::class,
             'quote' => Quote::class,
@@ -246,6 +256,9 @@ final class SyncMutationRelatedIdentityResolver
             'asset' => Asset::class,
             'asset_allocation' => AssetAllocation::class,
             'supplier' => Supplier::class,
+            'preparation' => EventPreparationItem::class,
+            'expense' => FinanceExpense::class,
+            'event_cost' => EventCost::class,
             default => null,
         };
 
