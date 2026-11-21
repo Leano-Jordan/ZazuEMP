@@ -176,6 +176,55 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertSame(0, FinanceExpense::query()->where('business_id', $business->id)->count());
     }
 
+    public function test_offline_update_rejects_an_identity_linked_to_another_business_record(): void
+    {
+        $business = $this->business('Identity owner business');
+        $foreignBusiness = $this->business('Identity record owner business');
+        $device = $this->device($business);
+        $foreignCustomer = Customer::create([
+            'business_id' => $foreignBusiness->id,
+            'name' => 'Foreign customer must remain untouched',
+        ]);
+        $localId = (string) Str::uuid();
+
+        // Simulate a stale or corrupted identity mapping. The identity row is
+        // scoped to this device's business, but its morph target belongs elsewhere.
+        SyncEntityIdentity::create([
+            'business_id' => $business->id,
+            'entity_type' => 'customer',
+            'entity_uuid' => $localId,
+            'record_type' => $foreignCustomer->getMorphClass(),
+            'record_id' => $foreignCustomer->id,
+        ]);
+
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'customer',
+            $localId,
+            'update',
+            [
+                'local_id' => $localId,
+                'record' => ['name' => 'Attempted cross-business takeover'],
+            ],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'customer' => app(OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('An offline update must reject an identity linked to a foreign business record.');
+        } catch (ValidationException $exception) {
+            $this->assertSame(
+                ['The offline synchronization identity does not belong to this business.'],
+                $exception->errors()['entity_id'] ?? [],
+            );
+        }
+
+        $this->assertSame('pending', $mutation->fresh()->status);
+        $this->assertSame($foreignBusiness->id, $foreignCustomer->fresh()->business_id);
+        $this->assertSame('Foreign customer must remain untouched', $foreignCustomer->fresh()->name);
+    }
+
     private function business(string $name): Business
     {
         return Business::create([
