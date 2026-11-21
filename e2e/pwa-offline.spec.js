@@ -3526,7 +3526,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     contentType: 'application/json',
                     body: JSON.stringify({
                         invoices: [{
-                            local_id: createdInvoiceLocalId,
+                            local_id: invoiceLocalId,
                             server_id: 7654322,
                             record: {
                                 id: 7654322,
