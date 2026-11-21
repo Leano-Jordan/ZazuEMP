@@ -105,6 +105,14 @@ class SyncMutationApplier
                 throw (new ModelNotFoundException)->setModel(SyncMutation::class, [$mutation->id]);
             }
 
+            if ($authenticatedDevice !== null) {
+                abort_unless(
+                    (int) $locked->business_id === (int) $authenticatedDevice->business_id
+                        && (int) $locked->sync_device_id === (int) $authenticatedDevice->id,
+                    404,
+                );
+            }
+
             if ($locked->status !== 'pending') {
                 return $locked;
             }
