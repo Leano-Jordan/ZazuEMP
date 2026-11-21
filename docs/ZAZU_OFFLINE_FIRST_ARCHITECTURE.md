@@ -1,3 +1,17 @@
+## Event-cost offline reconnect regression — 2026-11-21
+
+**Current test source:** `1600816a7495449acc9f5a8e69c0fe92dc63b654` on `main`.  
+**Prior exact-head CI:** [Laravel 44911285661](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44911285661) — failed one browser assertion; 61 other browser tests passed, Laravel and PostgreSQL jobs passed.
+
+- The failing assertion inspected `mutation.payload.event_local_id`, but the offline queue contract stores domain fields under `mutation.payload.record`.
+- The production queue envelope is `{ local_id, server_id, record }`; the server's `recordPayload()` unwraps `record` before applying event-cost validation and persistence.
+- Corrected the browser request probe to read `mutation.payload.record.event_local_id`. The event-cost identity assertion remains strict; no production code, validation, sync behavior, or test expectation was weakened.
+- Reconnect CI for the corrected test is running. Exact-head browser acceptance remains **PENDING** until that run completes.
+
+**Evidence disposition:** no production event-cost defect has been established by this failure. Keep evidence maturity at **77/100** and V1 **NOT READY** pending exact-head acceptance and the separate physical, recovery, commercial and POPIA gates.
+
+---
+
 ## Director acceptance checkpoint — 2026-11-21
 
 **Current source/test head:** `e45cab97cbcdbc3f989bf3843d751bb0f373c305` on `main`.  
