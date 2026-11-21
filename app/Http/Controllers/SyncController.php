@@ -265,7 +265,6 @@ class SyncController extends Controller
             'delivery_sequences.*' => ['required', 'integer', 'min:1'],
         ]);
         $device = $request->attributes->get('sync_device');
-        $device->update(['last_seen_at' => now()]);
 
         return response()->json($this->bootstrapPayload(
             $device,
@@ -698,7 +697,33 @@ class SyncController extends Controller
 
     private function bootstrapPayload(SyncDevice $device, array $deliverySequences = []): array
     {
-        return app(SyncBootstrapPayloadBuilder::class)->build($device, $deliverySequences);
+        return DB::transaction(function () use ($device, $deliverySequences): array {
+            DB::table('businesses')
+                ->where('id', $device->business_id)
+                ->lockForUpdate()
+                ->first();
+
+            $activeDevice = SyncDevice::query()
+                ->where('business_id', $device->business_id)
+                ->whereKey($device->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->first();
+
+            abort_unless($activeDevice, 401, 'This sync device is no longer active.');
+
+            $expectedTokenHash = (string) (($device->metadata ?? [])['sync_token_hash'] ?? '');
+            $currentTokenHash = (string) (($activeDevice->metadata ?? [])['sync_token_hash'] ?? '');
+            $sameCredential = $expectedTokenHash === ''
+                ? $currentTokenHash === ''
+                : hash_equals($expectedTokenHash, $currentTokenHash);
+
+            abort_unless($sameCredential, 401, 'This sync device credential has been replaced.');
+
+            $activeDevice->update(['last_seen_at' => now()]);
+
+            return app(SyncBootstrapPayloadBuilder::class)->build($activeDevice, $deliverySequences);
+        });
     }
 
 
