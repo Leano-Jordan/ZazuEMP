@@ -4,7 +4,7 @@ This document records what CI currently measures and what those measurements doâ
 
 ## PHP formatting
 
-The blocking Zazu Quality workflow installs the locked PHP development dependencies under PHP 8.4 and runs `vendor/bin/pint --test`. The check is non-mutating: CI reports formatting drift and fails rather than rewriting repository files. It complements PHPMD and Psalm; it does not replace either analysis.
+The blocking Zazu Quality workflow installs the locked PHP development dependencies under PHP 8.4 and runs `vendor/bin/pint --test` against PHP files changed in the push or pull request. The check is non-mutating: CI reports formatting drift and fails rather than rewriting repository files. The initial whole-repository baseline exposed substantial pre-existing formatting drift across legacy and test files; the gate therefore starts incrementally rather than triggering a broad, risky formatting-only rewrite. It complements PHPMD and Psalm; it does not replace either analysis.
 
 ## Frontend performance baseline
 
