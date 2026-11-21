@@ -2135,7 +2135,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $recorder = app(SyncMutationRecorder::class);
         $applier = \Mockery::mock(SyncMutationApplier::class, [$recorder])->makePartial();
-        $applier->shouldReceive('apply')->once()->andThrow(new \RuntimeException('Temporary persistence failure'));
+        $applier->shouldReceive('applyAuthenticated')->once()->andThrow(new \RuntimeException('Temporary persistence failure'));
 
         $response = app(SyncController::class)->push(
             $request,
