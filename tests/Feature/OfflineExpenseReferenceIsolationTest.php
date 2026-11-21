@@ -322,6 +322,31 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertSame([], $related);
     }
 
+    public function test_sync_snapshot_rejects_a_same_business_identity_with_wrong_morph_type(): void
+    {
+        $business = $this->business('Snapshot type identity business');
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'SNAPSHOT-TYPE-001',
+            'name' => 'Wrong model snapshot target',
+            'event_type' => 'Other',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+        $identity = SyncEntityIdentity::create([
+            'business_id' => $business->id,
+            'entity_type' => 'customer',
+            'entity_uuid' => (string) Str::uuid(),
+            'record_type' => $event->getMorphClass(),
+            'record_id' => $event->id,
+        ]);
+
+        $snapshot = app(\\App\\Support\\Offline\\SyncEntitySnapshotBuilder::class)->build($identity);
+
+        $this->assertTrue($snapshot['deleted']);
+        $this->assertSame([], $snapshot['record']);
+    }
+
     public function test_sync_snapshot_does_not_serialize_a_foreign_business_record(): void
     {
         $business = $this->business('Snapshot identity business');
