@@ -655,3 +655,21 @@ The authenticated offline shell, session transition and attachment boundary adva
 The Windows package build and PowerShell fresh-install verification passed on source commit `490100e2ae7a4793db3e06c37833cba7b2033fb9`.
 
 These are CI/browser-emulation results, not proof of a physical Android cold launch, restart or reconnection. Physical Android acceptance remains OPEN.
+
+## Receiver bootstrap completeness — 2026-11-21
+
+A receiver sync batch must not be acknowledged merely because a general bounded bootstrap succeeded. The previous design pulled a contiguous delivery prefix, fetched the ordinary business bootstrap and acknowledged the prefix after the snapshot was stored. Several aggregate collections were capped at 500 and some were ordered by display name or creation time. An older aggregate updated online or through another device could therefore remain outside the snapshot while its delivery sequence was still acknowledged.
+
+The correction on `main` is:
+
+- The client includes the exact receiver delivery sequences from the pull response as `delivery_sequences[]` on the bootstrap request.
+- The controller validates a maximum of 100 positive integer sequences. The builder resolves them only against deliveries belonging to the authenticated device, active business and business stream.
+- The resolver includes primary and related aggregates affected by each delivered mutation. This covers normal entity updates and command effects such as quote acceptance, invoice payment, purchase receipt/inventory, stock movement and asset allocation.
+- The builder unions those target records into the normal bounded collections or selected-record payload. The regular working set remains capped at 500; only records required by the current receiver delivery batch are added beyond that limit.
+- Ordinary bootstrap windows are ranked by the most recent sync-identity update timestamp, falling back to the business record's `updated_at`, then returned in the existing display order. This allows recent online edits to bubble into the bounded refresh without changing list presentation.
+- The client stores the refreshed snapshot before acknowledging the highest contiguous delivery sequence. If bootstrap validation, fetch, local persistence or session checks fail, the acknowledgement is not sent.
+- The service-worker static cache is `zazu-static-v58`, ensuring installed clients fetch the updated cache-first offline client.
+
+Regression coverage includes a supplier deliberately outside the default 500-record window, online revision promotion, explicit delivery inclusion, recipient-device isolation, second-device quote → acceptance → invoice → payment reconciliation, purchase receipt → affected inventory reconciliation, and a browser assertion that the client performs pull → targeted bootstrap → acknowledgement in that order.
+
+**Verification boundary:** implementation and regression tests are committed. Exact-head Laravel, PostgreSQL, offline-browser, PHPMD and quality results must be observed before this correction is marked verified. This does not close the full V1 sync matrix, the final writer audit, or physical-device cold-launch/restart/reconnect acceptance.
