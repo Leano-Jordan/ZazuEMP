@@ -40,7 +40,7 @@ class SyncConflictRecorder
             $lockedDevice = app(SyncDeviceAccessGuard::class)->lockActive($device);
 
             if ((int) $lockedDevice->business_id !== (int) $device->business_id) {
-                throw new \\LogicException('Cannot record a conflict for a mismatched sync device.');
+                throw new \LogicException('Cannot record a conflict for a mismatched sync device.');
             }
 
             $existing = SyncConflict::query()
