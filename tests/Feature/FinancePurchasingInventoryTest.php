@@ -980,4 +980,30 @@ class FinancePurchasingInventoryTest extends TestCase
             ->assertSee('EVT-STOCK-001 · Stock Allocation Job');
     }
 
+    public function test_finance_invoiced_total_excludes_unissued_draft_invoices(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        foreach ([
+            ['number' => 'INV-DRAFT-TOTAL', 'status' => 'draft', 'total' => '999.00'],
+            ['number' => 'INV-ISSUED-TOTAL', 'status' => 'issued', 'total' => '100.00'],
+            ['number' => 'INV-PAID-TOTAL', 'status' => 'paid', 'total' => '200.00'],
+        ] as $invoice) {
+            Invoice::create([
+                'business_id' => $business->id,
+                'number' => $invoice['number'],
+                'status' => $invoice['status'],
+                'currency' => 'ZAR',
+                'subtotal' => $invoice['total'],
+                'tax_total' => '0.00',
+                'total' => $invoice['total'],
+            ]);
+        }
+
+        $this->get(route('finance.index'))
+            ->assertOk()
+            ->assertViewHas('invoicedByCurrency', fn ($totals) => $totals->get('ZAR') === '300.00');
+    }
+
 }
