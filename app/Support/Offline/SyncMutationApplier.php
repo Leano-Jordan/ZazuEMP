@@ -60,10 +60,8 @@ class SyncMutationApplier
             return $mutation;
         }
 
-        $handler = $this->resolveHandler($mutation, $handlers);
-
         return DB::transaction(
-            fn (): SyncMutation => $this->applyWithinTransaction($mutation, $handler, $authenticatedDevice)
+            fn (): SyncMutation => $this->applyWithinTransaction($mutation, $handlers, $authenticatedDevice)
         );
     }
 
@@ -85,7 +83,7 @@ class SyncMutationApplier
 
     private function applyWithinTransaction(
         SyncMutation $mutation,
-        SyncMutationHandler $handler,
+        array $handlers,
         ?SyncDevice $authenticatedDevice,
     ): SyncMutation {
         $this->lockApplicationDevice($mutation, $authenticatedDevice);
@@ -95,6 +93,8 @@ class SyncMutationApplier
         if ($locked->status !== 'pending') {
             return $locked;
         }
+
+        $handler = $this->resolveHandler($locked, $handlers);
 
         return $this->applyPendingMutation($locked, $handler);
     }
