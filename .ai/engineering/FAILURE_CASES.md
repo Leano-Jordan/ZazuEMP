@@ -16,6 +16,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0033 | Offline sync existing-record updates | A queued update based on an old device snapshot is applied to the latest server row without a revision precondition | CLOSED — exact-head CI PASS | Revision preconditions, causal chains and conflict preservation verified across paired devices | Broader offline workflow matrix tracked separately |
 | CASE-ZAZU-0034 | Receiver bootstrap completeness | A receiver acknowledges a delivery batch after storing a bounded bootstrap that omitted the affected aggregate | CLOSED — exact-head CI PASS | Snapshot collection limit/display ordering can exclude a delivered or recently revised aggregate | Targeted bootstrap inclusion, recency, device isolation and post-ack reconciliation tests |
 | CASE-ZAZU-0035 | Bootstrap stale-device authorization | Bootstrap returns a business snapshot using a device model authenticated before revocation or credential replacement | CLOSED — exact-head CI PASS | Bootstrap did not re-read the active device/credential under lock before generating the snapshot | Revocation and replaced-token stale-snapshot regressions, business-first lock order |
+| CASE-ZAZU-0036 | Sync stale-device authorization | Conflict resolution or attachment operations proceed from a middleware snapshot after revocation; a stale token may revoke a re-paired device | OPEN — implementation committed, exact-head CI pending | Several endpoints did not share durable business/device lock and token-hash revalidation | Stale-snapshot regression tests for conflict, attachment upload/list and replacement-token revocation |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -690,3 +691,18 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** Exact source/test head `b26df40e150fc3b81425db81fe9cb16040970547`: offline browser **61 desktop Chromium + 7 mobile viewport + 1 phone-local attachment passed with no flaky retries**; Laravel **652 passed / 1 skipped / 4,487 assertions**; PostgreSQL migration/recovery, Zazu Quality and Push-on-main passed.
 
 **Loop prevention:** For service-worker-controlled routes, assert the authentication gate and preserved local state, not a URL transition that can legitimately differ during cached-shell fallback.
+
+
+### CASE-ZAZU-0036
+
+**Status:** OPEN — implementation and regression tests committed; exact-head CI verification pending.
+
+**Target:** Sync conflict resolution, private attachment upload/list/download and `/api/sync/revoke`.
+
+**Failure fingerprint:** Middleware authenticated a device and attached an Eloquent model snapshot. A later revocation or re-pair could change the durable device row before the endpoint completed. Conflict resolution and attachment paths did not consistently re-read the device under the same transaction lock as their work. The revoke endpoint also acted on device ID without comparing the authenticated token hash to the current persisted hash.
+
+**Control implemented:** A shared guard locks the business then device row, rechecks active status and compares the authenticated token hash with the persisted credential. Sensitive operations invoke it inside their transaction. A stale credential receives 401 and cannot revoke a replacement credential.
+
+**Regression coverage added:** revoked-snapshot conflict resolution, revoked-snapshot attachment upload, revoked-snapshot attachment listing, and stale-token attempt to revoke a replacement credential.
+
+**Verification boundary:** tests are committed but no exact-head pass is claimed yet. Bootstrap, pull and acknowledgement already had separate stale-snapshot controls and remain intact.
