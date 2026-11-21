@@ -207,11 +207,24 @@ class SyncBootstrapPayloadBuilder
 
     private function bootstrapInvoices(Business $business, SyncEntityIdentityRegistry $registry, array $includedIds = [])
     {
-        $query = Invoice::query()->where('business_id', $business->id)->with(['items', 'payments', 'quoteVersion']);
+        $query = Invoice::query()->where('business_id', $business->id)->with(['items', 'payments', 'quoteVersion.quote.event']);
         $this->applyBoundedWorkingSet($query, Invoice::class, $business, $includedIds, 'invoice', 'id', 'desc');
 
         return $query->get()
-            ->map(fn (Invoice $invoice) => [
+            ->map(function (Invoice $invoice) use ($business, $registry): array {
+                $quoteVersion = $invoice->quoteVersion;
+                if (
+                    ! $quoteVersion
+                    || (int) $quoteVersion->quote_id !== (int) $invoice->quote_id
+                    || (int) ($quoteVersion->quote?->event?->business_id ?? 0) !== (int) $business->id
+                ) {
+                    $quoteVersion = null;
+                } else {
+                    $quoteVersion->unsetRelation('quote');
+                }
+                $invoice->setRelation('quoteVersion', $quoteVersion);
+
+                return [
                 ...$this->identityPayload($invoice, 'invoice', $registry),
                 'server_id' => $invoice->id,
                 'record' => array_merge($invoice->toArray(), [
@@ -227,7 +240,8 @@ class SyncBootstrapPayloadBuilder
                         'record' => $payment->toArray(),
                     ])->values(),
                 ]),
-            ])
+            ];
+            })
             ->values();
     }
 
