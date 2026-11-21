@@ -62,6 +62,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-DATA-002 | CASE-ZAZU-0017 | Finance payment replay returns 422 instead of idempotent redirect | F1/F2/F3 | VERIFIED — current browser suite green |
 | ENG-DATA-003 | CASE-ZAZU-0033 | Stale offline snapshot overwrites an intervening record update | F1 | OPEN — revision precondition absent |
 | ENG-DATA-004 | CASE-ZAZU-0034 | Receiver bootstrap acknowledges an incomplete bounded snapshot | F1/F7 | OPEN — targeted snapshot reconciliation committed; exact-head verification pending |
+| ENG-AUTH-001 | CASE-ZAZU-0035 | Bootstrap trusts a stale authenticated device snapshot after revocation or credential replacement | F1/F7 | OPEN — business/device lock and credential revalidation committed; exact-head verification pending |
 | ENG-UI-003 | CASE-ZAZU-0018 | Calendar agenda hidden on desktop/tablet | F1/F2 | VERIFIED — current browser suite green |
 | ENG-CSS-002 | CASE-ZAZU-0019 | Horizontal overflow at 1280px | F1/F2 | VERIFIED — current browser suite green |
 | ENG-CSS-003 | CASE-ZAZU-0020 | Theme token state differs by browser/viewport | F1/F2/F4 | VERIFIED — current browser suite green |
