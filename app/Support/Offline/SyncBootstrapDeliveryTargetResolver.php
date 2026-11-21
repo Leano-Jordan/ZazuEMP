@@ -79,10 +79,15 @@ final class SyncBootstrapDeliveryTargetResolver
         SyncMutationRelatedIdentityResolver $identityResolver,
     ): array {
         $identities = $identityResolver->resolve($mutation);
-        if ($identities !== []) {
-            return $identities;
-        }
 
+        return $identities !== [] ? $identities : $this->fallbackIdentity($device, $mutation);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function fallbackIdentity(SyncDevice $device, SyncMutation $mutation): array
+    {
         $localId = $mutation->payload['local_id'] ?? $mutation->entity_id;
         if (! is_string($localId) || ! Str::isUuid($localId)) {
             return [];
@@ -109,12 +114,7 @@ final class SyncBootstrapDeliveryTargetResolver
             return [];
         }
 
-        $recordBusinessId = $record->getAttribute('business_id');
-        if ($recordBusinessId === null && method_exists($record, 'event')) {
-            $recordBusinessId = $record->event()->withTrashed()->value('business_id');
-        }
-
-        if (! is_numeric($recordBusinessId) || (int) $recordBusinessId !== (int) $device->business_id) {
+        if (! $this->recordBelongsToBusiness($record, (int) $device->business_id)) {
             return [];
         }
 
@@ -122,6 +122,16 @@ final class SyncBootstrapDeliveryTargetResolver
             'entity_type' => $identity->entity_type,
             'server_id' => (int) $identity->record_id,
         ]];
+    }
+
+    private function recordBelongsToBusiness(Model $record, int $businessId): bool
+    {
+        $recordBusinessId = $record->getAttribute('business_id');
+        if ($recordBusinessId === null && method_exists($record, 'event')) {
+            $recordBusinessId = $record->event()->withTrashed()->value('business_id');
+        }
+
+        return is_numeric($recordBusinessId) && (int) $recordBusinessId === $businessId;
     }
 
     /**
