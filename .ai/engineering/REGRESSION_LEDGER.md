@@ -236,16 +236,6 @@ An offline mutation may be based on an older business-record snapshot than the s
 
 **Status:** CLOSED — exact-head source `559e66b87de8617f967b722b55b0fbfd9b116495` passed Laravel (632 passed / 1 skipped / 4,388 assertions), PostgreSQL recovery, desktop Chromium (59), mobile viewport (7), phone-local attachment journey (1), PHPMD, Zazu Quality, Director Health, Push-on-main, Composer and secret checks. SonarCloud was skipped. The broader V1 sync matrix and physical-device acceptance remain open.
 
-## REG-026 — Bootstrap accepts a stale authenticated device snapshot
-
-**Failure:** The bootstrap controller trusted the sync-device model attached by authentication middleware and did not re-read the durable device state. A request authenticated just before revocation or credential replacement could still receive the business bootstrap. Its prior device activity update also occurred before the builder's business lock, violating the canonical business-first lock order.
-
-**Control:** bootstrap must lock the business first, then re-read and lock the active destination device, compare the persisted token hash with the middleware-authenticated snapshot, update device activity under that lock and build the snapshot before releasing the transaction. Any revoked or replaced device returns 401 before business data is returned.
-
-**Regression controls:** stale middleware snapshot after revocation; stale snapshot after sync-token replacement. Existing pull/ack revocation tests remain in place.
-
-**Status:** IMPLEMENTED ON MAIN — exact-head Laravel, PostgreSQL, PHPMD, quality and offline-browser verification pending. No security-gate closure is claimed until the new exact-head run passes.
-
 ## REG-026 — Bootstrap authorization reuses a stale middleware device snapshot
 
 **Failure:** The bootstrap endpoint relied on the SyncDevice model attached by authentication middleware. Revocation or bearer-token replacement between middleware lookup and bootstrap could leave the old request snapshot authorized to receive business data. The old last-seen write also occurred before the business lock.
