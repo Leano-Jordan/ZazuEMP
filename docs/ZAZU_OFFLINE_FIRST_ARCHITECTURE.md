@@ -1,8 +1,8 @@
 ### Authenticated mutation application boundary — 2026-11-21
 
-**Implementation:** [ed5f420](https://github.com/Leano-Jordan/ZazuEMP/commit/ed5f420c69532f5ed4ad4a3f2c7eac839cea8fd3).  
-**Push integration:** [c132650](https://github.com/Leano-Jordan/ZazuEMP/commit/c1326502db7dfd6d6f9e1a0188e9266044a0bf8b).  
-**Regression:** [9d6f093](https://github.com/Leano-Jordan/ZazuEMP/commit/9d6f093742e76ca712be3799d74589434fa8e98d).
+**Implementation:** [e66da83](https://github.com/Leano-Jordan/ZazuEMP/commit/e66da83a38f449482d83e9be9ffa6b4449830158).  
+**Push integration:** [d31aee2](https://github.com/Leano-Jordan/ZazuEMP/commit/d31aee2d2b03ce983c7d6370a53d17b7f3d77da4).  
+**Regression:** [b65ccfd](https://github.com/Leano-Jordan/ZazuEMP/commit/b65ccfd8dd99bd9b9effd964c0926889759e413e).
 
 The push path previously revalidated a device credential when recording a mutation, but the separate apply transaction checked only device active status. The applier now has an explicit authenticated entrypoint that verifies business/device ownership and revalidates the middleware token hash under the same transaction lock as domain application. The push processor uses that entrypoint. An adversarial test proves a mutation recorded before re-pairing remains pending and is not delivered when the stale snapshot attempts application. Exact-head CI pending.
 
