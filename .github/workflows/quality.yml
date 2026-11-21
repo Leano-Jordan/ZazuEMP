@@ -51,7 +51,7 @@ jobs:
         with:
           php-version: '8.4'
       - name: Install locked PHP dependencies without application scripts
-        run: composer install --locked --no-interaction --prefer-dist --no-progress --no-scripts
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
       - name: Enforce PHP formatting without modifying files
         run: vendor/bin/pint --test
 
