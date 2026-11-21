@@ -21,6 +21,8 @@ let checkedLinks = 0;
 for (const file of markdownFiles) {
     const source = fs.readFileSync(file, 'utf8');
     const relative = path.relative(root, file);
+    // Archived engineering records preserve historical references; they are not maintained operational documentation.
+    if (relative.split(path.sep).join('/').startsWith('docs/archive/')) continue;
     const linkPattern = /!?(?:\[[^\]]*\])\(([^)]+)\)/g;
     for (const match of source.matchAll(linkPattern)) {
         const raw = match[1].trim().replace(/^<|>$/g, '');
