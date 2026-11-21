@@ -1,3 +1,17 @@
+## Offline event-cost local sync-state reconciliation — 2026-11-21
+
+**Implementation:** `764f53682123481579a276303dc5da45c7c6038b` on `main`.  
+**Regression contract:** `aa77c2677b8e32a9e232075182332103b43e9af8` on `main`.
+
+- The latest exact-head browser run exposed a real local-state defect after event-cost sync: the record received its canonical `id`/`server_id` and the durable queue drained, but `pending_sync` remained `null` instead of transitioning from `true` to `false`.
+- Root cause: the event-cost form created the local cost record without setting `pending_sync: true`. The shared acknowledgement path intentionally clears only records explicitly marked pending, so the server acknowledgement did not produce the expected local status transition.
+- The form now marks the saved local event cost as pending. The browser regression asserts `pending_sync: true` before reconnect and `false` after canonical identity reconciliation and queue drainage.
+- This is a confirmed local UI-state defect; server-side event-cost persistence and tenant isolation remain separately covered.
+
+**Exact-head CI:** PENDING. Do not count the correction as verified until the event-cost browser journey and the full relevant checks pass.
+
+---
+
 ## Offline event-cost tenant isolation regression — 2026-11-21
 
 **Current implementation/test source:** `4f4f585b301010bdd89e3cc8e9da865e948a9f3e` on `main` (resolver wording implementation: `f5655b1`).
