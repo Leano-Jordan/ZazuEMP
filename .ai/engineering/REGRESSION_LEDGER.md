@@ -234,7 +234,7 @@ An offline mutation may be based on an older business-record snapshot than the s
 
 **Regression controls:** 500-record supplier-window test, recently revised online supplier promotion, exact delivery inclusion and non-recipient isolation; cross-device commercial and receipt/inventory reconciliation; browser pull → targeted bootstrap → acknowledgement ordering.
 
-**Status:** IMPLEMENTED ON MAIN — exact-head CI verification pending. Do not mark the case closed until Laravel, PostgreSQL, offline-browser, PHPMD and quality workflows pass on the same code head.
+**Status:** CLOSED — exact-head source `559e66b87de8617f967b722b55b0fbfd9b116495` passed Laravel (632 passed / 1 skipped / 4,388 assertions), PostgreSQL recovery, desktop Chromium (59), mobile viewport (7), phone-local attachment journey (1), PHPMD, Zazu Quality, Director Health, Push-on-main, Composer and secret checks. SonarCloud was skipped. The broader V1 sync matrix and physical-device acceptance remain open.
 
 ## REG-026 — Bootstrap accepts a stale authenticated device snapshot
 
@@ -254,4 +254,4 @@ An offline mutation may be based on an older business-record snapshot than the s
 
 **Regression controls:** Direct stale-snapshot tests for revocation and credential replacement. Existing pull and acknowledgement stale-snapshot protections are retained.
 
-**Status:** IMPLEMENTED ON MAIN — Laravel backend and supporting quality/security checks pass on source head `559e66b`; offline-browser acceptance is still in progress. Keep the case open until browser acceptance completes.
+**Status:** CLOSED — exact-head source `559e66b87de8617f967b722b55b0fbfd9b116495` passed Laravel (632 passed / 1 skipped / 4,388 assertions), PostgreSQL recovery, desktop Chromium (59), mobile viewport (7), phone-local attachment journey (1), PHPMD, Zazu Quality, Director Health, Push-on-main, Composer and secret checks. SonarCloud was skipped.
