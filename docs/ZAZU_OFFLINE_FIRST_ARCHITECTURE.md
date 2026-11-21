@@ -1,3 +1,13 @@
+### Primary mutation acknowledgement identity guard — 2026-11-21
+
+**Implementation:** [80f509d](https://github.com/Leano-Jordan/ZazuEMP/commit/80f509d6a910715aa1656650ba3625c72647e309) + [1c2d5e1](https://github.com/Leano-Jordan/ZazuEMP/commit/1c2d5e13d27d08fece18c878bcfb847a77b302f1) + [6b27c41](https://github.com/Leano-Jordan/ZazuEMP/commit/6b27c41912f5a4fe98f50e4bbf78f73c4dca422e).  
+**Regression:** [bb959cc](https://github.com/Leano-Jordan/ZazuEMP/commit/bb959cc33b1c2262e94f065349d7160592fd36fb).
+
+- The push response's primary identity was another raw identity lookup independent of the related-identity resolver. It now passes through the shared model-type and tenant-ownership validator before any server ID or revision is returned.
+- Expanded the validator's entity-to-model map to cover the full offline domain mutation set, including service, preparation, expense, event cost and payment records.
+- Extended the malformed invoice-to-Customer regression to assert the shared validator rejects the identity.
+- Exact-head CI remains pending.
+
 ### Bootstrap delivery target fallback tenant guard — 2026-11-21
 
 **Implementation:** [cb944b2](https://github.com/Leano-Jordan/ZazuEMP/commit/cb944b2fe0b3c74caec4eee99b0feda1a2188183) + [3d1586c](https://github.com/Leano-Jordan/ZazuEMP/commit/3d1586c04ba35e70e292a433f038e3b7ed3828d6).  
