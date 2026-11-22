@@ -115,6 +115,7 @@ class TaxComplianceTest extends TestCase
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
             'tax_rate_id' => $rate->id,
+            'quantity' => [$requirement->id => '100.00'],
             'unit_price' => [$requirement->id => '25.50'],
         ])->assertRedirect();
 
@@ -177,6 +178,7 @@ class TaxComplianceTest extends TestCase
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
             'tax_rate_id' => $rate->id,
+            'quantity' => [$requirement->id => '10.00'],
             'unit_price' => [$requirement->id => '100.00'],
         ]);
 
@@ -251,6 +253,7 @@ class TaxComplianceTest extends TestCase
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '10.00'],
             'unit_price' => [$requirement->id => '100.00'],
         ]);
 
