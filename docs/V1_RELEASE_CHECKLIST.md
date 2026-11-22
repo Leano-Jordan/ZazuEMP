@@ -1,3 +1,17 @@
+# Offline session and trusted-device security review — 2026-11-22
+
+**Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
+
+- Reviewed login/session expiry, logout and interrupted logout, business switching, device revocation/expiry, stale bootstrap, re-pair token replacement, in-flight sync and attachment responses.
+- Existing automated coverage passed: expired-session sign-in barrier with queue preservation; owner/manager transition; business queue/cache isolation; stale bootstrap rejection; old-token push cancellation/retry after re-pair; late attachment responses blocked after logout; server-side owner revocation and bearer expiry.
+- The approved DEC-019 model intentionally keeps the business-trusted device credential independent of an individual web login. Ordinary account logout preserves the business-scoped offline workspace and paired device. Device revocation is an explicit owner action. No new confirmed security defect was found; no architectural change is warranted.
+- Laravel: **679 passed / 1 skipped / 4,665 assertions**. Offline browser: **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**. PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- Automated acceptance does not prove physical Android cold-start/restart or owner-operated lost-device handling. Evidence maturity remains **77/100**; V1 remains **NOT READY**.
+
+**Next engineering target:** recovery integrity — business archive portability versus installation-wide backup/restore, private-media integrity, trusted-device safeguards and intended-PC recovery evidence.
+
+---
+
 # Offline expense identity isolation — 2026-11-22
 
 **Verified source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02).
