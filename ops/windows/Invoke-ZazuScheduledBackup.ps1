@@ -14,6 +14,10 @@ $environmentPath = Join-Path $ProjectPath '.env'
 $secondaryPath = $null
 $lastSecondarySuccess = $null
 $lastSecondaryArchive = $null
+$lastSecondaryArchivePath = $null
+$lastSecondarySha256 = $null
+$lastSecondarySizeBytes = 0
+$lastSecondaryModifiedUnix = 0
 $exitCode = 1
 
 function Read-ZazuSecondaryBackupPath([string]$EnvironmentFile) {
@@ -45,13 +49,21 @@ function Write-ZazuSecondaryStatus(
     [string]$Status,
     [string]$Message,
     [string]$ArchiveName,
-    [string]$LastSuccessfulAt
+    [string]$LastSuccessfulAt,
+    [string]$ArchivePath = $null,
+    [string]$Sha256 = $null,
+    [long]$SizeBytes = 0,
+    [long]$ModifiedUnix = 0
 ) {
     $payload = [ordered]@{
         status = $Status
         attempted_at = [DateTimeOffset]::UtcNow.ToString('o')
         last_successful_at = $LastSuccessfulAt
         archive = $ArchiveName
+        secondary_archive_path = $ArchivePath
+        secondary_archive_sha256 = $Sha256
+        secondary_archive_size_bytes = if ($SizeBytes -gt 0) { $SizeBytes } else { $null }
+        secondary_archive_modified_unix = if ($ModifiedUnix -gt 0) { $ModifiedUnix } else { $null }
         message = $Message
     }
     $temporaryPath = $statusPath + '.tmp'
@@ -71,6 +83,18 @@ try {
             }
             if ($previousStatus.archive) {
                 $lastSecondaryArchive = [string]$previousStatus.archive
+            }
+            if ($previousStatus.secondary_archive_path) {
+                $lastSecondaryArchivePath = [string]$previousStatus.secondary_archive_path
+            }
+            if ($previousStatus.secondary_archive_sha256) {
+                $lastSecondarySha256 = [string]$previousStatus.secondary_archive_sha256
+            }
+            if ($previousStatus.secondary_archive_size_bytes) {
+                $lastSecondarySizeBytes = [long]$previousStatus.secondary_archive_size_bytes
+            }
+            if ($previousStatus.secondary_archive_modified_unix) {
+                $lastSecondaryModifiedUnix = [long]$previousStatus.secondary_archive_modified_unix
             }
         } catch {
             $lines.Add('Previous secondary-copy status could not be read; a new verified result will replace it.')
@@ -138,7 +162,7 @@ try {
     if (-not $secondaryPath) {
         $secondaryMessage = 'No independent backup destination is configured. The only archive copy remains on this PC.'
         $lines.Add('WARNING: no independent backup destination is configured; the archive remains on this PC only.')
-        Write-ZazuSecondaryStatus -Status 'not_configured' -Message $secondaryMessage -ArchiveName $created[0].Name -LastSuccessfulAt $lastSecondarySuccess
+        Write-ZazuSecondaryStatus -Status 'not_configured' -Message $secondaryMessage -ArchiveName $created[0].Name -LastSuccessfulAt $lastSecondarySuccess -ArchivePath $lastSecondaryArchivePath -Sha256 $lastSecondarySha256 -SizeBytes $lastSecondarySizeBytes -ModifiedUnix $lastSecondaryModifiedUnix
     } else {
         if (-not [System.IO.Path]::IsPathRooted($secondaryPath)) {
             throw 'ZAZU_BACKUP_SECONDARY_PATH must be an absolute path outside the Zazu installation.'
@@ -178,10 +202,15 @@ try {
         }
 
         Move-Item -LiteralPath $temporaryArchive -Destination $destinationArchive -Force
+        $destinationItem = Get-Item -LiteralPath $destinationArchive
         $lastSecondarySuccess = [DateTimeOffset]::UtcNow.ToString('o')
         $lastSecondaryArchive = $sourceArchive.Name
+        $lastSecondaryArchivePath = $destinationArchive
+        $lastSecondarySha256 = $copyHash
+        $lastSecondarySizeBytes = [long]$destinationItem.Length
+        $lastSecondaryModifiedUnix = ([DateTimeOffset]$destinationItem.LastWriteTimeUtc).ToUnixTimeSeconds()
         $secondaryMessage = 'The independent backup copy was copied and SHA-256 verified.'
-        Write-ZazuSecondaryStatus -Status 'verified' -Message $secondaryMessage -ArchiveName $lastSecondaryArchive -LastSuccessfulAt $lastSecondarySuccess
+        Write-ZazuSecondaryStatus -Status 'verified' -Message $secondaryMessage -ArchiveName $lastSecondaryArchive -LastSuccessfulAt $lastSecondarySuccess -ArchivePath $lastSecondaryArchivePath -Sha256 $lastSecondarySha256 -SizeBytes $lastSecondarySizeBytes -ModifiedUnix $lastSecondaryModifiedUnix
 
         try {
             $secondaryArchives = @(Get-ChildItem -Path $secondaryDirectory -Filter 'zazu-backup-*.zip' -File |
@@ -205,10 +234,10 @@ try {
     try {
         if ($secondaryPath) {
             $secondaryMessage = 'The independent backup copy failed on the last scheduled run. Check the USB drive or synced-folder destination.'
-            Write-ZazuSecondaryStatus -Status 'failed' -Message $secondaryMessage -ArchiveName $lastSecondaryArchive -LastSuccessfulAt $lastSecondarySuccess
+            Write-ZazuSecondaryStatus -Status 'failed' -Message $secondaryMessage -ArchiveName $lastSecondaryArchive -LastSuccessfulAt $lastSecondarySuccess -ArchivePath $lastSecondaryArchivePath -Sha256 $lastSecondarySha256 -SizeBytes $lastSecondarySizeBytes -ModifiedUnix $lastSecondaryModifiedUnix
         } elseif (Test-Path -LiteralPath $backupDirectory -PathType Container) {
             $secondaryMessage = 'No independent backup destination is configured. The only archive copy remains on this PC.'
-            Write-ZazuSecondaryStatus -Status 'not_configured' -Message $secondaryMessage -ArchiveName $lastSecondaryArchive -LastSuccessfulAt $lastSecondarySuccess
+            Write-ZazuSecondaryStatus -Status 'not_configured' -Message $secondaryMessage -ArchiveName $lastSecondaryArchive -LastSuccessfulAt $lastSecondarySuccess -ArchivePath $lastSecondaryArchivePath -Sha256 $lastSecondarySha256 -SizeBytes $lastSecondarySizeBytes -ModifiedUnix $lastSecondaryModifiedUnix
         }
     } catch {
         $lines.Add('WARNING: secondary-copy status could not be persisted for the dashboard.')
