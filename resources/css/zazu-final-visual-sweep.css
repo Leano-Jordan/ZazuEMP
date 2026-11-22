@@ -6979,7 +6979,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 body.zazu-has-wallpaper:not(.zazu-dashboard-page) {
     background-color: var(--zazu-page) !important;
     background-image:
-        linear-gradient(rgba(226, 238, 246, .76), rgba(226, 238, 246, .76)),
+        linear-gradient(rgba(226, 238, 246, .38), rgba(226, 238, 246, .38)),
         var(--zazu-wallpaper) !important;
     background-size: cover, cover !important;
     background-position: center, center !important;
