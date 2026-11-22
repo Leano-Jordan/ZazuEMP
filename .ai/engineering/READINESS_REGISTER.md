@@ -4,6 +4,23 @@
 
 Do not chase this historical anomaly, request diagnostic captures, or ask the Founder to run `Test-ZazuDatabaseSchema.ps1` or `Get-ZazuIncident.ps1`. Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new diagnostic evidence appears. The separate installation backup/restore acceptance gate remains independent and must not be conflated with DB-001.
 
+## Offline cache priming lifecycle — exact-head automated acceptance PASS — 2026-11-22
+
+**Runtime implementation head:** [b9f9a14](https://github.com/Leano-Jordan/ZazuEMP/commit/b9f9a146c5a1310ef75e1f3edf5a341851be005b).  
+**Latest source/test head:** [a0baea5](https://github.com/Leano-Jordan/ZazuEMP/commit/a0baea5901b139b1c7397a12d780af245841d3ce).
+
+- Root cause: repeated page boots aborted an in-flight same-workspace cache-prime task; the next page boot restarted it and the client reported the interruption as a cache failure. Logout could also leave a stale task reference that a later same-workspace prime might join.
+- Fix: same-context requests share the active prime; navigation no longer aborts it; fetched route HTML and its static/private assets are refreshed; clearing the active workspace aborts and releases the stale task reference. Service-worker cache is now `zazu-static-v61`.
+- Laravel: **691 passed / 1 skipped / 4,794 assertions**; PostgreSQL migration/recovery smoke **PASS**.
+- Offline browser exact-head [run 45052231006](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45052231006): **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance **1 passed**.
+- Zazu Quality [45052230840](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45052230840), PHPMD [45052230971](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45052230971), Director Health [45052230859](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45052230859) and Push-on-main [45052231209](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45052231209): **PASS**. SonarCloud: **SKIPPED**, not counted as a pass.
+- Windows V1 package/fresh-install [45052196760](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45052196760): **PASS** on the matching runtime implementation head.
+- **Physical acceptance seed: PRESENT and runbook READY.** The Founder-confirmed fictional workspace already contains the required customer, quote, invoice, supplier, purchase-order and inventory records, with PC and Android linked to the same workspace. Use the prepared sequence in `docs/V1_RELEASE_CHECKLIST.md`; do not recreate or duplicate seed records.
+- Physical Android cold-launch, host-stop, offline write, force-close/restart and reconnect remains **OPEN** until the Founder performs the actual-device run. Owner-PC off-disk recovery, live populated-business financial reconciliation, POPIA operational sign-off and ZAZU name clearance remain separate release gates.
+
+**Evidence maturity:** remains **77/100**. No readiness uplift is claimed from automated results alone. V1 remains **NOT READY**.
+
+
 ## Closed security checkpoint — stale device credential writes — 2026-11-21
 
 - Mutation application revalidates the original authenticated credential and mutation business/device ownership inside the same transaction as the domain write.
