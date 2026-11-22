@@ -147,3 +147,8 @@ This is a product-wide requirement, but implementation must be incremental:
 6. Verify historical-data preservation, business isolation, permissions, PC/mobile and offline behaviour.
 
 **Release discipline:** this requirement is recorded and mandatory for product direction. It is not a claim that adaptive presets are already implemented or that every specialist workflow belongs in V1. Prioritize the smallest coherent V1 slice against current readiness gates; do not silently expand V1 into a rewrite.
+
+
+## Current implementation evidence — linked booking operations
+
+The Job-detail Helper now reads counts from the current business-owned Event's existing relationships and, when present, lists linked preparation items, purchase orders, asset allocations, recorded costs and travel costs. It does not infer missing work from an empty relation, create tasks, or replace the Job's existing next-action logic. A feature test seeds a tent/chair booking with a linked preparation item and purchase order and asserts both appear in the Helper context. This remains an evidence/context slice; it is not yet a component-to-operation recommendation engine or full adaptive workspace.
