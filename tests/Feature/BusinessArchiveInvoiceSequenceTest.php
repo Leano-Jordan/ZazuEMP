@@ -70,7 +70,7 @@ class BusinessArchiveInvoiceSequenceTest extends TestCase
 
         $service = app(BusinessArchiveService::class);
         $archive = $service->download($source);
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
         $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
         unset($data['invoice_number_sequences']);
