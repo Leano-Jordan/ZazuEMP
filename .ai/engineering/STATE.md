@@ -1499,4 +1499,4 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 
 **Compatibility detail:** existing legacy categories and custom units are retained by the shared edit form. Offline custom quote lines are not mistaken for deleted requirement snapshots; detached requirement snapshots still force a new revision.
 
-**Acceptance:** exact-head Laravel, Pint/quality, PHPMD, security and browser verification pending. No physical acceptance status is changed by this code increment.
+**Acceptance:** implementation is committed to `main`; exact-head Laravel, Pint/quality, PHPMD, security and browser verification are queued and not yet accepted. No physical acceptance status is changed by this code increment.
