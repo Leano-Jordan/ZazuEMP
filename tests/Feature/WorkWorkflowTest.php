@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
 use App\Models\EventCost;
+use App\Models\EventRequirement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,6 +19,55 @@ class WorkWorkflowTest extends TestCase
     }
 
     use RefreshDatabase;
+
+    public function test_new_job_intake_presents_event_details_before_service_scope(): void
+    {
+        $response = $this->get(route('work.create'));
+
+        $response->assertOk()
+            ->assertSee('When and where?')
+            ->assertSee('Select the services involved')
+            ->assertSee('These selections create starting service requirements.')
+            ->assertSee('Event type');
+
+        $content = $response->getContent();
+        $schedulePosition = strpos($content, 'When and where?');
+        $servicesPosition = strpos($content, 'Select the services involved');
+
+        $this->assertNotFalse($schedulePosition);
+        $this->assertNotFalse($servicesPosition);
+        $this->assertLessThan($servicesPosition, $schedulePosition);
+        $this->assertStringNotContainsString('Choose the job type', $content);
+    }
+
+    public function test_initial_service_selection_is_saved_as_a_starter_requirement(): void
+    {
+        $customer = Customer::create(['name' => 'Starter Requirement Customer']);
+        $services = collect(config('zazu.service_categories'))->flatten()->values();
+        $service = $services->first();
+
+        $this->assertNotNull($service);
+
+        $response = $this->post(route('work.store'), [
+            'customer_id' => $customer->id,
+            'name' => 'Starter Requirement Work',
+            'event_type' => 'Catering order',
+            'event_date' => '2026-12-10',
+            'services' => [$service],
+        ]);
+
+        $event = Event::query()->where('name', 'Starter Requirement Work')->firstOrFail();
+
+        $response->assertRedirect(route('work.show', $event));
+
+        $requirement = EventRequirement::query()
+            ->where('event_id', $event->id)
+            ->where('description', $service)
+            ->firstOrFail();
+
+        $this->assertSame(1.0, (float) $requirement->quantity);
+        $this->assertSame('service', $requirement->unit);
+    }
 
     public function test_work_can_be_created_from_a_customer_with_day_and_night_contacts(): void
     {
