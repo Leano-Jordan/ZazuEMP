@@ -356,6 +356,59 @@ class ZazuHelperTest extends TestCase
         }
     }
 
+
+    public function test_helper_combines_primary_focus_with_multiple_active_catalogue_capabilities(): void
+    {
+        $business = $this->makeBusiness('Helper Multi Service Business');
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'primary_niche' => 'sound_dj',
+        ]);
+
+        BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'White chair hire',
+            'category' => 'Furniture & equipment',
+            'capability_type' => 'rental',
+            'pricing_basis' => 'per_unit',
+            'default_unit' => 'chair',
+            'currency' => 'ZAR',
+            'is_active' => true,
+        ]);
+        BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Buffet catering',
+            'category' => 'Catering',
+            'capability_type' => 'service',
+            'pricing_basis' => 'per_person',
+            'default_unit' => 'person',
+            'currency' => 'ZAR',
+            'is_active' => true,
+        ]);
+        BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Archived cake service',
+            'category' => 'Baking',
+            'capability_type' => 'service',
+            'pricing_basis' => 'custom',
+            'currency' => 'ZAR',
+            'is_active' => false,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-focus="sound_dj"', false)
+            ->assertSee('data-zazu-helper-focuses="sound_dj,chairs_tents,catering_baking"', false)
+            ->assertSee('For your active service mix:')
+            ->assertSee('Keep sound equipment, crew, setup/breakdown, programme timing and transport connected to each booking.')
+            ->assertSee('Keep hire quantities, availability, delivery, setup, collection and asset condition connected to each booking.')
+            ->assertSee('Keep menus, quantities, dietary details, purchasing, preparation and delivery connected to each booking.')
+            ->assertDontSee('Archived cake service')
+            ->assertDontSee('Camera editing');
+    }
+
     public function test_helper_shows_only_the_current_jobs_saved_components(): void
     {
         $business = $this->makeBusiness('Helper Event Scope');
@@ -412,6 +465,8 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-zazu-helper-event-components="2"', false)
             ->assertSee('100 white chairs')
             ->assertSee('Two stretch tents')
+            ->assertSee('data-zazu-helper-focuses="chairs_tents"', false)
+            ->assertSee('For this booking, review hire quantities, asset availability, delivery, setup, collection and condition.')
             ->assertSee('data-zazu-helper-event-records="2"', false)
             ->assertSee('1 preparation item')
             ->assertSee('1 purchase order')
