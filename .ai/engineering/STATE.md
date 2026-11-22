@@ -1461,7 +1461,8 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Existing cached HTML is reused while its referenced static assets and private media are still checked/primed.
 - Static service-worker cache version advanced from v60 to v61 so installed clients receive the corrected worker.
 - Extended `PwaOfflineFoundationTest` source regression assertions for in-flight task reuse, cache reuse and continued asset priming.
+- Extended the existing offline-browser acceptance test to issue three concurrent same-workspace priming requests, require all three to complete successfully, and assert that the warning is absent before disconnecting.
 
-**Commits:** `0e2cc49` (worker), `7c8b93e` (initial regression assertions), `e1d6f8a` (preserve asset priming), and `b26564c` (final regression assertions).
+**Commits:** `0e2cc49` (worker), `7c8b93e` (initial regression assertions), `e1d6f8a` (preserve asset priming), `b26564c` (final source assertions), and `f1ff0b1` (concurrent offline-browser regression).
 
-**Acceptance:** implementation is committed to `main`; exact-head Laravel, offline-browser, quality and PHPMD runs are pending. Do not mark the founder-reported device symptom resolved until the new worker is deployed/served and the phone/PC navigation experience is confirmed. If the warning persists after v61 is active, inspect which required route is failing rather than suppressing the notice.
+**Acceptance:** implementation is committed to `main`; exact-head Laravel, offline-browser, quality and PHPMD runs are pending for the latest regression commit. Do not mark the founder-reported device symptom resolved until the new worker is deployed/served and the phone/PC navigation experience is confirmed. If the warning persists after v61 is active, inspect which required route is failing rather than suppressing the notice.
