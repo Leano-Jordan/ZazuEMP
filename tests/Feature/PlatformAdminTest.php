@@ -103,6 +103,28 @@ class PlatformAdminTest extends TestCase
         File::deleteDirectory($directory);
     }
 
+
+    public function test_platform_admin_upload_rejects_svg_and_untrusted_media_types(): void
+    {
+        $admin = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
+
+        $this->actingAs($admin)
+            ->from(route('admin.landing.settings'))
+            ->put(route('admin.landing.settings.update'), [
+                'hero_image' => 'catering_service',
+                'operations_image' => 'event_catering',
+                'resources_image' => 'sound_stage',
+                'control_image' => 'wedding_catering',
+                'venue_image' => 'venue',
+                'decor_image' => 'luxury_banquet',
+                'uploads' => [UploadedFile::fake()->create('unsafe-markup.svg', 20, 'image/svg+xml')],
+            ])
+            ->assertSessionHasErrors(['uploads.0']);
+
+        $this->assertDatabaseCount('platform_landing_media', 0);
+    }
+
     public function test_public_landing_uses_platform_media_configuration(): void
     {
         DB::table('platform_landing_settings')->update([
@@ -138,6 +160,20 @@ class PlatformAdminTest extends TestCase
         $this->actingAs($user)
             ->get(route('admin.landing.settings'))
             ->assertForbidden();
+
+        $this->actingAs($user)
+            ->put(route('admin.landing.settings.update'), [
+                'hero_image' => 'catering_service',
+                'operations_image' => 'event_catering',
+                'resources_image' => 'sound_stage',
+                'control_image' => 'wedding_catering',
+                'venue_image' => 'venue',
+                'decor_image' => 'luxury_banquet',
+                'uploads' => [UploadedFile::fake()->image('unauthorised.jpg', 1200, 800)],
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('platform_landing_media', 0);
     }
 
     public function test_business_owner_sees_owner_admin_and_not_the_founder_control_centre(): void
