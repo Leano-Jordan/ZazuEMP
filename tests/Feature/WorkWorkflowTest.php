@@ -175,6 +175,7 @@ class WorkWorkflowTest extends TestCase
         $response = $this->get(route('work.edit', $event));
 
         $response->assertOk();
+        $response->assertSee('Job name');
         $response->assertSee('Rendered Edit Work');
         $response->assertSee('Day Contact');
         $response->assertSee('Night Contact');
