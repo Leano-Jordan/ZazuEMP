@@ -10,6 +10,7 @@ use Tests\TestCase;
 class PwaOfflineFoundationTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_manifest_exposes_installable_zazu_icons(): void
     {
         $manifestPath = public_path('manifest.webmanifest');
