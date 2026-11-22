@@ -1385,3 +1385,14 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Source audit found one real Eloquent-event bypass: promoting a contact used a relationship mass update to clear other primary contacts. If the selected contact was already primary and its attributes were unchanged, the selected model emitted no update event, so the customer aggregate revision could remain unchanged while another contact row changed.
 - Corrected the promotion path to lock and update only competing primary contacts through their Eloquent models. Their existing parent-revision listener now advances the customer snapshot revision. Added a feature regression for the unchanged-selected-contact / duplicate-primary case.
 - This is one confirmed writer correction, not completion of the writer audit. Continue checking indirect, query-builder and command-side writers. Exact-head Laravel/browser acceptance for this change is pending.
+
+
+## Job workspace next-action state mapping — 2026-11-22
+
+- Replaced the generic “Open quote” default with state-derived guidance on the Job workspace.
+- The next action now distinguishes missing service scope, no quote, draft quote, sent quote, declined/expired quote, accepted quote awaiting invoice, outstanding invoice balance, open/blocked preparation, active purchase orders and planned costs.
+- Completed and cancelled jobs no longer display a misleading operational next-action button.
+- The job detail now eager-loads invoice payments so invoice balance decisions use the already-loaded job data.
+- Added focused feature coverage for sent-quote customer decision guidance and accepted-quote invoice hand-off.
+- Commits: `f413fb7`, `5db08de`, `4431e04`, `31f54aa`.
+- Runtime tests and exact-head CI have not yet been verified. Do not mark this change accepted until the Laravel workflow and quality/security checks report results.
