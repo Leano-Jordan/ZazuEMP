@@ -1,3 +1,18 @@
+## Director acceptance checkpoint — offline expense identity isolation — 2026-11-22
+
+**Source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02) on `main`. Exact-head Laravel + browser + PostgreSQL: [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883). Zazu Quality: [44987764894](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764894). PHPMD: [44987764850](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764850). Director Health: [44987764840](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764840). Push-on-main: [44987765335](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987765335).
+
+- Laravel: **679 passed / 1 skipped / 4,665 assertions**; `OfflineExpenseReferenceIsolationTest` passed.
+- Offline browser: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**. Public/auth accessibility acceptance passed.
+- PostgreSQL migration, rollback/reapplication, registration and backup/restore/private-file recovery: **PASS**.
+- Zazu Quality (incremental Pint, application checks, Composer security audit and secret scan), PHPMD, Director Health and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- Added an adversarial test proving corrupted business-local identity rows cannot bind an offline expense to a foreign event, supplier or purchase order. All three mutations remain pending, no expense is written, and foreign records remain unchanged. Existing resolver logic correctly fails closed; no application-code change was needed.
+- Evidence maturity remains **77/100**; no score uplift is claimed. V1 remains **NOT READY** pending physical Android acceptance, intended-PC recovery, live-business commercial reconciliation, POPIA operations and ZAZU name clearance.
+
+**Next engineering target:** continue the offline account/session transition adversarial review, preserving the approved business-trusted device model and durable local queue while verifying expiry, re-authentication and stale in-flight request handling.
+
+---
+
 ## Director acceptance checkpoint — 2026-11-21
 
 **Current source/test head:** `e45cab97cbcdbc3f989bf3843d751bb0f373c305` on `main`.  
