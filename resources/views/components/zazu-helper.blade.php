@@ -103,13 +103,22 @@
         && $event instanceof \App\Models\Event
         && $business
         && (int) $event->business_id === (int) $business->id) {
-        $event->loadCount([
-            'preparationItems',
-            'purchaseOrders',
-            'assetAllocations',
-            'costs',
-            'travelCosts',
-        ]);
+        $permissions = app(\App\Support\PermissionService::class);
+        $eventCountRelations = [];
+
+        foreach ([
+            'preparationItems' => 'work.view',
+            'purchaseOrders' => 'purchasing.view',
+            'assetAllocations' => 'assets.view',
+            'costs' => 'work.view',
+            'travelCosts' => 'work.view',
+        ] as $relation => $permission) {
+            if ($permissions->allows($permission, auth()->user(), $business)) {
+                $eventCountRelations[] = $relation;
+            }
+        }
+
+        $event->loadCount($eventCountRelations);
 
         $eventComponents = $event->requirements()
             ->with(['capability' => fn ($query) => $query->where('business_id', $business->id)])
