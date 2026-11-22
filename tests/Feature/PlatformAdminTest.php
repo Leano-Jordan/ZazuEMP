@@ -51,7 +51,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_platform_admin_can_upload_preview_and_reuse_landing_media(): void
     {
-        $admin = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $directory = storage_path('framework/testing/landing-uploads-'.Str::uuid());
@@ -98,7 +98,7 @@ class PlatformAdminTest extends TestCase
             $media->path,
             DB::table('platform_landing_settings')->value('hero_image_path')
         );
-        $this->assertSame($media->path, app(\\App\\Services\\LandingMediaService::class)->images()['hero']);
+        $this->assertSame($media->path, app(\App\Services\LandingMediaService::class)->images()['hero']);
 
         File::deleteDirectory($directory);
     }
@@ -106,7 +106,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_platform_admin_upload_rejects_svg_and_untrusted_media_types(): void
     {
-        $admin = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($admin)
@@ -275,7 +275,7 @@ class PlatformAdminTest extends TestCase
                 'failure_fingerprint' => $fingerprint,
                 'error_code' => 'DB-001',
                 'database_failure_class' => 'sqlite_missing_column',
-                'exception_class' => 'Illuminate\\Database\\QueryException',
+                'exception_class' => 'Illuminate\Database\QueryException',
                 'source_file' => 'DashboardController.php',
                 'timestamp' => '2026-11-18T10:00:00+02:00',
                 'sql' => 'private SQL must not appear',
@@ -285,7 +285,7 @@ class PlatformAdminTest extends TestCase
                 'failure_fingerprint' => $fingerprint,
                 'error_code' => 'DB-001',
                 'database_failure_class' => 'sqlite_missing_column',
-                'exception_class' => 'Illuminate\\Database\\QueryException',
+                'exception_class' => 'Illuminate\Database\QueryException',
                 'source_file' => 'DashboardController.php',
                 'timestamp' => '2026-11-18T11:00:00+02:00',
             ],
