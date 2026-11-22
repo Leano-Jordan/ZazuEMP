@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
 use App\Models\User;
@@ -46,8 +47,8 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-zazu-anchor="quotes.register"', false)
             ->assertSee('data-target="quotes.register"', false);
 
-        $customer = \App\Models\Customer::create(['name' => 'Helper Job Customer']);
-        $event = \App\Models\Event::create([
+        $customer = Customer::create(['name' => 'Helper Job Customer']);
+        $event = Event::create([
             'customer_id' => $customer->id,
             'reference' => 'HELPER-GUIDE-'.Str::upper(Str::random(5)),
             'name' => 'Helper Guide Job',
