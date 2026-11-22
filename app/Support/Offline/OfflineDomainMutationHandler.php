@@ -246,57 +246,87 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $attributes = $this->offlineJobAttributes($mutation, $payload, $event, $customer);
 
         if ($event instanceof Event) {
-            // Offline job edits must obey the same lifecycle boundary as online
-            // Work edits. Lock business → event before checking closure so a
-            // concurrent completion/cancellation cannot race this mutation.
-            $event = $this->lifecycle->lock($mutation->business_id, $event->id);
-            $this->lifecycle->assertOperational($event);
-
-            $nextStatus = $this->requiredString($payload['status'] ?? $event->status, 'status', 30);
-            $this->lifecycle->assertTransitionAllowed($event, $nextStatus);
-            $attributes['status'] = $nextStatus;
-
-            if (
-                (int) $event->customer_id !== (int) ($attributes['customer_id'] ?? $event->customer_id)
-                && $event->quotes()->exists()
-            ) {
-                throw ValidationException::withMessages([
-                    'customer_local_id' => 'The customer cannot be changed after a quote exists for this job.',
-                ]);
-            }
-
-            if (array_key_exists('services', $payload)) {
-                $requestedRequirements = $this->offlineJobRequirementDefinitions(
-                    $payload['services'],
-                    $payload['other_service'] ?? null
-                );
-                $acceptedQuoteExists = $event->quotes()->where('status', 'accepted')->exists();
-
-                if ($acceptedQuoteExists) {
-                    $currentDescriptions = $event->requirements()->pluck('description')->all();
-                    $requestedDescriptions = array_keys($requestedRequirements);
-                    sort($currentDescriptions);
-                    sort($requestedDescriptions);
-
-                    if ($currentDescriptions !== $requestedDescriptions) {
-                        throw ValidationException::withMessages([
-                            'services' => 'An accepted quote locks the agreed job scope. Create a separate job for additional work.',
-                        ]);
-                    }
-                } else {
-                    $this->syncOfflineJobRequirements($event, $payload);
-                }
-            }
-
-            $event->update($attributes);
-
-            return $event->fresh(['requirements']);
+            return $this->updateOfflineEvent($mutation, $event, $payload, $attributes);
         }
 
         $event = Event::create($attributes);
         $this->createOfflineJobRequirements($event, $payload);
 
         return $event->fresh(['requirements']);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $attributes
+     */
+    private function updateOfflineEvent(
+        SyncMutation $mutation,
+        Event $event,
+        array $payload,
+        array $attributes,
+    ): Event {
+        // Lock business → event before checking closure so a concurrent
+        // completion/cancellation cannot race this offline Work edit.
+        $event = $this->lifecycle->lock($mutation->business_id, $event->id);
+        $this->lifecycle->assertOperational($event);
+
+        $nextStatus = $this->requiredString($payload['status'] ?? $event->status, 'status', 30);
+        $this->lifecycle->assertTransitionAllowed($event, $nextStatus);
+        $attributes['status'] = $nextStatus;
+
+        $this->assertOfflineEventCustomerUnchanged($event, $attributes);
+        $this->syncOfflineEventRequirements($event, $payload);
+
+        $event->update($attributes);
+
+        return $event->fresh(['requirements']);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private function assertOfflineEventCustomerUnchanged(Event $event, array $attributes): void
+    {
+        if (
+            (int) $event->customer_id !== (int) ($attributes['customer_id'] ?? $event->customer_id)
+            && $event->quotes()->exists()
+        ) {
+            throw ValidationException::withMessages([
+                'customer_local_id' => 'The customer cannot be changed after a quote exists for this job.',
+            ]);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function syncOfflineEventRequirements(Event $event, array $payload): void
+    {
+        if (! array_key_exists('services', $payload)) {
+            return;
+        }
+
+        $requestedRequirements = $this->offlineJobRequirementDefinitions(
+            $payload['services'],
+            $payload['other_service'] ?? null
+        );
+
+        if (! $event->quotes()->where('status', 'accepted')->exists()) {
+            $this->syncOfflineJobRequirements($event, $payload);
+
+            return;
+        }
+
+        $currentDescriptions = $event->requirements()->pluck('description')->all();
+        $requestedDescriptions = array_keys($requestedRequirements);
+        sort($currentDescriptions);
+        sort($requestedDescriptions);
+
+        if ($currentDescriptions !== $requestedDescriptions) {
+            throw ValidationException::withMessages([
+                'services' => 'An accepted quote locks the agreed job scope. Create a separate job for additional work.',
+            ]);
+        }
     }
 
     /**
