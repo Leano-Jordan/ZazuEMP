@@ -95,8 +95,6 @@ class BusinessArchiveTest extends TestCase
 
     }
 
-
-
     public function test_restore_refuses_a_non_empty_business_without_changing_its_records(): void
     {
         Storage::fake('private');
@@ -136,7 +134,6 @@ class BusinessArchiveTest extends TestCase
         ]);
         $this->assertDatabaseCount('customers', 2);
     }
-
 
     public function test_restore_detaches_untrusted_polymorphic_audit_subjects_without_loading_classes(): void
     {
@@ -606,7 +603,6 @@ class BusinessArchiveTest extends TestCase
             'source' => 'upload',
         ]);
     }
-
 
     private function seedPurchaseOrderRecords(Business $source, Event $event): void
     {
