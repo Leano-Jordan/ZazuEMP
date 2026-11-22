@@ -72,6 +72,11 @@ class ZazuHelperTest extends TestCase
         $this->assertStringContainsString('safeStorageGet(storageKey)', $script);
         $this->assertStringContainsString("safeStorageSet(storageKey, 'off')", $script);
         $this->assertStringContainsString('[data-zazu-anchor]', $script);
+        $this->assertStringContainsString('resolveVisibleTarget', $script);
+        $this->assertStringContainsString("element.closest('[hidden], [aria-hidden=\"true\"]')", $script);
+        $this->assertStringContainsString('target.isConnected', $script);
+        $this->assertStringContainsString("toggle.setAttribute('aria-label', 'Open Zazu guide')", $script);
+        $this->assertStringContainsString('closeButton?.focus()', $script);
         $this->assertStringContainsString('prefers-reduced-motion', $script);
         $this->assertStringContainsString('.zazu-helper-target-highlight', $css);
     }
