@@ -2,6 +2,23 @@
 
 This is the short hands-on check that engineering cannot honestly complete from source code or CI alone. Use a test business and clearly fake records; do not use live customer or financial data.
 
+## Owner-verified physical and populated-workspace evidence — 2026-11-22
+
+**Status: PARTIAL OWNER ACCEPTANCE RECORDED; no duplicate setup required.**
+
+The Founder reports that the current Zazu installation has been physically exercised on both the PC and the linked mobile phone, and that both devices operate against the same Zazu EMP workspace. The Founder also confirms that the fictional test workspace is already populated with customer/client, quote, invoice, supplier, purchase-order and inventory records, and that these areas work as intended.
+
+The supplied dashboard screenshots show the Zazu Demo Catering workspace, two customer records, one active event (Isaac's Birthday Party), and the dashboard's connected workspace-health indicators. They are useful visual evidence of a populated, rendered workspace, but they do not expose the detailed quote, invoice, supplier, PO or inventory records.
+
+**Acceptance recorded from owner report:**
+- PC physical operation: **OWNER-VERIFIED PASS** for normal application use.
+- Linked mobile physical operation: **OWNER-VERIFIED PASS** for normal application use.
+- Shared/linked Zazu workspace: **OWNER-VERIFIED PASS**.
+- Populated business modules (customers/clients, quotes, invoices, suppliers, purchasing/POs and inventory): **OWNER-REPORTED FUNCTIONAL**.
+- No need to recreate customers, jobs, quotes, invoices, suppliers, POs or stock records for this acceptance exercise.
+
+**Evidence boundary:** this report does not yet independently demonstrate installed-app cold launch with the host unavailable, airplane-mode operation, offline-created record persistence and exactly-once reconnect sync, attachment round-trip, owner-PC off-disk backup/full restore, or a reconciled quote-to-profit calculation across one identified job. Those remain separate checks unless separately evidenced. The screenshots are dashboard captures, not transaction-level proof. All supplied business data is fictional and contains no live customer or financial information.
+
 ## Before testing
 
 - Zazu must be reachable from both the PC and phone at the **same stable HTTPS origin**. A temporary LAN `http://` address is not sufficient for installed-PWA acceptance.
@@ -17,7 +34,7 @@ If the stable HTTPS environment is not deployed yet, stop here. That is a deploy
 
 1. Open Zazu in the phone browser and use **Install app / Add to Home screen**. Launch it once from the installed Zazu icon.
 2. While connected, open the dashboard and the supported offline work areas. Wait for initial local data to finish loading.
-3. Create one clearly named test customer and one test job linked to that customer. Confirm both appear in Zazu before disconnecting.
+3. Reuse the existing fictional test customer and linked job/event if they are already present. Do not create duplicate records merely to repeat this runbook. Confirm the records appear on the device before disconnecting.
 4. Close Zazu fully. Turn on Airplane mode (make sure Wi-Fi is also off). Leave the PC/server unavailable or disconnect the phone from it.
 5. Launch Zazu from its installed icon. The real dashboard/workspace should open, not a browser error or a generic offline page.
 6. Close the app fully and launch it again while still disconnected. Confirm the test customer and job remain visible.
