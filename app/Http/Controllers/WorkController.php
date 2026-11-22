@@ -382,7 +382,6 @@ class WorkController extends Controller
         abort_unless($valid, 422, 'The selected contact does not belong to the selected customer.');
     }
 
-
     private function validationMessages(): array
     {
         return [
