@@ -152,3 +152,8 @@ This is a product-wide requirement, but implementation must be incremental:
 ## Current implementation evidence — linked booking operations
 
 The Job-detail Helper now reads counts from the current business-owned Event's existing relationships and, when present, lists linked preparation items, purchase orders, asset allocations, recorded costs and travel costs. It does not infer missing work from an empty relation, create tasks, or replace the Job's existing next-action logic. A feature test seeds a tent/chair booking with a linked preparation item and purchase order and asserts both appear in the Helper context. This remains an evidence/context slice; it is not yet a component-to-operation recommendation engine or full adaptive workspace.
+
+
+## Permission-aware Helper context — 2026-11-23
+
+The linked-booking summary now checks the active user's existing workspace permissions before rendering each record count: preparation/cost/travel context requires `work.view`, purchase-order context requires `purchasing.view`, and asset-allocation context requires `assets.view`. The event remains constrained to the active business. A feature test covers a staff member with `work.view` but without purchasing access: preparation context remains visible while the purchase-order count is withheld. This is presentation-layer minimization; the existing route middleware and server authorization remain the security boundary.
