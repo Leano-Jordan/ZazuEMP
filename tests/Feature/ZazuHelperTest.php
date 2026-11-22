@@ -45,6 +45,22 @@ class ZazuHelperTest extends TestCase
             ->assertOk()
             ->assertSee('data-zazu-anchor="quotes.register"', false)
             ->assertSee('data-target="quotes.register"', false);
+
+        $customer = \App\Models\Customer::create(['name' => 'Helper Job Customer']);
+        $event = \App\Models\Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'HELPER-GUIDE-'.Str::upper(Str::random(5)),
+            'name' => 'Helper Guide Job',
+            'event_date' => '2026-12-20',
+            'status' => 'draft',
+        ]);
+
+        $this->get(route('work.show', $event))
+            ->assertOk()
+            ->assertSee('data-zazu-anchor="work.next-action"', false)
+            ->assertSee('data-target="work.next-action"', false)
+            ->assertSee('data-zazu-anchor="work.progress"', false)
+            ->assertSee('data-target="work.progress"', false);
     }
 
     public function test_helper_uses_safe_storage_and_reduced_motion_aware_semantic_highlighting(): void
