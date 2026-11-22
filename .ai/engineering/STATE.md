@@ -20,6 +20,9 @@
 The online Requirements page and route set expose list/create only, and online `WorkController::update()` does not apply a submitted services list. However, `OfflineDomainMutationHandler::syncOfflineJobRequirements()` already reconciles a submitted offline service list, including removals while preserving matching rows' detail fields. Treat this as an online discoverability/capability gap with existing offline semantics—not as proof that the domain has no correction behavior. Any implementation must unify online/offline behavior and preserve quote snapshots. See the benchmark report's corrected finding.
 
 
+**Current-main correction — requirement lifecycle now implemented:** the initial source snapshot above is historical and has been superseded. Current `main` exposes edit/update/remove routes and controls in the Requirements workspace. `RequirementController` applies business scoping and event/requirement ownership checks, locks the event inside a transaction, prevents scope changes after quote acceptance, prevents removing the final quoted requirement, and preserves quote-version snapshots when a requirement is changed or removed. `WorkPlanningWorkflowTest` covers online correction, removal with detached historical quote lines, revision generation, final-line protection and accepted-quote scope locking. The earlier statement that online correction was unavailable is no longer current. Do not reopen this as an unimplemented feature; audit only if new evidence exposes a gap.
+
+
 **Research:** [Director Commercial Event Workflow Benchmark](../../docs/DIRECTOR_COMMERCIAL_EVENT_WORKFLOW_BENCHMARK_2026-11-22.md)
 
 Reviewed official workflow material from Caterease, Total Party Planner, Planning Pod and HoneyBook, plus practitioner discussions on Reddit. Common patterns: guided intake; event-centred home; visible upcoming/waiting/overdue/completed work; contextual document hand-offs; reusable templates; conditional/parallel operational work. The research distinguishes vendor feature claims from documented workflow steps and community anecdotes.
@@ -41,7 +44,7 @@ Reviewed official workflow material from Caterease, Total Party Planner, Plannin
 
 Application behavior/data model and existing routes were not changed. The change is a narrow presentation/copy correction. Exact-head tests and CI are pending verification; do not claim a pass until the run completes.
 
-**Next engineering priority:** resolve safe requirement correction/replace/cancel behavior (including quote-version and offline constraints), then build a state-derived Job-home orientation model. Do not move module destinations or perform a broad navigation rewrite.
+**Next engineering priority:** validate the state-derived Job-home orientation model and Helper recommendations against the full quote → customer decision → invoice/payment → delivery/purchasing/receiving → costs/profit → close-out lifecycle. Keep conditional and parallel work visible without forcing every job through a rigid sequence. Do not move module destinations or perform a broad navigation rewrite.
 
 ---
 
