@@ -1,15 +1,17 @@
-## Zazu Helper — origin-aware job guidance — 2026-11-22
+## Zazu Helper — origin-aware operational recommendations — 2026-11-22
 
-**Implementation:** committed directly to `main` in `400d092`, `ab7674b`, `df552df`, `203e77a`, `f867d44` and `ae9a61a`.
+**Implementation:** committed directly to `main`. Latest implementation/test commits: [f11ca76](https://github.com/Leano-Jordan/ZazuEMP/commit/f11ca767110e10e8a2e98f412947321bb73da86b), [670703c](https://github.com/Leano-Jordan/ZazuEMP/commit/670703cf706c9a50cd88187ff9c61f9b6d0bca4f), [4a4513b](https://github.com/Leano-Jordan/ZazuEMP/commit/4a4513b2e340e2096bc4774faf817c59c326eb4a), [df4e304](https://github.com/Leano-Jordan/ZazuEMP/commit/df4e304169e06bbd6c00ff10d2da089c290605b3) and [a8bc03b](https://github.com/Leano-Jordan/ZazuEMP/commit/a8bc03b72f60b49d959ce664a9f542544b18a4d5).
 
-- Added a contextual recommendation surface inside the Helper on Job detail pages.
-- The recommendation reads the existing `work.next-action` panel; it does not calculate a second workflow state or create a competing action source.
-- Only same-origin action links are eligible. The recommendation remains hidden until the existing `/up` origin-health monitor confirms availability.
-- The existing origin monitor now publishes its result to the Helper. On host/network outage, the Helper pauses job recommendations and explains that only supported offline workspace screens should be used.
-- Extended the existing desktop/mobile host-outage Playwright journey to assert that the Helper displays the offline explanation, hides the recommendation, and clears the explanation after reconnection.
-- Added focused Laravel source/render assertions for the Helper surface and origin-health contract.
+- Helper recommendation priority: use the Job detail page's existing state-derived `work.next-action`; on other guided workspaces, promote the first server-rendered attention item from `ZazuHelperService`.
+- Attention source remains business-scoped and permission-filtered by the existing service. The Helper does not calculate new business state or create another workflow authority.
+- Recommendation links are accepted only when same-origin. They are shown only after the existing origin-health monitor confirms server availability; on outage they pause, and the offline explanation clears after reconnection.
+- Added semantic source attributes to the existing attention list; existing visible attention content and links remain intact.
+- Repaired a malformed PHP assertion chain in `ZazuHelperTest` that would prevent the feature test file from parsing.
+- Added Laravel assertions for the attention source and Playwright coverage for online recommendation promotion, outage suppression and reconnect recovery across desktop/mobile browser projects.
 
-**Evidence status: CHANGED, NOT VERIFIED.** Every changed file was re-read from `main`. Exact-head Laravel, offline-browser, quality, PHPMD and related workflows have not yet been observed for `f867d44`; no pass is claimed. This change does not establish physical Android acceptance or broader offline parity.
+**Evidence status: IMPLEMENTED, EXACT-HEAD CI PENDING.** All changed files were read back from `main`. The Founder reports the previous checks were green; these additional commits were made afterward and require a fresh exact-head run before they can be called green. No physical Android or owner-PC recovery evidence is inferred from browser automation.
+
+---
 
 ---
 
