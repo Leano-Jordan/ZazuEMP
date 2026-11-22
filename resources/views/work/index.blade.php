@@ -218,7 +218,7 @@
         </div>
 
         <div class="zazu-inspector-body">
-            <section id="zazu-inspector-panel-catering" role="tabpanel" tabindex="0" aria-labelledby="zazu-inspector-tab-catering" data-zazu-tab-panel="catering">
+            <section id="zazu-inspector-panel-catering" role="tabpanel" tabindex="0" aria-labelledby="zazu-inspector-tab-catering" aria-hidden="false" data-zazu-tab-panel="catering">
                 <div data-zazu-inspector-content></div>
             </section>
 
