@@ -22,9 +22,6 @@ final class SecondaryBackupArchiveVerifier
         return $this->matchesRecordedMetadata($state) ? 'present' : 'changed';
     }
 
-    /**
-     * @param array<string, mixed> $state
-     */
     private function hasValidMetadata(array $state): bool
     {
         $path = $state['secondary_archive_path'] ?? null;
@@ -62,9 +59,6 @@ final class SecondaryBackupArchiveVerifier
         return is_file($path) && is_link($path) === false;
     }
 
-    /**
-     * @param array<string, mixed> $state
-     */
     private function matchesRecordedMetadata(array $state): bool
     {
         $path = (string) $state['secondary_archive_path'];
