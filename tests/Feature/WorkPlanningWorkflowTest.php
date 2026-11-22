@@ -265,4 +265,37 @@ class WorkPlanningWorkflowTest extends TestCase
         $this->assertDatabaseCount('quote_items', 1);
     }
 
+    public function test_offline_custom_quote_lines_do_not_count_as_detached_requirements(): void
+    {
+        $event = $this->event();
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => 'Catering',
+            'category' => 'Catering',
+            'quantity' => 1,
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '1.00'],
+            'unit_price' => [$requirement->id => '100.00'],
+        ])->assertRedirect();
+
+        $version = Quote::query()->firstOrFail()->latestVersion()->firstOrFail();
+        $version->items()->create([
+            'event_requirement_id' => null,
+            'capability_id' => null,
+            'description' => 'Offline custom delivery fee',
+            'quantity' => '1.00',
+            'unit' => 'fee',
+            'unit_price' => '50.00',
+            'line_total' => '50.00',
+            'source_snapshot' => ['offline' => true, 'quote_currency' => 'ZAR'],
+        ]);
+
+        $this->assertTrue($version->fresh()->matchesRequirements($event->requirements()->get()));
+    }
+
 }
