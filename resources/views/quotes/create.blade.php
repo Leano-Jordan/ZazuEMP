@@ -140,6 +140,7 @@
             <aside class="zazu-form-aside">
                 <div class="zazu-context-card zazu-financial-summary" data-quote-summary>
                     <div class="zazu-context-title">Live quote summary</div>
+                    <p class="zazu-field-help" data-quote-review-status role="status">Review every line before saving.</p>
                     <div class="zazu-context-copy">Use this as a quick check before saving. Zazu recalculates the final figures from the saved quote data.</div>
                     <dl class="zazu-financial-summary-list">
                         <div><dt>Subtotal</dt><dd data-quote-subtotal>{{ $defaultCurrency }} 0.00</dd></div>
@@ -175,12 +176,14 @@
             if (!summary) return;
 
             let subtotal = 0;
+            let incompleteLines = 0;
             priceInputs.forEach((input) => {
                 const line = input.closest('[data-quote-line]');
                 const quantity = Number.parseFloat(line?.querySelector('[data-quote-quantity]')?.value || '');
                 const price = Number.parseFloat(input.value || '');
-                const lineTotal = Number.isFinite(quantity) && Number.isFinite(price) ? quantity * price : null;
+                const lineTotal = Number.isFinite(quantity) && quantity > 0 && Number.isFinite(price) && price >= 0 ? quantity * price : null;
                 if (lineTotal !== null) subtotal += lineTotal;
+                else incompleteLines += 1;
                 const output = line?.querySelector('[data-quote-line-total]');
                 if (output) output.textContent = lineTotal === null ? 'Enter quantity and price' : (currencySelect?.value + ' ' + money.format(lineTotal));
             });
@@ -193,6 +196,8 @@
             const deposit = total * (Number.isFinite(depositPercent) ? depositPercent : 0) / 100;
             const format = (value) => currencySelect?.value + ' ' + money.format(value);
 
+            const reviewStatus = summary.querySelector('[data-quote-review-status]');
+            if (reviewStatus) reviewStatus.textContent = incompleteLines ? incompleteLines + ' line(s) still need a valid quantity and price.' : 'All line quantities and prices are entered.';
             summary.querySelector('[data-quote-subtotal]').textContent = format(subtotal);
             summary.querySelector('[data-quote-tax]').textContent = format(tax);
             summary.querySelector('[data-quote-total]').textContent = format(total);
