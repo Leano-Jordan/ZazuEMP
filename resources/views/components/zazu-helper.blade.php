@@ -104,7 +104,7 @@
         && $business
         && (int) $event->business_id === (int) $business->id) {
         $eventComponents = $event->requirements()
-            ->with('capability')
+            ->with(['capability' => fn ($query) => $query->where('business_id', $business->id)])
             ->get()
             ->map(fn ($requirement) => trim((string) ($requirement->description ?: $requirement->capability?->name ?: $requirement->category)))
             ->filter()
