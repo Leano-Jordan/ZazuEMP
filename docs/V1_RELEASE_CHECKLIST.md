@@ -1,3 +1,19 @@
+# Secondary backup health integrity — 2026-11-22
+
+**Implementation head:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
+
+- Fixed a false healthy state: a recent successful-copy timestamp alone no longer proves the secondary archive remains available.
+- Windows runner records the secondary archive path, SHA-256, byte size and last-write timestamp after copy verification. The PHP health check requires the archive to remain present as a regular non-symlink file with matching size and timestamp; missing/unavailable/changed metadata triggers **ATTENTION**.
+- SHA-256 is verified at copy time, not recomputed on every dashboard request. The health check does not prove a physically separate disk or completed cloud upload; the owner must verify the configured destination is genuinely independent.
+- Laravel: **679 passed / 1 skipped / 4,671 assertions**; the new missing/changed-secondary-copy regression passed. Zazu Quality, PHPMD, Psalm, populated upgrade/rollback, PostgreSQL migration/recovery and Windows fresh-install acceptance: **PASS**. SonarCloud: **SKIPPED**.
+- Windows PowerShell 5.1 runner metadata/failure-preservation test: [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) **PASS**.
+- Offline-browser acceptance was still running when this checkpoint was recorded; no pass is claimed here.
+- Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner-PC scheduled backup, independent off-disk copy and controlled full restore are demonstrated.
+
+**Next engineering target:** commercial quote-to-profit reconciliation using populated records. Physical Android acceptance and POPIA/name clearance remain open.
+
+---
+
 # Offline session and trusted-device security review — 2026-11-22
 
 **Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
