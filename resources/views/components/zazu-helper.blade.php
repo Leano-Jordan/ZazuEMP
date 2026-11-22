@@ -126,16 +126,23 @@
         && $event instanceof \\App\\Models\\Event
         && $business
         && (int) $event->business_id === (int) $business->id) {
+        $permissions = app(\\App\\Support\\PermissionService::class);
+
         foreach ([
-            'preparationItems' => 'preparation item',
-            'purchaseOrders' => 'purchase order',
-            'assetAllocations' => 'asset allocation',
-            'costs' => 'recorded cost',
-            'travelCosts' => 'travel cost',
-        ] as $relation => $label) {
+            'preparationItems' => ['label' => 'preparation item', 'permission' => 'work.view'],
+            'purchaseOrders' => ['label' => 'purchase order', 'permission' => 'purchasing.view'],
+            'assetAllocations' => ['label' => 'asset allocation', 'permission' => 'assets.view'],
+            'costs' => ['label' => 'recorded cost', 'permission' => 'work.view'],
+            'travelCosts' => ['label' => 'travel cost', 'permission' => 'work.view'],
+        ] as $relation => $definition) {
+            if (!$permissions->allows($definition['permission'], auth()->user(), $business)) {
+                continue;
+            }
+
             $count = (int) $event->getAttribute($relation.'_count');
 
             if ($count > 0) {
+                $label = $definition['label'];
                 $eventOperationalRecords->push($count.' '.$label.($count === 1 ? '' : 's'));
             }
         }
