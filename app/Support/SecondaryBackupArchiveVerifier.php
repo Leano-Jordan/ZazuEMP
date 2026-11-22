@@ -27,6 +27,7 @@ final class SecondaryBackupArchiveVerifier
 
     /**
      * @param array<string, mixed> $state
+     * @param mixed $path
      */
     private function hasValidMetadata(array $state, mixed $path): bool
     {
@@ -64,6 +65,7 @@ final class SecondaryBackupArchiveVerifier
     }
 
     /**
+     * @param string $path
      * @param array<string, mixed> $state
      */
     private function matchesRecordedMetadata(string $path, array $state): bool
