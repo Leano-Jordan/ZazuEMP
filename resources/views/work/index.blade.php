@@ -105,7 +105,7 @@
                         data-contact="{{ e($contact ?? $event->customer_phone ?? $event->customer_email ?? 'Contact not recorded') }}"
                     >
                         <section data-inspector-tab="catering">
-                            <div class="zazu-inspector-section-title">Services &amp; preparation</div>
+                            <div class="zazu-inspector-section-title">Scope &amp; preparation</div>
                             @if($event->requirements->isNotEmpty())
                                 <div class="zazu-inspector-record-list">
                                     @foreach($event->requirements as $requirement)
@@ -135,7 +135,7 @@
                         </section>
 
                         <section data-inspector-tab="equipment">
-                            <div class="zazu-inspector-section-title">Equipment &amp; hire demand</div>
+                            <div class="zazu-inspector-section-title">Resources &amp; setup</div>
                             @if($rentalRequirements->isNotEmpty())
                                 <div class="zazu-inspector-record-list">
                                     @foreach($rentalRequirements as $requirement)
@@ -149,7 +149,7 @@
                             @else
                                 <div class="zazu-inspector-empty">No rental requirements are recorded on this job.</div>
                             @endif
-                            <div class="zazu-inspector-section-title mt-5">Asset allocation history</div>
+                            <div class="zazu-inspector-section-title mt-5">Resource allocations</div>
                             @if($event->assetAllocations->isNotEmpty())
                                 <div class="zazu-inspector-record-list">
                                     @foreach($event->assetAllocations->sortByDesc('allocated_from') as $allocation)
@@ -166,7 +166,7 @@
                         </section>
 
                         <section data-inspector-tab="finance">
-                            <div class="zazu-inspector-section-title">Financial position</div>
+                            <div class="zazu-inspector-section-title">Commercial position</div>
                             <div class="zazu-inspector-finance">
                                 <div><span>Quote</span><strong>{{ $latestQuoteVersion ? ucfirst($latestQuoteVersion->status).' · '.$latestQuote?->currency : 'Not quoted' }}</strong></div>
                                 <div><span>Quote total</span><strong>{{ $latestQuoteVersion ? $latestQuote?->currency.' '.$formatMoney((string) $latestQuoteVersion->total) : 'Not quoted' }}</strong></div>
@@ -212,21 +212,21 @@
         </div>
 
         <div class="zazu-inspector-tabs" role="tablist" aria-label="Function sheet sections">
-            <button type="button" class="is-active" data-zazu-tab="catering" role="tab" aria-selected="true" aria-controls="zazu-inspector-panel-catering">Catering &amp; Menu Prep</button>
-            <button type="button" data-zazu-tab="equipment" role="tab" aria-selected="false" aria-controls="zazu-inspector-panel-equipment">Equipment Hire Manifest</button>
-            <button type="button" data-zazu-tab="finance" role="tab" aria-selected="false" aria-controls="zazu-inspector-panel-finance">Financial Ledger</button>
+            <button id="zazu-inspector-tab-catering" type="button" class="is-active" data-zazu-tab="catering" role="tab" aria-selected="true" aria-controls="zazu-inspector-panel-catering">Scope &amp; preparation</button>
+            <button id="zazu-inspector-tab-equipment" type="button" data-zazu-tab="equipment" role="tab" aria-selected="false" aria-controls="zazu-inspector-panel-equipment">Resources &amp; setup</button>
+            <button id="zazu-inspector-tab-finance" type="button" data-zazu-tab="finance" role="tab" aria-selected="false" aria-controls="zazu-inspector-panel-finance">Commercial position</button>
         </div>
 
         <div class="zazu-inspector-body">
-            <section id="zazu-inspector-panel-catering" role="tabpanel" tabindex="0" data-zazu-tab-panel="catering">
+            <section id="zazu-inspector-panel-catering" role="tabpanel" tabindex="0" aria-labelledby="zazu-inspector-tab-catering" data-zazu-tab-panel="catering">
                 <div data-zazu-inspector-content></div>
             </section>
 
-            <section id="zazu-inspector-panel-equipment" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="equipment">
+            <section id="zazu-inspector-panel-equipment" role="tabpanel" tabindex="0" aria-labelledby="zazu-inspector-tab-equipment" hidden data-zazu-tab-panel="equipment">
                 <div data-zazu-inspector-content></div>
             </section>
 
-            <section id="zazu-inspector-panel-finance" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="finance">
+            <section id="zazu-inspector-panel-finance" role="tabpanel" tabindex="0" aria-labelledby="zazu-inspector-tab-finance" hidden data-zazu-tab-panel="finance">
                 <div data-zazu-inspector-content></div>
                 <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-primary w-full mt-4" data-zazu-finance-link>Open job record</a>
             </section>
@@ -276,7 +276,10 @@
                     const sourceTab = [...sourceTabs].find(item => item.dataset.inspectorTab === target);
                     const content = panelSection.querySelector('[data-zazu-inspector-content]');
                     if (content) content.innerHTML = sourceTab?.innerHTML || '<div class="zazu-inspector-empty">No data recorded.</div>';
-                    panelSection.classList.toggle('hidden', target !== 'catering');
+                    const active = target === 'catering';
+                    panelSection.hidden = !active;
+                    panelSection.classList.toggle('hidden', !active);
+                    panelSection.setAttribute('aria-hidden', active ? 'false' : 'true');
                 });
 
                 returnFocus = button instanceof HTMLElement ? button : null;
@@ -340,7 +343,10 @@
                     item.tabIndex = active ? 0 : -1;
                 });
                 panel.querySelectorAll('[data-zazu-tab-panel]').forEach(section => {
-                    section.classList.toggle('hidden', section.dataset.zazuTabPanel !== target);
+                    const active = section.dataset.zazuTabPanel === target;
+                    section.hidden = !active;
+                    section.classList.toggle('hidden', !active);
+                    section.setAttribute('aria-hidden', active ? 'false' : 'true');
                 });
                 if (moveFocus) tab.focus();
             };
