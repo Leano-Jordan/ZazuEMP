@@ -103,6 +103,14 @@
         && $event instanceof \App\Models\Event
         && $business
         && (int) $event->business_id === (int) $business->id) {
+        $event->loadCount([
+            'preparationItems',
+            'purchaseOrders',
+            'assetAllocations',
+            'costs',
+            'travelCosts',
+        ]);
+
         $eventComponents = $event->requirements()
             ->with(['capability' => fn ($query) => $query->where('business_id', $business->id)])
             ->get()
@@ -110,6 +118,27 @@
             ->filter()
             ->unique()
             ->values();
+    }
+
+    $eventOperationalRecords = collect();
+
+    if ($routeName === 'work.show'
+        && $event instanceof \\App\\Models\\Event
+        && $business
+        && (int) $event->business_id === (int) $business->id) {
+        foreach ([
+            'preparationItems' => 'preparation item',
+            'purchaseOrders' => 'purchase order',
+            'assetAllocations' => 'asset allocation',
+            'costs' => 'recorded cost',
+            'travelCosts' => 'travel cost',
+        ] as $relation => $label) {
+            $count = (int) $event->getAttribute($relation.'_count');
+
+            if ($count > 0) {
+                $eventOperationalRecords->push($count.' '.$label.($count === 1 ? '' : 's'));
+            }
+        }
     }
 
     $steps = $guides[$routeName] ?? [];
@@ -152,6 +181,16 @@
                     @if ($eventComponents->count() > 4)
                         <p class="zazu-helper-copy">{{ $eventComponents->count() - 4 }} more booking components</p>
                     @endif
+                </div>
+            @endif
+            @if ($eventOperationalRecords->isNotEmpty())
+                <div class="zazu-helper-step" data-zazu-helper-event-records="{{ $eventOperationalRecords->count() }}">
+                    <div class="zazu-helper-step-label">Work linked to this booking</div>
+                    <ul class="list-disc pl-5" data-zazu-helper-event-record-list>
+                        @foreach ($eventOperationalRecords as $record)
+                            <li>{{ $record }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
             @if(!empty($attention))
