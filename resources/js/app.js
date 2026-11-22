@@ -675,6 +675,11 @@ function setupZazuHelper() {
         const stepLabel = helper.querySelector('[data-zazu-helper-step-label]');
         const count = helper.querySelector('[data-zazu-helper-count]');
         const guideLink = helper.querySelector('[data-zazu-helper-link]');
+        const recommendation = helper.querySelector('[data-zazu-helper-recommendation]');
+        const recommendationTitle = helper.querySelector('[data-zazu-helper-recommendation-title]');
+        const recommendationCopy = helper.querySelector('[data-zazu-helper-recommendation-copy]');
+        const recommendationLink = helper.querySelector('[data-zazu-helper-recommendation-link]');
+        const connectivity = helper.querySelector('[data-zazu-helper-connectivity]');
         const data = [...helper.querySelectorAll('[data-zazu-helper-step-data]')].map((item) => ({
             label: item.dataset.label || '',
             title: item.dataset.title || '',
@@ -689,6 +694,7 @@ function setupZazuHelper() {
         let index = 0;
         let enabled = safeStorageGet(storageKey) !== 'off';
         let targetTimer = null;
+        let originAvailable = null;
 
         const clearTargetHighlight = () => {
             window.clearTimeout(targetTimer);
@@ -751,6 +757,51 @@ function setupZazuHelper() {
             if (nextButton) nextButton.textContent = index === data.length - 1 ? 'Done' : 'Next';
         };
 
+        const syncRecommendation = () => {
+            if (!recommendation || !recommendationTitle || !recommendationCopy || !recommendationLink) return;
+
+            const source = document.querySelector('[data-zazu-anchor="work.next-action"]');
+            const titleText = source?.querySelector('.zazu-next-action-title')?.textContent?.trim() || '';
+            const copyText = source?.querySelector('.zazu-next-action-copy')?.textContent?.trim() || '';
+            const sourceLink = source?.querySelector('a[href]');
+            let safeHref = '';
+
+            if (sourceLink) {
+                try {
+                    const url = new URL(sourceLink.getAttribute('href'), window.location.href);
+                    if (url.origin === window.location.origin) safeHref = url.href;
+                } catch {
+                    safeHref = '';
+                }
+            }
+
+            const available = originAvailable === true;
+            recommendation.hidden = !available || !titleText || !copyText || !safeHref;
+            if (!recommendation.hidden) {
+                recommendationTitle.textContent = titleText;
+                recommendationCopy.textContent = copyText;
+                recommendationLink.href = safeHref;
+                recommendationLink.textContent = sourceLink.textContent.trim() || 'Open next action';
+            }
+        };
+
+        const syncConnectivity = (available) => {
+            originAvailable = available === true;
+
+            if (connectivity) {
+                connectivity.hidden = originAvailable;
+                connectivity.textContent = originAvailable
+                    ? ''
+                    : 'Connection to Zazu is unavailable. Job recommendations are paused until the server responds. Use only the supported offline workspace meanwhile.';
+            }
+
+            syncRecommendation();
+        };
+
+        window.addEventListener('zazu:origin-availability', (event) => {
+            syncConnectivity(event.detail?.available === true);
+        });
+
         const syncEnabledState = () => {
             helper.dataset.zazuGuideEnabled = enabled ? 'on' : 'off';
             toggleLabel.textContent = enabled ? 'Guide' : 'Guide off';
@@ -772,6 +823,7 @@ function setupZazuHelper() {
             safeStorageSet(seenKey, '1');
             syncEnabledState();
             render(true);
+            syncRecommendation();
             panel.hidden = false;
             toggle.setAttribute('aria-expanded', 'true');
             toggle.setAttribute('aria-label', 'Close Zazu guide');
