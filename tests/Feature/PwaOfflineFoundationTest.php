@@ -87,7 +87,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('Offline workspace is not fully prepared.', $app);
         $this->assertStringNotContainsString("document.querySelectorAll('a[href]')", $app);
         $layout = File::get(resource_path('views/components/app-layout.blade.php'));
-        $offlineScriptPosition = strpos($layout, '<script src='/zazu-offline.js' defer></script>');
+        $offlineScriptPosition = strpos($layout, "<script src='/zazu-offline.js' defer></script>");
         $viteScriptPosition = strpos($layout, "@vite(['resources/css/app.css'");
         $this->assertNotFalse($offlineScriptPosition);
         $this->assertNotFalse($viteScriptPosition);
