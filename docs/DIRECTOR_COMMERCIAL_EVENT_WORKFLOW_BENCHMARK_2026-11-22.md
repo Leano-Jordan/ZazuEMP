@@ -265,7 +265,8 @@ This is a conceptual arrangement. It is not permission to move existing routes o
 - Removed a repeated "Choose the job type" heading and added an explicit "Event type" field legend.
 - Clarified that selected services are persisted as starter requirements.
 - Updated the "What happens next" guidance to explain review of quantities, units and special details.
-- Added a feature test for the new intake order and the persisted starter-requirement behavior.
+- Aligned the Job name label between create and edit forms.
+- Added feature tests for the new intake order, persisted starter-requirement behavior and create/edit naming consistency.
 
 Application changes are intentionally narrow. No navigation destinations, route names, database schema, existing records or commercial rules were changed.
 
