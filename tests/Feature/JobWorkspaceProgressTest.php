@@ -109,3 +109,60 @@ class JobWorkspaceProgressTest extends TestCase
         $this->assertStringContainsString('aria-current="step"', $response->getContent());
     }
 }
+    public function test_job_workspace_keeps_older_outstanding_invoice_visible_when_a_newer_invoice_is_paid(): void
+    {
+        $customer = Customer::create(['name' => 'Multiple Invoice Customer']);
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZU-NEXT-MULTI-001',
+            'name' => 'Multiple Invoice Job',
+            'event_date' => '2026-12-15',
+            'status' => 'confirmed',
+        ]);
+        $event->quotes()->create([
+            'reference' => 'QUO-NEXT-MULTI-001',
+            'status' => 'accepted',
+            'currency' => 'ZAR',
+        ]);
+
+        $olderOutstanding = Invoice::create([
+            'business_id' => $event->business_id,
+            'event_id' => $event->id,
+            'number' => 'INV-NEXT-OLDER-001',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'issued_at' => now()->subDays(2)->toDateString(),
+        ]);
+        $newerPaid = Invoice::create([
+            'business_id' => $event->business_id,
+            'event_id' => $event->id,
+            'number' => 'INV-NEXT-NEWER-001',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '200.00',
+            'tax_total' => '0.00',
+            'total' => '200.00',
+            'issued_at' => now()->toDateString(),
+        ]);
+        Payment::create([
+            'business_id' => $event->business_id,
+            'invoice_id' => $newerPaid->id,
+            'event_id' => $event->id,
+            'type' => 'final',
+            'idempotency_key' => 'job-progress-paid-newer-invoice',
+            'amount' => '200.00',
+            'currency' => 'ZAR',
+            'method' => 'cash',
+            'paid_at' => now()->toDateString(),
+        ]);
+
+        $this->get(route('work.show', $event))
+            ->assertOk()
+            ->assertSee('2 balance due')
+            ->assertSee('Record payment')
+            ->assertSee(route('finance.payments.create', ['invoice_id' => $olderOutstanding->id]), false);
+    }
+
