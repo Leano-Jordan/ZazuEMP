@@ -9,6 +9,7 @@ use App\Models\Quote;
 use App\Services\QuoteService;
 use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class QuoteWorkflowTest extends TestCase
@@ -74,7 +75,7 @@ class QuoteWorkflowTest extends TestCase
 
     public function test_quote_deposit_percent_calculates_from_final_total(): void
     {
-        $customer = \App\Models\Customer::create([
+        $customer = Customer::create([
             'name' => 'Deposit Quote Customer',
         ]);
 
@@ -93,7 +94,7 @@ class QuoteWorkflowTest extends TestCase
             'unit' => 'event',
         ]);
 
-        $quote = app(\App\Services\QuoteService::class)->createFromRequirements(
+        $quote = app(QuoteService::class)->createFromRequirements(
             $event,
             collect([$requirement->load('capability')]),
             [$requirement->id => '1000.00'],
@@ -113,7 +114,7 @@ class QuoteWorkflowTest extends TestCase
     {
         $customer = Customer::create(['name' => 'Invalid Link Customer']);
         $event = Event::create([
-            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
+            'business_id' => app(CurrentBusiness::class)->id(auth()->user()),
             'customer_id' => $customer->id,
             'reference' => 'ZAZ-PUBLIC-002',
             'name' => 'Invalid Link Event',
@@ -136,7 +137,7 @@ class QuoteWorkflowTest extends TestCase
     {
         $customer = Customer::create(['name' => 'Customer Acceptance']);
         $event = Event::create([
-            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
+            'business_id' => app(CurrentBusiness::class)->id(auth()->user()),
             'customer_id' => $customer->id,
             'reference' => 'ZAZ-PUBLIC-003',
             'name' => 'Customer Acceptance Event',
@@ -151,7 +152,7 @@ class QuoteWorkflowTest extends TestCase
             'unit' => 'event',
         ]);
 
-        $quote = app(\App\Services\QuoteService::class)->createFromRequirements(
+        $quote = app(QuoteService::class)->createFromRequirements(
             $event,
             collect([$requirement->load('capability')]),
             [$requirement->id => '2500.00'],
@@ -164,7 +165,7 @@ class QuoteWorkflowTest extends TestCase
         $quote->update(['status' => 'sent']);
         $quote->latestVersion()->update(['status' => 'sent']);
 
-        $viewUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        $viewUrl = URL::temporarySignedRoute(
             'quotes.public',
             now()->addMinutes(10),
             ['quote' => $quote->id]
@@ -177,7 +178,7 @@ class QuoteWorkflowTest extends TestCase
         $view->assertSee('ZAR 2,500.00');
         $view->assertSee('Accept quote');
 
-        $acceptUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        $acceptUrl = URL::temporarySignedRoute(
             'quotes.public.accept',
             now()->addMinutes(10),
             ['quote' => $quote->id]
