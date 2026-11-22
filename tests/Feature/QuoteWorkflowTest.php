@@ -46,6 +46,7 @@ class QuoteWorkflowTest extends TestCase
         $response = $this->post(route('work.quotes.store', $event), [
             'currency' => 'zar',
             'notes' => 'Initial draft',
+            'quantity' => [$requirement->id => '100.00'],
             'unit_price' => [
                 $requirement->id => 25.50,
             ],
@@ -317,6 +318,7 @@ class QuoteWorkflowTest extends TestCase
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
+            'quantity' => [$first->id => '10.00'],
             'unit_price' => [$first->id => '100.00'],
         ]);
 
@@ -365,6 +367,7 @@ class QuoteWorkflowTest extends TestCase
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '50.00'],
             'unit_price' => [$requirement->id => 40],
         ]);
 
@@ -378,6 +381,7 @@ class QuoteWorkflowTest extends TestCase
 
         $response = $this->put(route('quotes.versions.update', [$quote, $version]), [
             'notes' => 'Updated revision',
+            'quantity' => [$requirement->id => '100.00'],
             'unit_price' => [$requirement->id => 50],
         ]);
 
@@ -416,6 +420,7 @@ class QuoteWorkflowTest extends TestCase
         $response = $this->from(route('work.quotes.create', $event))
             ->post(route('work.quotes.store', $event), [
                 'currency' => 'ZAR',
+                'quantity' => [$requirement->id => '10.00'],
                 'unit_price' => [$requirement->id => '12.345'],
             ]);
 
@@ -446,6 +451,7 @@ class QuoteWorkflowTest extends TestCase
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '25.00'],
             'unit_price' => [$requirement->id => 40],
         ]);
 
