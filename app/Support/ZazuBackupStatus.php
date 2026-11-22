@@ -122,7 +122,7 @@ final class ZazuBackupStatus
             'secondary_status' => $verified ? 'healthy' : 'attention',
             'secondary_at' => $lastSuccessfulAt,
             'secondary_age_hours' => $ageHours,
-            'secondary_message' => $this->secondaryMessage($state['status'] ?? null, $verified, $ageHours),
+            'secondary_message' => $this->secondaryMessage($state, $verified, $ageHours),
         ];
     }
 
@@ -143,7 +143,49 @@ final class ZazuBackupStatus
     {
         return ($state['status'] ?? null) === 'verified'
             && $ageHours !== null
-            && $ageHours <= self::MAX_AGE_HOURS;
+            && $ageHours <= self::MAX_AGE_HOURS
+            && $this->secondaryArchiveIntegrity($state) === 'present';
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     */
+    private function secondaryArchiveIntegrity(array $state): string
+    {
+        $path = $state['secondary_archive_path'] ?? null;
+        $sha256 = $state['secondary_archive_sha256'] ?? null;
+        $sizeBytes = $state['secondary_archive_size_bytes'] ?? null;
+        $modifiedUnix = $state['secondary_archive_modified_unix'] ?? null;
+
+        if (! is_string($path) || $path === ''
+            || (! str_starts_with($path, DIRECTORY_SEPARATOR)
+                && preg_match('/^[A-Za-z]:[\\\\\\/]/', $path) !== 1
+                && ! str_starts_with($path, '\\\\'))
+            || ! is_string($sha256)
+            || preg_match('/^[a-f0-9]{64}$/i', $sha256) !== 1
+            || ! is_numeric($sizeBytes)
+            || (int) $sizeBytes < 1
+            || ! is_numeric($modifiedUnix)
+            || (int) $modifiedUnix < 1) {
+            return 'invalid';
+        }
+
+        clearstatcache(true, $path);
+        if (! is_file($path) || is_link($path)) {
+            return 'missing';
+        }
+
+        $actualSize = @filesize($path);
+        $actualModifiedUnix = @filemtime($path);
+        if ($actualSize === false || $actualModifiedUnix === false) {
+            return 'missing';
+        }
+
+        if ((int) $actualSize !== (int) $sizeBytes || (int) $actualModifiedUnix !== (int) $modifiedUnix) {
+            return 'changed';
+        }
+
+        return 'present';
     }
 
     /**
@@ -180,16 +222,24 @@ final class ZazuBackupStatus
         }
     }
 
-    private function secondaryMessage(?string $state, bool $verified, ?int $ageHours): string
+    private function secondaryMessage(array $state, bool $verified, ?int $ageHours): string
     {
         if ($verified) {
-            return 'An independent backup copy was verified '.$ageHours.' hours ago.';
+            return 'An independent backup copy is present and its recorded size and timestamp match; SHA-256 was verified when copied '.$ageHours.' hours ago.';
         }
 
-        return match ($state) {
+        if (($state['status'] ?? null) === 'verified') {
+            return match ($this->secondaryArchiveIntegrity($state)) {
+                'missing' => 'The last verified independent backup archive is missing or its drive is unavailable.',
+                'changed' => 'The last verified independent backup archive changed after verification. Run a new backup.',
+                'invalid' => 'The last verified independent backup archive has no valid integrity record. Run a new backup.',
+                default => 'The last independent backup copy is overdue. Check that its destination is available.',
+            };
+        }
+
+        return match ($state['status'] ?? null) {
             'failed' => 'The independent backup copy failed on the last scheduled run. Check the USB drive or synced-folder destination.',
             'not_configured' => 'No independent backup destination is configured. The only archive copy remains on this PC.',
-            'verified' => 'The last independent backup copy is overdue. Check that its destination is available.',
             default => 'No independent backup destination is configured; no independent backup copy has been verified on this installation.',
         };
     }
