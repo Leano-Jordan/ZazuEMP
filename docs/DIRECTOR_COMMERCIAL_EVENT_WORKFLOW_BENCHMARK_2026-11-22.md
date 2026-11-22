@@ -177,6 +177,9 @@ Because quote snapshots and stale-quote logic exist, any correction workflow mus
 
 **Disposition:** high-priority workflow defect to resolve after tracing quote status, offline mutation support, audit expectations and lifecycle constraints. Do not bolt on an unguarded delete button.
 
+
+**Current-main correction (2026-11-22):** this paragraph records the initial research snapshot and is now superseded by the implemented correction workflow. Current `RequirementController`, `routes/web.php`, `resources/views/requirements/index.blade.php` and `resources/views/requirements/create.blade.php` expose guarded edit/update/remove controls. Transactions lock the job before mutation; accepted quotes lock scope; the final quoted requirement cannot be removed; prior quote lines are detached from the live requirement while retaining their historical description/source snapshot. `tests/Feature/WorkPlanningWorkflowTest.php` covers the online correction/removal and quote-revision behavior. Treat this requirement-correction gate as implemented at source/test level, subject to exact-head CI and owner walkthrough—not as an outstanding missing feature.
+
 **D. The visible Job progress model remains too coarse.**
 
 The Job page's five stages are Job → Services → Quote → Prepare → Complete. It does not clearly show the commercial decision, invoice/payment state, procurement/receiving, actual cost close-out or conditional work. Its Next action selection is still narrow after quote creation, as documented in the earlier Workflow Discovery Review.
