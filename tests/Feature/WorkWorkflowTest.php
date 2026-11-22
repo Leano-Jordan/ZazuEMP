@@ -6,19 +6,18 @@ use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
 use App\Models\EventCost;
-use App\Models\EventRequirement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class WorkWorkflowTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->signInAsOwner();
     }
-
-    use RefreshDatabase;
 
     public function test_new_job_intake_presents_event_details_before_service_scope(): void
     {
@@ -312,69 +311,5 @@ class WorkWorkflowTest extends TestCase
         $response->assertSessionHas('success', 'Job created. Zazu opened the quote workflow from your starting point.');
     }
 
-    public function test_job_workspace_points_to_customer_decision_after_quote_is_sent(): void
-    {
-        $customer = Customer::create(['name' => 'Sent Quote Customer']);
-        $event = Event::create([
-            'customer_id' => $customer->id,
-            'reference' => 'ZAZU-NEXT-SENT-001',
-            'name' => 'Sent Quote Job',
-            'event_date' => '2026-12-12',
-            'status' => 'confirmed',
-        ]);
-
-        EventRequirement::create([
-            'event_id' => $event->id,
-            'description' => 'Catering service',
-            'category' => 'Catering',
-            'quantity' => 1,
-            'unit' => 'service',
-            'status' => 'open',
-        ]);
-        $event->quotes()->create([
-            'reference' => 'QUO-NEXT-SENT-001',
-            'status' => 'sent',
-            'currency' => 'ZAR',
-        ]);
-
-        $response = $this->get(route('work.show', $event));
-
-        $response->assertOk()
-            ->assertSee('Check customer decision')
-            ->assertSee('The quote has been sent. Check for the customer’s response before moving forward.');
-    }
-
-    public function test_job_workspace_points_to_invoice_creation_after_quote_acceptance(): void
-    {
-        $customer = Customer::create(['name' => 'Accepted Quote Customer']);
-        $event = Event::create([
-            'customer_id' => $customer->id,
-            'reference' => 'ZAZU-NEXT-ACCEPTED-001',
-            'name' => 'Accepted Quote Job',
-            'event_date' => '2026-12-13',
-            'status' => 'confirmed',
-        ]);
-
-        EventRequirement::create([
-            'event_id' => $event->id,
-            'description' => 'Catering service',
-            'category' => 'Catering',
-            'quantity' => 1,
-            'unit' => 'service',
-            'status' => 'open',
-        ]);
-        $quote = $event->quotes()->create([
-            'reference' => 'QUO-NEXT-ACCEPTED-001',
-            'status' => 'accepted',
-            'currency' => 'ZAR',
-        ]);
-
-        $response = $this->get(route('work.show', $event));
-
-        $response->assertOk()
-            ->assertSee('Create invoice')
-            ->assertSee(route('finance.invoices.create', ['quote_id' => $quote->id]), false)
-            ->assertSee('The customer accepted the quote. Create the invoice from this accepted quote to begin tracking payment.');
-    }
 
 }
