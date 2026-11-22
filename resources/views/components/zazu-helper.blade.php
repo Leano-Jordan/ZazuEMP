@@ -9,7 +9,7 @@
     $attention = array_slice($attention, 0, $level === 'basic' ? 2 : ($level === 'intermediate' ? 3 : 4));
     $guides = [
         'dashboard' => [
-            ['label' => 'Start', 'title' => 'Define what your business offers', 'copy' => 'Services and products become reusable building blocks for jobs, requirements and quotes.', 'href' => route('capabilities.index'), 'link' => 'Open Services'],
+            ['label' => 'Start', 'title' => 'Define what your business offers', 'copy' => 'Services and products become reusable building blocks for jobs, requirements and quotes.', 'href' => route('capabilities.index'), 'link' => 'Open Services', 'target' => 'dashboard.overview'],
             ['label' => 'Next', 'title' => 'Create the job', 'copy' => 'The Job is the operational home for the customer, requirements, quotes, preparation and costs.', 'href' => route('work.index'), 'link' => 'Open Jobs'],
             ['label' => 'Then', 'title' => 'Follow the job through execution', 'copy' => 'Move from accepted quote to requirements, purchasing, inventory, preparation and finance without losing the thread.'],
         ],
