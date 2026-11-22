@@ -108,7 +108,7 @@ class JobWorkspaceProgressTest extends TestCase
             ->assertSee('Add services');
         $this->assertStringContainsString('aria-current="step"', $response->getContent());
     }
-}
+
     public function test_job_workspace_keeps_older_outstanding_invoice_visible_when_a_newer_invoice_is_paid(): void
     {
         $customer = Customer::create(['name' => 'Multiple Invoice Customer']);
@@ -165,4 +165,4 @@ class JobWorkspaceProgressTest extends TestCase
             ->assertSee('Record payment')
             ->assertSee(route('finance.payments.create', ['invoice_id' => $olderOutstanding->id]), false);
     }
-
+}
