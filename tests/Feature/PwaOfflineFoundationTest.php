@@ -121,7 +121,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('const timeout = setTimeout(() => controller.abort(), timeoutMs);', $worker);
         $this->assertStringContainsString('async function fetchWithTimeout(request, timeoutMs = 4000)', $worker);
         $this->assertStringContainsString('fetchWithTimeout(request)', $worker);
-        $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
+        $this->assertStringContainsString('OFFLINE_SHELL,', $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
         $this->assertMatchesRegularExpression("/const CACHE_NAME = 'zazu-static-v[0-9]+';/", $worker);
         $this->assertStringContainsString('await cache.put(request, response.clone());', $worker);
@@ -136,7 +136,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('caches.match(request)', $worker);
         $this->assertStringNotContainsString('cache.put(request, copy)', $worker);
         $this->assertStringContainsString("event.data?.type === 'clear-user'", $worker);
-        $this->assertStringContainsString("async function clearActiveContext()", $worker);
+        $this->assertStringContainsString('async function clearActiveContext()', $worker);
         $this->assertStringContainsString('let activeUserGeneration = 0;', $worker);
         $this->assertStringContainsString('requestGeneration !== activeUserGeneration', $worker);
         $this->assertStringContainsString("url.pathname === '/logout'", $worker);
@@ -152,9 +152,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('async function loadActiveContext(expectedGeneration = activeUserGeneration)', $worker);
         $this->assertStringContainsString('await loadActiveContext(requestGeneration);', $worker);
         $this->assertStringContainsString('if (expectedGeneration !== activeUserGeneration) return null;', $worker);
-        $this->assertStringContainsString("activePrimeController?.abort()", $worker);
-        $this->assertStringContainsString("const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;", $worker);
-        $this->assertStringNotContainsString("return cachedPage || caches.match(OFFLINE_SHELL);", $worker);
+        $this->assertStringContainsString('activePrimeController?.abort()', $worker);
+        $this->assertStringContainsString('const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;', $worker);
+        $this->assertStringNotContainsString('return cachedPage || caches.match(OFFLINE_SHELL);', $worker);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages'", $worker);
         $this->assertStringContainsString('const MAX_PRIME_ROUTES = 100;', $worker);
         $this->assertStringContainsString('const PRIME_CONCURRENCY = 3;', $worker);
@@ -181,7 +181,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('Response.redirect(destination.href, 302)', $worker);
         $this->assertStringContainsString('function shouldPreferOfflineShell(request, pathname)', $worker);
         $this->assertStringContainsString("'/finance/invoices/create'", $worker);
-        $this->assertStringContainsString("|| /^\\/work\\/\\d+$/.test(pathname)", $worker);
+        $this->assertStringContainsString('|| /^\\/work\\/\\d+$/.test(pathname)', $worker);
         $this->assertSame(3, substr_count($worker, 'cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname))'));
         $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v61\';', $worker);
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
@@ -191,7 +191,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('quotes.index')", $dashboard);
         $this->assertStringContainsString("route('inventory.index')", $dashboard);
         $this->assertStringContainsString("route('finance.index')", $dashboard);
-        $this->assertStringContainsString("app(\\App\\Support\\PermissionService::class)", $dashboard);
+        $this->assertStringContainsString('app(\\App\\Support\\PermissionService::class)', $dashboard);
         $this->assertStringContainsString("->allows('customers.view')", $dashboard);
         $this->assertStringContainsString("->allows('work.view')", $dashboard);
         $this->assertStringContainsString("->allows('quotes.view')", $dashboard);
@@ -265,11 +265,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("entity === 'purchase_receipt'", $app);
         $this->assertStringContainsString("entity === 'asset_allocation'", $app);
         $this->assertStringContainsString("const entitiesRequiringName = ['customer', 'job', 'supplier', 'inventory_item', 'asset', 'service'];", $app);
-        $this->assertStringContainsString("invoice.payments = invoice.payments || [];", $app);
-        $this->assertStringContainsString("const remaining = toHundredths(item.quantity) - toHundredths(item.received_quantity);", $app);
-        $this->assertStringContainsString("if (incoming > remaining)", $app);
-        $this->assertStringContainsString("const sameCapability = capabilityId === null", $app);
-        $this->assertStringContainsString("inventoryItem.on_hand = Number(((onHandHundredths + quantityHundredths) / 100).toFixed(2));", $app);
+        $this->assertStringContainsString('invoice.payments = invoice.payments || [];', $app);
+        $this->assertStringContainsString('const remaining = toHundredths(item.quantity) - toHundredths(item.received_quantity);', $app);
+        $this->assertStringContainsString('if (incoming > remaining)', $app);
+        $this->assertStringContainsString('const sameCapability = capabilityId === null', $app);
+        $this->assertStringContainsString('inventoryItem.on_hand = Number(((onHandHundredths + quantityHundredths) / 100).toFixed(2));', $app);
         $this->assertStringContainsString("entity === 'purchase_receipt'", $app);
         $this->assertStringContainsString('Illuminate\\Support\\Str::uuid()', $purchaseShow);
 
@@ -278,8 +278,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('data-zazu-offline-entity="inventory_movement"', $inventory);
         $this->assertStringContainsString("entity === 'service'", $app);
         $this->assertStringContainsString("entity === 'inventory_movement'", $app);
-        $this->assertStringContainsString("capability_type", File::get(app_path('Support/Offline/OfflineDomainMutationHandler.php')));
-        $this->assertStringContainsString("pricing_basis", File::get(app_path('Support/Offline/OfflineDomainMutationHandler.php')));
+        $this->assertStringContainsString('capability_type', File::get(app_path('Support/Offline/OfflineDomainMutationHandler.php')));
+        $this->assertStringContainsString('pricing_basis', File::get(app_path('Support/Offline/OfflineDomainMutationHandler.php')));
     }
 
     public function test_shared_zazu_local_client_is_real_application_infrastructure_not_a_second_workspace(): void
@@ -288,10 +288,10 @@ class PwaOfflineFoundationTest extends TestCase
         $client = File::get(public_path('zazu-offline.js'));
 
         $this->assertStringContainsString("const LEGACY_DB_NAME = 'zazu-client';", $client);
-        $this->assertStringContainsString("const DB_NAME = ACTIVE_BUSINESS_ID > 0", $client);
+        $this->assertStringContainsString('const DB_NAME = ACTIVE_BUSINESS_ID > 0', $client);
         $this->assertStringContainsString('async function migrateLegacyWorkspace(targetDb)', $client);
-        $this->assertStringContainsString("window.ZazuOffline =", $client);
-        $this->assertStringContainsString("async function pair(pairingCode)", $client);
+        $this->assertStringContainsString('window.ZazuOffline =', $client);
+        $this->assertStringContainsString('async function pair(pairingCode)', $client);
         $this->assertStringContainsString('async function assessLogout()', $client);
         $this->assertStringContainsString('async function clearLocalSession()', $client);
         $this->assertStringContainsString("'zazu-phone-attachments-business-' + ACTIVE_BUSINESS_ID", $client);
@@ -338,14 +338,14 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('let activeSyncController = null;', $client);
         $this->assertStringContainsString('activeSyncController?.abort();', $client);
         $this->assertStringContainsString('sessionCleared || !state?.sync?.token', $client);
-        $this->assertStringContainsString("tx.objectStore(QUEUE).clear();", $client);
+        $this->assertStringContainsString('tx.objectStore(QUEUE).clear();', $client);
         $this->assertStringContainsString("new BroadcastChannel('zazu-offline-session-' + ACTIVE_BUSINESS_ID)", $client);
         $this->assertStringContainsString('sessionCleared', $client);
         $this->assertStringContainsString('requestToken !== (state?.sync?.token || null)', $client);
         $this->assertStringContainsString('activeSyncController?.abort();', $client);
-        $this->assertStringContainsString("async function sync()", $client);
-        $this->assertStringContainsString("/api/sync/push", $client);
-        $this->assertStringContainsString("/api/sync/pull?stream=business&limit=100", $client);
+        $this->assertStringContainsString('async function sync()', $client);
+        $this->assertStringContainsString('/api/sync/push', $client);
+        $this->assertStringContainsString('/api/sync/pull?stream=business&limit=100', $client);
         $this->assertStringContainsString("deliveryQuery.append('delivery_sequences[]', String(sequence));", $client);
         $this->assertStringContainsString("'/api/sync/bootstrap?' + deliveryQueryString", $client);
         $syncController = File::get(app_path('Http/Controllers/SyncController.php'));
@@ -356,20 +356,20 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('where(\'destination_device_id\', $device->id)', $deliveryTargetResolver);
         $this->assertStringContainsString('where(\'business_id\', $device->business_id)', $deliveryTargetResolver);
         $this->assertStringContainsString('$this->applyBoundedWorkingSet($query, Supplier::class, $business, $includedIds', $bootstrapBuilder);
-        $this->assertStringContainsString("/api/sync/acknowledge", $client);
+        $this->assertStringContainsString('/api/sync/acknowledge', $client);
         $this->assertStringContainsString("status: 'failed'", $client);
         $this->assertStringContainsString('const remainingMutations = await pending();', $client);
         $this->assertStringContainsString('sameRecordStillPending', $client);
         $this->assertStringContainsString('if (record?.pending_sync === true) record.pending_sync = false;', $client);
         $this->assertStringContainsString('state.local_dirty = remainingMutations.length > 0;', $client);
         $this->assertStringContainsString('remote.conflict_id', $client);
-        $this->assertStringContainsString("crypto.randomUUID()", $client);
-        $this->assertStringContainsString("Local offline state write was aborted.", $client);
-        $this->assertStringContainsString("Offline queue acknowledgement was aborted.", $client);
+        $this->assertStringContainsString('crypto.randomUUID()', $client);
+        $this->assertStringContainsString('Local offline state write was aborted.', $client);
+        $this->assertStringContainsString('Offline queue acknowledgement was aborted.', $client);
         $app = File::get(resource_path('js/app.js'));
-        $this->assertStringContainsString("data-zazu-offline-save-error", $app);
-        $this->assertStringContainsString("Check the offline queue before trying again.", $app);
-        $this->assertStringContainsString("delete form.dataset.zazuSubmitting;", $app);
+        $this->assertStringContainsString('data-zazu-offline-save-error', $app);
+        $this->assertStringContainsString('Check the offline queue before trying again.', $app);
+        $this->assertStringContainsString('delete form.dataset.zazuSubmitting;', $app);
     }
 
     public function test_phone_pairing_is_discoverable_and_uses_the_eight_digit_contract(): void
@@ -388,12 +388,12 @@ class PwaOfflineFoundationTest extends TestCase
         $client = File::get(public_path('zazu-offline.js'));
         $worker = File::get(public_path('sw.js'));
 
-        $this->assertStringContainsString("if (!/^\\d{8}$/.test(normalizedCode))", $client);
-        $this->assertStringContainsString("pairing_code: normalizedCode", $client);
-        $this->assertStringNotContainsString("slice(0, 6)", $client);
-        $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
+        $this->assertStringContainsString('if (!/^\\d{8}$/.test(normalizedCode))', $client);
+        $this->assertStringContainsString('pairing_code: normalizedCode', $client);
+        $this->assertStringNotContainsString('slice(0, 6)', $client);
+        $this->assertStringContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString("zazu-static-v61", $worker);
+        $this->assertStringContainsString('zazu-static-v61', $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
@@ -420,5 +420,4 @@ class PwaOfflineFoundationTest extends TestCase
         $response = $this->get('/offline');
         $response->assertRedirect('/dashboard');
     }
-
 }
