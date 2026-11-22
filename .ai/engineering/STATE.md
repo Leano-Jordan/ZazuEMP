@@ -20,7 +20,8 @@ Reviewed official workflow material from Caterease, Total Party Planner, Plannin
 - Removed duplicate job-type heading and added an explicit Event type legend.
 - Clarified that selected services become starter requirements and must be reviewed for quantity, unit and special details before quoting.
 - Clarified the next-step panel and service review step labels.
-- Added `WorkWorkflowTest` coverage for intake order and starter requirement persistence.
+- Aligned the Job name label between create and edit forms.
+- Added `WorkWorkflowTest` coverage for intake order, starter requirement persistence and create/edit naming.
 
 Application behavior/data model and existing routes were not changed. The change is a narrow presentation/copy correction. Exact-head tests and CI are pending verification; do not claim a pass until the run completes.
 
