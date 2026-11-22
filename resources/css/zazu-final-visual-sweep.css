@@ -6901,3 +6901,75 @@ body.zazu-mobile-menu-open .zazu-helper {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+
+/* Landing image workshop: position-specific crops and direct-pick affordance. */
+.zazu-landing-slot { min-width: 0; }
+.zazu-admin-image-preview {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--zazu-border);
+    border-radius: 12px;
+    background: var(--zazu-surface-2);
+    min-height: 0;
+}
+.zazu-admin-image-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+    object-position: center;
+}
+.zazu-admin-image-preview-hero_image { aspect-ratio: 16 / 9; }
+.zazu-admin-image-preview-operations_image,
+.zazu-admin-image-preview-resources_image,
+.zazu-admin-image-preview-control_image,
+.zazu-admin-image-preview-venue_image,
+.zazu-admin-image-preview-decor_image { aspect-ratio: 4 / 3; }
+.zazu-admin-image-preview > span {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 8px 10px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    background: linear-gradient(transparent, rgba(10, 25, 38, .78));
+    pointer-events: none;
+}
+.zazu-admin-image-preview.is-empty,
+.zazu-admin-image-preview.is-broken {
+    display: grid;
+    place-items: center;
+    min-height: 150px;
+    border-style: dashed;
+}
+.zazu-admin-image-preview.is-empty::before,
+.zazu-admin-image-preview.is-broken::before {
+    content: "Choose a valid image to preview this position";
+    padding: 18px;
+    color: var(--zazu-muted);
+    text-align: center;
+    font-size: 12px;
+}
+.zazu-admin-image-preview.is-broken img { display: none; }
+.zazu-landing-library-card[data-zazu-library-image] {
+    cursor: pointer;
+    outline: 0;
+    border: 1px solid var(--zazu-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.zazu-landing-library-card[data-zazu-library-image]:hover,
+.zazu-landing-library-card[data-zazu-library-image]:focus-visible {
+    border-color: var(--zazu-primary);
+    box-shadow: 0 0 0 3px var(--zazu-primary-soft);
+    transform: translateY(-2px);
+}
+.zazu-landing-library-card[data-zazu-library-image] img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
