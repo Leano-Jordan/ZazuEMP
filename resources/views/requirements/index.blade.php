@@ -4,8 +4,8 @@
     <section class="zazu-command-band zazu-requirements-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
-            <h2 class="zazu-command-title">Services for this job</h2>
-            <p class="zazu-command-copy">Build the concrete services, rentals and deliverables that the quote will use.</p>
+            <h2 class="zazu-command-title">Products and services for this job</h2>
+            <p class="zazu-command-copy">Review and correct the products, services, quantities and details that feed the quote. Earlier quote versions stay unchanged.</p>
         </div>
         <div class="zazu-command-meta"><div class="zazu-command-meta-label">Records</div><div class="zazu-command-meta-value">{{ $requirements->count() }}</div></div>
     </section>
@@ -38,6 +38,14 @@
                 </div>
                 <div class="zazu-list-side"><div class="zazu-side-primary">{{ number_format((float) $requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }}</div></div>
                 <div class="zazu-list-side"><div class="zazu-side-primary">{{ ucfirst($requirement->status) }}</div></div>
+                <div class="zazu-list-side flex flex-wrap items-center justify-end gap-2">
+                    <a href="{{ route('work.requirements.edit', [$event, $requirement]) }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm">Edit</a>
+                    <form method="POST" action="{{ route('work.requirements.destroy', [$event, $requirement]) }}" onsubmit="return confirm('Remove this requirement? Earlier quote versions will remain as saved snapshots.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="zazu-btn zazu-btn-ghost zazu-btn-sm">Remove</button>
+                    </form>
+                </div>
             </div>
         @empty
             <div class="zazu-empty">
