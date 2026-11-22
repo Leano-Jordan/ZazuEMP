@@ -96,6 +96,22 @@
         $guides[$routeName][2]['copy'] = $focusGuidance[$nicheFocus][$routeName];
     }
 
+    $event = request()->route('event');
+    $eventComponents = collect();
+
+    if ($routeName === 'work.show'
+        && $event instanceof \App\Models\Event
+        && $business
+        && (int) $event->business_id === (int) $business->id) {
+        $eventComponents = $event->requirements()
+            ->with('capability')
+            ->get()
+            ->map(fn ($requirement) => trim((string) ($requirement->description ?: $requirement->capability?->name ?: $requirement->category)))
+            ->filter()
+            ->unique()
+            ->values();
+    }
+
     $steps = $guides[$routeName] ?? [];
 @endphp
 
@@ -125,6 +141,19 @@
                 <a href="#" class="zazu-helper-link" data-zazu-helper-recommendation-link></a>
             </div>
             <p class="zazu-helper-copy" data-zazu-helper-connectivity role="status" aria-live="polite" hidden></p>
+            @if ($eventComponents->isNotEmpty())
+                <div class="zazu-helper-step" data-zazu-helper-event-components="{{ $eventComponents->count() }}">
+                    <div class="zazu-helper-step-label">This booking includes</div>
+                    <ul class="list-disc pl-5" data-zazu-helper-event-component-list>
+                        @foreach ($eventComponents->take(4) as $component)
+                            <li>{{ $component }}</li>
+                        @endforeach
+                    </ul>
+                    @if ($eventComponents->count() > 4)
+                        <p class="zazu-helper-copy">{{ $eventComponents->count() - 4 }} more booking components</p>
+                    @endif
+                </div>
+            @endif
             @if(!empty($attention))
                 <div class="zazu-helper-step">
                     <div class="zazu-helper-step-label">Needs attention</div>
