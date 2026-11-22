@@ -175,3 +175,29 @@ The current implementation now combines the member's selected primary focus with
 Attention ordering is now explicit: overdue preparation (priority 10), open purchase orders (20), draft Jobs (30), then optional owner setup reminders (40). Members without the corresponding permission do not receive those records as Helper attention. The exact priority order and multi-capability/event-specific focus have feature tests.
 
 **Commercial references:** [Intercom Fin Guidance best practices](https://www.intercom.com/help/en/articles/10560969-fin-guidance-best-practices), [Provide Fin AI Agent with specific guidance](https://www.intercom.com/help/en/articles/10210126-provide-fin-ai-agent-with-specific-guidance), and [Use Fin previews](https://www.intercom.com/help/en/articles/12599471-use-fin-previews). These are product-design references only; Zazu's workflow state and permissions remain authoritative.
+
+
+## Director source-to-surface map — 2026-11-23
+
+This map is based on the current implementation, not an assumed architecture:
+
+| Surface | Existing authority | Current behaviour / gap |
+|---|---|---|
+| Business focus | Membership pivot `primary_niche`; `NicheFocus` | One explicit primary focus; `activeFor()` supplements guidance from active catalogue categories. This is not yet a full capability selection model. |
+| Catalogue | Business-scoped `BusinessCapability` records (`category`, `capability_type`, `is_active`) | The catalogue is the strongest existing business-specific data source. Rental items were separated correctly, but the second stream was hard-coded to catering/food/per-person categories, excluding valid DJ, decor, photography and general service capabilities. |
+| Onboarding | `OnboardingController::storeExperience()` | Saves one primary niche and experience tier. It does not yet offer multi-capability composition. |
+| Navigation | `resources/views/components/app-layout.blade.php` plus role permissions | Navigation is permission-driven and largely static; it does not yet adapt to the business catalogue. Do not use capability visibility as an authorization boundary. |
+| Dashboard | `DashboardController::workspaceToolsFor()` and `NicheFocus` | Tool visibility follows permissions/tier; Helper focus is adapted, but dashboard module composition is not capability-driven. |
+| Event scope | Business-owned `EventRequirement` records | The actual selected components are already available as the event-specific source of truth and should determine downstream relevance. |
+| Helper | `NicheFocus`, `ZazuHelperService`, current Event requirements and linked operational records | Business and event context are partially reflected; further recommendations must remain grounded in permitted linked records. |
+| Offline | Business capability aggregate revision/sync support and offline bootstrap | Capability records participate in synchronization, but parity of future multi-capability configuration and resulting UI state still needs explicit proof. |
+
+### First implementation slice
+
+The catalogue's second stream now includes all non-rental capability types (`service`, `package`, `product`, `other`) rather than only hospitality/catering categories. Its label and pricing display are business-neutral. Empty streams are not rendered, so a tent/chair-only business does not see an empty catering tab, while a DJ/decor/photography business can see its own service and product catalogue entries. Rental capabilities remain in their own asset-linked stream.
+
+This is an incremental catalogue correction, not completion of adaptive workspace behaviour. The authoritative capability records remain unchanged; no records are created, deleted or reclassified by this presentation change.
+
+### Next vertical slice
+
+Use the existing active `BusinessCapability` catalogue as the read model for an owner-facing capability summary in business settings/onboarding, then test the effect of adding/deactivating a capability on catalogue discoverability and Helper guidance. Do not add a parallel preset table or mutate historical EventRequirement/quote snapshots. After that, derive only low-risk navigation and dashboard progressive disclosure from the same active capability set, preserving permission middleware and cross-business essentials.
