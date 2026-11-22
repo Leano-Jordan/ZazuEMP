@@ -105,6 +105,7 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('120.00', (string) $firstItem->quantity);
         $this->assertSame('10200.00', (string) $firstVersion->total);
 
+        $requirement->update(['quantity' => '125.00']);
         $this->post(route('quotes.versions.store', $quote))->assertRedirect();
         $revision = $quote->refresh()->latestVersion()->firstOrFail();
 
