@@ -43,6 +43,9 @@ class QuoteQuantityReviewTest extends TestCase
         $this->get(route('work.quotes.create', $event))
             ->assertOk()
             ->assertSee('name="quantity[' . $requirement->id . ']"', false)
+            ->assertSee('Quantity to quote')
+            ->assertSee('Every line needs your attention.')
+            ->assertSee('Do not leave this at one unless one is genuinely correct.')
             ->assertSee('data-quote-line-total', false);
 
         $this->post(route('work.quotes.store', $event), [
