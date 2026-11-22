@@ -1,3 +1,18 @@
+## Director security review — offline session and trusted-device transitions — 2026-11-22
+
+**Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
+
+- Laravel: **679 passed / 1 skipped / 4,665 assertions**.
+- Offline browser: **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**.
+- PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- Audited expiry/re-authentication, logout failure, owner/manager transition, business switching, late bootstrap, re-pair token replacement, in-flight push/attachment responses, owner revocation and token expiry. Existing tests and generation/token guards cover these boundaries; **no new confirmed defect**.
+- DEC-019 intentionally retains business-scoped trusted-device credentials across ordinary web-account logout. This is not per-staff offline isolation; owner revocation is the device-removal control.
+- Evidence maturity remains **77/100**. V1 remains **NOT READY**; automated browser tests do not replace physical Android or lost-device acceptance.
+
+**Next engineering target:** recovery integrity review — business archive export/import versus installation-wide backup/restore, including trusted-device safeguards and private media.
+
+---
+
 ## Director acceptance checkpoint — offline expense identity isolation — 2026-11-22
 
 **Source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02) on `main`. Exact-head Laravel + browser + PostgreSQL: [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883). Zazu Quality: [44987764894](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764894). PHPMD: [44987764850](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764850). Director Health: [44987764840](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764840). Push-on-main: [44987765335](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987765335).
