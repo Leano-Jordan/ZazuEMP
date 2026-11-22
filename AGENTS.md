@@ -11,6 +11,13 @@
 
 Read `memory.md` first. Its opening **Owner V1 shipping mandate** is a binding instruction: ship a practical, dependable V1 for first businesses; close acceptance-passed gates at 5/5; avoid perfectionism, speculative blockers, scope creep and repeated engineering loops; offline V1 engineering is explicitly resumed; work across local persistence, service worker, attachments, sync and PWA installation is authorized where it closes agreed V1 gaps. This is the operating objective for every session.
 
+## Known incident disposition — DB-001
+
+- DB-001 is a historical, unreproduced, non-critical test-time anomaly, not a current defect or V1 blocker.
+- The Founder clarifies it occurred while testing offline event creation and a calendar-related task. It has not recurred after subsequent offline-architecture work.
+- Do not pursue it, request diagnostic captures, or ask the Founder to run the read-only DB-001 scripts. Reopen only after reproducible recurrence on current `main` or materially new evidence.
+- Do not claim a root cause or fix. Keep the separate installation backup/restore acceptance gate independent.
+
 ## Canonical control contract
 
 Then read and obey, in order:
