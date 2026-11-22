@@ -1,3 +1,24 @@
+## Director execution checkpoint — 2026-11-22 — offline cache regression verified
+
+**Exact source/test HEAD:** `605e1d69f33fc295138813c732f20b5c2c07234d` on canonical `main`.
+
+- Corrected the offline-readiness contract regression after the service worker changed from trusting the in-memory priming list to verifying required routes in the authenticated dynamic cache.
+- Exact-head Laravel workflow [45057702836](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45057702836): **PASS**, including service-worker cache/session contract checks, full Laravel tests, coverage report, desktop/mobile offline browser acceptance, simulated host outage, phone-local attachment/reconnect and public/auth accessibility acceptance.
+- Exact-head Zazu Quality [45057702839](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45057702839): **PASS**.
+- Exact-head PHPMD [45057702867](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45057702867): **PASS**.
+- Exact-head Director Health [45057702895](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45057702895): **PASS**.
+- Exact-head CodeQL push analysis [45057702987](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45057702987): **PASS**.
+- SonarCloud [45057703012](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45057703012): **SKIPPED**, not passed.
+- The stale offline-readiness test assertion was corrected in `605e1d69`; the exact-head Laravel workflow now passes. The earlier Laravel failure on `bf7683a` is superseded.
+- This closes the current automated cache-readiness regression. It does **not** prove that the previously reported phone warning is absent on the installed device, nor does it close physical Android cold-launch/restart/reconnect acceptance.
+- Recovery review confirms the codebase has separate business-scoped `.zazu` export/import and installation-wide operator backup/restore. Business archive tests cover allowlisted data, remapped IDs, private media, malformed/undeclared ZIP entries, trusted-device rejection and rollback after a mid-file-write failure. PostgreSQL and Windows recovery CI are supporting evidence only.
+- **Still owner-operated:** independent off-disk backup and controlled full installation restore on the intended PC; physical Android offline launch/restart/reconnect and phone attachment; live populated-business quote-to-payment-to-cost/profit reconciliation; POPIA operational sign-off and ZAZU name clearance.
+- **Release decision:** V1 remains **NOT READY**. No evidence-maturity score uplift is claimed. Do not ask the Founder to recreate populated records or re-pair the phone. Do not claim physical acceptance.
+
+**Next engineering direction:** maintain the current green baseline and address any reproducible release-critical defect only. The remaining recovery, commercial, physical and legal/brand gates require the explicitly identified owner/operator evidence; automated CI must not be represented as a substitute.
+
+---
+
 ## DB-001 disposition — Founder clarification (2026-11-22)
 
 **DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
