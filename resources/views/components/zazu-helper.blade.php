@@ -77,6 +77,9 @@
     $businessFocuses = $business
         ? $nicheService->activeFor($business, $nicheFocus)
         : [];
+    $businessFocusLabels = collect($businessFocuses)
+        ->map(fn ($focus) => $nicheService->label($focus))
+        ->values();
 
     $event = request()->route('event');
     $eventComponents = collect();
@@ -185,22 +188,32 @@
             </div>
             <div class="zazu-helper-title" data-zazu-helper-title aria-live="polite">{{ $steps[0]['title'] }}</div>
             <p class="zazu-helper-copy" data-zazu-helper-copy aria-live="polite">{{ $steps[0]['copy'] }}</p>
-            <div class="zazu-helper-step" data-zazu-helper-recommendation hidden>
+            <div class="zazu-helper-step zazu-helper-next-action" data-zazu-helper-recommendation hidden>
                 <div class="zazu-helper-step-label">Next best action</div>
-                <strong class="block" data-zazu-helper-recommendation-title></strong>
-                <div class="zazu-helper-step-label mt-2">Why Zazu suggests it</div>
+                <strong class="zazu-helper-action-title" data-zazu-helper-recommendation-title></strong>
+                <div class="zazu-helper-reason-label">Why this matters</div>
                 <p class="zazu-helper-copy" data-zazu-helper-recommendation-copy></p>
                 <a href="#" class="zazu-helper-link" data-zazu-helper-recommendation-link></a>
             </div>
             <p class="zazu-helper-copy" data-zazu-helper-connectivity role="status" aria-live="polite" hidden></p>
+            @if ($routeName !== 'work.show' && $businessFocusLabels->isNotEmpty())
+                <div class="zazu-helper-context" aria-label="Active business services">
+                    <div class="zazu-helper-step-label">Your active services</div>
+                    <div class="zazu-helper-chip-list">
+                        @foreach ($businessFocusLabels as $focusLabel)
+                            <span class="zazu-helper-context-chip">{{ $focusLabel }}</span>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
             @if ($eventComponents->isNotEmpty())
                 <div class="zazu-helper-step" data-zazu-helper-event-components="{{ $eventComponents->count() }}">
                     <div class="zazu-helper-step-label">This booking includes</div>
-                    <ul class="list-disc pl-5" data-zazu-helper-event-component-list>
+                    <div class="zazu-helper-chip-list" data-zazu-helper-event-component-list>
                         @foreach ($eventComponents->take(4) as $component)
-                            <li>{{ $component }}</li>
+                            <span class="zazu-helper-context-chip">{{ $component }}</span>
                         @endforeach
-                    </ul>
+                    </div>
                     @if ($eventComponents->count() > 4)
                         <p class="zazu-helper-copy">{{ $eventComponents->count() - 4 }} more booking components</p>
                     @endif
