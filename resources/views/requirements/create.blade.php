@@ -1,4 +1,5 @@
 <x-app-layout>
+    @php($requirement = $requirement ?? null)
     <x-slot:title>{{ isset($requirement) ? 'Edit requirement' : 'Add service to job' }}</x-slot:title>
     <x-slot:heading>{{ isset($requirement) ? 'Edit requirement' : 'Add service to job' }}</x-slot:heading>
     <x-slot:headerAction>
