@@ -389,7 +389,7 @@ Evidence maturity is 75/100 (+2) after exact-head backend, PostgreSQL and deskto
 - [x] Command-side aggregate revision regression: quote acceptance → Work, payment → invoice, purchase receipt → purchase order/inventory, inventory movement → inventory item, asset allocation → asset passed in `SyncRevisionAggregateTrackingTest`.
 - [ ] Full offline sync workflow matrix, physical Android cold launch/restart/reconnect, intended-PC recovery drill, real-business commercial reconciliation, POPIA operations and ZAZU name clearance remain OPEN.
 
-DB-001 remains DORMANT / MONITORING by Founder report; its historical root cause is unproven and it is not an active release blocker. Installation recovery remains OPEN independently. V1 remains NOT READY; evidence maturity is 75/100, with physical Android, intended-PC recovery, real-business reconciliation and POPIA operations still open.
+DB-001 is DORMANT / HISTORICAL / NON-CRITICAL by the 2026-11-22 Founder clarification: it occurred during offline event-creation/calendar-related task testing and has not recurred after subsequent offline-architecture work. Root cause remains unproven; it is not an active release blocker. Installation recovery remains OPEN independently. V1 remains NOT READY; evidence maturity is 75/100, with physical Android, intended-PC recovery, real-business reconciliation and POPIA operations still open.
 
 ---
 ## Dormant database incident — owner installation (Founder clarification 2026-11-22)
@@ -548,15 +548,17 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Keep the offline-browser acceptance tests intact; all three previously blocked journeys now pass.
 - [x] Exact-head Laravel run `44184183003`: Laravel, PostgreSQL migration/recovery and offline-browser jobs all PASS, including mobile customer-to-Work and phone-local attachment acceptance.
 - [x] Zazu Quality `44184183085`, Windows package + PowerShell fresh install `44184182900`, Director Health `44184182984` and Push-on-main `44184180721`: PASS. SonarCloud skipped.
-- DB-001 remains open. No readiness score uplift; V1 remains NOT READY.
+- Historical status at this checkpoint: DB-001 was listed as open. That status is superseded by the 2026-11-22 Founder clarification at the top of this checklist; V1 remains NOT READY for its separate acceptance gates.
 
 
-### DB-001 recurrence — 2026-11-18
+### Historical DB-001 diagnostic work — 2026-11-18 (superseded disposition)
 
-- [ ] Resolve owner-reported DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`; cause remains unconfirmed pending the matching runtime record.
-- [x] Add safe, reference-specific Windows log extraction at `ops/windows/Get-ZazuIncident.ps1`; output is restricted to allowlisted incident metadata and database diagnostics.
-- [ ] Apply the targeted correction after inspecting the matching record and verify the affected workflow on the intended installation.
-- Do not reset, reinstall or alter business data as an investigative step. Release remains NOT READY.
+This section records the diagnostic tooling added at the time. Its original open-task wording is superseded by the 2026-11-22 Founder clarification at the top of this checklist; it is not current work.
+
+- Historical reference retained: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`; no verified root cause or fix was established.
+- [x] Safe, reference-specific Windows log extraction exists at `ops/windows/Get-ZazuIncident.ps1`; output is restricted to allowlisted incident metadata and database diagnostics.
+- The read-only schema utility remains available only if a fresh, reproducible recurrence later requires diagnosis. Do not run it now or request another owner-side capture.
+- Do not reset, reinstall or alter business data as an investigative step.
 
 
 ### COM-01 customer document handoff — PARTIAL (2026-11-18)
