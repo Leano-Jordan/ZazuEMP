@@ -1,14 +1,13 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\Customer;
-use App\\Models\\Event;
-use App\\Models\\EventRequirement;
-use App\\Models\\Quote;
-use App\\Services\\QuoteService;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Tests\\TestCase;
+use App\Models\Customer;
+use App\Models\Event;
+use App\Models\EventRequirement;
+use App\Models\Quote;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class QuoteQuantityReviewTest extends TestCase
 {
