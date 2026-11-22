@@ -62,9 +62,12 @@ class QuoteVersion extends Model
     {
         $this->loadMissing('items');
 
-        $items = $this->items
-            ->filter(fn (QuoteItem $item) => $item->event_requirement_id !== null)
-            ->keyBy('event_requirement_id');
+        $allItems = $this->items;
+        if ($allItems->contains(fn (QuoteItem $item) => $item->event_requirement_id === null)) {
+            return false;
+        }
+
+        $items = $allItems->keyBy('event_requirement_id');
 
         if ($items->count() !== $requirements->count()) {
             return false;
