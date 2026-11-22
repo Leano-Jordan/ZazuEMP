@@ -177,7 +177,7 @@
         </section>
     @endif
 
-    <section class="zazu-work-progress zazu-work-progress-refined" aria-label="Job progress">
+    <section class="zazu-work-progress zazu-work-progress-refined" data-zazu-anchor="work.progress" aria-label="Job progress">
         <a href="{{ route('work.show', $event) }}" class="zazu-work-progress-step complete">
             <span>1</span><strong>Job</strong><small>Details saved</small>
         </a>
