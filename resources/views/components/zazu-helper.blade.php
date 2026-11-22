@@ -23,7 +23,7 @@
             ['label' => 'Maintain', 'title' => 'Keep the catalogue trustworthy', 'copy' => 'Archive or deactivate outdated offerings instead of deleting history.'],
         ],
         'work.index' => [
-            ['label' => 'Jobs', 'title' => 'Treat each event as one operational workspace', 'copy' => 'The job should be the place where the customer, date, requirements, quotes and execution state meet.'],
+            ['label' => 'Jobs', 'title' => 'Treat each event as one operational workspace', 'copy' => 'The job should be the place where the customer, date, requirements, quotes and execution state meet.', 'target' => 'work.register'],
             ['label' => 'Plan', 'title' => 'Open a job before creating disconnected records', 'copy' => 'Use the job context to keep downstream work tied to the correct customer and event.'],
             ['label' => 'Control', 'title' => 'Watch exceptions', 'copy' => 'Pay attention to approaching work, blocked preparation, procurement gaps and unresolved actions.'],
         ],
@@ -33,7 +33,7 @@
             ['label' => 'Execute', 'title' => 'Use the downstream workspaces', 'copy' => 'Quote, preparation, purchasing, inventory, assets, costs and travel should all remain connected to this job.'],
         ],
         'quotes.index' => [
-            ['label' => 'Quotes', 'title' => 'Build from the work', 'copy' => 'Use the job requirements as the commercial starting point rather than retyping the scope.'],
+            ['label' => 'Quotes', 'title' => 'Build from the work', 'copy' => 'Use the job requirements as the commercial starting point rather than retyping the scope.', 'target' => 'quotes.register'],
             ['label' => 'Control', 'title' => 'Revise before acceptance', 'copy' => 'Keep quote versions traceable so the accepted commercial state is clear.'],
             ['label' => 'Finance', 'title' => 'Accepted work becomes billable context', 'copy' => 'Keep the accepted quote and invoice relationship explicit.'],
         ],
@@ -137,7 +137,7 @@
         </button>
         <div hidden>
             @foreach($steps as $index => $step)
-                <template data-zazu-helper-step-data data-index="{{ $index }}" data-label="{{ $step['label'] }}" data-title="{{ $step['title'] }}" data-copy="{{ $step['copy'] }}" @if(!empty($step['href'])) data-href="{{ $step['href'] }}" data-link="{{ $step['link'] }}" @endif></template>
+                <template data-zazu-helper-step-data data-index="{{ $index }}" data-label="{{ $step['label'] }}" data-title="{{ $step['title'] }}" data-copy="{{ $step['copy'] }}" @if(!empty($step['target'])) data-target="{{ $step['target'] }}" @endif @if(!empty($step['href'])) data-href="{{ $step['href'] }}" data-link="{{ $step['link'] }}" @endif></template>
             @endforeach
         </div>
     </div>
