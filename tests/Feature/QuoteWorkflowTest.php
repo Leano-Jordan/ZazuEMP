@@ -72,7 +72,6 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('100 white chairs', $item->source_snapshot['description']);
     }
 
-
     public function test_quote_deposit_percent_calculates_from_final_total(): void
     {
         $customer = Customer::create([
@@ -193,9 +192,6 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('accepted', $quote->latestVersion()->firstOrFail()->fresh()->status);
     }
 
-
-
-
     public function test_quote_creation_rejects_prices_with_more_than_two_decimal_places(): void
     {
         $customer = Customer::create(['name' => 'Precision Customer']);
@@ -263,8 +259,6 @@ class QuoteWorkflowTest extends TestCase
         $response->assertSee('Revise quote');
         $response->assertSee(route('quotes.versions.store', $event->quotes()->first()), false);
     }
-
-
 
     public function test_quote_creation_requires_a_price_for_each_current_requirement(): void
     {
