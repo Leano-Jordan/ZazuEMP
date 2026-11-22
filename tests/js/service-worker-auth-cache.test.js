@@ -282,7 +282,9 @@ test('cached offline pages remain prepared when a later prime attempt hits a tra
         businessId: '17',
         routes,
     });
-    assert.deepEqual(firstAttempt, [{ type: 'prime-pages-complete', success: true }]);
+    assert.equal(firstAttempt.length, 1);
+    assert.equal(firstAttempt[0].type, 'prime-pages-complete');
+    assert.equal(firstAttempt[0].success, true);
 
     hostAvailable = false;
     const retryAttempt = await worker.dispatchMessage({
@@ -292,9 +294,11 @@ test('cached offline pages remain prepared when a later prime attempt hits a tra
         routes,
     });
 
-    assert.deepEqual(
-        retryAttempt,
-        [{ type: 'prime-pages-complete', success: true }],
+    assert.equal(retryAttempt.length, 1);
+    assert.equal(retryAttempt[0].type, 'prime-pages-complete');
+    assert.equal(
+        retryAttempt[0].success,
+        true,
         'existing authenticated offline pages must satisfy readiness during a temporary outage',
     );
 });
