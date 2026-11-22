@@ -1,3 +1,16 @@
+## Adaptive business presets and event-component experience — 2026-11-23
+
+**Founder requirement recorded as mandatory product direction:** Zazu must shape its workspace around the business capabilities selected by the owner. A DJ, tent/chair hire operator, caterer, photographer and multi-service event provider must not be forced through one generic service catalogue or cluttered workflow. Business selections must materially affect relevant navigation, catalogue defaults, event intake, requirements, operational surfaces, reporting and Helper recommendations.
+
+- Added the product contract: [Adaptive Business Presets and Event Components](../../docs/ADAPTIVE_BUSINESS_PRESETS_AND_EVENT_COMPONENTS.md).
+- Updated README product direction so this cannot be mistaken for a generic catalogue-only feature.
+- Guardrails: presets are configurable starting points; multiple capabilities compose into one workspace; event components determine relevant downstream work; irrelevant options are progressively disclosed rather than destructively removed; disabling capabilities preserves historical/active records and accepted quote snapshots; visibility never replaces authorization; offline parity must be proven.
+- **Current status: DOCUMENTED / IMPLEMENTATION NOT YET VERIFIED.** No claim that adaptive presets or complete specialist workflows already exist.
+- **Next execution target:** inspect the current capability configuration/catalogue source, onboarding and business settings, navigation, event requirements, Helper recommendation sources and offline synchronization. Produce a capability-to-surface map from actual code, then implement one narrow preset-to-Helper vertical slice without introducing a competing configuration source.
+- Continue Helper hardening in that slice: recommendations must be relevant to the business's enabled capabilities and the current event's selected components, while reusing existing permission-filtered state and routes. Do not invent workflow states or recommend disabled modules.
+
+---
+
 ## Zazu Helper — origin-aware operational recommendations — 2026-11-22
 
 **Implementation:** committed directly to `main`. Latest implementation/test commits: [f11ca76](https://github.com/Leano-Jordan/ZazuEMP/commit/f11ca767110e10e8a2e98f412947321bb73da86b), [670703c](https://github.com/Leano-Jordan/ZazuEMP/commit/670703cf706c9a50cd88187ff9c61f9b6d0bca4f), [4a4513b](https://github.com/Leano-Jordan/ZazuEMP/commit/4a4513b2e340e2096bc4774faf817c59c326eb4a), [df4e304](https://github.com/Leano-Jordan/ZazuEMP/commit/df4e304169e06bbd6c00ff10d2da089c290605b3) and [a8bc03b](https://github.com/Leano-Jordan/ZazuEMP/commit/a8bc03b72f60b49d959ce664a9f542544b18a4d5).
