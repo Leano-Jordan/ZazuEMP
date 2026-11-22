@@ -1,3 +1,9 @@
+## DB-001 disposition — Founder clarification (2026-11-22)
+
+**DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
+
+Do not chase this historical anomaly, request diagnostic captures, or ask the Founder to run `Test-ZazuDatabaseSchema.ps1` or `Get-ZazuIncident.ps1`. Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new diagnostic evidence appears. The separate installation backup/restore acceptance gate remains independent and must not be conflated with DB-001.
+
 ## Director recovery integrity checkpoint — secondary backup presence — 2026-11-22
 
 **Implementation head:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
@@ -11,7 +17,7 @@
 - Exact-head offline-browser acceptance [44989474410](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44989474410): **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance passed.
 - Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner PC proves a scheduled backup, genuinely independent copy and controlled full restore with representative private media.
 
-**Next active target (Director one-target WIP limit): DB-001 owner-installation evidence.** In the actual installed Zazu folder, run `.\ops\windows\Test-ZazuDatabaseSchema.ps1` and `.\ops\windows\Get-ZazuIncident.ps1 -Reference '895e2c23-bc6b-4919-a891-1e8e5c1e27e4'`. Both are read-only. Return the Desktop JSON schema report and the safe incident report/no-match output. Do not run migrations, reset, reinstall or alter the database. Establish root cause before any correction. Commercial quote → invoice → payment → costs → profit proof is priority 2.
+**Next active target:** DB-001 is not an active target. Continue V1 convergence from current `main` against reproducible defects and the remaining genuine acceptance gaps. Do not request or run DB-001 diagnostics unless the failure recurs on the current offline architecture. Owner-operated commercial and recovery acceptance remain separate release gates.
 
 ---
 
