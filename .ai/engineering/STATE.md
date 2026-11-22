@@ -631,7 +631,7 @@ CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has pa
 - **Active Work attachments — AUTOMATED ACCEPTANCE PASS.** The suite exercises local file persistence, offline queueing, retry/idempotency, reconnect upload, server identity reconciliation, private download caching, cross-tab re-pair and late-response/logout protection. Pixel 7 emulation is not a physical phone restart test.
 - **Revision-aware sync — IMPLEMENTED; FULL MATRIX OPEN.** The new regression verifies quote acceptance → Work, payment → invoice, purchase receipt → purchase order and affected inventory, inventory movement → inventory item, and asset allocation → asset revision propagation. Full workflow replay/reconciliation across all supported entities and physical-device acceptance remain open.
 - **Commercial workflow — SEEDED AUTOMATED PASS; REAL-BUSINESS RECONCILIATION OPEN.** Current seeded proof: invoice R11,500 including VAT, deposit R3,450, final payment R8,050, net sales R10,000 excluding VAT, actual cost R2,800, indicative contribution R7,200 (72%). This is not audited accounting profit and does not verify live customer records.
-- **DB-001 — DORMANT / MONITORING** by current Founder report; no root cause or fix claimed. Do not chase unless it recurs or new evidence appears. **Installation recovery remains OPEN** pending the controlled drill on the intended installed PC.
+- **DB-001 — DORMANT / HISTORICAL / NON-CRITICAL.** The Founder clarifies it occurred during offline event-creation/calendar-related task testing and has not recurred since offline-architecture work. No root cause or fix is claimed. **Installation recovery remains OPEN** pending the controlled drill on the intended installed PC.
 - Still owner-dependent: physical Android cold launch/restart/reconnect; intended-PC recovery drill; real-business commercial reconciliation; POPIA operational controls; ZAZU name clearance.
 
 **Release remains NOT READY. Evidence maturity remains 73/100 with no uplift.** No production deployment, live business data or device storage was changed. No branches were created.
@@ -642,7 +642,7 @@ CASE-ZAZU-0033 / ENG-DATA-003 is **CLOSED**. The stale-write contract now has pa
 
 **Repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` only · **code commits:** `353ba56` (command-revision regression added), corrected in `98f5921` (inventory baseline captured before command effects). No branches created.
 
-- **DB-001 disposition: DORMANT / MONITORING.** The Founder reports that the error has not appeared recently. No root cause or fix is claimed. Do not spend active engineering time reproducing the historical incident unless it recurs or new evidence appears. Preserve references and incident records. This supersedes dated entries below that described DB-001 as an active blocker. **Installation recovery remains OPEN independently** until the controlled recovery drill is completed on the intended installed PC.
+- **DB-001 disposition: DORMANT / HISTORICAL / NON-CRITICAL.** The Founder clarifies it occurred during offline event-creation/calendar-related task testing and has not recurred since offline-architecture work. No root cause or fix is claimed. Do not spend active engineering time on it unless it recurs or materially new evidence appears. Preserve references and incident records. This supersedes dated entries below that described DB-001 as an active blocker. **Installation recovery remains OPEN independently** until the controlled recovery drill is completed on the intended installed PC.
 - **Revision-aware stale-write protection is present on main.** The server uses aggregate revisions, immutable same-device causal mutation chains, stale conflict snapshots and explicit keep-local/use-server resolution. Do not reopen the old “missing base revision” finding as though the implementation were absent.
 - **Writer audit — bounded source pass:** inspected the Eloquent revision listeners and the customer/contact, Work, service/capability, supplier, quote, invoice/payment, purchasing, inventory and asset write paths, including relevant relationship/query-builder updates. No additional confirmed revision bypass was found in those inspected paths. Keep the remaining audit classified as source review until automated and physical acceptance close the wider matrix.
 - **New regression:** `SyncRevisionAggregateTrackingTest::test_offline_commands_advance_every_related_aggregate_revision` exercises quote acceptance → Work, payment → invoice, purchase receipt → purchase order and inventory, and inventory movement → inventory item revision propagation. The test was added on main at `98f5921`; exact-head Laravel CI is pending.
@@ -928,7 +928,7 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Windows startup now checks migration status before starting Laravel. When updates are pending, it must create and verify a full database + private-files backup before applying them, then confirm no migrations remain pending. Backup or migration failure blocks server startup.
 - **Verification:** Source is committed on `main`. Exact-head CI and PowerShell execution for this follow-up have not yet been observed. No readiness uplift is claimed.
 
-## Open owner-reported database incident — 2026-11-17
+## Historical DB-001 incident notes — 2026-11-17 (superseded by 2026-11-22 Founder clarification)
 
 - Repeated user-facing `DB-001` incidents were reported. References: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`.
 - The contemporaneous note associated the reference with an Account access error screen, but the Founder clarified on 2026-11-22 that the occurrence under discussion happened during offline event-creation and calendar-related task testing. That later clarification supersedes the earlier characterization.
@@ -971,9 +971,9 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - This closes the form regression and associated CI failure only. DB-001's OPEN label in this historical note is superseded by the 2026-11-22 Founder clarification; the separate V1 release gates remained open at that time.
 
 
-## DB-001 recurrence — reference 895e2c23-bc6b-4919-a891-1e8e5c1e27e4 (2026-11-18)
+## Historical DB-001 diagnostic record — reference 895e2c23-bc6b-4919-a891-1e8e5c1e27e4 (2026-11-18; superseded)
 
-- Owner reports another DB-001 while opening/saving account/workspace information. Reference: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`. The exact triggering action and matching runtime record are not yet available; do not infer a cause from the reference alone.
+- This contemporaneous summary described the reference as an account/workspace issue. The Founder clarified on 2026-11-22 that the occurrence under discussion happened during offline event-creation/calendar-related task testing; that clarification supersedes the earlier description. Reference retained for traceability only: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`.
 - Existing incident recorder now emits bounded database diagnostics (connection, driver, SQLSTATE, numeric driver code and operation) without SQL, bindings, exception messages or credentials.
 - Added `ops/windows/Get-ZazuIncident.ps1` and `docs/DB001_INCIDENT_CAPTURE.md` on `main`. The script finds the exact request ID in Laravel logs and outputs only an allowlist of diagnostic fields. This is a safe evidence-capture path, not a root-cause fix.
 - The matching record and repeat test were proposed at this historical checkpoint. That request is superseded by the 2026-11-22 Founder clarification; no DB-001 action is currently required. No database changes, reset or restore were performed by that investigation.
