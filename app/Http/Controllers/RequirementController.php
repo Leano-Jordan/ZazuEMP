@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RequirementController extends Controller
@@ -106,6 +107,12 @@ class RequirementController extends Controller
             $lockedEvent = $lifecycle->lock($businessId, $event->id);
             $lifecycle->assertOperational($lockedEvent);
             $lockedRequirement = $lockedEvent->requirements()->whereKey($requirement->id)->lockForUpdate()->firstOrFail();
+            if ($lockedEvent->quotes()->exists() && $lockedEvent->requirements()->count() === 1) {
+                throw ValidationException::withMessages([
+                    'requirement' => 'Add a replacement requirement before removing the final line from a job that already has a quote.',
+                ]);
+            }
+
             $lockedRequirement->delete();
         });
 
