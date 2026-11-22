@@ -19,10 +19,14 @@
         $latestQuoteNeedsRevision = $latestQuote?->latestVersion
             ? !$latestQuote->latestVersion->matchesRequirements($event->requirements)
             : false;
-        $latestInvoice = $event->invoices
-            ->where('status', '!=', 'void')
-            ->sortByDesc('created_at')
-            ->first();
+        $nonVoidInvoices = $event->invoices->where('status', '!=', 'void');
+        $latestInvoice = $nonVoidInvoices->sortByDesc('created_at')->first();
+        $outstandingInvoices = $nonVoidInvoices
+            ->filter(fn ($invoice) => $invoice->balance > 0)
+            ->sortBy('created_at')
+            ->values();
+        $payableInvoice = $outstandingInvoices->first(fn ($invoice) => $invoice->status === 'issued');
+        $invoiceWorkspaceTarget = $payableInvoice ?? $outstandingInvoices->first() ?? $latestInvoice;
         $outstandingPreparation = $event->preparationItems
             ->whereIn('status', ['open', 'blocked']);
         $activePurchaseOrders = $event->purchaseOrders
@@ -39,7 +43,11 @@
         };
         $invoiceProgressLabel = !$latestQuote || $latestQuote->status !== 'accepted'
             ? 'After acceptance'
-            : (!$latestInvoice ? 'Not invoiced' : ($latestInvoice->balance > 0 ? 'Balance due' : 'Paid'));
+            : ($nonVoidInvoices->isEmpty()
+                ? 'Not invoiced'
+                : ($outstandingInvoices->isNotEmpty()
+                    ? $outstandingInvoices->count().' balance due'
+                    : 'Paid'));
         $deliveryProgressLabel = $event->status === 'completed'
             ? 'Delivered'
             : ($event->status === 'cancelled'
@@ -53,7 +61,7 @@
                 ? 'Not applicable'
                 : ($plannedCosts->isNotEmpty()
                     ? $plannedCosts->count().' planned costs'
-                    : ($latestInvoice && $latestInvoice->balance > 0
+                    : ($outstandingInvoices->isNotEmpty()
                         ? 'Payment due'
                         : ($latestQuote?->status === 'accepted' && $latestInvoice ? 'Ready for review' : 'After delivery'))));
 
@@ -63,7 +71,7 @@
                 $progressCurrent = 'scope';
             } elseif (!$latestQuote || in_array($latestQuote->status, ['draft', 'sent', 'declined', 'expired'], true)) {
                 $progressCurrent = 'quote';
-            } elseif (!$latestInvoice || $latestInvoice->balance > 0) {
+            } elseif ($nonVoidInvoices->isEmpty() || $outstandingInvoices->isNotEmpty()) {
                 $progressCurrent = 'finance';
             } elseif ($outstandingPreparation->isNotEmpty() || $activePurchaseOrders->isNotEmpty()) {
                 $progressCurrent = 'delivery';
@@ -96,8 +104,11 @@
                     case 'accepted':
                         if (!$latestInvoice) {
                             $nextAction = ['label' => 'Create invoice', 'route' => route('finance.invoices.create', ['quote_id' => $latestQuote->id]), 'copy' => 'The customer accepted the quote. Create the invoice from this accepted quote to begin tracking payment.'];
-                        } elseif ($latestInvoice->balance > 0) {
-                            $nextAction = ['label' => 'Record payment', 'route' => route('finance.payments.create', ['invoice_id' => $latestInvoice->id]), 'copy' => 'This invoice still has an outstanding balance. Record the customer payment here when it arrives.'];
+                        } elseif ($payableInvoice) {
+                            $nextAction = ['label' => 'Record payment', 'route' => route('finance.payments.create', ['invoice_id' => $payableInvoice->id]), 'copy' => 'At least one invoice still has an outstanding balance. Record the customer payment against the open invoice.'];
+                        } elseif ($outstandingInvoices->isNotEmpty()) {
+                            $nextInvoice = $outstandingInvoices->first();
+                            $nextAction = ['label' => 'Review invoice', 'route' => route('finance.invoices.show', $nextInvoice), 'copy' => 'An invoice still has an outstanding balance and needs review before payment can be recorded.'];
                         } elseif (!$outstandingPreparation->isEmpty()) {
                             $nextAction = ['label' => 'Complete preparation', 'route' => route('work.preparation.index', $event), 'copy' => $outstandingPreparation->count().' preparation item(s) still need attention.'];
                         } elseif (!$activePurchaseOrders->isEmpty()) {
@@ -176,7 +187,7 @@
         <a href="{{ $latestQuote ? route('quotes.show', $latestQuote) : route('work.quotes.create', $event) }}" class="zazu-work-progress-step {{ $latestQuote?->status === 'accepted' ? 'complete' : (in_array($latestQuote?->status, ['declined', 'expired'], true) ? 'current' : ($progressCurrent === 'quote' ? 'current' : '')) }}" @if ($progressCurrent === 'quote') aria-current="step" @endif>
             <span>3</span><strong>Quote & decision</strong><small>{{ $quoteProgressLabel }}</small>
         </a>
-        <a href="{{ $latestInvoice ? route('finance.invoices.show', $latestInvoice) : ($latestQuote?->status === 'accepted' ? route('finance.invoices.create', ['quote_id' => $latestQuote->id]) : ($latestQuote ? route('quotes.show', $latestQuote) : route('work.quotes.create', $event))) }}" class="zazu-work-progress-step {{ $latestInvoice && $latestInvoice->balance <= 0 ? 'complete' : ($progressCurrent === 'finance' ? 'current' : '') }}" @if ($progressCurrent === 'finance') aria-current="step" @endif>
+        <a href="{{ $invoiceWorkspaceTarget ? route('finance.invoices.show', $invoiceWorkspaceTarget) : ($latestQuote?->status === 'accepted' ? route('finance.invoices.create', ['quote_id' => $latestQuote->id]) : ($latestQuote ? route('quotes.show', $latestQuote) : route('work.quotes.create', $event))) }}" class="zazu-work-progress-step {{ $latestInvoice && $outstandingInvoices->isEmpty() ? 'complete' : ($progressCurrent === 'finance' ? 'current' : '') }}" @if ($progressCurrent === 'finance') aria-current="step" @endif>
             <span>4</span><strong>Invoice & payment</strong><small>{{ $invoiceProgressLabel }}</small>
         </a>
         <a href="{{ route('work.preparation.index', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete' : ($progressCurrent === 'delivery' ? 'current' : '') }}" @if ($progressCurrent === 'delivery') aria-current="step" @endif>
