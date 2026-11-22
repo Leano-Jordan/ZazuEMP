@@ -6,6 +6,8 @@ use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Models\PurchaseOrder;
+use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -141,6 +143,39 @@ class ZazuHelperTest extends TestCase
             'status' => 'confirmed',
         ]);
 
+        $localSupplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Local helper supplier',
+        ]);
+        $foreignSupplier = Supplier::create([
+            'business_id' => $foreignBusiness->id,
+            'name' => 'Foreign helper supplier',
+        ]);
+        PurchaseOrder::create([
+            'business_id' => $business->id,
+            'supplier_id' => $localSupplier->id,
+            'reference' => 'HELPER-PO-LOCAL-'.Str::upper(Str::random(5)),
+            'status' => 'sent',
+            'currency' => 'ZAR',
+            'total_amount' => '100.00',
+        ]);
+        PurchaseOrder::create([
+            'business_id' => $foreignBusiness->id,
+            'supplier_id' => $foreignSupplier->id,
+            'reference' => 'HELPER-PO-FOREIGN-'.Str::upper(Str::random(5)),
+            'status' => 'ordered',
+            'currency' => 'ZAR',
+            'total_amount' => '200.00',
+        ]);
+        PurchaseOrder::create([
+            'business_id' => $business->id,
+            'supplier_id' => $localSupplier->id,
+            'reference' => 'HELPER-PO-CLOSED-'.Str::upper(Str::random(5)),
+            'status' => 'received',
+            'currency' => 'ZAR',
+            'total_amount' => '50.00',
+        ]);
+
         foreach ([$activeJob, $cancelledJob, $foreignJob] as $index => $job) {
             EventPreparationItem::create([
                 'business_id' => $job->business_id,
@@ -158,7 +193,9 @@ class ZazuHelperTest extends TestCase
             ->get(route('dashboard'))
             ->assertOk()
             ->assertSee('1 preparation item overdue')
-            ->assertSee('1 job still in draft');
+            ->assertSee('1 purchase order still open')
+            ->assertSee('1 job still in draft')
+            ->assertDontSee('2 purchase orders still open');
     }
 
     public function test_helper_does_not_expose_work_attention_to_a_member_without_work_view_permission(): void
