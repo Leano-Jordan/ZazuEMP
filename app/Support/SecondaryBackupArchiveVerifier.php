@@ -60,7 +60,7 @@ final class SecondaryBackupArchiveVerifier
 
     private function isRegularArchive(string $path): bool
     {
-        return is_file($path) && ! is_link($path);
+        return is_file($path) && !is_link($path);
     }
 
     /**
