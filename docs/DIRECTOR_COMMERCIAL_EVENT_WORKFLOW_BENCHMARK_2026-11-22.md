@@ -171,7 +171,9 @@ The separate Requirements page then invites the user to add a service with a qua
 
 The inspected `RequirementController` exposes index, create and store. The relevant `routes/web.php` section exposes GET index, GET create and POST store; no requirement update or delete route was found. The list view presents rows without edit/delete controls.
 
-This creates a material correction risk: a user can create an initial service requirement (including through the new-job form) but cannot correct or remove it through the normal online requirements UI. Because quote snapshots and stale-quote logic exist, any future correction workflow must be version-aware and must not silently rewrite accepted quotes.
+This creates a material correction risk: a user can create an initial service requirement (including through the new-job form) but cannot correct or remove it from the normal online Requirements page. The inspected online `WorkController::update()` also does not apply a submitted `services` list. The offline `OfflineDomainMutationHandler::syncOfflineJobRequirements()` does support reconciling a submitted service list, including removing descriptions no longer present while preserving matching rows' quantity, notes, status and capability links. That is a meaningful existing capability, but it does not provide a clearly discoverable online correction path.
+
+Because quote snapshots and stale-quote logic exist, any correction workflow must be version-aware and must not silently rewrite accepted quotes. Online and offline correction semantics must be reconciled rather than implementing two different rules.
 
 **Disposition:** high-priority workflow defect to resolve after tracing quote status, offline mutation support, audit expectations and lifecycle constraints. Do not bolt on an unguarded delete button.
 
