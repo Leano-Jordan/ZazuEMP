@@ -123,10 +123,10 @@
     $eventOperationalRecords = collect();
 
     if ($routeName === 'work.show'
-        && $event instanceof \\App\\Models\\Event
+        && $event instanceof \App\Models\Event
         && $business
         && (int) $event->business_id === (int) $business->id) {
-        $permissions = app(\\App\\Support\\PermissionService::class);
+        $permissions = app(\App\Support\PermissionService::class);
 
         foreach ([
             'preparationItems' => ['label' => 'preparation item', 'permission' => 'work.view'],
