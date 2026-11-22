@@ -1,3 +1,29 @@
+## Commercial event workflow benchmark and intake correction — 2026-11-22
+
+**Research:** [Director Commercial Event Workflow Benchmark](../../docs/DIRECTOR_COMMERCIAL_EVENT_WORKFLOW_BENCHMARK_2026-11-22.md)
+
+Reviewed official workflow material from Caterease, Total Party Planner, Planning Pod and HoneyBook, plus practitioner discussions on Reddit. Common patterns: guided intake; event-centred home; visible upcoming/waiting/overdue/completed work; contextual document hand-offs; reusable templates; conditional/parallel operational work. The research distinguishes vendor feature claims from documented workflow steps and community anecdotes.
+
+**Direct Zazu findings:**
+- New-job intake previously asked for service scope before date/time/location. Caterease's published onboarding sequence places event facts before menu building.
+- The new-job form's service selections are persisted immediately as starter `EventRequirement` rows with quantity 1 and unit `service`; that behavior was not disclosed clearly.
+- The online requirements controller/routes expose list/create only; no update/delete UI route was found. Correcting an initially selected requirement therefore needs a carefully guarded workflow, especially when quote snapshots exist.
+- The Job home progress strip and Next action remain too coarse for the full commercial/operational lifecycle.
+- Visible terminology mixes Job, Work and Event.
+
+**Implemented on main:**
+- Reordered new-job form: customer → job name/type → when/where → service scope.
+- Removed duplicate job-type heading and added an explicit Event type legend.
+- Clarified that selected services become starter requirements and must be reviewed for quantity, unit and special details before quoting.
+- Clarified the next-step panel and service review step labels.
+- Added `WorkWorkflowTest` coverage for intake order and starter requirement persistence.
+
+Application behavior/data model and existing routes were not changed. The change is a narrow presentation/copy correction. Exact-head tests and CI are pending verification; do not claim a pass until the run completes.
+
+**Next engineering priority:** resolve safe requirement correction/replace/cancel behavior (including quote-version and offline constraints), then build a state-derived Job-home orientation model. Do not move module destinations or perform a broad navigation rewrite.
+
+---
+
 ## Founder workflow-discovery clarification — 2026-11-22
 
 The Founder clarifies that "separated features" means the user does not see an obvious business-process trail. They move between pages and click around without confidence that they are following the right order. This is a workflow orientation/discoverability concern, not evidence that the individual modules are broken or should be merged.
