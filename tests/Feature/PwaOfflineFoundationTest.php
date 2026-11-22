@@ -68,6 +68,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("event.data?.type !== 'prime-pages-complete'", $app);
         $this->assertStringContainsString("zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false'", $app);
         $this->assertStringContainsString("event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed })", $worker);
+        // Keep the source contract aligned with the service worker's authenticated cache generation.
         $this->assertStringContainsString("const requiredOfflineRoutes = ['/dashboard', '/customers', '/customers/create', '/work', '/work/create'];", $worker);
         $this->assertStringContainsString('requiredOfflineRoutes.every((path) => primedRoutes.has(path))', $worker);
         $this->assertStringContainsString('let activePrimeTask = null;', $worker);
