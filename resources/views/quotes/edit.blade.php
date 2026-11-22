@@ -72,6 +72,7 @@
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Products and services</div>
                         <div class="zazu-form-section-copy">Confirm the quantity, unit and price for every product and service. Line totals and the quote summary update as you type.</div>
+                        <div class="zazu-quote-quantity-instruction" role="note"><strong>Every line needs your attention.</strong> Enter the real quantity for each product or service, then check its unit price. A quantity of 1 is not assumed.</div>
                     </div>
                     <div class="zazu-card zazu-list zazu-quote-line-editor">
                         @foreach ($quote->event->requirements as $requirement)
@@ -106,13 +107,14 @@
                                         @if ($capability) · {{ $capability->name }} @endif
                                     </div>
                                     <div class="zazu-form-grid mt-3">
-                                        <label class="zazu-field">
-                                            <span class="zazu-label">Quantity <span class="zazu-required">*</span></span>
+                                        <label class="zazu-field zazu-quote-quantity-field">
+                                            <span class="zazu-label">Quantity to quote <span class="zazu-required">*</span></span>
                                             <input type="number" min="0.01" step="0.01" inputmode="decimal"
                                                 name="quantity[{{ $requirement->id }}]"
                                                 value="{{ old('quantity.'.$requirement->id, (float) $requirement->quantity === 1.0 ? '' : $requirement->quantity) }}"
+                                                placeholder="Enter quantity" aria-label="Quantity to quote for {{ $requirement->description }}"
                                                 data-quote-quantity class="zazu-input" required>
-                                            <span class="zazu-field-help">Unit: {{ $requirement->unit ?: 'not specified' }}. Enter the amount required.</span>
+                                            <span class="zazu-field-help"><strong>Required:</strong> enter the total {{ $requirement->unit ?: 'amount' }} you will supply. Do not leave this at one unless one is genuinely correct.</span>
                                             @error('quantity.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
                                         </label>
                                         <label class="zazu-field">
