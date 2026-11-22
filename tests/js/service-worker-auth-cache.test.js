@@ -464,6 +464,56 @@ test('a persisted identity read finishing after logout cannot restore the identi
     assert.equal(await cache.match('/__zazu-active-context__'), null, 'logout must leave no persisted active identity');
 });
 
+test('a fresh cache prime after logout does not join an invalidated task', async () => {
+    const staleRequestStarted = deferred();
+    const staleResponse = deferred();
+    const freshRequestStarted = deferred();
+    const worker = bootWorker(async (request) => {
+        const path = new URL(request.url).pathname;
+        if (path === '/reports') {
+            staleRequestStarted.resolve();
+            return staleResponse.promise;
+        }
+        if (path === '/dashboard') {
+            freshRequestStarted.resolve();
+            return new MockResponse(
+                '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Fresh dashboard</main></body></html>',
+                { headers: { 'content-type': 'text/html; charset=utf-8' } },
+            );
+        }
+        return new MockResponse('online');
+    });
+
+    const stalePrime = worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/reports'],
+    });
+
+    await staleRequestStarted.promise;
+    await worker.dispatchMessage({ type: 'clear-user' });
+
+    const freshPrime = worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/dashboard'],
+    });
+
+    await freshRequestStarted.promise;
+    staleResponse.resolve(new MockResponse(
+        '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Stale reports</main></body></html>',
+        { headers: { 'content-type': 'text/html; charset=utf-8' } },
+    ));
+
+    await Promise.all([stalePrime, freshPrime]);
+
+    const privateCache = await worker.caches.open('zazu-static-v61-user-41-business-17');
+    assert.ok(await privateCache.match('/dashboard'));
+    assert.equal(await privateCache.match('/reports'), null, 'the invalidated task must not repopulate stale routes');
+});
+
 test('a failed logout request preserves the authenticated page cache and active identity', async () => {
     const worker = bootWorker(async (request) => {
         if (new URL(request.url).pathname === '/logout') throw new Error('Server is unreachable');
