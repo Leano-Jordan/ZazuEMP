@@ -70,11 +70,37 @@
             ['label' => 'Protect', 'title' => 'Treat settings as controlled state', 'copy' => 'Important configuration should be auditable and protected from accidental changes.'],
         ],
     ];
+    $nicheFocus = $business
+        ? app(\\App\\Support\\NicheFocus::class)->for(auth()->user(), $business)
+        : \\App\\Support\\NicheFocus::DEFAULT;
+
+    $focusGuidance = [
+        'chairs_tents' => [
+            'dashboard' => 'Keep hire quantities, availability, delivery, setup, collection and asset condition connected to each booking.',
+            'work.index' => 'Watch hire availability, delivery/setup timing, collection plans and asset condition across upcoming bookings.',
+            'work.show' => 'For this booking, review hire quantities, asset availability, delivery, setup, collection and condition.',
+        ],
+        'sound_dj' => [
+            'dashboard' => 'Keep sound equipment, crew, setup/breakdown, programme timing and transport connected to each booking.',
+            'work.index' => 'Watch equipment availability, crew, setup timing, programme details and transport across upcoming bookings.',
+            'work.show' => 'For this booking, review sound equipment, crew, programme timing, setup/breakdown and transport.',
+        ],
+        'catering_baking' => [
+            'dashboard' => 'Keep menus, quantities, dietary details, purchasing, preparation and delivery connected to each booking.',
+            'work.index' => 'Watch menu confirmation, dietary details, purchasing, preparation deadlines and delivery across upcoming bookings.',
+            'work.show' => 'For this booking, review menu quantities, dietary details, purchasing, preparation and delivery.',
+        ],
+    ];
+
+    if (isset($focusGuidance[$nicheFocus][$routeName])) {
+        $guides[$routeName][2]['copy'] = $focusGuidance[$nicheFocus][$routeName];
+    }
+
     $steps = $guides[$routeName] ?? [];
 @endphp
 
 @if(!empty($steps))
-    <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on" data-zazu-helper-attention="{{ count($attention) }}">
+    <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on" data-zazu-helper-focus="{{ $nicheFocus }}" data-zazu-helper-attention="{{ count($attention) }}">
         <section id="zazu-helper-panel" class="zazu-helper-panel" data-zazu-helper-panel role="region" aria-label="Zazu workflow guide" hidden>
             <div class="zazu-helper-head">
                 <div class="zazu-helper-bird zazu-helper-bird-panel" aria-hidden="true">
