@@ -6,12 +6,11 @@
 - Attention source remains business-scoped and permission-filtered by the existing service. The Helper does not calculate new business state or create another workflow authority.
 - Recommendation links are accepted only when same-origin. They are shown only after the existing origin-health monitor confirms server availability; on outage they pause, and the offline explanation clears after reconnection.
 - Added semantic source attributes to the existing attention list; existing visible attention content and links remain intact.
+- The recommendation card uses workspace-neutral wording because its source may be a job action or a dashboard/purchasing/finance attention item.
 - Repaired a malformed PHP assertion chain in `ZazuHelperTest` that would prevent the feature test file from parsing.
 - Added Laravel assertions for the attention source and Playwright coverage for online recommendation promotion, outage suppression and reconnect recovery across desktop/mobile browser projects.
 
 **Evidence status: IMPLEMENTED, EXACT-HEAD CI PENDING.** All changed files were read back from `main`. The Founder reports the previous checks were green; these additional commits were made afterward and require a fresh exact-head run before they can be called green. No physical Android or owner-PC recovery evidence is inferred from browser automation.
-
----
 
 ---
 
