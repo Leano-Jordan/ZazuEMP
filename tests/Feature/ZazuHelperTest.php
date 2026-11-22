@@ -466,7 +466,19 @@ class ZazuHelperTest extends TestCase
     {
         $business = $this->makeBusiness('Helper Event Scope');
         $user = User::factory()->create();
-        $business->users()->attach($user->id, ['role' => 'owner']);
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'primary_niche' => 'catering_baking',
+        ]);
+        BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Buffet catering',
+            'category' => 'Catering',
+            'capability_type' => 'service',
+            'pricing_basis' => 'per_person',
+            'currency' => 'ZAR',
+            'is_active' => true,
+        ]);
         $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'HELPER-SCOPE-'.Str::upper(Str::random(5)),
@@ -518,8 +530,10 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-zazu-helper-event-components="2"', false)
             ->assertSee('100 white chairs')
             ->assertSee('Two stretch tents')
+            ->assertSee('data-zazu-helper-focus="catering_baking"', false)
             ->assertSee('data-zazu-helper-focuses="chairs_tents"', false)
             ->assertSee('For this booking, review hire quantities, asset availability, delivery, setup, collection and condition.')
+            ->assertDontSee('For this booking, review menu quantities, dietary details, purchasing, preparation and delivery.')
             ->assertSee('data-zazu-helper-event-records="2"', false)
             ->assertSee('1 preparation item')
             ->assertSee('1 purchase order')
