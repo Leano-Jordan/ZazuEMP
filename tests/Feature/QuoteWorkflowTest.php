@@ -267,10 +267,11 @@ class QuoteWorkflowTest extends TestCase
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '50.00'],
             'unit_price' => [
                 $requirement->id => 40,
             ],
-        ]);
+        ])->assertRedirect();
 
         $quote = Quote::query()->firstOrFail();
         $original = $quote->versions()->with('items')->firstOrFail();
