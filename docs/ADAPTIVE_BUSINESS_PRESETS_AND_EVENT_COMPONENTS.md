@@ -123,6 +123,12 @@ The requirement is not complete merely because a preset selector exists.
 - [ ] PC, phone, offline, restart and reconnect behaviour is consistent and covered by automated plus physical acceptance.
 - [ ] Regression tests cover business isolation, staff permissions, configuration changes, historical records, multi-capability combinations and offline synchronization.
 
+## Current implementation evidence — 2026-11-23
+
+The first Helper adaptation slice now reads the existing saved primary business focus and changes guidance on Dashboard, Jobs and Job detail for chairs/tents, sound/DJ and catering/baking. Automated feature coverage has been added for those three focus values.
+
+This is deliberately partial. The current focus is a single presentation preference, not a complete multi-capability configuration. Active catalogue categories can identify supporting areas, but they are not yet a unified capability-selection contract for navigation, event intake, event components and downstream operations. The slice does not prove that irrelevant modules are hidden or that every specialist workflow exists.
+
 ## Implementation sequencing
 
 This is a product-wide requirement, but implementation must be incremental:
