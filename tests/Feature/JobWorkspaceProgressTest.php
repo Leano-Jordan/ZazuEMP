@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\EventRequirement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
