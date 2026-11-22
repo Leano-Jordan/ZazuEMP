@@ -122,7 +122,7 @@
                                             @error('unit_price.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
                                         </label>
                                     </div>
-                                    <div class="zazu-list-meta mt-2">Line total: <strong data-quote-line-total>{{ old('currency', $defaultCurrency) }} 0.00</strong></div>
+                                    <div class="zazu-quote-line-total"><span>Line total</span><strong data-quote-line-total>{{ old('currency', $defaultCurrency) }} 0.00</strong></div>
                                 </div>
                             </div>
                         @endforeach
@@ -140,7 +140,7 @@
             <aside class="zazu-form-aside">
                 <div class="zazu-context-card zazu-financial-summary" data-quote-summary>
                     <div class="zazu-context-title">Live quote summary</div>
-                    <p class="zazu-field-help" data-quote-review-status role="status">Review every line before saving.</p>
+                    <p class="zazu-quote-review-status" data-quote-review-status role="status">Review every line before saving.</p>
                     <div class="zazu-context-copy">Use this as a quick check before saving. Zazu recalculates the final figures from the saved quote data.</div>
                     <dl class="zazu-financial-summary-list">
                         <div><dt>Subtotal</dt><dd data-quote-subtotal>{{ $defaultCurrency }} 0.00</dd></div>
