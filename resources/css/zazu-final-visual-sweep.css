@@ -6973,3 +6973,34 @@ body.zazu-mobile-menu-open .zazu-helper {
     aspect-ratio: 4 / 3;
     object-fit: cover;
 }
+
+
+/* Wallpaper visibility fix: use an actual image layer, not a colour token in background-image. */
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) {
+    background-color: var(--zazu-page) !important;
+    background-image:
+        linear-gradient(rgba(226, 238, 246, .76), rgba(226, 238, 246, .76)),
+        var(--zazu-wallpaper) !important;
+    background-size: cover, cover !important;
+    background-position: center, center !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-attachment: fixed, fixed !important;
+}
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-shell,
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-main,
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-content {
+    background: transparent !important;
+}
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-card,
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-panel,
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-form-section,
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-setting-card,
+body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
+    background-color: color-mix(in srgb, var(--zazu-surface) 88%, transparent) !important;
+    backdrop-filter: blur(3px);
+}
+@media (max-width: 760px) {
+    body.zazu-has-wallpaper:not(.zazu-dashboard-page) {
+        background-attachment: scroll, scroll !important;
+    }
+}
