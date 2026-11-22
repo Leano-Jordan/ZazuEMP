@@ -187,6 +187,10 @@ The first production slice is now implemented on the dashboard, Work register, Q
 - Motion respects `prefers-reduced-motion`.
 - Guide preference reads/writes use the existing guarded storage helpers, so blocked browser storage does not break the Helper.
 - Missing anchors fail quietly: the guide text remains available and the Helper does not invent a screen coordinate.
+- Target resolution skips disconnected, hidden and accessibility-hidden elements, so a desktop/mobile duplicate or collapsed surface cannot be highlighted by mistake.
+- Target cleanup is centralized, and delayed cleanup checks that the original element is still connected before touching it.
+- Opening the guide moves keyboard focus into its Close control; closing or pressing Escape restores focus to the Helper toggle and keeps its accessible label in sync.
+- Smooth scrolling is guarded with a plain-scroll fallback, while reduced-motion users continue to receive non-animated movement.
 
 This remains an initial Guide Me slice, not completion of all ten behaviours. The new Job workspace targets are paired with feature regression coverage; exact-head verification is pending. Further anchors should be added only alongside a tested workflow that needs them.
 
