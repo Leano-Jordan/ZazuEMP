@@ -681,14 +681,16 @@ function setupZazuHelper() {
             copy: item.dataset.copy || '',
             href: item.dataset.href || '',
             link: item.dataset.link || '',
+            target: item.dataset.target || '',
         }));
 
         if (!panel || !toggle || !toggleLabel || !data.length) return;
 
         let index = 0;
-        let enabled = localStorage.getItem(storageKey) !== 'off';
+        let enabled = safeStorageGet(storageKey) !== 'off';
+        let targetTimer = null;
 
-        const render = () => {
+        const render = (guideTarget = false) => {
             const step = data[index];
 
             if (title) title.textContent = step.title;
@@ -702,6 +704,19 @@ function setupZazuHelper() {
                 guideLink.textContent = step.link || '';
             }
 
+            if (guideTarget && step.target) {
+                const target = [...document.querySelectorAll('[data-zazu-anchor]')]
+                    .find((element) => element.dataset.zazuAnchor === step.target);
+
+                if (target) {
+                    window.clearTimeout(targetTimer);
+                    document.querySelectorAll('.zazu-helper-target-highlight').forEach((element) => element.classList.remove('zazu-helper-target-highlight'));
+                    target.classList.add('zazu-helper-target-highlight');
+                    target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+                    targetTimer = window.setTimeout(() => target.classList.remove('zazu-helper-target-highlight'), 2400);
+                }
+            }
+
             if (backButton) backButton.disabled = index === 0;
             if (nextButton) nextButton.textContent = index === data.length - 1 ? 'Done' : 'Next';
         };
@@ -712,6 +727,8 @@ function setupZazuHelper() {
         };
 
         const close = () => {
+            window.clearTimeout(targetTimer);
+            document.querySelectorAll('.zazu-helper-target-highlight').forEach((element) => element.classList.remove('zazu-helper-target-highlight'));
             panel.hidden = true;
             toggle.setAttribute('aria-expanded', 'false');
         };
@@ -719,17 +736,17 @@ function setupZazuHelper() {
         const open = () => {
             if (!enabled) enabled = true;
             index = 0;
-            localStorage.setItem(storageKey, 'on');
-            localStorage.setItem(seenKey, '1');
+            safeStorageSet(storageKey, 'on');
+            safeStorageSet(seenKey, '1');
             syncEnabledState();
-            render();
+            render(true);
             panel.hidden = false;
             toggle.setAttribute('aria-expanded', 'true');
         };
 
         const turnOff = () => {
             enabled = false;
-            localStorage.setItem(storageKey, 'off');
+            safeStorageSet(storageKey, 'off');
             syncEnabledState();
             close();
         };
@@ -748,7 +765,7 @@ function setupZazuHelper() {
         backButton?.addEventListener('click', () => {
             if (index === 0) return;
             index -= 1;
-            render();
+            render(true);
         });
 
         nextButton?.addEventListener('click', () => {
@@ -758,7 +775,7 @@ function setupZazuHelper() {
             }
 
             index += 1;
-            render();
+            render(true);
         });
 
         document.addEventListener('keydown', (event) => {
