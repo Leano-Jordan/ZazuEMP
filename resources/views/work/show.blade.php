@@ -29,31 +29,47 @@
             ->whereIn('status', ['draft', 'sent', 'ordered']);
         $plannedCosts = $event->costs->where('status', 'planned');
 
-        $nextAction = in_array($event->status, ['completed', 'cancelled'], true)
-            ? null
-            : ($latestQuoteNeedsRevision
-                ? ['label' => 'Review quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'The job services changed after the latest quote. Review the current lines before using the quote.']
-                : (!$hasRequirements
-                    ? ['label' => 'Add services', 'route' => route('work.requirements.create', $event), 'copy' => 'Choose what you are providing for this job.']
-                    : (!$latestQuote
-                        ? ['label' => 'Create quote', 'route' => route('work.quotes.create', $event), 'copy' => 'Your service scope is ready. Prepare the quote for the customer.']
-                        : (match ($latestQuote->status) {
-                            'draft' => ['label' => 'Finish quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'Review the quote and send it to the customer when it is ready.'],
-                            'sent' => ['label' => 'Check customer decision', 'route' => route('quotes.show', $latestQuote), 'copy' => 'The quote has been sent. Check for the customer’s response before moving forward.'],
-                            'declined', 'expired' => ['label' => 'Revise quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'This quote is no longer active. Review the customer response and prepare a revision if needed.'],
-                            'accepted' => ($latestInvoice === null
-                                ? ['label' => 'Create invoice', 'route' => route('finance.index'), 'copy' => 'The customer accepted the quote. Create the invoice to begin tracking payment.']
-                                : ($latestInvoice->balance > 0
-                                    ? ['label' => 'Review invoice', 'route' => route('finance.invoices.show', $latestInvoice), 'copy' => 'Check the invoice balance and record payments as they arrive.']
-                                    : (!$outstandingPreparation->isEmpty()
-                                        ? ['label' => 'Complete preparation', 'route' => route('work.preparation.index', $event), 'copy' => $outstandingPreparation->count().' preparation item(s) still need attention.']
-                                        : (!$activePurchaseOrders->isEmpty()
-                                            ? ['label' => 'Review purchasing', 'route' => route('purchasing.index', ['event_id' => $event->id]), 'copy' => $activePurchaseOrders->count().' purchase order(s) are still active.']
-                                            : (!$plannedCosts->isEmpty()
-                                                ? ['label' => 'Review job costs', 'route' => route('work.costs.index', $event), 'copy' => $plannedCosts->count().' planned cost(s) still need to be incurred or cancelled.']
-                                                : ['label' => 'Review job close-out', 'route' => route('work.costs.index', $event), 'copy' => 'The quote is paid and outstanding preparation and purchasing are clear. Review the final job costs before closing it.'])))),
-                            default => ['label' => 'Open quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'Review the current quote for this job.'],
-                        }))));
+        $nextAction = null;
+
+        if (!in_array($event->status, ['completed', 'cancelled'], true)) {
+            if ($latestQuoteNeedsRevision) {
+                $nextAction = ['label' => 'Review quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'The job services changed after the latest quote. Review the current lines before using the quote.'];
+            } elseif (!$hasRequirements) {
+                $nextAction = ['label' => 'Add services', 'route' => route('work.requirements.create', $event), 'copy' => 'Choose what you are providing for this job.'];
+            } elseif (!$latestQuote) {
+                $nextAction = ['label' => 'Create quote', 'route' => route('work.quotes.create', $event), 'copy' => 'Your service scope is ready. Prepare the quote for the customer.'];
+            } else {
+                switch ($latestQuote->status) {
+                    case 'draft':
+                        $nextAction = ['label' => 'Finish quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'Review the quote and send it to the customer when it is ready.'];
+                        break;
+                    case 'sent':
+                        $nextAction = ['label' => 'Check customer decision', 'route' => route('quotes.show', $latestQuote), 'copy' => 'The quote has been sent. Check for the customer’s response before moving forward.'];
+                        break;
+                    case 'declined':
+                    case 'expired':
+                        $nextAction = ['label' => 'Revise quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'This quote is no longer active. Review the customer response and prepare a revision if needed.'];
+                        break;
+                    case 'accepted':
+                        if (!$latestInvoice) {
+                            $nextAction = ['label' => 'Create invoice', 'route' => route('finance.index'), 'copy' => 'The customer accepted the quote. Create the invoice to begin tracking payment.'];
+                        } elseif ($latestInvoice->balance > 0) {
+                            $nextAction = ['label' => 'Review invoice', 'route' => route('finance.invoices.show', $latestInvoice), 'copy' => 'Check the invoice balance and record payments as they arrive.'];
+                        } elseif (!$outstandingPreparation->isEmpty()) {
+                            $nextAction = ['label' => 'Complete preparation', 'route' => route('work.preparation.index', $event), 'copy' => $outstandingPreparation->count().' preparation item(s) still need attention.'];
+                        } elseif (!$activePurchaseOrders->isEmpty()) {
+                            $nextAction = ['label' => 'Review purchasing', 'route' => route('purchasing.index', ['event_id' => $event->id]), 'copy' => $activePurchaseOrders->count().' purchase order(s) are still active.'];
+                        } elseif (!$plannedCosts->isEmpty()) {
+                            $nextAction = ['label' => 'Review job costs', 'route' => route('work.costs.index', $event), 'copy' => $plannedCosts->count().' planned cost(s) still need to be incurred or cancelled.'];
+                        } else {
+                            $nextAction = ['label' => 'Review job close-out', 'route' => route('work.costs.index', $event), 'copy' => 'The quote is paid and outstanding preparation and purchasing are clear. Review the final job costs before closing it.'];
+                        }
+                        break;
+                    default:
+                        $nextAction = ['label' => 'Open quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'Review the current quote for this job.'];
+                }
+            }
+        }
     @endphp
 
     @if (session('schedule_warning'))
