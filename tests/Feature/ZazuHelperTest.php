@@ -253,19 +253,13 @@ class ZazuHelperTest extends TestCase
             'status' => 'draft',
         ]);
 
-        $html = $this->actingAs($user)->get(route('dashboard'))->assertOk()->getContent();
-        $overdue = strpos($html, 'data-priority="10"');
-        $purchasing = strpos($html, 'data-priority="20"');
-        $draft = strpos($html, 'data-priority="30"');
-        $setup = strpos($html, 'data-priority="40"');
+        $items = app(\\App\\Support\\ZazuHelperService::class)->attention($user, $business, 'dashboard');
 
-        $this->assertNotFalse($overdue);
-        $this->assertNotFalse($purchasing);
-        $this->assertNotFalse($draft);
-        $this->assertNotFalse($setup);
-        $this->assertLessThan($purchasing, $overdue);
-        $this->assertLessThan($draft, $purchasing);
-        $this->assertLessThan($setup, $draft);
+        $this->assertSame([10, 20, 30, 40], array_column($items, 'priority'));
+        $this->assertSame('1 preparation item overdue', $items[0]['title']);
+        $this->assertSame('1 purchase order still open', $items[1]['title']);
+        $this->assertSame('1 job still in draft', $items[2]['title']);
+        $this->assertSame('Workspace setup is still open', $items[3]['title']);
     }
 
     public function test_helper_does_not_expose_work_attention_to_a_member_without_work_view_permission(): void
