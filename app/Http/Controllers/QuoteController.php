@@ -91,7 +91,7 @@ class QuoteController extends Controller
             'deposit_percent' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
-            'quantity' => ['sometimes', 'required', 'array', 'min:1'],
+            'quantity' => ['required', 'array', 'min:1'],
             'quantity.*' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
         ]);
 
