@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AuditLog;
+use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\InventoryMovement;
@@ -302,12 +303,11 @@ class CommercialReconciliationTest extends TestCase
         );
     }
 
-
     public function test_work_store_created_job_reconciles_through_quote_invoice_payments_and_profit(): void
     {
         [$user, $business] = array_slice($this->prepareCommercialScenario(), 0, 2);
 
-        $customer = \App\Models\Customer::query()
+        $customer = Customer::query()
             ->where('business_id', $business->id)
             ->where('name', 'Mokoena Family Events')
             ->firstOrFail();
@@ -374,6 +374,4 @@ class CommercialReconciliationTest extends TestCase
         $this->assertSame(720000, $profit['indicative_result_cents']);
         $this->assertSame(72.0, $profit['indicative_margin_percentage']);
     }
-
-
 }
