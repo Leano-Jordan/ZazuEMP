@@ -68,6 +68,59 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('100 white chairs', $item->source_snapshot['description']);
     }
 
+    public function test_quote_quantity_can_be_confirmed_and_corrected_on_initial_quote_and_revision(): void
+    {
+        $customer = Customer::create(['name' => 'Quantity Review Customer']);
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-QTY-001',
+            'name' => 'Quantity Review Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'draft',
+        ]);
+        $requirement = $event->requirements()->create([
+            'description' => 'Catering package',
+            'category' => 'service',
+            'quantity' => '1.00',
+            'unit' => 'guest',
+            'status' => 'open',
+        ]);
+
+        $this->get(route('work.quotes.create', $event))
+            ->assertOk()
+            ->assertSee('name="quantity[' . $requirement->id . ']"', false)
+            ->assertSee('data-quote-line-total', false);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '120.00'],
+            'unit_price' => [$requirement->id => '85.00'],
+        ])->assertRedirect();
+
+        $quote = Quote::query()->firstOrFail();
+        $firstVersion = $quote->latestVersion()->with('items')->firstOrFail();
+        $firstItem = $firstVersion->items->firstOrFail();
+
+        $this->assertSame('120.00', (string) $requirement->fresh()->quantity);
+        $this->assertSame('120.00', (string) $firstItem->quantity);
+        $this->assertSame('10200.00', (string) $firstVersion->total);
+
+        $this->post(route('quotes.versions.store', $quote))->assertRedirect();
+        $revision = $quote->refresh()->latestVersion()->firstOrFail();
+
+        $this->put(route('quotes.versions.update', [$quote, $revision]), [
+            'quantity' => [$requirement->id => '150.00'],
+            'unit_price' => [$requirement->id => '90.00'],
+            'deposit_percent' => '0.00',
+        ])->assertRedirect(route('quotes.show', $quote));
+
+        $revision->refresh()->load('items');
+        $this->assertSame('150.00', (string) $requirement->fresh()->quantity);
+        $this->assertSame('150.00', (string) $revision->items->first()->quantity);
+        $this->assertSame('13500.00', (string) $revision->total);
+        $this->assertSame('120.00', (string) $firstVersion->fresh()->items()->firstOrFail()->quantity);
+    }
+
     public function test_quote_deposit_percent_calculates_from_final_total(): void
     {
         $customer = \App\Models\Customer::create([
