@@ -2763,6 +2763,9 @@ function setupZazuOfflineDirectoryViews() {
             try {
                 lastOriginAvailable = navigator.onLine && await canReachZazuOrigin();
                 notice.hidden = lastOriginAvailable;
+                window.dispatchEvent(new CustomEvent('zazu:origin-availability', {
+                    detail: { available: lastOriginAvailable },
+                }));
                 refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState());
             } finally {
                 checking = false;
@@ -2777,6 +2780,9 @@ function setupZazuOfflineDirectoryViews() {
         window.addEventListener('offline', () => {
             lastOriginAvailable = false;
             notice.hidden = false;
+            window.dispatchEvent(new CustomEvent('zazu:origin-availability', {
+                detail: { available: false },
+            }));
             refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState());
             refreshOriginAvailability();
         });
