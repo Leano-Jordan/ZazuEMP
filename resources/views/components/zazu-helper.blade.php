@@ -70,10 +70,10 @@
             ['label' => 'Protect', 'title' => 'Treat settings as controlled state', 'copy' => 'Important configuration should be auditable and protected from accidental changes.'],
         ],
     ];
-    $nicheService = app(\App\\Support\\NicheFocus::class);
+    $nicheService = app(\App\Support\NicheFocus::class);
     $nicheFocus = $business
         ? $nicheService->for(auth()->user(), $business)
-        : \App\\Support\\NicheFocus::DEFAULT;
+        : \App\Support\NicheFocus::DEFAULT;
     $businessFocuses = $business
         ? $nicheService->activeFor($business, $nicheFocus)
         : [];
@@ -83,7 +83,7 @@
     $eventNicheFocuses = [];
 
     if ($routeName === 'work.show'
-        && $event instanceof \App\\Models\\Event
+        && $event instanceof \App\Models\Event
         && $business
         && (int) $event->business_id === (int) $business->id) {
         $eventRequirements = $event->requirements()
