@@ -12,7 +12,7 @@ The Founder confirms physical operation of Zazu EMP on the PC and linked mobile 
 - **Data classification:** Founder confirms all test/business records supplied for this exercise are fictional.
 
 Do not ask the Founder to recreate records or repeat basic connected PC/mobile startup checks. Do not infer that connected operation proves disconnected cold-start, offline write/restart/reconnect, attachment sync, full installation restore, or transaction-level quote-to-profit reconciliation. Keep those distinct evidence gates open until directly demonstrated. The owner-PC off-disk backup/restore and POPIA/name-clearance gates are also unaffected.
-## Physical acceptance seed — prepared, execution gated by exact-head CI
+## Physical acceptance seed — READY FOR OWNER RUN
 
 **Seed status: PRESENT.** The Founder-confirmed fictional workspace already contains customers, quotes, invoices, suppliers, purchase orders and inventory. The PC and linked Android phone already use that same workspace. No duplicate seed records or re-pairing are required.
 
@@ -28,7 +28,7 @@ Do not ask the Founder to recreate records or repeat basic connected PC/mobile s
 
 **Evidence to record:** exact commit/build, Android model and browser/PWA version, host-offline and restart observations, queue state before/after, the single reconciled job, attachment open result, and commercial totals. Browser emulation is supporting evidence only; it does not close this physical gate.
 
-**Release gate:** this sequence is prepared, but execution is released only after exact-head Laravel, desktop/mobile offline-browser, quality, PHPMD and package checks pass. Physical acceptance remains OPEN until the Founder performs and records the actual-device run.
+**Automated gate:** PASS on source/test head `a0baea5901b139b1c7397a12d780af245841d3ce`: Laravel 691 passed / 1 skipped / 4,794 assertions; PostgreSQL migration/recovery; 63 desktop Chromium, 7 mobile viewport, 1 mobile host-outage and 1 phone-local attachment/reconnect; public/auth accessibility 1 passed; Zazu Quality, PHPMD, Director Health and Push-on-main passed. Windows V1 package/fresh-install passed on runtime implementation head `b9f9a146c5a1310ef75e1f3edf5a341851be005b`. SonarCloud was skipped. Physical acceptance is now **SEEDED AND READY**; it remains OPEN until the Founder performs and records the actual-device run.
 
 
 ## DB-001 disposition — Founder clarification (2026-11-22)
