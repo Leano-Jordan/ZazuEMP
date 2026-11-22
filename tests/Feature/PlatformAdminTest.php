@@ -27,6 +27,13 @@ class PlatformAdminTest extends TestCase
             ->assertSee('Venue image')
             ->assertSee('Decor and reception image')
             ->assertSee('Complete image library')
+            ->assertSee('data-zazu-library-image', false)
+            ->assertSee('data-zazu-slot-preview', false)
+            ->assertSee('click any image below to assign it')
+            ->assertDontSee('/images/landing/hero.svg')
+            ->assertDontSee('/images/landing/operations.svg')
+            ->assertDontSee('/images/landing/resources.svg')
+            ->assertDontSee('/images/landing/control.svg')
             ->assertSee('Upload image experiments')
             ->assertSee('data-zazu-upload-previews', false);
 
