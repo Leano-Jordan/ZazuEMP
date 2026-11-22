@@ -5,6 +5,12 @@
 **Release owner:** Isaac Junior Lehlogonolo Maluleka  
 **Rule:** browser emulation does not equal physical-device acceptance.
 
+## Founder-reported physical use — 2026-11-22
+
+The Founder confirms Zazu EMP has been physically used on the PC and linked mobile phone, both operating against the same workspace. This is recorded as **OWNER-VERIFIED PASS for normal connected operation and shared-workspace use**. The Founder also confirms the existing fictional workspace is populated across customers/clients, quotes, invoices, suppliers, purchase orders and inventory, and that these modules work as intended.
+
+This report does **not** certify the disconnected cold-launch/relaunch/reconnect flow, attachment round-trip, or a physical tablet test. Device model, OS/browser versions, deployed origin and exact release commit were not supplied with the screenshots. Keep those specific checks open; do not ask the Founder to repeat basic connected PC/mobile setup.
+
 ## Purpose
 
 Provide the controlled acceptance test for a real phone and real tablet before V1 release.
