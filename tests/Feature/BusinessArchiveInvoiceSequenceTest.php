@@ -1,0 +1,61 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Business;
+use App\Services\BusinessArchiveService;
+use App\Services\InvoiceNumberGenerator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
+
+class BusinessArchiveInvoiceSequenceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_business_archive_preserves_the_invoice_number_sequence(): void
+    {
+        $issuedAt = now();
+        $period = $issuedAt->format('Ym');
+
+        $source = Business::create([
+            'name' => 'Invoice Sequence Source',
+            'slug' => 'invoice-sequence-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        DB::table('invoice_number_sequences')->insert([
+            'business_id' => $source->id,
+            'period' => $period,
+            'next_number' => 42,
+            'created_at' => $issuedAt,
+            'updated_at' => $issuedAt,
+        ]);
+
+        $archive = app(BusinessArchiveService::class)->download($source);
+        $target = Business::create([
+            'name' => 'Invoice Sequence Target',
+            'slug' => 'invoice-sequence-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            app(BusinessArchiveService::class)->restore($archive, $target);
+        } finally {
+            @unlink($archive);
+        }
+
+        $nextNumber = DB::transaction(
+            fn (): string => app(InvoiceNumberGenerator::class)->nextForBusiness($target->id, $issuedAt),
+        );
+
+        $this->assertSame('INV-'.$period.'-000042', $nextNumber);
+        $this->assertDatabaseHas('invoice_number_sequences', [
+            'business_id' => $target->id,
+            'period' => $period,
+            'next_number' => 43,
+        ]);
+    }
+}
