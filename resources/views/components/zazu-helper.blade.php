@@ -70,9 +70,36 @@
             ['label' => 'Protect', 'title' => 'Treat settings as controlled state', 'copy' => 'Important configuration should be auditable and protected from accidental changes.'],
         ],
     ];
+    $nicheService = app(\\App\\Support\\NicheFocus::class);
     $nicheFocus = $business
-        ? app(\App\Support\NicheFocus::class)->for(auth()->user(), $business)
-        : \App\Support\NicheFocus::DEFAULT;
+        ? $nicheService->for(auth()->user(), $business)
+        : \\App\\Support\\NicheFocus::DEFAULT;
+    $businessFocuses = $business
+        ? $nicheService->activeFor($business, $nicheFocus)
+        : [];
+
+    $event = request()->route('event');
+    $eventComponents = collect();
+    $eventNicheFocuses = [];
+
+    if ($routeName === 'work.show'
+        && $event instanceof \\App\\Models\\Event
+        && $business
+        && (int) $event->business_id === (int) $business->id) {
+        $eventRequirements = $event->requirements()
+            ->with(['capability' => fn ($query) => $query->where('business_id', $business->id)])
+            ->get();
+
+        $eventComponents = $eventRequirements
+            ->map(fn ($requirement) => trim((string) ($requirement->description ?: $requirement->capability?->name ?: $requirement->category)))
+            ->filter()
+            ->unique()
+            ->values();
+
+        $eventNicheFocuses = $nicheService->matchingCategories(
+            $eventRequirements->pluck('category')->all()
+        );
+    }
 
     $focusGuidance = [
         'chairs_tents' => [
@@ -92,41 +119,20 @@
         ],
     ];
 
-    if (isset($focusGuidance[$nicheFocus][$routeName])) {
-        $guides[$routeName][2]['copy'] = $focusGuidance[$nicheFocus][$routeName];
-    }
+    // Business-wide guidance reflects the active catalogue mix. On Job detail,
+    // the saved requirements for this exact booking take precedence.
+    $guidanceFocuses = $routeName === 'work.show'
+        ? $eventNicheFocuses
+        : $businessFocuses;
+    $guidanceCopies = collect(array_slice($guidanceFocuses, 0, 3))
+        ->map(fn ($focus) => $focusGuidance[$focus][$routeName] ?? null)
+        ->filter()
+        ->values();
 
-    $event = request()->route('event');
-    $eventComponents = collect();
-
-    if ($routeName === 'work.show'
-        && $event instanceof \App\Models\Event
-        && $business
-        && (int) $event->business_id === (int) $business->id) {
-        $permissions = app(\App\Support\PermissionService::class);
-        $eventCountRelations = [];
-
-        foreach ([
-            'preparationItems' => 'work.view',
-            'purchaseOrders' => 'purchasing.view',
-            'assetAllocations' => 'assets.view',
-            'costs' => 'work.view',
-            'travelCosts' => 'work.view',
-        ] as $relation => $permission) {
-            if ($permissions->allows($permission, auth()->user(), $business)) {
-                $eventCountRelations[] = $relation;
-            }
-        }
-
-        $event->loadCount($eventCountRelations);
-
-        $eventComponents = $event->requirements()
-            ->with(['capability' => fn ($query) => $query->where('business_id', $business->id)])
-            ->get()
-            ->map(fn ($requirement) => trim((string) ($requirement->description ?: $requirement->capability?->name ?: $requirement->category)))
-            ->filter()
-            ->unique()
-            ->values();
+    if ($guidanceCopies->isNotEmpty() && isset($guides[$routeName][2])) {
+        $guides[$routeName][2]['copy'] = $guidanceCopies->count() > 1
+            ? 'For your active service mix: '.$guidanceCopies->implode(' ')
+            : $guidanceCopies->first();
     }
 
     $eventOperationalRecords = collect();
@@ -161,7 +167,7 @@
 @endphp
 
 @if(!empty($steps))
-    <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on" data-zazu-helper-focus="{{ $nicheFocus }}" data-zazu-helper-attention="{{ count($attention) }}">
+    <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on" data-zazu-helper-focus="{{ $nicheFocus }}" data-zazu-helper-focuses="{{ implode(',', $guidanceFocuses) }}" data-zazu-helper-attention="{{ count($attention) }}">
         <section id="zazu-helper-panel" class="zazu-helper-panel" data-zazu-helper-panel role="region" aria-label="Zazu workflow guide" hidden>
             <div class="zazu-helper-head">
                 <div class="zazu-helper-bird zazu-helper-bird-panel" aria-hidden="true">
