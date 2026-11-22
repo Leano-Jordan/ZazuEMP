@@ -319,7 +319,7 @@ The backup command now reopens its completed temporary ZIP, performs ZIP consist
 - GitHub Actions run `44179163841` passed all jobs on `76be1f234e7726352c2e15b511b37b9084d2ddfa`: application, Composer security audit and secret scan.
 - Application: `npm ci`, scoped npm audit policy and service-worker authentication cache-race tests all passed.
 - The exact GHSA-fc5q-39xc-vjpf / CVE-2026-112366 exception remains temporary because npm has no patched picomatch version. The audit script fails closed for every other high/critical advisory and for any dependency chain not exclusively attributable to this finding.
-- This is a CI gate resolution, not vulnerability remediation. Keep the advisory tracked until upstream publishes a fix or withdraws it. No readiness score uplift; DB-001 and owner acceptance gates remain open.
+- This is a CI gate resolution, not vulnerability remediation. Keep the advisory tracked until upstream publishes a fix or withdraws it. No readiness score uplift at that historical checkpoint; the DB-001 open label is superseded by the 2026-11-22 Founder clarification. Separate owner acceptance gates remain open.
 
 
 ## New-job form regression — CLOSED (2026-11-17)
@@ -328,7 +328,7 @@ The create screen had omitted the required Work / event name field although `Wor
 
 **Exact-head evidence:** Laravel run `44184183003` passed all three jobs: Laravel tests, PostgreSQL migration/registration/backup/restore/private-file recovery, and offline-browser acceptance (including the mobile customer-to-Work and phone-local attachment journeys). Zazu Quality `44184183085`, Windows V1 Package `44184182900` (including PowerShell fresh install), Director Health `44184182984` and Push-on-main `44184180721` also passed. SonarCloud was skipped, not passed.
 
-This is a closed form/CI regression, not a readiness uplift. the historical DB-001 open label is superseded by the 2026-11-22 Founder clarification; the separate operator acceptance gates remain open; release remains NOT READY and evidence maturity remains 73/100.
+This is a closed form/CI regression, not a readiness uplift. The historical DB-001 open label is superseded by the 2026-11-22 Founder clarification. The separate operator acceptance gates remain open; release remained NOT READY and evidence maturity remained 73/100 at that historical checkpoint.
 
 
 ## Historical DB-001 recurrence record — 2026-11-18 (superseded; not active)
@@ -340,6 +340,6 @@ A safe Windows capture utility was added to `main`: `ops/windows/Get-ZazuInciden
 **Closure still requires:** matching runtime record, a targeted correction, and successful repeat of the affected workflow on the intended installation. Do not alter the database while the cause is unknown. Release remains NOT READY; no score uplift.
 
 
-## DB-001 read-only local SQLite inspection — OPEN (2026-11-18)
+## Historical DB-001 read-only SQLite inspection — 2026-11-18 (superseded; tool retained only for a new recurrence)
 
 The read-only Windows diagnostic `ops/windows/Test-ZazuDatabaseSchema.ps1` remains available for a genuinely new, reproducible recurrence. Its historical request for an owner-PC report is superseded by the 2026-11-22 Founder clarification. Do not run it now, request a report or select a speculative schema correction. No DB-001 root cause or fix is claimed.
