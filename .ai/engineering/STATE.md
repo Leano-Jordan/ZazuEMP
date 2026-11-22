@@ -1462,6 +1462,6 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Static service-worker cache version advanced from v60 to v61 so installed clients receive the corrected worker.
 - Extended `PwaOfflineFoundationTest` source regression assertions for in-flight task reuse, cache reuse and continued asset priming.
 
-**Commits:** `0e2cc49` (worker), `7c8b93e` (initial regression assertions), `e1d6f8a` (preserve asset priming), with the latest test assertion commit recorded separately below.
+**Commits:** `0e2cc49` (worker), `7c8b93e` (initial regression assertions), `e1d6f8a` (preserve asset priming), and `b26564c` (final regression assertions).
 
 **Acceptance:** implementation is committed to `main`; exact-head Laravel, offline-browser, quality and PHPMD runs are pending. Do not mark the founder-reported device symptom resolved until the new worker is deployed/served and the phone/PC navigation experience is confirmed. If the warning persists after v61 is active, inspect which required route is failing rather than suppressing the notice.
