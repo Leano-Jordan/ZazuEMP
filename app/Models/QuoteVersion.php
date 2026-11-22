@@ -63,11 +63,20 @@ class QuoteVersion extends Model
         $this->loadMissing('items');
 
         $allItems = $this->items;
-        if ($allItems->contains(fn (QuoteItem $item) => $item->event_requirement_id === null)) {
+        $hasDetachedRequirement = $allItems->contains(function (QuoteItem $item): bool {
+            $snapshot = is_array($item->source_snapshot) ? $item->source_snapshot : [];
+
+            return $item->event_requirement_id === null
+                && array_key_exists('requirement_id', $snapshot);
+        });
+
+        if ($hasDetachedRequirement) {
             return false;
         }
 
-        $items = $allItems->keyBy('event_requirement_id');
+        $items = $allItems
+            ->filter(fn (QuoteItem $item) => $item->event_requirement_id !== null)
+            ->keyBy('event_requirement_id');
 
         if ($items->count() !== $requirements->count()) {
             return false;
