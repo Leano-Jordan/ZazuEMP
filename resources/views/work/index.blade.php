@@ -28,7 +28,7 @@
         @endforeach
     </nav>
 
-    <section class="zazu-ops-register zazu-card" aria-labelledby="work-register-title">
+    <section class="zazu-ops-register zazu-card" data-zazu-anchor="work.register" aria-labelledby="work-register-title">
         <div class="zazu-card-header zazu-ops-register-head">
             <div>
                 <div class="zazu-eyebrow">Operational register</div>
