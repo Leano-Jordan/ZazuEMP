@@ -58,6 +58,7 @@ class BusinessArchiveInvoiceSequenceTest extends TestCase
             'next_number' => 43,
         ]);
     }
+
     public function test_legacy_business_archive_without_invoice_sequence_remains_restorable(): void
     {
         $source = Business::create([
@@ -95,5 +96,4 @@ class BusinessArchiveInvoiceSequenceTest extends TestCase
             'business_id' => $target->id,
         ]);
     }
-
 }
