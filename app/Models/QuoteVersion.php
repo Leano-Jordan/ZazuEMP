@@ -62,48 +62,56 @@ class QuoteVersion extends Model
     {
         $this->loadMissing('items');
 
-        $allItems = $this->items;
-        $hasDetachedRequirement = $allItems->contains(function (QuoteItem $item): bool {
+        $items = $this->items;
+
+        if ($this->hasDetachedRequirementItems($items)) {
+            return false;
+        }
+
+        $itemsByRequirement = $items
+            ->filter(fn (QuoteItem $item) => $item->event_requirement_id !== null)
+            ->keyBy('event_requirement_id');
+
+        if ($itemsByRequirement->count() !== $requirements->count()) {
+            return false;
+        }
+
+        foreach ($requirements as $requirement) {
+            $item = $itemsByRequirement->get($requirement->id);
+
+            if (! $item || ! $this->itemMatchesRequirement($item, $requirement)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function hasDetachedRequirementItems(Collection $items): bool
+    {
+        return $items->contains(function (QuoteItem $item): bool {
             $snapshot = is_array($item->source_snapshot) ? $item->source_snapshot : [];
 
             return $item->event_requirement_id === null
                 && array_key_exists('requirement_id', $snapshot);
         });
+    }
 
-        if ($hasDetachedRequirement) {
-            return false;
-        }
+    private function itemMatchesRequirement(QuoteItem $item, mixed $requirement): bool
+    {
+        $snapshot = is_array($item->source_snapshot) ? $item->source_snapshot : [];
+        $expected = [
+            'description' => (string) $requirement->description,
+            'category' => $requirement->category,
+            'quantity' => (string) $requirement->quantity,
+            'unit' => $requirement->unit,
+            'notes' => $requirement->notes,
+            'capability_id' => $requirement->capability_id ? (int) $requirement->capability_id : null,
+        ];
 
-        $items = $allItems
-            ->filter(fn (QuoteItem $item) => $item->event_requirement_id !== null)
-            ->keyBy('event_requirement_id');
-
-        if ($items->count() !== $requirements->count()) {
-            return false;
-        }
-
-        foreach ($requirements as $requirement) {
-            $item = $items->get($requirement->id);
-
-            if (!$item) {
+        foreach ($expected as $key => $value) {
+            if (($snapshot[$key] ?? null) !== $value) {
                 return false;
-            }
-
-            $snapshot = is_array($item->source_snapshot) ? $item->source_snapshot : [];
-
-            $expected = [
-                'description' => (string) $requirement->description,
-                'category' => $requirement->category,
-                'quantity' => (string) $requirement->quantity,
-                'unit' => $requirement->unit,
-                'notes' => $requirement->notes,
-                'capability_id' => $requirement->capability_id ? (int) $requirement->capability_id : null,
-            ];
-
-            foreach ($expected as $key => $value) {
-                if (($snapshot[$key] ?? null) !== $value) {
-                    return false;
-                }
             }
         }
 
