@@ -12,6 +12,24 @@ The Founder confirms physical operation of Zazu EMP on the PC and linked mobile 
 - **Data classification:** Founder confirms all test/business records supplied for this exercise are fictional.
 
 Do not ask the Founder to recreate records or repeat basic connected PC/mobile startup checks. Do not infer that connected operation proves disconnected cold-start, offline write/restart/reconnect, attachment sync, full installation restore, or transaction-level quote-to-profit reconciliation. Keep those distinct evidence gates open until directly demonstrated. The owner-PC off-disk backup/restore and POPIA/name-clearance gates are also unaffected.
+## Physical acceptance seed — prepared, execution gated by exact-head CI
+
+**Seed status: PRESENT.** The Founder-confirmed fictional workspace already contains customers, quotes, invoices, suppliers, purchase orders and inventory. The PC and linked Android phone already use that same workspace. No duplicate seed records or re-pairing are required.
+
+**Physical Android acceptance sequence:**
+1. Record the tested main commit and installed build. Confirm the phone is using the installed Zazu PWA over its supported HTTPS origin and that the local mutation/attachment queues are clear before starting.
+2. Keep phone Wi-Fi enabled. Stop the Zazu host on the PC; do not use airplane mode. Confirm the phone detects the unavailable host and offers the offline workspace.
+3. Open the cached dashboard, Customers and Work screens. Create one clearly named offline acceptance job against an existing fictional customer and attach one small file from the phone.
+4. Force-close the installed PWA/browser completely while the host remains stopped. Relaunch it and verify the job, its details and attachment remain available, with the mutation still pending locally.
+5. Restart the PC host. Wait for the queue to reconcile. Verify on both devices that exactly one job exists, its attachment is present and opens, and no pending mutation or attachment remains.
+6. Using the existing populated fictional commercial records, trace an accepted quote version through invoice, recorded payments, actual costs and the resulting profit/margin. Record the actual values; do not substitute the seeded automated test's example amounts.
+
+**Stop conditions:** if the queue does not drain, the attachment is missing, a duplicate appears, or the app asks to clear/re-pair the device, stop and preserve local data. Do not clear browser storage, uninstall the PWA or repeat the operation until the cause is captured.
+
+**Evidence to record:** exact commit/build, Android model and browser/PWA version, host-offline and restart observations, queue state before/after, the single reconciled job, attachment open result, and commercial totals. Browser emulation is supporting evidence only; it does not close this physical gate.
+
+**Release gate:** this sequence is prepared, but execution is released only after exact-head Laravel, desktop/mobile offline-browser, quality, PHPMD and package checks pass. Physical acceptance remains OPEN until the Founder performs and records the actual-device run.
+
 
 ## DB-001 disposition — Founder clarification (2026-11-22)
 
