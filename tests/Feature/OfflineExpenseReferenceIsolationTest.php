@@ -7,6 +7,7 @@ use App\Models\AssetAllocation;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\EventCost;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\FinanceExpense;
@@ -112,7 +113,7 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             $this->assertSame('pending', $mutation->fresh()->status);
         }
 
-        $this->assertSame(0, \App\Models\EventCost::query()
+        $this->assertSame(0, EventCost::query()
             ->where('business_id', $business->id)
             ->count());
     }
