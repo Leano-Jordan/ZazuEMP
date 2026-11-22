@@ -1,3 +1,17 @@
+## Helper event-component context slice — 2026-11-23
+
+**Implemented directly on `main`:**
+- On Job detail only, Helper now reads the current event's saved `EventRequirement` records and surfaces up to four distinct component descriptions under “This booking includes”.
+- The query is anchored to the route's current `Event`, verifies that event belongs to the active business, and scopes any capability fallback lookup to that same business.
+- Added a feature test with a tent/chair booking to assert the actual saved components are shown and unrelated catering/camera prompts are absent.
+- This is event-scope awareness, not a new workflow engine. It does not yet infer component-specific preparation actions, change navigation, hide modules, or implement preset composition.
+
+**Verification:** source/test changes read back from `main`; exact-head CI remains unverified. Physical acceptance remains outstanding.
+
+**Next target:** derive Helper's actionable prompts from existing event component types and their real linked operational records (assets/allocations, preparation, purchasing, costs and delivery). Only recommend work when the underlying record and permission support it. Avoid generic “all modules” guidance.
+
+---
+
 ## Helper business-focus guidance slice — 2026-11-23
 
 **Implemented directly on `main`:**
