@@ -170,7 +170,7 @@ class WorkPlanningWorkflowTest extends TestCase
     {
         $event = $this->event();
         $requirement = EventRequirement::create([
-            'event_id' => $event->id, 'description' => 'Starter catering', 'category' => 'Catering',
+            'event_id' => $event->id, 'description' => 'Starter catering', 'category' => 'service',
             'quantity' => 1, 'unit' => 'service', 'status' => 'open',
         ]);
 
@@ -184,14 +184,15 @@ class WorkPlanningWorkflowTest extends TestCase
         $originalItem = $originalVersion->items()->firstOrFail();
 
         $this->put(route('work.requirements.update', [$event, $requirement]), [
-            'description' => 'Full-service catering', 'category' => 'Catering',
-            'quantity' => '80.00', 'unit' => 'guests', 'notes' => 'Includes setup and service',
+            'description' => 'Full-service catering', 'category' => 'service',
+            'quantity' => '80.00', 'unit' => 'custom guests', 'notes' => 'Includes setup and service',
         ])->assertRedirect(route('work.requirements.index', $event));
 
         $requirement->refresh();
         $originalItem->refresh();
         $this->assertSame('Full-service catering', $requirement->description);
         $this->assertSame('80.00', (string) $requirement->quantity);
+        $this->assertSame('custom guests', $requirement->unit);
         $this->assertSame('Starter catering', $originalItem->description);
         $this->assertSame('1.00', (string) $originalItem->quantity);
         $this->assertFalse($originalVersion->fresh()->matchesRequirements($event->requirements()->get()));
