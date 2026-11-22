@@ -27,7 +27,7 @@ class ZazuHelperTest extends TestCase
             ->assertSee('Turn guide off')
             ->assertSee('aria-expanded="false"', false)
             ->assertDontSee('data-zazu-helper-toggle aria-expanded="false" aria-pressed', false)
-            ->assertSee('data-zazu-guide-enabled="on"', false);
+            ->assertSee('data-zazu-guide-enabled="on"', false)
             ->assertSee('data-zazu-helper-recommendation', false)
             ->assertSee('data-zazu-helper-connectivity', false);
     }
