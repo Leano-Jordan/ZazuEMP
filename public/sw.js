@@ -445,14 +445,11 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
 
                     const pageRequest = new Request(new URL(path, self.location.origin));
                     const existingPage = await cache.match(pageRequest);
-                    if (existingPage) {
-                        primedRoutes.add(new URL(path, self.location.origin).pathname);
-                        return;
-                    }
+                    const pageHtml = existingPage ? await existingPage.clone().text() : html;
+                    if (!existingPage) await cache.put(pageRequest, response.clone());
 
-                    await cache.put(pageRequest, response.clone());
                     primedRoutes.add(new URL(path, self.location.origin).pathname);
-                    await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);
+                    await primeStaticAssetsFromHtml(pageHtml, primeGeneration, primedStaticAssetUrls, controller.signal);
                     await primePrivateMediaFromHtml(
                         html,
                         primeGeneration,
