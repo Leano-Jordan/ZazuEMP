@@ -1466,3 +1466,22 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Commits:** `0e2cc49` (worker), `7c8b93e` (initial regression assertions), `e1d6f8a` (preserve asset priming), `b26564c` (final source assertions), and `f1ff0b1` (concurrent offline-browser regression).
 
 **Acceptance:** implementation is committed to `main`; exact-head Laravel, offline-browser, quality and PHPMD runs are pending for the latest regression commit. Do not mark the founder-reported device symptom resolved until the new worker is deployed/served and the phone/PC navigation experience is confirmed. If the warning persists after v61 is active, inspect which required route is failing rather than suppressing the notice.
+
+
+## Offline page-cache warning — priming lifecycle correction — 2026-11-22
+
+**Founder-reported symptom:** ordinary page navigation repeatedly displayed the offline-cache preparation warning.
+
+**Confirmed source defect:** page boot starts the same authenticated multi-route cache prime. Navigation aborted the active worker task, and the next page boot restarted it. The client then interpreted the interrupted run as a genuine cache failure. A second lifecycle edge case allowed logout/session clearing to leave a stale in-flight task reference that a later same-workspace prime could join.
+
+**Implemented on main:**
+- Same-user/business prime requests now join the active task instead of aborting/restarting it.
+- Normal page navigation no longer aborts background priming.
+- Successfully fetched route HTML is refreshed in the private workspace cache, and its static/private assets continue to be primed.
+- Clearing the authenticated workspace aborts and releases the in-flight task reference so a later login can start a fresh prime.
+- Service-worker static cache advanced to `zazu-static-v61`.
+- Regression coverage now exercises concurrent same-workspace prime requests across navigation and a fresh prime after logout invalidates an earlier task.
+
+**Verification on source/test head `a0baea5901b139b1c7397a12d780af245841d3ce`:** Laravel **691 passed / 1 skipped / 4,794 assertions**; PostgreSQL migration/recovery smoke **PASS**; Zazu Quality **PASS**; PHPMD **PASS**; Director Health **PASS**. The exact-head offline-browser acceptance job is still running; do not claim the full post-fix desktop/mobile suite passed until it completes. SonarCloud is skipped. Windows V1 package/fresh-install passed on runtime source head `b9f9a146c5a1310ef75e1f3edf5a341851be005b`.
+
+**Physical acceptance seed:** the Founder-confirmed fictional PC/phone workspace is already populated. A controlled Android offline/restart/reconnect runbook is prepared in `docs/V1_RELEASE_CHECKLIST.md`. The actual physical-device gate remains OPEN until the Founder performs the run on the installed phone. Do not ask the Founder to recreate the seed records.
