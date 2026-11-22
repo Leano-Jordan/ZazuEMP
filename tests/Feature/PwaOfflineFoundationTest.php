@@ -73,10 +73,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('requiredOfflineRoutes.every((path) => primedRoutes.has(path))', $worker);
         $this->assertStringContainsString('let activePrimeTask = null;', $worker);
         $this->assertStringContainsString('activePrimeTaskContext === taskContext', $worker);
-        $this->assertStringContainsString('const existingPage = await cache.match(pageRequest);', $worker);
-        $this->assertStringContainsString('if (!existingPage) await cache.put(pageRequest, response.clone());', $worker);
-        $this->assertStringContainsString('const pageHtml = existingPage ? await existingPage.clone().text() : html;', $worker);
-        $this->assertStringContainsString('await primeStaticAssetsFromHtml(pageHtml, primeGeneration, primedStaticAssetUrls, controller.signal);', $worker);
+        $this->assertStringContainsString('await cache.put(pageRequest, response.clone());', $worker);
+        $this->assertStringContainsString('await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);', $worker);
         $this->assertStringNotContainsString('Real navigation takes priority over background cache warming', $worker);
         $this->assertStringContainsString('responseUrl.pathname !== requestedUrl.pathname', $worker);
         $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
