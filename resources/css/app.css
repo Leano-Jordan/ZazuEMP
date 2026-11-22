@@ -8385,3 +8385,31 @@ body.zazu-has-wallpaper .zazu-content {
         box-sizing: border-box;
     }
 }
+
+
+/* Quote quantity confirmation — make the commercial decision impossible to miss. */
+.zazu-quote-quantity-instruction {
+    margin: 12px 0 16px;
+    padding: 13px 15px;
+    border: 1px solid #d59a32;
+    border-left: 4px solid #b97812;
+    border-radius: 10px;
+    background: color-mix(in srgb, #d59a32 10%, var(--zazu-surface));
+    color: var(--zazu-ink);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.zazu-quote-quantity-instruction strong { display: block; margin-bottom: 2px; }
+.zazu-quote-quantity-field {
+    padding: 12px;
+    border: 1px solid color-mix(in srgb, #d59a32 65%, var(--zazu-border));
+    border-radius: 10px;
+    background: color-mix(in srgb, #d59a32 7%, var(--zazu-surface));
+}
+.zazu-quote-quantity-field .zazu-label { font-weight: 850; }
+.zazu-quote-quantity-field input { border-width: 2px; border-color: #b97812; min-height: 48px; }
+.zazu-quote-quantity-field input::placeholder { color: var(--zazu-muted); opacity: 1; }
+.zazu-quote-quantity-field .zazu-field-help strong { color: var(--zazu-ink); }
+@media (prefers-reduced-motion: no-preference) {
+    .zazu-quote-quantity-field input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, #d59a32 25%, transparent); }
+}
