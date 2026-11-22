@@ -71,8 +71,8 @@
         ],
     ];
     $nicheFocus = $business
-        ? app(\\App\\Support\\NicheFocus::class)->for(auth()->user(), $business)
-        : \\App\\Support\\NicheFocus::DEFAULT;
+        ? app(\App\\Support\\NicheFocus::class)->for(auth()->user(), $business)
+        : \App\\Support\\NicheFocus::DEFAULT;
 
     $focusGuidance = [
         'chairs_tents' => [
