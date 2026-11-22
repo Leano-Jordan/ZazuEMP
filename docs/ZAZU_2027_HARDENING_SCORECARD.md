@@ -7,7 +7,7 @@
 - Laravel **679 passed / 1 skipped / 4,671 assertions**; Zazu Quality, PHPMD, Psalm, PostgreSQL recovery, populated upgrade/rollback and Windows fresh-install acceptance passed. Windows PowerShell 5.1 backup-runner metadata test [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) passed.
 - **Score disposition: 77/100 unchanged.** This closes a meaningful backup-observability defect but does not replace the owner-PC off-disk and full restore drill. V1 remains **NOT READY**.
 
-**Next engineering target:** populated commercial quote-to-profit reconciliation.
+**Next active target (one-target WIP limit): DB-001 on the Founder's actual installation.** Run the read-only schema check and inspect the matching classified incident record before any correction. Populated commercial quote-to-profit proof is priority 2.
 
 ---
 
