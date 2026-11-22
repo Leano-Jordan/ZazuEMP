@@ -135,11 +135,13 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
 
     function dispatchMessage(data) {
         const pending = [];
+        const messages = [];
         listeners.get('message')({
             data,
+            ports: [{ postMessage: (message) => messages.push(message), close: () => {} }],
             waitUntil: (promise) => pending.push(Promise.resolve(promise)),
         });
-        return Promise.all(pending);
+        return Promise.all(pending).then(() => messages);
     }
 
     function dispatchFetch(request) {
@@ -260,6 +262,41 @@ test('authenticated uploaded images are cached only in the active business cache
     assert.equal(offlineResponse.ok, true);
     assert.equal(await offlineResponse.text(), 'image-bytes');
     await offline.finished();
+});
+
+test('cached offline pages remain prepared when a later prime attempt hits a transient outage', async () => {
+    let hostAvailable = true;
+    const worker = bootWorker(async (request) => {
+        if (!hostAvailable) throw new Error('Temporary host outage');
+        const path = new URL(request.url).pathname;
+        return new MockResponse(
+            '<body data-zazu-user-id="41" data-zazu-business-id="17"><main>' + path + '</main></body>',
+            { headers: { 'content-type': 'text/html; charset=utf-8' } },
+        );
+    });
+    const routes = ['/dashboard', '/customers', '/customers/create', '/work', '/work/create'];
+
+    const firstAttempt = await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes,
+    });
+    assert.deepEqual(firstAttempt, [{ type: 'prime-pages-complete', success: true }]);
+
+    hostAvailable = false;
+    const retryAttempt = await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes,
+    });
+
+    assert.deepEqual(
+        retryAttempt,
+        [{ type: 'prime-pages-complete', success: true }],
+        'existing authenticated offline pages must satisfy readiness during a temporary outage',
+    );
 });
 
 test('page priming rejects cross-origin and API routes before making credentialed requests', async () => {
