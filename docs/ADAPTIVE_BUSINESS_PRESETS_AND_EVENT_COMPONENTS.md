@@ -157,3 +157,21 @@ The Job-detail Helper now reads counts from the current business-owned Event's e
 ## Permission-aware Helper context — 2026-11-23
 
 The linked-booking summary now checks the active user's existing workspace permissions before rendering each record count: preparation/cost/travel context requires `work.view`, purchase-order context requires `purchasing.view`, and asset-allocation context requires `assets.view`. The event remains constrained to the active business. A feature test covers a staff member with `work.view` but without purchasing access: preparation context remains visible while the purchase-order count is withheld. This is presentation-layer minimization; the existing route middleware and server authorization remain the security boundary.
+
+
+## Helper interaction and validation model — 2026-11-23
+
+The Helper should behave like a dependable operations coach, not a generic chatbot. Commercial guidance products such as Intercom Fin separate focused guidance from procedures, encourage precise conditions and concrete outcomes, and provide a preview/testing step before publishing changes. Zazu applies the useful product lessons without copying the AI-agent architecture:
+
+1. **One current context:** use the active business, current route, signed-in member permissions and (on Job detail) that Job's saved requirement categories.
+2. **One best next action:** prefer the Job's existing state-derived next-action source. Elsewhere, choose the highest-priority permission-filtered attention item.
+3. **A visible reason:** explain why the action matters using the same authoritative state that triggered it.
+4. **A permitted destination:** link only to an internal action/page the member can access. UI guidance must never become an authorization bypass.
+5. **No fabricated work:** do not recommend a specialist workflow because an event type sounds like it might need it. Use saved requirement components and actual linked records.
+6. **Preview before activation:** future changes to Helper rules should be tested against representative DJ, tent/chair, catering and mixed-service fixtures before being treated as ready.
+
+The current implementation now combines the member's selected primary focus with up to two additional focus areas inferred from active business catalogue categories. On Job detail, the saved requirement categories for that business-owned Job take precedence over the general business mix. Inactive catalogue items are excluded. This affects guidance only; it does not enable modules, hide records, grant access or change historical data.
+
+Attention ordering is now explicit: overdue preparation (priority 10), open purchase orders (20), draft Jobs (30), then optional owner setup reminders (40). Members without the corresponding permission do not receive those records as Helper attention. The exact priority order and multi-capability/event-specific focus have feature tests.
+
+**Commercial references:** [Intercom Fin Guidance best practices](https://www.intercom.com/help/en/articles/10560969-fin-guidance-best-practices), [Provide Fin AI Agent with specific guidance](https://www.intercom.com/help/en/articles/10210126-provide-fin-ai-agent-with-specific-guidance), and [Use Fin previews](https://www.intercom.com/help/en/articles/12599471-use-fin-previews). These are product-design references only; Zazu's workflow state and permissions remain authoritative.
