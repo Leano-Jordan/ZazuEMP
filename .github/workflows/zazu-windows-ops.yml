@@ -441,10 +441,12 @@ jobs:
           if ([string]$failedStatus.last_successful_at -ne $lastSuccess) {
             throw 'A failed secondary copy must preserve the timestamp of the previous verified copy.'
           }
-          if ([string]$failedStatus.secondary_archive_path -ne [string]$verifiedStatus.secondary_archive_path
-              -or [string]$failedStatus.secondary_archive_sha256 -ne [string]$verifiedStatus.secondary_archive_sha256
-              -or [long]$failedStatus.secondary_archive_size_bytes -ne [long]$verifiedStatus.secondary_archive_size_bytes
-              -or [long]$failedStatus.secondary_archive_modified_unix -ne [long]$verifiedStatus.secondary_archive_modified_unix) {
+          if (
+            [string]$failedStatus.secondary_archive_path -ne [string]$verifiedStatus.secondary_archive_path -or
+            [string]$failedStatus.secondary_archive_sha256 -ne [string]$verifiedStatus.secondary_archive_sha256 -or
+            [long]$failedStatus.secondary_archive_size_bytes -ne [long]$verifiedStatus.secondary_archive_size_bytes -or
+            [long]$failedStatus.secondary_archive_modified_unix -ne [long]$verifiedStatus.secondary_archive_modified_unix
+          ) {
             throw 'A failed secondary copy must preserve the previous verified archive integrity metadata.'
           }
 
