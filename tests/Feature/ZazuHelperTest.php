@@ -285,6 +285,31 @@ class ZazuHelperTest extends TestCase
             ->assertDontSee('preparation item overdue');
     }
 
+    public function test_helper_guidance_adapts_to_the_saved_business_focus(): void
+    {
+        $cases = [
+            'chairs_tents' => 'Keep hire quantities, availability, delivery, setup, collection and asset condition connected to each booking.',
+            'sound_dj' => 'Keep sound equipment, crew, setup/breakdown, programme timing and transport connected to each booking.',
+            'catering_baking' => 'Keep menus, quantities, dietary details, purchasing, preparation and delivery connected to each booking.',
+        ];
+
+        foreach ($cases as $focus => $expectedGuidance) {
+            $business = $this->makeBusiness('Helper Focus '.Str::random(6));
+            $user = User::factory()->create();
+            $business->users()->attach($user->id, [
+                'role' => 'owner',
+                'primary_niche' => $focus,
+                'experience_level' => 'intermediate',
+            ]);
+
+            $this->actingAs($user)
+                ->get(route('dashboard'))
+                ->assertOk()
+                ->assertSee('data-zazu-helper-focus="'.$focus.'"', false)
+                ->assertSee($expectedGuidance);
+        }
+    }
+
     private function makeBusiness(string $name): Business
     {
         return Business::create([
