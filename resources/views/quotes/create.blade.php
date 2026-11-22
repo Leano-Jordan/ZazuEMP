@@ -13,7 +13,7 @@
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Commercial</div>
             <h2 class="zazu-command-title">Build draft quote v1</h2>
-            <p class="zazu-command-copy">Review every line before sending. Confirm the quantity, unit and price for each product or service. Saved prices are filled in where available.</p>
+            <p class="zazu-command-copy">Some starter lines begin at 1. Confirm the correct quantity, unit and price for every product or service before saving. Saved prices are filled in where available.</p>
         </div>
     </section>
 
@@ -99,7 +99,7 @@
                                                 name="quantity[{{ $requirement->id }}]"
                                                 value="{{ old('quantity.'.$requirement->id, $requirement->quantity) }}"
                                                 data-quote-quantity class="zazu-input" required>
-                                            <span class="zazu-field-help">How many {{ $requirement->unit ?: 'units' }} are needed?</span>
+                                            <span class="zazu-field-help">Unit: {{ $requirement->unit ?: 'not specified' }}. Enter the amount required.</span>
                                             @error('quantity.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
                                         </label>
                                         <label class="zazu-field">
