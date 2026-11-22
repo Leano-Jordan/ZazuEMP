@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\Event;
 use App\Models\EventCost;
+use App\Models\EventRequirement;
+use App\Models\Quote;
 use App\Models\EventPreparationItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -163,6 +165,7 @@ class WorkPlanningWorkflowTest extends TestCase
 
         $this->assertSame('open', $item->fresh()->status);
     }
+
     public function test_requirement_can_be_corrected_online_without_rewriting_an_existing_quote_snapshot(): void
     {
         $event = $this->event();
