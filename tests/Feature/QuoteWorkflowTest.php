@@ -495,6 +495,45 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('1.00', (string) $requirement->fresh()->quantity);
     }
 
+    public function test_quote_revision_rejects_missing_quantity_confirmation(): void
+    {
+        $customer = Customer::create(['name' => 'Revision Quantity Customer']);
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-QTY-003',
+            'name' => 'Revision Quantity Event',
+            'event_date' => now()->addDays(13)->toDateString(),
+            'status' => 'draft',
+        ]);
+        $requirement = $event->requirements()->create([
+            'description' => 'Starter service',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
+        $quote = app(\\App\\Services\\QuoteService::class)->createFromRequirements(
+            $event,
+            collect([$requirement->load('capability')]),
+            [$requirement->id => '500.00'],
+            'ZAR',
+            null,
+            null
+        );
+
+        $this->post(route('quotes.versions.store', $quote))->assertRedirect();
+        $revision = $quote->refresh()->latestVersion()->firstOrFail();
+
+        $this->from(route('quotes.versions.edit', [$quote, $revision]))
+            ->put(route('quotes.versions.update', [$quote, $revision]), [
+                'unit_price' => [$requirement->id => '550.00'],
+            ])
+            ->assertRedirect(route('quotes.versions.edit', [$quote, $revision]))
+            ->assertSessionHasErrors('quantity');
+
+        $this->assertSame('1.00', (string) $requirement->fresh()->quantity);
+        $this->assertSame('500.00', (string) $revision->fresh()->items()->firstOrFail()->unit_price);
+    }
+
     public function test_quote_creation_requires_a_price_for_each_current_requirement(): void
     {
         $customer = Customer::create(['name' => 'Validation Customer']);
