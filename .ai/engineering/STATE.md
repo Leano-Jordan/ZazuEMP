@@ -1409,3 +1409,19 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Commits: d992046 (test class correction), b8a819e (progress state), 9d58102 / 04dfb32 (focused tests), e949b7f (six-column layout).
 - A final contextual fallback keeps the Invoice & payment stage inside the current Job (quote creation or quote detail) until an accepted quote exists; commit 8bdc66c. Exact-head Laravel, formatting, PHPMD, offline-browser and security checks are queued for the current main head; do not treat this implementation as accepted until those checks complete.
 - Rendered visual and mobile review remain unverified; source-level changes do not establish visual acceptance.
+
+## Quote quantity review — 2026-11-22
+
+**Founder usability finding:** quote creation allowed starter requirements to carry a default quantity of 1 without a clear review step. The quote editor showed the quantity only as secondary metadata and its live total calculation defaulted to 1 when no explicit quantity value was present. This could produce a commercially misleading quote.
+
+**Implemented on main:**
+- Initial quote creation and draft revision editors now expose a prominent, required quantity input beside the unit price for every line.
+- Each line displays its own live line total; the quote subtotal, tax, total and deposit recalculate from the entered quantities and prices.
+- The editor copy explicitly asks the user to review quantities, units and prices before saving.
+- Submitted quantities update the underlying job requirements and quote snapshots in one database transaction, preserving the requirement-to-quote freshness contract. Previous quote versions remain unchanged.
+- Existing service callers that do not submit a quantity array retain the stored requirement quantities for compatibility.
+- Added a feature regression covering quantity changes during initial quote creation and a later draft revision.
+
+**Verification status:** implementation and regression test are committed; local PHPUnit, Blade compilation, JS execution and rendered desktop/mobile + light/dark visual review have not been run in this environment. Exact-head GitHub Actions results must be checked before acceptance. Do not mark this target VERIFIED until those gates are evidenced.
+
+**Known UI acceptance points:** confirm the quantity field, unit hint, line total and live summary are clear at phone width; confirm validation errors remain visible and no horizontal overflow is introduced. This is a workflow correctness fix as well as a visual hierarchy change.
