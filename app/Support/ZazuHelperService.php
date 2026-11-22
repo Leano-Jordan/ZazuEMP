@@ -26,10 +26,13 @@ class ZazuHelperService
 
         $items = [];
 
+        // Operational deadlines and commitments outrank optional setup polish.
         $this->addOwnerSetupAttention($items, $user, $business);
         $this->addOverduePreparationAttention($items, $user, $business);
         $this->addPurchasingAttention($items, $user, $business);
         $this->addDraftWorkAttention($items, $user, $business);
+
+        usort($items, static fn (array $left, array $right) => ($left['priority'] ?? 100) <=> ($right['priority'] ?? 100));
 
         return array_slice($items, 0, 4);
     }
@@ -45,6 +48,7 @@ class ZazuHelperService
         }
 
         $items[] = [
+            'priority' => 40,
             'title' => 'Workspace setup is still open',
             'copy' => 'Finish or deliberately defer the remaining setup steps so the workspace reflects your operating context.',
             'href' => route('onboarding.index'),
@@ -73,6 +77,7 @@ class ZazuHelperService
         }
 
         $items[] = [
+            'priority' => 10,
             'title' => $overdue.' preparation item'.($overdue === 1 ? '' : 's').' overdue',
             'copy' => 'Review the affected jobs and clear or re-plan the outstanding operational work.',
             'href' => route('work.index', ['filter' => 'overdue']),
@@ -96,6 +101,7 @@ class ZazuHelperService
         }
 
         $items[] = [
+            'priority' => 20,
             'title' => $openPurchases.' purchase order'.($openPurchases === 1 ? '' : 's').' still open',
             'copy' => 'Check outstanding purchasing commitments before they become execution-day surprises.',
             'href' => route('purchasing.index'),
@@ -119,6 +125,7 @@ class ZazuHelperService
         }
 
         $items[] = [
+            'priority' => 30,
             'title' => $drafts.' job'.($drafts === 1 ? '' : 's').' still in draft',
             'copy' => 'Confirm the operational state when the job is ready to move beyond planning.',
             'href' => route('work.index', ['filter' => 'draft']),
