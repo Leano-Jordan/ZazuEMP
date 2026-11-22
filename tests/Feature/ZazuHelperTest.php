@@ -27,6 +27,38 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-zazu-guide-enabled="on"', false);
     }
 
+    public function test_helper_guides_resolve_real_semantic_targets_on_core_workspaces(): void
+    {
+        $this->signInAsOwner();
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-zazu-anchor="dashboard.overview"', false)
+            ->assertSee('data-target="dashboard.overview"', false);
+
+        $this->get(route('work.index'))
+            ->assertOk()
+            ->assertSee('data-zazu-anchor="work.register"', false)
+            ->assertSee('data-target="work.register"', false);
+
+        $this->get(route('quotes.index'))
+            ->assertOk()
+            ->assertSee('data-zazu-anchor="quotes.register"', false)
+            ->assertSee('data-target="quotes.register"', false);
+    }
+
+    public function test_helper_uses_safe_storage_and_reduced_motion_aware_semantic_highlighting(): void
+    {
+        $script = file_get_contents(resource_path('js/app.js'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertStringContainsString("safeStorageGet(storageKey)", $script);
+        $this->assertStringContainsString("safeStorageSet(storageKey, 'off')", $script);
+        $this->assertStringContainsString("[data-zazu-anchor]", $script);
+        $this->assertStringContainsString("prefers-reduced-motion", $script);
+        $this->assertStringContainsString(".zazu-helper-target-highlight", $css);
+    }
+
     public function test_public_landing_authentication_modal_does_not_render_the_workspace_helper(): void
     {
         $this->get(route('landing'))
