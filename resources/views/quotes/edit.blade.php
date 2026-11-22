@@ -139,6 +139,7 @@
                      data-quote-summary
                      data-current-tax-rate="{{ $version->tax_rate ?? 0 }}">
                     <div class="zazu-context-title">Live quote summary</div>
+                    <p class="zazu-field-help" data-quote-review-status role="status">Review every line before saving.</p>
                     <div class="zazu-context-copy">Use this as a quick check before saving. Earlier quote revisions remain unchanged.</div>
                     <dl class="zazu-financial-summary-list">
                         <div><dt>Subtotal</dt><dd data-quote-subtotal>{{ $quote->currency }} 0.00</dd></div>
@@ -169,12 +170,14 @@
             if (!editSummary) return;
 
             let subtotal = 0;
+            let incompleteLines = 0;
             editPriceInputs.forEach((input) => {
                 const line = input.closest('[data-quote-line]');
                 const quantity = Number.parseFloat(line?.querySelector('[data-quote-quantity]')?.value || '');
                 const price = Number.parseFloat(input.value || '');
-                const lineTotal = Number.isFinite(quantity) && Number.isFinite(price) ? quantity * price : null;
+                const lineTotal = Number.isFinite(quantity) && quantity > 0 && Number.isFinite(price) && price >= 0 ? quantity * price : null;
                 if (lineTotal !== null) subtotal += lineTotal;
+                else incompleteLines += 1;
                 const output = line?.querySelector('[data-quote-line-total]');
                 if (output) output.textContent = lineTotal === null ? 'Enter quantity and price' : (editCurrency + ' ' + editMoney.format(lineTotal));
             });
@@ -189,6 +192,8 @@
             const deposit = total * (Number.isFinite(depositPercent) ? depositPercent : 0) / 100;
             const format = (value) => editCurrency + ' ' + editMoney.format(value);
 
+            const reviewStatus = editSummary.querySelector('[data-quote-review-status]');
+            if (reviewStatus) reviewStatus.textContent = incompleteLines ? incompleteLines + ' line(s) still need a valid quantity and price.' : 'All line quantities and prices are entered.';
             editSummary.querySelector('[data-quote-subtotal]').textContent = format(subtotal);
             editSummary.querySelector('[data-quote-tax]').textContent = format(tax);
             editSummary.querySelector('[data-quote-total]').textContent = format(total);
