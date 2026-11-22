@@ -72,6 +72,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('requiredOfflineRoutes.every((path) => primedRoutes.has(path))', $worker);
         $this->assertStringContainsString('let activePrimeTask = null;', $worker);
         $this->assertStringContainsString('activePrimeTaskContext === taskContext', $worker);
+        $this->assertStringContainsString('activePrimeTask = null;', $worker);
+        $this->assertStringContainsString('activePrimeTaskContext = null;', $worker);
         $this->assertStringContainsString('await cache.put(pageRequest, response.clone());', $worker);
         $this->assertStringContainsString('await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);', $worker);
         $this->assertStringNotContainsString('Real navigation takes priority over background cache warming', $worker);
