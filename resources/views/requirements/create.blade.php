@@ -89,6 +89,9 @@
                             <span class="zazu-label">Unit</span>
                             <select name="unit" class="zazu-select" id="unit-select">
                                 <option value="">Not specified</option>
+                                @if ($requirement?->unit && !array_key_exists($requirement->unit, config('zazu.units')))
+                                    <option value="{{ $requirement->unit }}" selected>{{ $requirement->unit }}</option>
+                                @endif
                                 @foreach (config('zazu.units') as $value => $label)
                                     <option value="{{ $value }}" @selected(old('unit', $requirement?->unit) === $value)>{{ $label }}</option>
                                 @endforeach
