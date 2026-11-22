@@ -103,11 +103,11 @@
                 <div class="zazu-helper-step">
                     <div class="zazu-helper-step-label">Needs attention</div>
                     @foreach($attention as $item)
-                        <div class="mt-2">
-                            <strong class="block">{{ $item['title'] }}</strong>
-                            <span class="block">{{ $item['copy'] }}</span>
+                        <div class="mt-2" data-zazu-helper-attention-item>
+                            <strong class="block" data-zazu-helper-attention-title>{{ $item['title'] }}</strong>
+                            <span class="block" data-zazu-helper-attention-copy>{{ $item['copy'] }}</span>
                             @if(!empty($item['href']))
-                                <a href="{{ $item['href'] }}" class="zazu-helper-link">{{ $item['link'] }}</a>
+                                <a href="{{ $item['href'] }}" class="zazu-helper-link" data-zazu-helper-attention-link>{{ $item['link'] }}</a>
                             @endif
                         </div>
                     @endforeach
