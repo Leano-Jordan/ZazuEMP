@@ -8,10 +8,10 @@
 - Exact-head Laravel: **679 passed / 1 skipped / 4,671 assertions**; `InstallationBackupStatusTest` passed, including missing and changed secondary archive cases.
 - Exact-head Zazu Quality (formatting, Composer audit, secret scan and application checks), PHPMD, Psalm, populated upgrade/rollback, PostgreSQL migration/rollback/registration/backup-recovery, Windows installation candidate build and fresh PowerShell install: **PASS**. SonarCloud: **SKIPPED**.
 - Windows PowerShell 5.1 scheduled-backup runner test [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) passed its metadata persistence and failed-copy preservation assertions.
-- Offline-browser acceptance for this source head was still running when this checkpoint was recorded; no browser pass is claimed here.
+- Exact-head offline-browser acceptance [44989474410](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44989474410): **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance passed.
 - Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner PC proves a scheduled backup, genuinely independent copy and controlled full restore with representative private media.
 
-**Next engineering target:** commercial workflow reconciliation — quote → invoice → payment → expense → profit, using populated records and explicit balance checks. Physical Android acceptance and legal/brand gates remain owner-operated.
+**Next active target (Director one-target WIP limit): DB-001 on the Founder's actual installation.** Run the existing read-only schema check and inspect the matching classified incident record in one owner-assisted session. Establish root cause before any correction. Commercial quote → invoice → payment → costs → profit proof is priority 2.
 
 ---
 
