@@ -79,7 +79,7 @@ class RequirementController extends Controller
         $validated = $request->validate([
             'capability_id' => ['nullable', Rule::exists('business_capabilities', 'id')->where(fn ($query) => $query->where('business_id', $event->business_id)->where('is_active', true))],
             'description' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:100', Rule::in(array_keys(config('zazu.service_categories')))],
+            'category' => ['required', 'string', 'max:100', Rule::in(array_unique([...array_keys(config('zazu.service_categories')), $requirement->category]))],
             'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
             'unit' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
