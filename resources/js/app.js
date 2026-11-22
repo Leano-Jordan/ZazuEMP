@@ -722,25 +722,28 @@ function setupZazuHelper() {
                 guideLink.textContent = step.link || '';
             }
 
-            if (guideTarget && step.target) {
+            if (guideTarget) {
                 clearTargetHighlight();
-                const target = resolveVisibleTarget(step.target);
 
-                if (target) {
-                    target.classList.add('zazu-helper-target-highlight');
+                if (step.target) {
+                    const target = resolveVisibleTarget(step.target);
 
-                    try {
-                        target.scrollIntoView({
-                            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-                            block: 'center',
-                        });
-                    } catch {
-                        target.scrollIntoView();
+                    if (target) {
+                        target.classList.add('zazu-helper-target-highlight');
+
+                        try {
+                            target.scrollIntoView({
+                                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                                block: 'center',
+                            });
+                        } catch {
+                            target.scrollIntoView();
+                        }
+
+                        targetTimer = window.setTimeout(() => {
+                            if (target.isConnected) target.classList.remove('zazu-helper-target-highlight');
+                        }, 2400);
                     }
-
-                    targetTimer = window.setTimeout(() => {
-                        if (target.isConnected) target.classList.remove('zazu-helper-target-highlight');
-                    }, 2400);
                 }
             }
 
