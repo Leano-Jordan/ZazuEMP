@@ -153,7 +153,7 @@
     </section>
 
     @if ($nextAction)
-        <section class="zazu-next-action zazu-next-action-primary">
+        <section class="zazu-next-action zazu-next-action-primary" data-zazu-anchor="work.next-action">
             <div>
                 <div class="zazu-eyebrow">Next action</div>
                 <h2 class="zazu-next-action-title">{{ $nextAction['label'] }}</h2>
