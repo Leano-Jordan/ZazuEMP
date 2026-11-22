@@ -235,6 +235,46 @@ class ZazuHelperTest extends TestCase
             ->assertDontSee('job still in draft');
     }
 
+
+    public function test_helper_exposes_purchasing_attention_only_when_the_member_has_purchasing_view_permission(): void
+    {
+        config(['zazu.permissions.roles.staff' => ['dashboard.view', 'purchasing.view']]);
+
+        $business = $this->makeBusiness('Helper Purchasing Access');
+        $business->forceFill([
+            'catalogue_setup_completed_at' => now(),
+            'business_setup_completed_at' => now(),
+        ])->save();
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'staff']);
+        $supplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Permitted helper supplier',
+        ]);
+        PurchaseOrder::create([
+            'business_id' => $business->id,
+            'supplier_id' => $supplier->id,
+            'reference' => 'HELPER-PO-PERMISSION-'.Str::upper(Str::random(5)),
+            'status' => 'ordered',
+            'currency' => 'ZAR',
+            'total_amount' => '125.00',
+        ]);
+        Event::create([
+            'business_id' => $business->id,
+            'reference' => 'HELPER-WORK-RESTRICTED-'.Str::upper(Str::random(5)),
+            'name' => 'Restricted work item',
+            'status' => 'draft',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('1 purchase order still open')
+            ->assertDontSee('job still in draft')
+            ->assertDontSee('preparation item overdue');
+    }
+
     private function makeBusiness(string $name): Business
     {
         return Business::create([
