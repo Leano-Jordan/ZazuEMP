@@ -341,6 +341,7 @@ class CommercialReconciliationTest extends TestCase
             'currency' => 'ZAR',
             'tax_rate_id' => $taxRate->id,
             'deposit_percent' => '30.00',
+            'quantity' => [$requirement->id => '1.00'],
             'unit_price' => [$requirement->id => '10000.00'],
         ])->assertRedirect();
 
