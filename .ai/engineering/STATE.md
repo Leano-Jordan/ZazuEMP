@@ -1595,3 +1595,17 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added browser assertions for inspector tab switching, panel visibility and arrow-key navigation.
 - PHPMD workflow on the previous batch completed with failure. Exact log detail is not available through the repository connector; treat PHPMD as open until the report is retrieved. Do not claim full CI success.
 - All changes remain direct to main; no branch creation.
+
+
+## Landing media, workspace wallpaper and dashboard image correction — 2026-11-23
+
+**Implemented directly on main:**
+- Removed bundled SVG illustration fallbacks from the landing-media configuration so the platform library exposes photographic assets and validated uploads only.
+- Kept the six per-position dropdowns and added direct, keyboard-accessible assignment from the image library to the focused position.
+- Added actual slot crop previews (hero 16:9; supporting placements 4:3), plus a save guard requiring six selected entries and successfully loaded previews.
+- Corrected workspace wallpaper layering: a valid translucent gradient sits above the selected wallpaper, and shell/content surfaces no longer paint an opaque canvas over it.
+- Re-enabled the business-selected dashboard image. The previous dashboard stylesheet explicitly set it to display:none; the new layout shows it with a restrained text gradient.
+
+**Verification:** feature assertions and documentation were committed. Exact-head CI and physical PC/phone visual acceptance are pending; do not mark this slice green until checked.
+
+**Next execution target remains the adaptive business capability-to-surface map.** Trace the current authoritative capability source, onboarding, catalogue categories, navigation, event requirements and offline sync; implement one narrow end-to-end preset slice without introducing a parallel configuration system.
