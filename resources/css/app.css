@@ -7416,6 +7416,29 @@ textarea:focus {
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
+.zazu-quote-line-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--zazu-border);
+    color: var(--zazu-muted);
+    font-size: 11px;
+}
+.zazu-quote-line-total strong {
+    color: var(--zazu-ink);
+    font-size: 14px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+.zazu-quote-review-status {
+    margin: 8px 0 0;
+    color: var(--zazu-ink);
+    font-size: 12px;
+    font-weight: 700;
+}
 .zazu-quote-savebar {
     border-color: var(--zazu-border-strong);
 }
