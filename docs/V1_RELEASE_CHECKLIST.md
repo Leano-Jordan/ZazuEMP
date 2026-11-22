@@ -1,3 +1,18 @@
+# Owner-verified physical operation and populated workspace — 2026-11-22
+
+**Founder evidence update; current repository baseline:** [`cd7762a`](https://github.com/Leano-Jordan/ZazuEMP/commit/cd7762a18976eeae7cef6d2c4fb132f69b32b0f5).
+
+The Founder confirms physical operation of Zazu EMP on the PC and linked mobile phone, with both using the same workspace. The Founder reports that fictional customer/client, quote, invoice, supplier, purchase-order and inventory records have already been created and that these areas work as intended. This supersedes the earlier assumption that the owner still needed to create the initial customer/job and populate the commercial modules.
+
+- **PC normal-use acceptance:** OWNER-VERIFIED PASS.
+- **Linked mobile normal-use acceptance:** OWNER-VERIFIED PASS.
+- **Shared workspace operation:** OWNER-VERIFIED PASS.
+- **Populated business modules:** OWNER-REPORTED FUNCTIONAL; record population confirmed by Founder.
+- **Screenshots reviewed:** dashboard shows Zazu Demo Catering, two customers, one active event and connected workspace-health indicators. Screenshots do not show transaction detail for quotes, invoices, POs or inventory.
+- **Data classification:** Founder confirms all test/business records supplied for this exercise are fictional.
+
+Do not ask the Founder to recreate records or repeat basic connected PC/mobile startup checks. Do not infer that connected operation proves disconnected cold-start, offline write/restart/reconnect, attachment sync, full installation restore, or transaction-level quote-to-profit reconciliation. Keep those distinct evidence gates open until directly demonstrated. The owner-PC off-disk backup/restore and POPIA/name-clearance gates are also unaffected.
+
 ## DB-001 disposition — Founder clarification (2026-11-22)
 
 **DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
