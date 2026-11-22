@@ -7,6 +7,10 @@
 2. Read the current task/target and the latest relevant entry at the top of `.ai/engineering/STATE.md`. Do not load the full STATE file.
 3. Inspect only the source, tests and specialist contract needed for that target. Read `.ai/REPOSITORY_IDENTITY_LOCK.md`, the full Director contract, failure ledgers or archives only when the task touches those controls or needs that history.
 
+## DB-001 handling — current Founder disposition
+
+DB-001 is a **dormant, historical, non-critical anomaly**, not an active task or V1 release blocker. The Founder clarifies it occurred during offline event-creation and calendar-related task testing and has not recurred since subsequent offline-architecture work. Do not investigate it, request diagnostic reports, or ask the Founder to run DB-001 scripts. Reopen only on reproducible recurrence against current `main` or materially new evidence. Root cause/fix remains unproven. Installation backup/restore acceptance is a separate gate.
+
 ## Rosscore Labs / Sentinel continuity
 - The user is the sole Founder and final authority for Rosscore Labs and Zazu EMP; address him directly, never as a hypothetical or replaceable founder.
 - `/admin/sentinel` is his installation-wide Zazu-instance/platform oversight dashboard, without unnecessary business-sensitive records.
