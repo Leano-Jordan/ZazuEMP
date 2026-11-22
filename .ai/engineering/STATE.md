@@ -11,7 +11,7 @@
 - Exact-head offline-browser acceptance [44989474410](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44989474410): **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance passed.
 - Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner PC proves a scheduled backup, genuinely independent copy and controlled full restore with representative private media.
 
-**Next active target (Director one-target WIP limit): DB-001 on the Founder's actual installation.** Run the existing read-only schema check and inspect the matching classified incident record in one owner-assisted session. Establish root cause before any correction. Commercial quote → invoice → payment → costs → profit proof is priority 2.
+**Next active target (Director one-target WIP limit): DB-001 owner-installation evidence.** In the actual installed Zazu folder, run `.\ops\windows\Test-ZazuDatabaseSchema.ps1` and `.\ops\windows\Get-ZazuIncident.ps1 -Reference '895e2c23-bc6b-4919-a891-1e8e5c1e27e4'`. Both are read-only. Return the Desktop JSON schema report and the safe incident report/no-match output. Do not run migrations, reset, reinstall or alter the database. Establish root cause before any correction. Commercial quote → invoice → payment → costs → profit proof is priority 2.
 
 ---
 
