@@ -59,3 +59,18 @@ These settings are platform-level and do not change individual business branding
 All changes were committed directly to `main`; no feature branch was created. At the time of the first check for the current code batch, Laravel, quality, PHPMD and Director health workflows had been created by GitHub but were still queued. Their completed result must be checked against the latest main commit before describing the work as passing.
 
 Automated browser checks do not replace visual review on the actual installed PC and phone. Physical offline acceptance, reconnect/restart acceptance, business recovery drill, commercial workflow acceptance and legal/brand clearance remain separate V1 gates.
+
+
+## Refinement pass — 2026-11-23
+
+A second review found that the first inspector implementation still used catering- and equipment-hire-specific tab names. That was inconsistent with the adaptive business model. The visible labels now use business-neutral event language: **Scope & preparation**, **Resources & setup**, and **Commercial position**. Internal tab keys remain stable to avoid breaking existing content wiring.
+
+The inspector's summary fields now read as distinct cards, the tab strip has a stable three-column layout with readable wrapping, the heading remains visible while scrolling, and the content area uses contained scrolling. On phone widths the inspector occupies the viewport and its Job action controls become a deliberate two-column grid rather than a squeezed inline row.
+
+Tab panels now update both the native `hidden` state and `aria-hidden`, retain labelled tab/panel relationships and support arrow/Home/End keyboard navigation. Browser coverage checks the three neutral labels, tab switching, panel visibility and arrow-key navigation.
+
+The Helper now visibly identifies active business services as compact chips. On a Job, saved requirement components appear as chips instead of a generic bullet dump. The recommended next action has a clearer visual hierarchy, a reason label and a distinct action link. This is still driven by existing authoritative Job state and permission-filtered attention, not speculative AI recommendations.
+
+## Quality gate correction
+
+The earlier PHPMD workflow did not remain queued: GitHub completed it with **failure** on the previous code batch. The Laravel and Zazu quality workflows were still queued at the time of the follow-up inspection, and the Director Health workflow completed successfully. PHPMD's job log was not available through the repository connector, so its exact finding has not been attributed to a particular changed file. This is an open quality gate; do not treat the batch as green until the PHPMD output is retrieved and addressed, and the new commits receive fresh test runs.
