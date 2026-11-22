@@ -80,7 +80,18 @@ class RequirementController extends Controller
         $this->ensureBusiness($event, $request);
         abort_unless((int) $requirement->event_id === (int) $event->id, 404);
         $validated = $request->validate([
-            'capability_id' => ['nullable', Rule::exists('business_capabilities', 'id')->where(fn ($query) => $query->where('business_id', $event->business_id)->where('is_active', true))],
+            'capability_id' => [
+                'nullable',
+                Rule::exists('business_capabilities', 'id')->where(function ($query) use ($event, $requirement): void {
+                    $query->where('business_id', $event->business_id)
+                        ->where(function ($active) use ($requirement): void {
+                            $active->where('is_active', true);
+                            if ($requirement->capability_id) {
+                                $active->orWhere('id', $requirement->capability_id);
+                            }
+                        });
+                }),
+            ],
             'description' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100', Rule::in(array_unique([...array_keys(config('zazu.service_categories')), $requirement->category]))],
             'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
