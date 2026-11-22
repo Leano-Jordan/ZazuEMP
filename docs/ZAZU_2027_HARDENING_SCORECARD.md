@@ -1,3 +1,16 @@
+## Director recovery integrity checkpoint — secondary backup presence — 2026-11-22
+
+**Implementation head:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
+
+- Removed a false healthy backup state. The Windows runner persists secondary archive path, SHA-256, size and modification time; PHP now checks destination presence, regular-file status, and recorded size/timestamp. Missing/unavailable/changed metadata triggers attention.
+- SHA-256 is verified when copied, not re-hashed on every dashboard request. Local health cannot prove separate physical media or completed cloud sync; operator verification remains required.
+- Laravel **679 passed / 1 skipped / 4,671 assertions**; Zazu Quality, PHPMD, Psalm, PostgreSQL recovery, populated upgrade/rollback and Windows fresh-install acceptance passed. Windows PowerShell 5.1 backup-runner metadata test [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) passed.
+- **Score disposition: 77/100 unchanged.** This closes a meaningful backup-observability defect but does not replace the owner-PC off-disk and full restore drill. V1 remains **NOT READY**.
+
+**Next engineering target:** populated commercial quote-to-profit reconciliation.
+
+---
+
 ## Director security review — offline session and trusted-device transitions — 2026-11-22
 
 **Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
