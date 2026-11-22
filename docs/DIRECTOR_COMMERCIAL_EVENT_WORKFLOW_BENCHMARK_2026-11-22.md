@@ -302,3 +302,12 @@ Application changes are intentionally narrow. No navigation destinations, route 
 - Reddit — event planning software clunkiness and tool sprawl: https://www.reddit.com/r/EventProduction/comments/1dfd3b4
 - Reddit — Caterease/enterprise software usability and training: https://www.reddit.com/r/restaurant/comments/1m5jh5m
 - Reddit — event software complexity and adoption: https://www.reddit.com/r/EventProduction/comments/1jlxdyg
+
+
+## Follow-through: job workspace next action
+
+The first Job workspace implementation always directed users to the latest quote whenever any quote existed. That ignored the quote's actual state and could send users back to an already accepted or sent quote instead of the next operational hand-off.
+
+The next-action guidance is now derived from persisted state: service scope, quote status, invoice balance, outstanding preparation, active purchasing and planned costs. Completed/cancelled jobs suppress the operational CTA. The change reuses existing module destinations and lifecycle records; it does not create a parallel workflow or move navigation.
+
+Regression tests were added for sent-quote and accepted-quote hand-offs. Exact-head execution remains pending.
