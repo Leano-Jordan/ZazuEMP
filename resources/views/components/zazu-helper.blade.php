@@ -93,7 +93,7 @@
             <div class="zazu-helper-title" data-zazu-helper-title aria-live="polite">{{ $steps[0]['title'] }}</div>
             <p class="zazu-helper-copy" data-zazu-helper-copy aria-live="polite">{{ $steps[0]['copy'] }}</p>
             <div class="zazu-helper-step" data-zazu-helper-recommendation hidden>
-                <div class="zazu-helper-step-label">Next action for this job</div>
+                <div class="zazu-helper-step-label">Recommended next action</div>
                 <strong class="block" data-zazu-helper-recommendation-title></strong>
                 <p class="zazu-helper-copy" data-zazu-helper-recommendation-copy></p>
                 <a href="#" class="zazu-helper-link" data-zazu-helper-recommendation-link></a>
