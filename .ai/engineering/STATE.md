@@ -1574,3 +1574,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Verification:** source and test changes were read back from `main`. The Founder reports prior checks passed; these two new commits were made after that check. GitHub combined status currently returns no status entries for the new head, so the new feature test is added but not yet independently verified here. No physical offline acceptance is inferred.
 
 **Next target:** map each saved requirement/capability to only the existing relevant operational records and permissions, then add narrow DJ, hire and catering cases. Avoid recommending a workflow action unless the domain state and user permission make it valid.
+
+
+## Permission-aware Helper booking context — 2026-11-23
+
+**Implemented directly on `main`:**
+- Linked booking record counts are now individually gated by the same permission families used by their workspaces: `work.view` for preparation/cost/travel, `purchasing.view` for purchase orders, and `assets.view` for asset allocations.
+- Added a feature test proving a staff member with work access but no purchasing permission sees preparation context but not the purchase-order count.
+- Existing event/business ownership guard remains in place. This reduces unnecessary disclosure in the Helper; it does not replace route middleware or server-side authorization.
+
+**Verification:** source and test are committed and should be run by the repository checks. No successful test execution is claimed for this new change from this session.
