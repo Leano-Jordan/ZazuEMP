@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -21,7 +22,11 @@ class PlatformAdminTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.landing.settings'))
             ->assertOk()
-            ->assertSee('Landing page imagery');
+            ->assertSee('Landing page positions')
+            ->assertSee('Venue image')
+            ->assertSee('Decor and reception image')
+            ->assertSee('Complete image library')
+            ->assertSee('Upload image experiments');
 
         $this->actingAs($admin)
             ->put(route('admin.landing.settings.update'), [
@@ -29,6 +34,8 @@ class PlatformAdminTest extends TestCase
                 'operations_image' => 'event_catering',
                 'resources_image' => 'sound_stage',
                 'control_image' => 'wedding_catering',
+                'venue_image' => 'venue',
+                'decor_image' => 'luxury_banquet',
             ])
             ->assertRedirect(route('admin.landing.settings'));
 
@@ -37,6 +44,63 @@ class PlatformAdminTest extends TestCase
         $this->assertSame(config('zazu.landing_image_library.sound_stage.url'), $row->hero_image_path);
         $this->assertSame(config('zazu.landing_image_library.event_catering.url'), $row->operations_image_path);
         $this->assertSame(config('zazu.landing_image_library.wedding_catering.url'), $row->control_image_path);
+        $this->assertSame(config('zazu.landing_image_library.venue.url'), $row->venue_image_path);
+        $this->assertSame(config('zazu.landing_image_library.luxury_banquet.url'), $row->decor_image_path);
+    }
+
+
+    public function test_platform_admin_can_upload_preview_and_reuse_landing_media(): void
+    {
+        $admin = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
+
+        $directory = storage_path('framework/testing/landing-uploads-'.Str::uuid());
+        Config::set('zazu.landing_media_uploads.directory', $directory);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing.settings.update'), [
+                'hero_image' => 'catering_service',
+                'operations_image' => 'event_catering',
+                'resources_image' => 'sound_stage',
+                'control_image' => 'wedding_catering',
+                'venue_image' => 'venue',
+                'decor_image' => 'luxury_banquet',
+                'uploads' => [UploadedFile::fake()->image('stage-experiment.jpg', 1200, 800)],
+            ])
+            ->assertRedirect(route('admin.landing.settings'));
+
+        $media = DB::table('platform_landing_media')->first();
+
+        $this->assertNotNull($media);
+        $this->assertSame('stage experiment', $media->label);
+        $this->assertStringStartsWith('/images/landing/uploads/', $media->path);
+        $this->assertStringNotContainsString('stage-experiment', $media->path);
+        $this->assertFileExists($directory.'/'.basename($media->path));
+
+        $this->actingAs($admin)
+            ->get(route('admin.landing.settings'))
+            ->assertOk()
+            ->assertSee('stage experiment')
+            ->assertSee($media->path);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing.settings.update'), [
+                'hero_image' => 'uploaded_'.$media->id,
+                'operations_image' => 'event_catering',
+                'resources_image' => 'sound_stage',
+                'control_image' => 'wedding_catering',
+                'venue_image' => 'venue',
+                'decor_image' => 'luxury_banquet',
+            ])
+            ->assertRedirect(route('admin.landing.settings'));
+
+        $this->assertSame(
+            $media->path,
+            DB::table('platform_landing_settings')->value('hero_image_path')
+        );
+        $this->assertSame($media->path, app(\\App\\Services\\LandingMediaService::class)->images()['hero']);
+
+        File::deleteDirectory($directory);
     }
 
     public function test_public_landing_uses_platform_media_configuration(): void
@@ -46,6 +110,8 @@ class PlatformAdminTest extends TestCase
             'operations_image_path' => config('zazu.landing_image_library.event_catering.url'),
             'resources_image_path' => config('zazu.landing_image_library.wedding_catering.url'),
             'control_image_path' => config('zazu.landing_image_library.catering_service.url'),
+            'venue_image_path' => config('zazu.landing_image_library.venue.url'),
+            'decor_image_path' => config('zazu.landing_image_library.luxury_banquet.url'),
         ]);
 
         $response = $this->get(route('landing'));
@@ -57,6 +123,8 @@ class PlatformAdminTest extends TestCase
             config('zazu.landing_image_library.event_catering.url'),
             config('zazu.landing_image_library.wedding_catering.url'),
             config('zazu.landing_image_library.catering_service.url'),
+            config('zazu.landing_image_library.venue.url'),
+            config('zazu.landing_image_library.luxury_banquet.url'),
         ] as $imageUrl) {
             $response->assertSee(e($imageUrl), false);
         }
