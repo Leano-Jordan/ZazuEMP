@@ -57,6 +57,8 @@ final class BusinessArchiveService
             'assets' => ['scope' => 'business'],
             'asset_allocations' => ['scope' => 'business'],
             'invoices' => ['scope' => 'business'],
+            // Preserve the per-business invoice counter when moving a workspace.
+            'invoice_number_sequences' => ['scope' => 'business'],
             'invoice_items' => ['scope' => 'parent', 'parent' => 'invoices', 'parent_key' => 'invoice_id'],
             'payments' => ['scope' => 'business'],
             'finance_expenses' => ['scope' => 'business'],
