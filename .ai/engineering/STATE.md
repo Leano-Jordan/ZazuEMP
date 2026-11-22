@@ -1,3 +1,20 @@
+## Director recovery integrity checkpoint — secondary backup presence — 2026-11-22
+
+**Implementation head:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
+
+- Closed a backup-health false positive: the dashboard previously trusted a recent `status=verified` timestamp without checking whether the secondary archive still existed.
+- Windows runner now persists the secondary archive's absolute path, SHA-256, size and last-write timestamp. PHP health checks require a valid absolute path, a regular non-symlink file, and matching recorded size/timestamp. Missing/unavailable/changed metadata becomes **ATTENTION**.
+- SHA-256 is verified during copy. The dashboard does not re-hash a multi-gigabyte archive on every page load; it checks presence and recorded metadata. It also cannot prove a destination is physically off-disk or that cloud sync completed; operator configuration/verification remains required.
+- Exact-head Laravel: **679 passed / 1 skipped / 4,671 assertions**; `InstallationBackupStatusTest` passed, including missing and changed secondary archive cases.
+- Exact-head Zazu Quality (formatting, Composer audit, secret scan and application checks), PHPMD, Psalm, populated upgrade/rollback, PostgreSQL migration/rollback/registration/backup-recovery, Windows installation candidate build and fresh PowerShell install: **PASS**. SonarCloud: **SKIPPED**.
+- Windows PowerShell 5.1 scheduled-backup runner test [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) passed its metadata persistence and failed-copy preservation assertions.
+- Offline-browser acceptance for this source head was still running when this checkpoint was recorded; no browser pass is claimed here.
+- Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner PC proves a scheduled backup, genuinely independent copy and controlled full restore with representative private media.
+
+**Next engineering target:** commercial workflow reconciliation — quote → invoice → payment → expense → profit, using populated records and explicit balance checks. Physical Android acceptance and legal/brand gates remain owner-operated.
+
+---
+
 ## Director security review — offline session and trusted-device transitions — 2026-11-22
 
 **Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
