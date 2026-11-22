@@ -48,7 +48,7 @@ class JobWorkspaceProgressTest extends TestCase
         $response->assertOk()
             ->assertSee('Check customer decision')
             ->assertSee('Waiting for customer')
-            ->assertSee('Invoice &amp; payment')
+            ->assertSee('Invoice & payment')
             ->assertSee('Delivery readiness')
             ->assertSee('Close-out')
             ->assertSee('The quote has been sent. Check for the customer’s response before moving forward.');
