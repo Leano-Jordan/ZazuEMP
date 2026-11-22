@@ -1561,3 +1561,16 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Compatibility detail:** existing legacy categories and custom units are retained by the shared edit form. Offline custom quote lines are not mistaken for deleted requirement snapshots; detached requirement snapshots still force a new revision.
 
 **Acceptance:** implementation is committed to `main`; exact-head Laravel, Pint/quality, PHPMD, security and browser verification are queued and not yet accepted. No physical acceptance status is changed by this code increment.
+
+
+## Helper linked-booking operations slice — 2026-11-23
+
+**Implemented directly on `main`:**
+- Job-detail Helper now loads counts from the current business-owned Event's existing preparation, purchase-order, asset-allocation, cost and travel-cost relationships.
+- It lists only record types that actually have linked records. An empty relationship is not treated as a missing task or operational failure.
+- Added feature coverage that seeds a tent/chair booking with one linked preparation item and one event-linked purchase order, then asserts both appear in Helper context.
+- This remains contextual visibility, not a recommendation engine. It does not create tasks, infer prerequisites, alter permissions, or supersede the existing Job next-action authority.
+
+**Verification:** source and test changes were read back from `main`. The Founder reports prior checks passed; these two new commits were made after that check. GitHub combined status currently returns no status entries for the new head, so the new feature test is added but not yet independently verified here. No physical offline acceptance is inferred.
+
+**Next target:** map each saved requirement/capability to only the existing relevant operational records and permissions, then add narrow DJ, hire and catering cases. Avoid recommending a workflow action unless the domain state and user permission make it valid.
