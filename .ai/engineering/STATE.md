@@ -1,3 +1,18 @@
+## Helper business-focus guidance slice — 2026-11-23
+
+**Implemented directly on `main`:**
+- The existing saved `primary_niche` preference now selects the Helper's third guidance step on Dashboard, Jobs and Job detail for `chairs_tents`, `sound_dj` and `catering_baking`.
+- The copy reflects relevant operational concerns: hire quantities/availability/logistics/asset condition; sound equipment/crew/programme/setup/transport; or menus/quantities/dietary needs/purchasing/preparation/delivery.
+- The Helper exposes the resolved focus as a semantic data attribute for verification.
+- Added `ZazuHelperTest::test_helper_guidance_adapts_to_the_saved_business_focus` for all three configured focus values.
+- This is a presentation/guidance slice only. It does **not** implement multi-preset selection, capability-driven navigation, event-component-specific Helper state, or full workspace adaptation. It does not alter permissions, authorization, records or offline sync.
+
+**Verification:** source and test files read back from `main`; exact-head CI has not been run/verified. Do not mark this slice green until the normal GitHub Actions checks complete. Physical PC/phone/offline acceptance is unchanged.
+
+**Next target:** map existing primary focus, active catalogue categories, event requirements and operational records into a single capability-to-surface matrix. Then extend Helper relevance from primary focus to the actual components on the current event, without duplicating workflow state or treating every possible step as mandatory.
+
+---
+
 ## Adaptive business presets and event-component experience — 2026-11-23
 
 **Founder requirement recorded as mandatory product direction:** Zazu must shape its workspace around the business capabilities selected by the owner. A DJ, tent/chair hire operator, caterer, photographer and multi-service event provider must not be forced through one generic service catalogue or cluttered workflow. Business selections must materially affect relevant navigation, catalogue defaults, event intake, requirements, operational surfaces, reporting and Helper recommendations.
