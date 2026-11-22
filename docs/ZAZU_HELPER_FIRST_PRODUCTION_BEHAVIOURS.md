@@ -178,17 +178,17 @@ All ten behaviours must follow these rules:
 
 ## 13. Implemented first slice — semantic Guide Me
 
-The first production slice is now implemented on the dashboard, Work register and Quote register:
+The first production slice is now implemented on the dashboard, Work register, Quote register and Job workspace:
 
 - Guide steps can declare a semantic `target` independently of the selected character skin.
-- The page registers the matching `data-zazu-anchor` on its real workspace section.
+- The page registers the matching `data-zazu-anchor` on its real workspace section. Dashboard, Work register and Quote register are covered; the Job workspace exposes its live Next action and Progress sections.
 - Opening or advancing the guide resolves that semantic key against the current DOM, scrolls the target into view and briefly highlights it.
 - The highlight is removed on timeout or when the guide closes; it does not replace the target's normal controls or permissions.
 - Motion respects `prefers-reduced-motion`.
 - Guide preference reads/writes use the existing guarded storage helpers, so blocked browser storage does not break the Helper.
 - Missing anchors fail quietly: the guide text remains available and the Helper does not invent a screen coordinate.
 
-This is an initial proof across three core workspaces, not completion of all ten behaviours. Further anchors should be added only alongside a tested workflow that needs them.
+This remains an initial Guide Me slice, not completion of all ten behaviours. The new Job workspace targets are paired with feature regression coverage; exact-head verification is pending. Further anchors should be added only alongside a tested workflow that needs them.
 
 ## 14. Production proof order
 
