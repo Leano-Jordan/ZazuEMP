@@ -6,10 +6,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
-/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PwaOfflineFoundationTest extends TestCase
 {
-
     use RefreshDatabase;
 
     public function test_manifest_exposes_installable_zazu_icons(): void
