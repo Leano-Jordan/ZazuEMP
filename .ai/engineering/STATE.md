@@ -4,6 +4,8 @@
 
 Founder reports that Zazu EMP has been physically used on both PC and linked mobile, operating against the same workspace. The fictional workspace already contains customer/client, quote, invoice, supplier, purchase-order and inventory records; the Founder reports these areas work as intended. Dashboard screenshots reviewed show two customers, one active event and connected workspace-health indicators.
 
+The Founder notes that the business areas can feel operationally separate/disjointed, while still working as intended in their respective modules. Record module-level functionality as owner-reported; do not infer a fully integrated end-to-end transaction chain from the populated workspace alone.
+
 Acceptance ledger:
 - PC normal connected operation: **OWNER-VERIFIED PASS**.
 - Linked mobile normal connected operation: **OWNER-VERIFIED PASS**.
