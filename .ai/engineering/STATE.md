@@ -2,7 +2,7 @@
 
 **DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
 
-Do not chase this historical anomaly, request diagnostic captures, or ask the Founder to run `Test-ZazuDatabaseSchema.ps1` or `Get-ZazuIncident.ps1`. Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new diagnostic evidence appears. The separate installation backup/restore acceptance gate remains independent and must not be conflated with DB-001.
+Do not chase this historical anomaly, request diagnostic captures, or ask the Founder to run `Test-ZazuDatabaseSchema.ps1` or `Get-ZazuIncident.ps1`. Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new diagnostic evidence appears. The separate installation backup/restore acceptance gate remains independent and must not be conflated with DB-001. All later dated DB-001 OPEN/active-priority notes in this file are historical snapshots superseded by this disposition; their earlier account/workspace wording is also superseded by the Founder clarification.
 
 ## Director recovery integrity checkpoint — secondary backup presence — 2026-11-22
 
@@ -689,7 +689,7 @@ A substantial implementation slice is now committed directly to `main`:
 ### Product boundary and remaining gates
 
 - Current offline UI remains bounded IndexedDB workspace and mutation queue; customer and Work local directories/inspection, plus dashboard quote detail/acceptance. Cached Laravel HTML remains a snapshot, not a general local route renderer. Do not claim app-wide offline parity.
-- Still open: full sync acceptance matrix; physical Android standalone offline cold launch/restart/reconnect; DB-001 on the installed PC; installed-target recovery; live commercial reconciliation; POPIA operations; ZAZU name clearance.
+- Still open: full sync acceptance matrix; physical Android standalone offline cold launch/restart/reconnect; installed-target recovery; live commercial reconciliation; POPIA operations; ZAZU name clearance.
 - V1 remains NOT READY. Keep the official evidence-maturity score at 73/100 until physical and operational acceptance evidence is completed.
 
 ---
@@ -785,9 +785,9 @@ A substantial implementation slice is now committed directly to `main`:
 
 **Source:** Founder-supplied read-only research report of main at cb7ab270. The report states that Laravel and browser suites were not run. Its test/CI statements are repository-documentation claims; market numbers and adoption scenarios are research estimates, not verified forecasts.
 
-**Current assessment:** Late Alpha; the report estimates V1 completion at approximately 74%. DB-001 remains OPEN. The actual installed workflow has not yet been demonstrated error-free. There are no paying customers or completed customer pilots.
+**Current assessment:** Late Alpha; the report estimates V1 completion at approximately 74%. This historical 2026-11-18 snapshot treated DB-001 as OPEN; that status is superseded by the Founder clarification at the top of this file. The actual installed workflow has not yet been demonstrated error-free. There are no paying customers or completed customer pilots.
 
-**Active priority:** DB-001 on the Founder's real installation. The first investigation is limited to one focused owner-assisted session: run the existing schema check on the Founder's PC and inspect the matching classified incident record. Establish root cause before changing code. Do not mark closed until the affected installed workflow is repeated successfully.
+**Historical priority (superseded 2026-11-22):** DB-001 diagnostic follow-up was proposed at this time. Do not execute that old proposal; the current Founder disposition at the top of this file is authoritative and no DB-001 owner action is required.
 
 **Next priorities, in order:**
 1. Prove the populated-record quote → invoice → payment recording → costs/expenses → event profit workflow. Manual/EFT payment recording is enough for the first pilot.
@@ -828,7 +828,7 @@ A substantial implementation slice is now committed directly to `main`:
 
 ## DB-001 support capture — 2026-11-18
 
-The DB-001 error page now offers a reference-scoped download of the matching redacted incident record through the local API. It is rate-limited and exposes only an allowlist of diagnostic fields; SQL, bindings, exception messages, customer data and credentials are excluded. This removes the need to copy diagnostic files between the Windows host and phone. The endpoint is useful only when the running installation contains the updated incident recorder. **DB-001 remains OPEN until the actual installed-workflow failure is identified, corrected and repeated successfully.** No root cause or readiness uplift is claimed.
+The DB-001 error page now offers a reference-scoped download of the matching redacted incident record through the local API. It is rate-limited and exposes only an allowlist of diagnostic fields; SQL, bindings, exception messages, customer data and credentials are excluded. This removes the need to copy diagnostic files between the Windows host and phone. The endpoint is useful only when the running installation contains the updated incident recorder. **Historical status only:** DB-001 was recorded as open at the time this diagnostic endpoint was added. That status is superseded by the 2026-11-22 Founder clarification at the top of this file. No root cause or fix is claimed.
 
 
 As of: 2026-11-17
@@ -931,9 +931,9 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 ## Open owner-reported database incident — 2026-11-17
 
 - Repeated user-facing `DB-001` incidents were reported. References: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`.
-- The newer reference was supplied with the Account access error screen; the exact action that triggered that occurrence was not stated.
+- The contemporaneous note associated the reference with an Account access error screen, but the Founder clarified on 2026-11-22 that the occurrence under discussion happened during offline event-creation and calendar-related task testing. That later clarification supersedes the earlier characterization.
 - Source inspection found that the Work controller writes the five new scheduling columns, while the previous Windows start path did not check or apply pending migrations. A local SQLite database behind the current code is therefore the leading explanation, **not a confirmed root cause**.
-- Backup-first migration handling has now been added to the shared Windows startup script. It has not yet run against the owner's installed database. The incident remains OPEN until exact runtime evidence confirms the cause and the affected workflow succeeds.
+- Backup-first migration handling has now been added to the shared Windows startup script. It has not yet run against the owner's installed database. The incident was recorded as OPEN at that historical checkpoint; its current disposition is the dormant, non-critical status at the top of this file.
 
 
 ## DB-001 diagnostic contract correction — 2026-11-17
@@ -950,7 +950,7 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Closed a source-level safety gap found while reviewing the backup-first Windows startup path: the launcher previously accepted a non-empty ZIP based on process exit code and file size, while full manifest/checksum validation happened only during restore.
 - `ZazuBackupCommand` now reopens the completed temporary ZIP with consistency checking, validates the Zazu format/driver/manifest, checks exact payload membership and verifies every payload SHA-256 before publishing the archive. Failed verification prevents publication.
 - Added a focused regression proving the verifier accepts a valid archive and rejects a tampered private-storage payload.
-- Changes are on `main`; exact-head Laravel/Windows CI has not yet been observed. This is a source correction, not proof of the owner's installed backup or migration. DB-001 remains OPEN; no readiness uplift.
+- Changes are on `main`; exact-head Laravel/Windows CI has not yet been observed. This is a source correction, not proof of the owner's installed backup or migration. DB-001 was recorded as OPEN at this historical checkpoint; that status is superseded by the 2026-11-22 Founder clarification.
 
 
 ## Zazu quality workflow — scoped npm advisory exception — 2026-11-17
@@ -976,7 +976,7 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Owner reports another DB-001 while opening/saving account/workspace information. Reference: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`. The exact triggering action and matching runtime record are not yet available; do not infer a cause from the reference alone.
 - Existing incident recorder now emits bounded database diagnostics (connection, driver, SQLSTATE, numeric driver code and operation) without SQL, bindings, exception messages or credentials.
 - Added `ops/windows/Get-ZazuIncident.ps1` and `docs/DB001_INCIDENT_CAPTURE.md` on `main`. The script finds the exact request ID in Laravel logs and outputs only an allowlist of diagnostic fields. This is a safe evidence-capture path, not a root-cause fix.
-- DB-001 remains OPEN until the matching record is inspected and the failing workflow is repeated successfully on the intended installation. No database changes, reset or restore performed. V1 remains NOT READY; no evidence-score uplift.
+- The matching record and repeat test were proposed at this historical checkpoint. That request is superseded by the 2026-11-22 Founder clarification; no DB-001 action is currently required. No database changes, reset or restore were performed by that investigation.
 
 
 ## DB-001 read-only SQLite inspection added — 2026-11-18
@@ -986,7 +986,7 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - It emits only bounded schema/status metadata to a desktop JSON report. It does not run migrations, create backups, restore archives, or alter database records/schema.
 - Added a Windows Ops workflow contract check for the diagnostic's required checks and non-mutating boundary.
 - This enables evidence-based selection of a repair once the owner's actual installed SQLite database is inspected. The source repository cannot inspect the owner's local database or recover the omitted SQL exception from the request ID alone.
-- DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4` remains OPEN pending the read-only report and successful reproduction on the intended installation. No readiness uplift.
+- DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4` is retained for historical traceability only. The read-only report is not currently required; see the 2026-11-22 Founder disposition at the top of this file.
 
 
 ## Offline cache-priming input hardening — 2026-11-18
@@ -1129,10 +1129,10 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 ## Director continuation and DB-001 isolation — 2026-11-18
 
 - Founder explicitly confirmed: do not freeze Jarvis. Engineering, Sentinel and hardening remain active; focused work batches are a delivery discipline, not a development freeze.
-- Repository review confirms the pending `2026_11_18_000001_create_invoice_number_sequences_table` migration is used by invoice issuance only: online `FinanceController::storeInvoice` and offline invoice sync through `OfflineDomainMutationHandler`. It is not called by business/account settings or dashboard account loading. It is therefore not a supported explanation for the earlier account/workspace DB-001 incident.
-- The historical DB-001 fingerprint was `GET /dashboard` querying missing `business_user.primary_niche`; the current supplied Sentinel schema report confirms that column is present. The separate invoice-sequence migration remains pending and still requires backup-first installation handling before invoice issuance is considered ready.
+- Repository review confirms the pending `2026_11_18_000001_create_invoice_number_sequences_table` migration is used by invoice issuance only: online `FinanceController::storeInvoice` and offline invoice sync through `OfflineDomainMutationHandler`. It is not called by business/account settings or dashboard account loading. It is therefore not a supported explanation for the historical test-time DB-001 anomaly.
+- An earlier diagnostic review recorded `GET /dashboard` querying `business_user.primary_niche` as a historical fingerprint and noted that the supplied Sentinel schema report showed the column present. This was not established as the cause of the test-time event-creation/calendar anomaly and is not a current defect finding. The separate invoice-sequence migration remains pending and still requires backup-first installation handling before invoice issuance is considered ready.
 - Windows Ops workflow initially exposed a PowerShell parse failure in the new existing-server migration guard. The failure was diagnosed and corrected on main. Exact current main HEAD `a7798c41224876aa4a6e2d98963e8cd793680909`: Windows Ops Scripts, Windows V1 Package, Zazu quality and Push on main all completed SUCCESS. This confirms CI only, not the Founder's installed PC.
-- DB-001 remains OPEN pending matching current incident evidence and successful repetition of the affected installed workflow. No database migration or owner-device mutation has been performed by this repository investigation.
+- At this historical checkpoint DB-001 was still listed as OPEN. That status is superseded by the 2026-11-22 Founder clarification at the top of this file; no new owner-side incident evidence was established by this repository investigation.
 
 
 ## Sentinel overview accuracy correction — 2026-11-18
@@ -1269,7 +1269,7 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Command-side parent revision advancement is explicit for quote acceptance → Work and purchase receipt → affected inventory items, in addition to the existing quote, invoice, Purchase Order, inventory and asset parents.
 - Online write trace reviewed: customer/contact, import, Work/lifecycle, quote, capability, supplier, asset, event cost/preparation, invoice/payment/expense, inventory and purchasing controllers/services. The inspected updates to existing tracked roots use the business-first lock boundary and Eloquent revision events. The inspected raw/bulk operations either also update the aggregate root in the same transaction (e.g. quote status replacement) or restore into a newly-created empty business without existing sync identities. This is a broad source trace, not yet proof that no future or indirect writer can bypass the contract; keep the final writer audit gate open until the repository-wide write inventory is closed.
 - Exact-head evidence at `7d5f861`: Laravel unit/feature PASS, PostgreSQL migration smoke PASS, PHPMD PASS, Zazu Quality PASS, Director Health PASS. Offline browser acceptance, including the new multi-aggregate acknowledgement case, was still running when this state was written. SonarCloud is skipped by workflow configuration.
-- CASE-ZAZU-0033 remains OPEN until the exact-head browser result and remaining supported-aggregate writer audit pass. V1 readiness and the documented 73/100 evidence-maturity score are unchanged. Physical Android/PC acceptance, operator recovery drill, populated commercial reconciliation, DB-001 and legal/operational sign-off remain separate gates.
+- CASE-ZAZU-0033 remains OPEN until the exact-head browser result and remaining supported-aggregate writer audit pass. V1 readiness and the documented 73/100 evidence-maturity score are unchanged. Physical Android/PC acceptance, operator recovery drill, populated commercial reconciliation, The historical DB-001 anomaly is dormant and non-critical; legal/operational sign-off remains a separate gate.
 
 
 ## CASE-ZAZU-0033 — operator conflict-resolution acceptance added — 2026-11-20
