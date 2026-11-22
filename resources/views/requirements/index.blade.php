@@ -18,7 +18,7 @@
         </div>
         @if ($requirements->count())
             <div class="zazu-record-header" data-record-cols="2">
-                <div class="zazu-record-header-note">Service</div>
+                <div class="zazu-record-header-note">Product / service</div>
                 <div class="zazu-record-header-cell">Quantity</div>
                 <div class="zazu-record-header-cell">Status</div>
             </div>
@@ -37,14 +37,16 @@
                     </div>
                 </div>
                 <div class="zazu-list-side"><div class="zazu-side-primary">{{ number_format((float) $requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }}</div></div>
-                <div class="zazu-list-side"><div class="zazu-side-primary">{{ ucfirst($requirement->status) }}</div></div>
-                <div class="zazu-list-side flex flex-wrap items-center justify-end gap-2">
+                <div class="zazu-list-side">
+                    <div class="zazu-side-primary">{{ ucfirst($requirement->status) }}</div>
+                    <div class="mt-2 flex flex-wrap items-center justify-end gap-2">
                     <a href="{{ route('work.requirements.edit', [$event, $requirement]) }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm">Edit</a>
                     <form method="POST" action="{{ route('work.requirements.destroy', [$event, $requirement]) }}" onsubmit="return confirm('Remove this requirement? Earlier quote versions will remain as saved snapshots.');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="zazu-btn zazu-btn-ghost zazu-btn-sm">Remove</button>
                     </form>
+                    </div>
                 </div>
             </div>
         @empty
