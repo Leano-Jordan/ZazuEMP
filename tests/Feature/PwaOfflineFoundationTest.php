@@ -169,7 +169,6 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await cache.put(pageRequest, response.clone())', $worker);
     }
 
-
     public function test_disconnected_top_level_navigation_prefers_the_local_dashboard_over_a_stale_route_snapshot(): void
     {
         $worker = File::get(public_path('sw.js'));
