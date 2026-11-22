@@ -46,7 +46,7 @@
             : ($nonVoidInvoices->isEmpty()
                 ? 'Not invoiced'
                 : ($outstandingInvoices->isNotEmpty()
-                    ? $outstandingInvoices->count().' balance due'
+                    ? $outstandingInvoices->count().' invoice'.($outstandingInvoices->count() === 1 ? '' : 's').' due'
                     : 'Paid'));
         $deliveryProgressLabel = $event->status === 'completed'
             ? 'Delivered'
