@@ -6,18 +6,20 @@ use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventRequirement;
 use App\Models\Quote;
+use App\Services\QuoteService;
+use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class QuoteWorkflowTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->signInAsOwner();
     }
-
-    use RefreshDatabase;
 
     public function test_quote_v1_is_created_from_current_requirements_and_totals_are_persisted(): void
     {
