@@ -65,7 +65,7 @@ jobs:
             echo "No PHP files changed; incremental Pint gate has nothing to check."
             exit 0
           fi
-          vendor/bin/pint --test "${php_files[@]}"
+          vendor/bin/pint --test -vvv "${php_files[@]}"
 
   composer-security-audit:
     runs-on: ubuntu-latest
