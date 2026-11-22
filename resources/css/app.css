@@ -8413,3 +8413,104 @@ body.zazu-has-wallpaper .zazu-content {
 @media (prefers-reduced-motion: no-preference) {
     .zazu-quote-quantity-field input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, #d59a32 25%, transparent); }
 }
+
+
+/* Director refinement — Job inspector hierarchy and action alignment */
+.zazu-inspector {
+    width: min(560px, 100vw);
+    border-left-color: var(--zazu-border-strong);
+}
+.zazu-inspector-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    align-items: center;
+    background: var(--zazu-surface);
+}
+.zazu-inspector-summary {
+    gap: 10px;
+}
+.zazu-inspector-summary > div {
+    min-height: 54px;
+    padding: 10px 12px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 10px;
+    background: var(--zazu-surface);
+}
+.zazu-inspector-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+    background: var(--zazu-surface);
+}
+.zazu-inspector-tabs button {
+    min-width: 0;
+    min-height: 48px;
+    padding: 10px 8px;
+    white-space: normal;
+    line-height: 1.25;
+    font-size: 11px;
+}
+.zazu-inspector-body {
+    padding: 20px;
+    overscroll-behavior: contain;
+}
+.zazu-inspector-body [role="tabpanel"][hidden] {
+    display: none !important;
+}
+.zazu-inspector-record-list {
+    gap: 9px;
+}
+.zazu-inspector-record {
+    padding: 13px 14px;
+    border-radius: 10px;
+}
+.zazu-ops-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.zazu-ops-actions > .zazu-btn,
+.zazu-ops-actions form > .zazu-btn {
+    min-height: 38px;
+    justify-content: center;
+}
+@media (max-width: 640px) {
+    .zazu-inspector {
+        width: 100vw;
+        border-left: 0;
+    }
+    .zazu-inspector-head {
+        padding: 16px;
+    }
+    .zazu-inspector-summary {
+        gap: 7px;
+        padding: 12px 14px;
+    }
+    .zazu-inspector-summary > div {
+        min-height: 50px;
+        padding: 8px 10px;
+    }
+    .zazu-inspector-tabs button {
+        min-height: 46px;
+        padding: 9px 5px;
+        font-size: 10px;
+    }
+    .zazu-inspector-body {
+        padding: 16px;
+    }
+    .zazu-ops-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        gap: 8px;
+    }
+    .zazu-ops-actions > .zazu-btn,
+    .zazu-ops-actions form,
+    .zazu-ops-actions form > .zazu-btn {
+        width: 100%;
+        min-width: 0;
+    }
+}
