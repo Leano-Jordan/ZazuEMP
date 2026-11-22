@@ -91,6 +91,8 @@ class QuoteController extends Controller
             'deposit_percent' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
+            'quantity' => ['sometimes', 'required', 'array', 'min:1'],
+            'quantity.*' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
         ]);
 
         $taxRate = $this->resolveTaxRate($businessId, $validated['tax_rate_id'] ?? null);
@@ -115,7 +117,8 @@ class QuoteController extends Controller
             strtoupper($validated['currency']),
             $taxRate,
             $validated['notes'] ?? null,
-            (string) ($validated['deposit_percent'] ?? '0.00')
+            (string) ($validated['deposit_percent'] ?? '0.00'),
+            $validated['quantity'] ?? null
         );
 
         return redirect()
@@ -370,6 +373,8 @@ class QuoteController extends Controller
             'deposit_percent' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
+            'quantity' => ['sometimes', 'required', 'array', 'min:1'],
+            'quantity.*' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
         ]);
 
         $requirementsById = $quote->event->requirements->keyBy('id');
@@ -399,7 +404,8 @@ class QuoteController extends Controller
             $taxRate,
             $replaceTax,
             $validated['notes'] ?? null,
-            (string) ($validated['deposit_percent'] ?? '0.00')
+            (string) ($validated['deposit_percent'] ?? '0.00'),
+            $validated['quantity'] ?? null
         );
 
         return redirect()
