@@ -194,7 +194,7 @@
     </section>
 
     <div class="zazu-inspector-backdrop" data-zazu-inspector-close></div>
-    <aside class="zazu-inspector" aria-hidden="true" aria-labelledby="zazu-inspector-title" data-zazu-inspector-panel>
+    <aside class="zazu-inspector" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="zazu-inspector-title" data-zazu-inspector-panel>
         <header class="zazu-inspector-head">
             <div>
                 <div class="zazu-eyebrow">Function sheet</div>
@@ -239,6 +239,15 @@
             const backdrop = document.querySelector('.zazu-inspector-backdrop');
             if (!panel || !backdrop) return;
 
+            // A fixed drawer must live outside transformed/contained application
+            // layout ancestors. Portal it to the document layer before wiring it.
+            if (panel.parentElement !== document.body) {
+                document.body.append(backdrop, panel);
+            }
+
+            let returnFocus = null;
+            const closeButton = panel.querySelector('[data-zazu-inspector-close]');
+
             const open = (button) => {
                 const row = button.closest('[data-zazu-job-row]');
                 const source = row?.querySelector('[data-zazu-inspector]');
@@ -270,17 +279,22 @@
                     panelSection.classList.toggle('hidden', target !== 'catering');
                 });
 
+                returnFocus = button instanceof HTMLElement ? button : null;
                 panel.classList.add('is-open');
                 backdrop.classList.add('is-visible');
                 panel.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('zazu-inspector-open');
+                closeButton?.focus();
             };
 
             const close = () => {
+                if (!panel.classList.contains('is-open')) return;
                 panel.classList.remove('is-open');
                 backdrop.classList.remove('is-visible');
                 panel.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('zazu-inspector-open');
+                if (returnFocus?.isConnected) returnFocus.focus();
+                returnFocus = null;
             };
 
             document.querySelectorAll('[data-zazu-inspector-open]').forEach(button => button.addEventListener('click', (event) => {
@@ -290,7 +304,31 @@
             }));
 
             document.querySelectorAll('[data-zazu-inspector-close]').forEach(button => button.addEventListener('click', close));
-            document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+            document.addEventListener('keydown', event => {
+                if (!panel.classList.contains('is-open')) return;
+
+                if (event.key === 'Escape') {
+                    close();
+                    return;
+                }
+
+                if (event.key !== 'Tab') return;
+
+                const focusable = [...panel.querySelectorAll(
+                    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                )].filter(element => element.getClientRects().length > 0);
+                if (!focusable.length) return;
+
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (event.shiftKey && (document.activeElement === first || !panel.contains(document.activeElement))) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            });
 
             const tabs = [...panel.querySelectorAll('[data-zazu-tab]')];
             const activateTab = (tab, moveFocus = false) => {
