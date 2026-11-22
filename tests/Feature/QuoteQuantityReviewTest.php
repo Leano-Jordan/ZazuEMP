@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
-use App\Models\EventRequirement;
 use App\Models\Quote;
 use App\Services\QuoteService;
 use App\Support\CurrentBusiness;
@@ -42,7 +41,7 @@ class QuoteQuantityReviewTest extends TestCase
 
         $this->get(route('work.quotes.create', $event))
             ->assertOk()
-            ->assertSee('name="quantity[' . $requirement->id . ']"', false)
+            ->assertSee('name="quantity['.$requirement->id.']"', false)
             ->assertSee('Quantity to quote')
             ->assertSee('Every line needs your attention.')
             ->assertSee('Do not leave this at one unless one is genuinely correct.')
