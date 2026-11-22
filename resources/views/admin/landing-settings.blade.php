@@ -72,7 +72,7 @@
                                 @error($field)<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </div>
                             <div class="zazu-admin-image-preview zazu-admin-image-preview-{{ $field }}" aria-label="{{ $slot['preview'] }}" data-zazu-slot-preview>
-                                <img src="{{ $selectedUrl }}" alt="{{ $slot['preview'] }}" loading="lazy" data-zazu-landing-preview>
+                                <img src="{{ $selectedUrl }}" alt="{{ $slot['preview'] }}" data-zazu-landing-preview>
                                 <span>Live crop preview · {{ $slot['preview'] }}</span>
                             </div>
                         </article>
