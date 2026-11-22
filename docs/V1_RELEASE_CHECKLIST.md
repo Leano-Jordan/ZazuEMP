@@ -398,7 +398,7 @@ DB-001 is DORMANT / HISTORICAL / NON-CRITICAL by the 2026-11-22 Founder clarific
 - Historical references and diagnostic tooling remain in the record for traceability; they do not create a current investigation task.
 - Root cause and fix remain unproven. Do not claim resolution, request captures or spend active engineering time on it unless it recurs on current `main` or materially new evidence appears.
 - Windows startup source checks migration status, creates and verifies a full database/private-files backup before applying pending migrations, and verifies final migration state.
-- [ ] **Separate V1 gate:** complete the controlled installation recovery drill on the intended Windows installation with representative data and private files. This remains open regardless of DB-001 recurrence status.
+- [ ] **Separate V1 gate:** complete the controlled installation recovery drill on the intended Windows installation with representative data and private files. This remains open independently of the dormant DB-001 anomaly.
 
 ## Current code follow-up — 2026-11-17
 
