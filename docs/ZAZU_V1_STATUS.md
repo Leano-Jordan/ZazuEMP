@@ -5,10 +5,10 @@
 - Fixed stale secondary-backup health: the dashboard no longer trusts a recent verified timestamp alone. It now requires the recorded archive path to resolve to a regular non-symlink file whose size and last-write timestamp match the metadata written after SHA-256-verified copy.
 - Missing drive/archive or changed metadata produces **ATTENTION**. SHA-256 is verified at copy time, not re-hashed on every dashboard request. Physical disk separation and cloud-provider upload completion still require operator verification.
 - Laravel: **679 passed / 1 skipped / 4,671 assertions**; backup status regression passed. Zazu Quality, PHPMD, Psalm, PostgreSQL recovery, populated upgrade/rollback and Windows fresh-install acceptance: **PASS**. Windows PowerShell 5.1 runner metadata test: [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) **PASS**. SonarCloud: **SKIPPED**.
-- Offline-browser acceptance was still running at this checkpoint; no pass is claimed.
+- Exact-head offline-browser acceptance [44989474410](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44989474410): **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance passed.
 - Evidence maturity remains **77/100**. V1 remains **NOT READY** until owner-PC independent backup and full restore are demonstrated.
 
-**Next engineering target:** commercial workflow reconciliation with populated quote, invoice, payment, expense and profit records.
+**Next active target (one-target WIP limit): DB-001 on the Founder's actual installation.** Run the read-only schema check and inspect the matching classified incident record before any correction. Commercial workflow reconciliation is priority 2.
 
 ---
 
