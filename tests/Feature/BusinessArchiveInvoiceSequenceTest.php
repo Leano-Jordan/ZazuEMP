@@ -58,4 +58,42 @@ class BusinessArchiveInvoiceSequenceTest extends TestCase
             'next_number' => 43,
         ]);
     }
+    public function test_legacy_business_archive_without_invoice_sequence_remains_restorable(): void
+    {
+        $source = Business::create([
+            'name' => 'Legacy Archive Source',
+            'slug' => 'legacy-archive-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $service = app(BusinessArchiveService::class);
+        $archive = $service->download($source);
+        $zip = new \\ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
+        unset($data['invoice_number_sequences']);
+        $zip->deleteName('data.json');
+        $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR));
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Legacy Archive Target',
+            'slug' => 'legacy-archive-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            $result = $service->restore($archive, $target);
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertSame(29, $result['tables']);
+        $this->assertDatabaseMissing('invoice_number_sequences', [
+            'business_id' => $target->id,
+        ]);
+    }
+
 }
