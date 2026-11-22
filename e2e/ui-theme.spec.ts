@@ -177,7 +177,23 @@ test.describe('Zazu UI theme and navigation', () => {
         await expectNoViewportOverflow(page);
         await expect(page.locator('[data-zazu-inspector-open]').first()).toBeVisible();
         await page.locator('[data-zazu-inspector-open]').first().click();
-        await expect(page.locator('[data-zazu-inspector-panel]').first()).toBeVisible();
+        const inspector = page.locator('[data-zazu-inspector-panel]').first();
+        await expect(inspector).toBeVisible();
+
+        const inspectorGeometry = await inspector.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            return {
+                isDocumentLayer: element.parentElement === document.body,
+                top: rect.top,
+                bottom: rect.bottom,
+                viewportHeight: window.innerHeight,
+                position: getComputedStyle(element).position,
+            };
+        });
+        expect(inspectorGeometry.isDocumentLayer).toBe(true);
+        expect(inspectorGeometry.position).toBe('fixed');
+        expect(inspectorGeometry.top).toBeGreaterThanOrEqual(0);
+        expect(inspectorGeometry.bottom).toBeLessThanOrEqual(inspectorGeometry.viewportHeight + 1);
 
         expect(responses).toEqual([]);
     });
