@@ -1,3 +1,19 @@
+# Offline expense identity isolation — 2026-11-22
+
+**Verified source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02).
+
+- Added a fail-closed regression for corrupted business-local sync identity rows pointing to foreign event, supplier or purchase-order records in an offline expense mutation.
+- The test verifies each mutation remains pending, no local expense is written and all foreign records remain unchanged.
+- Laravel: **679 passed / 1 skipped / 4,665 assertions**; `OfflineExpenseReferenceIsolationTest` passed.
+- Zazu Quality, incremental formatting, Composer security audit, secret scan, PHPMD, PostgreSQL migration/rollback/registration/backup/private-file recovery, Director Health and Push-on-main: **PASS**.
+- SonarCloud: **SKIPPED**.
+- Offline-browser acceptance in [Laravel workflow 44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) was still running at the time this checkpoint was recorded. No browser-suite pass is claimed here.
+- Evidence maturity remains **77/100**; V1 remains **NOT READY**. This server-side isolation regression does not close physical Android acceptance, owner-PC recovery, live-business commercial reconciliation, POPIA or name clearance.
+
+**Next engineering target:** offline account/session transition adversarial review, with emphasis on expiry, re-authentication, preserving queued local work and blocking stale-session online mutations.
+
+---
+
 # Dependency refresh verification — 2026-11-22
 
 **Exact repository HEAD:** [7005bc8](https://github.com/Leano-Jordan/ZazuEMP/commit/7005bc805bdf94429579e4b0cdb2208eec322235) on `main`.
