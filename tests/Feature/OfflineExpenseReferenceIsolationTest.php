@@ -252,7 +252,7 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
             'business_id' => $business->id,
             'entity_type' => 'customer',
             'entity_uuid' => $customerUuid,
-            'record_type' => (new Event())->getMorphClass(),
+            'record_type' => (new Event)->getMorphClass(),
             'record_id' => $customer->id,
         ]);
 
