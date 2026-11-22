@@ -930,7 +930,7 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 
 ## Historical DB-001 incident notes — 2026-11-17 (superseded by 2026-11-22 Founder clarification)
 
-- Repeated user-facing `DB-001` incidents were reported. References: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`.
+- Historical reports had grouped these references as repeated DB-001 incidents: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`. The Founder clarification on 2026-11-22 supersedes that grouping for the occurrence under discussion: it arose during offline event-creation/calendar-related task testing and has not recurred after subsequent offline-architecture work.
 - The contemporaneous note associated the reference with an Account access error screen, but the Founder clarified on 2026-11-22 that the occurrence under discussion happened during offline event-creation and calendar-related task testing. That later clarification supersedes the earlier characterization.
 - Source inspection found that the Work controller writes the five new scheduling columns, while the previous Windows start path did not check or apply pending migrations. A local SQLite database behind the current code is therefore the leading explanation, **not a confirmed root cause**.
 - Backup-first migration handling has now been added to the shared Windows startup script. It has not yet run against the owner's installed database. The incident was recorded as OPEN at that historical checkpoint; its current disposition is the dormant, non-critical status at the top of this file.
