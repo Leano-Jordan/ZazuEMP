@@ -1,3 +1,18 @@
+## Founder acceptance evidence update — 2026-11-22
+
+**Repository baseline reviewed:** [`cd7762a`](https://github.com/Leano-Jordan/ZazuEMP/commit/cd7762a18976eeae7cef6d2c4fb132f69b32b0f5).
+
+Founder reports that Zazu EMP has been physically used on both PC and linked mobile, operating against the same workspace. The fictional workspace already contains customer/client, quote, invoice, supplier, purchase-order and inventory records; the Founder reports these areas work as intended. Dashboard screenshots reviewed show two customers, one active event and connected workspace-health indicators.
+
+Acceptance ledger:
+- PC normal connected operation: **OWNER-VERIFIED PASS**.
+- Linked mobile normal connected operation: **OWNER-VERIFIED PASS**.
+- Shared workspace use: **OWNER-VERIFIED PASS**.
+- Business module population/functionality: **OWNER-REPORTED FUNCTIONAL**.
+- All supplied test records are fictional per Founder.
+
+Do not send the Founder back through basic setup or ask them to recreate records. Detailed transaction screenshots were not supplied, so do not claim quote-to-profit reconciliation, payment idempotency, stock receipt reconciliation or exact margin validation. Physical connected use does not by itself prove cold-start host outage, fully disconnected offline write/relaunch/reconnect, attachment round-trip, or installation-wide PC backup/restore. Preserve these as separate evidence gates. The supplied dashboard images are visual workspace evidence, not transaction-level evidence.
+
 ## Business archive invoice-sequence portability — 2026-11-22
 
 **Implementation:** [e52d1bf](https://github.com/Leano-Jordan/ZazuEMP/commit/e52d1bfd0f8fbbfa4148f05ad77ed3a387c8124f). **Legacy compatibility:** [c8afa0e](https://github.com/Leano-Jordan/ZazuEMP/commit/c8afa0e4117980519463574917f1c8cdce4ae831). **Regression coverage:** [c9f0c7b](https://github.com/Leano-Jordan/ZazuEMP/commit/c9f0c7b8e113eec67d93d77a22a8a0150882bb69).
