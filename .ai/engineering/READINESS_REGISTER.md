@@ -304,14 +304,14 @@ Close the physical Android device, intended-installation recovery, live financia
 
 Source inspection confirms the authoritative incident logger is intentionally privacy-minimised. It records request ID, error classification, exception class, route/action, method/path, timestamp and source file/line; it does not record exception messages, SQL, bindings or stack traces. The request middleware also adds the request ID to log context and the response header.
 
-The incident-framework documentation was corrected on `main` (documentation-only commit `f88af665ae09b6f87f3c8d73a52c3cc5e4854dbd`) to match the implementation. This is a documentation correction, not an incident fix. The actual owner-installation log entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` is still required to inspect its exception class, source file/line and route. DB-001 remains OPEN; no readiness uplift.
+The incident-framework documentation was corrected on `main` (documentation-only commit `f88af665ae09b6f87f3c8d73a52c3cc5e4854dbd`) to match the implementation. This is a documentation correction, not an incident fix. At that historical checkpoint, the owner-installation log entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` was requested. That request and the OPEN label are superseded by the 2026-11-22 Founder clarification at the top of this register; do not pursue it unless DB-001 recurs on current `main`.
 
 
 ## Backup-first startup verification hardening — 2026-11-17
 
 The backup command now reopens its completed temporary ZIP, performs ZIP consistency checking, validates the Zazu manifest and database driver, checks that archive payload membership exactly matches the checksum manifest, and verifies every payload SHA-256 before publishing the backup. The Windows startup script's backup command therefore returns success only after this self-verification. A focused regression checks valid and tampered payload behavior.
 
-**Evidence status:** committed on `main`; exact-head Laravel and Windows workflow results are not yet available. Owner-installation migration execution and the affected account workflow remain required. No DB-001 closure or readiness uplift.
+**Evidence status:** committed on `main`; exact-head Laravel and Windows workflow results are not yet available. At that historical checkpoint, installation migration execution and account-workflow verification were still listed as required. That DB-001 follow-up is superseded by the 2026-11-22 Founder clarification; installation recovery remains its own separate acceptance gate.
 
 
 ## Zazu quality workflow — exact-head result — 2026-11-17
@@ -328,20 +328,18 @@ The create screen had omitted the required Work / event name field although `Wor
 
 **Exact-head evidence:** Laravel run `44184183003` passed all three jobs: Laravel tests, PostgreSQL migration/registration/backup/restore/private-file recovery, and offline-browser acceptance (including the mobile customer-to-Work and phone-local attachment journeys). Zazu Quality `44184183085`, Windows V1 Package `44184182900` (including PowerShell fresh install), Director Health `44184182984` and Push-on-main `44184180721` also passed. SonarCloud was skipped, not passed.
 
-This is a closed form/CI regression, not a readiness uplift. DB-001 and all four operator acceptance gates remain open; release remains NOT READY and evidence maturity remains 73/100.
+This is a closed form/CI regression, not a readiness uplift. the historical DB-001 open label is superseded by the 2026-11-22 Founder clarification; the separate operator acceptance gates remain open; release remains NOT READY and evidence maturity remains 73/100.
 
 
-## DB-001 recurrence — OPEN (2026-11-18)
+## Historical DB-001 recurrence record — 2026-11-18 (superseded; not active)
 
-New owner-reported reference: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`. The user reports another failure while opening/saving account/workspace information. The precise action and matching log record are not yet known, so no root cause is claimed.
+Historical reference retained for traceability: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`. Earlier summaries described an account/workspace-save failure, but the Founder clarified on 2026-11-22 that the occurrence under discussion happened during offline event-creation/calendar-related task testing and has not recurred since subsequent offline-architecture work. That clarification supersedes the earlier description.
 
-A safe Windows capture utility is now on `main`: `ops/windows/Get-ZazuIncident.ps1`. Run it from the Zazu project folder with the reference ID; it returns only the correlated request ID, route/action, exception class, source file/line and bounded database diagnostics. It deliberately excludes SQL, bindings, messages and secrets. See `docs/DB001_INCIDENT_CAPTURE.md`.
+A safe Windows capture utility was added to `main`: `ops/windows/Get-ZazuIncident.ps1`. It is retained for a genuinely new recurrence only; do not run it now or request another owner-side capture.
 
 **Closure still requires:** matching runtime record, a targeted correction, and successful repeat of the affected workflow on the intended installation. Do not alter the database while the cause is unknown. Release remains NOT READY; no score uplift.
 
 
 ## DB-001 read-only local SQLite inspection — OPEN (2026-11-18)
 
-A new Windows diagnostic is committed on `main`: `ops/windows/Test-ZazuDatabaseSchema.ps1`, documented in `docs/DB001_SQLITE_SCHEMA_CHECK.md`. It inspects migration status, the event scheduling migration ledger/columns, the historical `business_user.primary_niche` column and SQLite integrity without changing the database. A Windows Ops workflow contract check now guards its required checks and non-mutating boundary.
-
-**Next evidence required:** run the script against the owner's installed Zazu project and inspect the generated `Zazu-Database-Schema-Check.json`. Then select a targeted correction from the observed schema/migration state and reproduce the failing workflow. This source-side diagnostic does not establish the cause of request `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`; do not claim the incident is resolved.
+The read-only Windows diagnostic `ops/windows/Test-ZazuDatabaseSchema.ps1` remains available for a genuinely new, reproducible recurrence. Its historical request for an owner-PC report is superseded by the 2026-11-22 Founder clarification. Do not run it now, request a report or select a speculative schema correction. No DB-001 root cause or fix is claimed.
