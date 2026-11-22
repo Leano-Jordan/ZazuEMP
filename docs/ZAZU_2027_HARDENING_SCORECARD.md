@@ -1,3 +1,16 @@
+## Director security review — offline session and trusted-device transitions — 2026-11-22
+
+**Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
+
+- Confirmed existing controls for session expiry, interrupted logout, business switching, stale bootstrap, re-pair token replacement, late sync/attachment responses, device revocation and bearer expiry.
+- Laravel: **679 passed / 1 skipped / 4,665 assertions**; offline browser: **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; PostgreSQL migration/recovery, Zazu Quality and PHPMD passed.
+- No new confirmed defect. DEC-019's business-scoped trusted-device credential intentionally survives ordinary web-account logout; owner revocation remains the device-removal control.
+- **Score disposition: 77/100 unchanged.** Automated transition coverage is not physical Android or lost-device operational proof. V1 remains **NOT READY**.
+
+**Next engineering target:** recovery integrity — distinguish business archive portability from installation-wide backup/restore, and verify private-media and trusted-device safeguards.
+
+---
+
 ## Director execution checkpoint — offline expense identity isolation — 2026-11-22
 
 **Verified source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02).
