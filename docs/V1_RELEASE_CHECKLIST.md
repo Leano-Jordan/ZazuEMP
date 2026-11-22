@@ -7,10 +7,10 @@
 - SHA-256 is verified at copy time, not recomputed on every dashboard request. The health check does not prove a physically separate disk or completed cloud upload; the owner must verify the configured destination is genuinely independent.
 - Laravel: **679 passed / 1 skipped / 4,671 assertions**; the new missing/changed-secondary-copy regression passed. Zazu Quality, PHPMD, Psalm, populated upgrade/rollback, PostgreSQL migration/recovery and Windows fresh-install acceptance: **PASS**. SonarCloud: **SKIPPED**.
 - Windows PowerShell 5.1 runner metadata/failure-preservation test: [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) **PASS**.
-- Offline-browser acceptance was still running when this checkpoint was recorded; no pass is claimed here.
+- Exact-head offline-browser acceptance [44989474410](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44989474410): **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance passed.
 - Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner-PC scheduled backup, independent off-disk copy and controlled full restore are demonstrated.
 
-**Next engineering target:** commercial quote-to-profit reconciliation using populated records. Physical Android acceptance and POPIA/name clearance remain open.
+**Next active target (one-target WIP limit): DB-001 on the Founder's actual installation.** Run the read-only schema check and inspect the matching classified incident record before any correction. Commercial quote-to-profit proof is priority 2. Physical Android acceptance and POPIA/name clearance remain open.
 
 ---
 
