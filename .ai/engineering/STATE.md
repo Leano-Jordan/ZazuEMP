@@ -1,3 +1,18 @@
+## Director security review — offline session and trusted-device transitions — 2026-11-22
+
+**Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
+
+- Traced login/session expiry, explicit logout, interrupted logout, business switching, device revocation/expiry, stale bootstrap responses, re-pair token replacement, in-flight sync pushes and attachment response races.
+- Existing coverage includes `e2e/offline-session-transition.spec.js` (unreachable logout, expiry/re-authentication, owner/manager account transition, workspace switching), `e2e/pwa-offline.spec.js` (late bootstrap cannot overwrite the active workspace), `e2e/offline-attachment-sync.spec.js` (old push and late attachment responses after re-pair/logout), and `tests/Feature/SyncDeviceManagementTest.php` (owner revocation, expired bearer rejection, idle-expiry renewal).
+- Client guards increment session generations, abort active sync, compare the request token again after responses, and reject stale state writes. The service worker invalidates user/business page caches only after confirmed logout and refuses to mask online 401/403 with stale authenticated HTML. Server device APIs independently enforce active, unexpired, owner-revocable device credentials.
+- **No new confirmed defect found.** The business-scoped trusted-device token intentionally survives ordinary web-account logout under DEC-019; this is an owner-approved shared-device model, not per-staff offline isolation. Owner revocation remains the control for lost/reassigned devices. Do not silently change this architecture.
+- Exact-head evidence: Laravel **679 passed / 1 skipped / 4,665 assertions**; offline browser **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push-on-main **PASS**. SonarCloud **SKIPPED**.
+- This is automated evidence, not physical lost-device/Android proof. Evidence maturity remains **77/100**; V1 remains **NOT READY**.
+
+**Next engineering target:** recovery integrity review — distinguish business archive export/import from installation-wide backup/restore; verify trusted-device safeguards, private-media consistency, rollback and recovery on the intended Windows installation.
+
+---
+
 ## Director execution checkpoint — offline expense identity isolation challenge — 2026-11-22
 
 **Source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02) on `main`.
