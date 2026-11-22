@@ -89,6 +89,17 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         expect(await page.evaluate(() => navigator.onLine)).toBe(true);
 
+        const helperToggle = page.locator('[data-zazu-helper-toggle]');
+        await helperToggle.click();
+        const recommendation = page.locator('[data-zazu-helper-recommendation]');
+        const attentionItem = page.locator('[data-zazu-helper-attention-item]').first();
+        if (await attentionItem.count()) {
+            await expect(recommendation).toBeVisible();
+        } else {
+            await expect(recommendation).toBeHidden();
+        }
+        await helperToggle.click();
+
         originAvailable = false;
         await page.evaluate(() => window.dispatchEvent(new Event('focus')));
         const notice = page.locator('[data-zazu-origin-offline-notice]');
