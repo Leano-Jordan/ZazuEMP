@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventRequirement;
 use App\Models\Quote;
 use App\Services\QuoteService;
+use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -72,6 +74,85 @@ class QuoteQuantityReviewTest extends TestCase
         $this->assertSame('150.00', (string) $revision->items->first()->quantity);
         $this->assertSame('13500.00', (string) $revision->total);
         $this->assertSame('120.00', (string) $firstVersion->fresh()->items()->firstOrFail()->quantity);
+    }
+
+    public function test_quote_line_items_visibly_distinguish_products_from_services(): void
+    {
+        $businessId = app(CurrentBusiness::class)->id(auth()->user());
+        $product = BusinessCapability::create([
+            'business_id' => $businessId,
+            'name' => 'Chicken portions',
+            'category' => 'Catering',
+            'capability_type' => 'product',
+            'pricing_basis' => 'per_unit',
+            'default_price' => '45.00',
+            'currency' => 'ZAR',
+            'default_unit' => 'portion',
+            'is_active' => true,
+        ]);
+        $service = BusinessCapability::create([
+            'business_id' => $businessId,
+            'name' => 'Waiter service',
+            'category' => 'Staffing',
+            'capability_type' => 'service',
+            'pricing_basis' => 'per_hour',
+            'default_price' => '120.00',
+            'currency' => 'ZAR',
+            'default_unit' => 'hour',
+            'is_active' => true,
+        ]);
+        $customer = Customer::create(['name' => 'Product Service Customer']);
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-TYPES-001',
+            'name' => 'Product Service Event',
+            'event_date' => now()->addDays(15)->toDateString(),
+            'status' => 'draft',
+        ]);
+        $productRequirement = $event->requirements()->create([
+            'capability_id' => $product->id,
+            'description' => 'Chicken portions',
+            'category' => 'Catering',
+            'quantity' => '1.00',
+            'unit' => 'portion',
+            'status' => 'open',
+        ]);
+        $serviceRequirement = $event->requirements()->create([
+            'capability_id' => $service->id,
+            'description' => 'Waiter service',
+            'category' => 'Staffing',
+            'quantity' => '1.00',
+            'unit' => 'hour',
+            'status' => 'open',
+        ]);
+
+        $this->get(route('work.quotes.create', $event))
+            ->assertOk()
+            ->assertSee('Product')
+            ->assertSee('Service')
+            ->assertSee('Chicken portions')
+            ->assertSee('Waiter service');
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'quantity' => [
+                $productRequirement->id => '100.00',
+                $serviceRequirement->id => '8.00',
+            ],
+            'unit_price' => [
+                $productRequirement->id => '45.00',
+                $serviceRequirement->id => '120.00',
+            ],
+        ])->assertRedirect();
+
+        $quote = Quote::query()->firstOrFail();
+        $this->post(route('quotes.versions.store', $quote))->assertRedirect();
+        $revision = $quote->refresh()->latestVersion()->firstOrFail();
+
+        $this->get(route('quotes.versions.edit', [$quote, $revision]))
+            ->assertOk()
+            ->assertSee('Product')
+            ->assertSee('Service');
     }
 
     public function test_quote_creation_rejects_missing_quantity_confirmation(): void
