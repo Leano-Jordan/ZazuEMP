@@ -294,6 +294,9 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::get('/work/{event}/requirements/create', [RequirementController::class, 'create'])
         ->middleware('permission:work.update')
         ->name('work.requirements.create');
+    Route::get('/work/{event}/requirements/{requirement}/edit', [RequirementController::class, 'edit'])->middleware('permission:work.update')->name('work.requirements.edit');
+    Route::put('/work/{event}/requirements/{requirement}', [RequirementController::class, 'update'])->middleware('permission:work.update')->name('work.requirements.update');
+    Route::delete('/work/{event}/requirements/{requirement}', [RequirementController::class, 'destroy'])->middleware('permission:work.update')->name('work.requirements.destroy');
     Route::post('/work/{event}/requirements', [RequirementController::class, 'store'])
         ->middleware('permission:work.update')
         ->name('work.requirements.store');
