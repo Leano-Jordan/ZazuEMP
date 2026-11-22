@@ -28,8 +28,8 @@
             ['label' => 'Control', 'title' => 'Watch exceptions', 'copy' => 'Pay attention to approaching work, blocked preparation, procurement gaps and unresolved actions.'],
         ],
         'work.show' => [
-            ['label' => 'Review', 'title' => 'Start with the event facts', 'copy' => 'Confirm the customer, date, contacts, status and location before changing the job.'],
-            ['label' => 'Build', 'title' => 'Turn the brief into requirements', 'copy' => 'Requirements become the operational checklist for what must be delivered or prepared.'],
+            ['label' => 'Review', 'title' => 'Start with the next useful action', 'copy' => 'Zazu highlights the next step based on this job’s actual records. Review it before moving through the workflow.', 'target' => 'work.next-action'],
+            ['label' => 'Build', 'title' => 'Track the job journey', 'copy' => 'This progress strip follows scope, customer decision, payment, delivery readiness and close-out.', 'target' => 'work.progress'],
             ['label' => 'Execute', 'title' => 'Use the downstream workspaces', 'copy' => 'Quote, preparation, purchasing, inventory, assets, costs and travel should all remain connected to this job.'],
         ],
         'quotes.index' => [
