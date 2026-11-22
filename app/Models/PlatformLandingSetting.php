@@ -11,6 +11,8 @@ class PlatformLandingSetting extends Model
         'operations_image_path',
         'resources_image_path',
         'control_image_path',
+        'venue_image_path',
+        'decor_image_path',
     ];
 
     public static function current(): self
