@@ -13,7 +13,7 @@
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Commercial</div>
             <h2 class="zazu-command-title">Build draft quote v1</h2>
-            <p class="zazu-command-copy">Your job services are already listed. Zazu fills in saved usual prices where you have them. Check the amounts, change anything needed, then save the quote.</p>
+            <p class="zazu-command-copy">Review every line before sending. Confirm the quantity, unit and price for each product or service. Saved prices are filled in where available.</p>
         </div>
     </section>
 
@@ -72,7 +72,7 @@
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Quote lines</div>
-                        <div class="zazu-form-section-copy">These values are copied into the quote snapshot when saved.</div>
+                        <div class="zazu-form-section-copy">Check the quantity and unit price on every line. The line total and quote summary update as you type.</div>
                     </div>
 
                     <div class="zazu-list zazu-quote-line-editor">
@@ -85,34 +85,45 @@
                                     ? $capability->default_price
                                     : null;
                             @endphp
-                            <div class="zazu-list-item">
+                            <div class="zazu-list-item" data-quote-line>
                                 <div class="zazu-list-main">
                                     <div class="zazu-list-title">{{ $requirement->description }}</div>
                                     <div class="zazu-list-meta">
-                                        {{ number_format((float) $requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }}
-                                        · {{ $requirement->category ?: 'General' }}
+                                        {{ $requirement->category ?: 'General' }}
                                         @if ($capability) · {{ $capability->name }} @endif
                                     </div>
+                                    <div class="zazu-form-grid mt-3">
+                                        <label class="zazu-field">
+                                            <span class="zazu-label">Quantity <span class="zazu-required">*</span></span>
+                                            <input type="number" min="0.01" step="0.01" inputmode="decimal"
+                                                name="quantity[{{ $requirement->id }}]"
+                                                value="{{ old('quantity.'.$requirement->id, $requirement->quantity) }}"
+                                                data-quote-quantity class="zazu-input" required>
+                                            <span class="zazu-field-help">How many {{ $requirement->unit ?: 'units' }} are needed?</span>
+                                            @error('quantity.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
+                                        </label>
+                                        <label class="zazu-field">
+                                            <span class="zazu-label">Unit price ({{ old('currency', $defaultCurrency) }}) <span class="zazu-required">*</span></span>
+                                            <input type="number" min="0" step="0.01" inputmode="decimal"
+                                                name="unit_price[{{ $requirement->id }}]"
+                                                value="{{ old('unit_price.'.$requirement->id, $initialPrice) }}"
+                                                data-quote-price data-default-price="{{ $initialPrice ?? '' }}"
+                                                data-price-currency="{{ $capability?->currency ?? '' }}"
+                                                class="zazu-input" required>
+                                            <span class="zazu-field-help" data-price-help="{{ $requirement->id }}">
+                                                @if ($initialPrice !== null)
+                                                    Saved price in {{ $capability->currency }}
+                                                @elseif ($capability?->default_price !== null)
+                                                    Saved price is in {{ $capability->currency }}. Enter a price in the selected currency.
+                                                @else
+                                                    Enter a price for this line.
+                                                @endif
+                                            </span>
+                                            @error('unit_price.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
+                                        </label>
+                                    </div>
+                                    <div class="zazu-list-meta mt-2">Line total: <strong data-quote-line-total>{{ old('currency', $defaultCurrency) }} 0.00</strong></div>
                                 </div>
-                                <label class="w-40 shrink-0">
-                                    <span class="zazu-label">Price</span>
-                                    <input type="number" min="0" step="0.01" inputmode="decimal"
-                                        name="unit_price[{{ $requirement->id }}]"
-                                        value="{{ old('unit_price.'.$requirement->id, $initialPrice) }}"
-                                        data-quote-price data-default-price="{{ $initialPrice ?? '' }}"
-                                        data-price-currency="{{ $capability?->currency ?? '' }}"
-                                        class="zazu-input" required>
-                                    <span class="zazu-field-help mt-1" data-price-help="{{ $requirement->id }}">
-                                        @if ($initialPrice !== null)
-                                            Saved price in {{ $capability->currency }}
-                                        @elseif ($capability?->default_price !== null)
-                                            Saved price is in {{ $capability->currency }}. Enter a price in the selected currency.
-                                        @else
-                                            Enter a price for this service.
-                                        @endif
-                                    </span>
-                                    @error('unit_price.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
-                                </label>
                             </div>
                         @endforeach
                     </div>
@@ -165,9 +176,13 @@
 
             let subtotal = 0;
             priceInputs.forEach((input) => {
-                const quantity = Number.parseFloat(input.dataset.quoteQuantity || '1');
+                const line = input.closest('[data-quote-line]');
+                const quantity = Number.parseFloat(line?.querySelector('[data-quote-quantity]')?.value || '');
                 const price = Number.parseFloat(input.value || '');
-                if (Number.isFinite(quantity) && Number.isFinite(price)) subtotal += quantity * price;
+                const lineTotal = Number.isFinite(quantity) && Number.isFinite(price) ? quantity * price : null;
+                if (lineTotal !== null) subtotal += lineTotal;
+                const output = line?.querySelector('[data-quote-line-total]');
+                if (output) output.textContent = lineTotal === null ? 'Enter quantity and price' : (currencySelect?.value + ' ' + money.format(lineTotal));
             });
 
             const selectedTax = taxSelect?.selectedOptions[0];
@@ -184,6 +199,7 @@
             summary.querySelector('[data-quote-deposit]').textContent = format(deposit);
         }
         const priceInputs = [...document.querySelectorAll('[data-quote-price]')];
+        const quantityInputs = [...document.querySelectorAll('[data-quote-quantity]')];
 
         const priceId = (input) => input.name.replace('unit_price[', '').replace(']', '');
 
@@ -219,6 +235,7 @@
         });
 
         priceInputs.forEach((input) => input.addEventListener('input', refreshQuoteSummary));
+        quantityInputs.forEach((input) => input.addEventListener('input', refreshQuoteSummary));
         refreshQuoteSummary();
     </script>
 </x-app-layout>
