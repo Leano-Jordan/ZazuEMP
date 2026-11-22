@@ -15,6 +15,7 @@ class PlatformLandingSettingsController extends Controller
         return view('admin.landing-settings', [
             'settings' => $landingMedia->current(),
             'library' => $landingMedia->library(),
+            'images' => $landingMedia->images(),
         ]);
     }
 
