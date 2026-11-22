@@ -2,8 +2,10 @@
     <x-slot:title>{{ $customer->name }}</x-slot:title>
     <x-slot:heading>{{ $customer->name }}</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('customers.edit', $customer) }}" class="zazu-btn zazu-btn-secondary">Edit customer</a>
-        <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-ghost">← Customers</a>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('customers.edit', $customer) }}" class="zazu-btn zazu-btn-secondary">Edit customer</a>
+            <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-ghost">← Customers</a>
+        </div>
     </x-slot:headerAction>
 <section class="zazu-command-band zazu-customer-hero">
         <div class="flex min-w-0 items-center gap-4">
