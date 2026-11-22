@@ -91,7 +91,7 @@
 
                 <p class="zazu-field-help" data-zazu-active-slot-label>Choose a landing position above, then click any image below to assign it. The preview uses that position’s crop.</p>
                 <div class="zazu-landing-library-grid">
-                    @forelse($library as $image)
+                    @forelse($library as $key => $image)
                         <figure class="zazu-landing-library-card" role="button" tabindex="0" aria-label="Use {{ $image['label'] }} for the selected landing position" data-zazu-library-image data-image-url="{{ $image['url'] }}" data-image-key="{{ $key }}">
                             <img src="{{ $image['url'] }}" alt="{{ $image['label'] }}" loading="lazy">
                             <figcaption>
