@@ -4,7 +4,7 @@ The Founder clarifies that "separated features" means the user does not see an o
 
 **Workspace count correction:** the populated fictional workspace contains **4 customers and 2 jobs**. This supersedes the earlier screenshot-derived count of 2 customers. Founder confirms normal connected use on PC and linked mobile.
 
-Source inspection identified a narrow Job-page next-action decision, a five-stage progress strip that omits several consequential business states, an operational chain that exposes destinations without explaining their sequence, and a floating Helper that provides optional page guidance rather than a persistent state-aware journey. Details and acceptance criteria: [Director Workflow Discovery Review](../docs/DIRECTOR_WORKFLOW_DISCOVERY_REVIEW_2026-11-22.md).
+Source inspection identified a narrow Job-page next-action decision, a five-stage progress strip that omits several consequential business states, an operational chain that exposes destinations without explaining their sequence, and a floating Helper that provides optional page guidance rather than a persistent state-aware journey. Details and acceptance criteria: [Director Workflow Discovery Review](../../docs/DIRECTOR_WORKFLOW_DISCOVERY_REVIEW_2026-11-22.md).
 
 **Director guardrail:** do not move, rename, merge or reorder existing modules/navigation based on this finding alone. First trace actual lifecycle transitions, prerequisites, permissions and conditional/parallel work. The safe direction is a job-contextual, state-aware orientation layer over existing records and routes, validated with a human walkthrough before broader navigation changes. No duplicate workflow authority or new source of truth.
 
