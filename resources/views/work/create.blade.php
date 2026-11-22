@@ -66,15 +66,18 @@
                                 @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </label>
                         </div>
-                        <div class="zazu-choice-grid">
-                            @foreach ($jobTypes as $jobType)
-                                <label class="zazu-choice-card">
-                                    <input type="radio" name="event_type" value="{{ $jobType }}" @checked(old('event_type') === $jobType) required>
-                                    <span>{{ $jobType }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('event_type')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        <fieldset class="zazu-field zazu-field-wide">
+                            <legend class="zazu-label">Event type <span class="zazu-required">*</span></legend>
+                            <div class="zazu-choice-grid">
+                                @foreach ($jobTypes as $jobType)
+                                    <label class="zazu-choice-card">
+                                        <input type="radio" name="event_type" value="{{ $jobType }}" @checked(old('event_type') === $jobType) required>
+                                        <span>{{ $jobType }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('event_type')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </fieldset>
                     </section>
 
                     <section class="zazu-form-section">
