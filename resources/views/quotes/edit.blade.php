@@ -100,7 +100,7 @@
                                             <span class="zazu-label">Quantity <span class="zazu-required">*</span></span>
                                             <input type="number" min="0.01" step="0.01" inputmode="decimal"
                                                 name="quantity[{{ $requirement->id }}]"
-                                                value="{{ old('quantity.'.$requirement->id, $requirement->quantity) }}"
+                                                value="{{ old('quantity.'.$requirement->id, (float) $requirement->quantity === 1.0 ? '' : $requirement->quantity) }}"
                                                 data-quote-quantity class="zazu-input" required>
                                             <span class="zazu-field-help">Unit: {{ $requirement->unit ?: 'not specified' }}. Enter the amount required.</span>
                                             @error('quantity.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
