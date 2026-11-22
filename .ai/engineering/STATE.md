@@ -1584,3 +1584,14 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Existing event/business ownership guard remains in place. This reduces unnecessary disclosure in the Helper; it does not replace route middleware or server-side authorization.
 
 **Verification:** source and test are committed and should be run by the repository checks. No successful test execution is claimed for this new change from this session.
+
+
+### 2026-11-23 — UI and Helper refinement follow-up
+
+- Replaced catering/equipment-specific Job inspector tab labels with business-neutral Scope & preparation, Resources & setup, and Commercial position.
+- Improved inspector visual hierarchy: card-like Job summary, readable three-column tab strip, sticky heading, contained content scrolling, full-width phone drawer, and aligned action controls.
+- Hardened tab accessibility with explicit labelled tab/panel relationships, native hidden state, aria-hidden synchronisation and keyboard navigation coverage.
+- Helper now surfaces active business service focuses and Job requirement components as compact chips; next action and its reason have stronger visual hierarchy.
+- Added browser assertions for inspector tab switching, panel visibility and arrow-key navigation.
+- PHPMD workflow on the previous batch completed with failure. Exact log detail is not available through the repository connector; treat PHPMD as open until the report is retrieved. Do not claim full CI success.
+- All changes remain direct to main; no branch creation.
