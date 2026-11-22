@@ -1,4 +1,8 @@
 ## Commercial event workflow benchmark and intake correction — 2026-11-22
+### Requirement correction nuance
+
+The online Requirements page and route set expose list/create only, and online `WorkController::update()` does not apply a submitted services list. However, `OfflineDomainMutationHandler::syncOfflineJobRequirements()` already reconciles a submitted offline service list, including removals while preserving matching rows' detail fields. Treat this as an online discoverability/capability gap with existing offline semantics—not as proof that the domain has no correction behavior. Any implementation must unify online/offline behavior and preserve quote snapshots. See the benchmark report's corrected finding.
+
 
 **Research:** [Director Commercial Event Workflow Benchmark](../../docs/DIRECTOR_COMMERCIAL_EVENT_WORKFLOW_BENCHMARK_2026-11-22.md)
 
