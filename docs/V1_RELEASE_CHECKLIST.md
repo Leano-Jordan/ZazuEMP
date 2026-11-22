@@ -7,7 +7,7 @@
 - Laravel: **679 passed / 1 skipped / 4,665 assertions**; `OfflineExpenseReferenceIsolationTest` passed.
 - Zazu Quality, incremental formatting, Composer security audit, secret scan, PHPMD, PostgreSQL migration/rollback/registration/backup/private-file recovery, Director Health and Push-on-main: **PASS**.
 - SonarCloud: **SKIPPED**.
-- Offline-browser acceptance in [Laravel workflow 44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) was still running at the time this checkpoint was recorded. No browser-suite pass is claimed here.
+- Exact-head offline-browser acceptance in [Laravel workflow 44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883): **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance also passed.
 - Evidence maturity remains **77/100**; V1 remains **NOT READY**. This server-side isolation regression does not close physical Android acceptance, owner-PC recovery, live-business commercial reconciliation, POPIA or name clearance.
 
 **Next engineering target:** offline account/session transition adversarial review, with emphasis on expiry, re-authentication, preserving queued local work and blocking stale-session online mutations.
