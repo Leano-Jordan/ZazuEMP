@@ -151,7 +151,7 @@ class JobWorkspaceProgressTest extends TestCase
             'business_id' => $event->business_id,
             'invoice_id' => $newerPaid->id,
             'event_id' => $event->id,
-            'type' => 'final',
+            'type' => 'payment',
             'idempotency_key' => 'job-progress-paid-newer-invoice',
             'amount' => '200.00',
             'currency' => 'ZAR',
