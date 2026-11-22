@@ -247,7 +247,7 @@ class CommercialReconciliationTest extends TestCase
         $this->assertSame('10000.00', (string) $invoice->subtotal);
         $this->assertSame('1500.00', (string) $invoice->tax_total);
         $this->assertSame('11500.00', (string) $invoice->total);
-        $this->assertCount(3, $invoice->items()->get());
+        $this->assertSame($quote->latestVersion->items()->count(), $invoice->items()->count());
 
         return $invoice;
     }
