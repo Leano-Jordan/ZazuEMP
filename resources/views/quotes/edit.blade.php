@@ -14,7 +14,7 @@
         <div>
             <div class="zazu-eyebrow">{{ $quote->reference }} · Revision v{{ $version->version }}</div>
             <h2 class="zazu-command-title">Review the current services and prices</h2>
-            <p class="zazu-command-copy">Zazu carries forward prices from the previous revision where possible. New services need a price before you save.</p>
+            <p class="zazu-command-copy">Review and confirm each line's quantity and price. Earlier quote versions remain unchanged.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Currency</div>
@@ -71,7 +71,7 @@
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Current Work services</div>
-                        <div class="zazu-form-section-copy">This draft records the current Work services and prices when you save it. Earlier quote revisions remain unchanged.</div>
+                        <div class="zazu-form-section-copy">Confirm quantities and unit prices for every line. Line totals and the quote summary update as you type.</div>
                     </div>
                     <div class="zazu-card zazu-list zazu-quote-line-editor">
                         @foreach ($quote->event->requirements as $requirement)
@@ -83,7 +83,7 @@
                                     $defaultPrice = $requirement->capability->default_price;
                                 }
                             @endphp
-                            <div class="zazu-list-item">
+                            <div class="zazu-list-item" data-quote-line>
                                 <div class="zazu-list-main">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <span class="zazu-list-title">{{ $requirement->description }}</span>
@@ -92,23 +92,37 @@
                                         @endif
                                     </div>
                                     <div class="zazu-list-meta">
-                                        {{ number_format((float) $requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }}
-                                        · {{ $requirement->category ?: 'General' }}
+                                        {{ $requirement->category ?: 'General' }}
                                         @if ($requirement->capability) · {{ $requirement->capability->name }} @endif
                                     </div>
+                                    <div class="zazu-form-grid mt-3">
+                                        <label class="zazu-field">
+                                            <span class="zazu-label">Quantity <span class="zazu-required">*</span></span>
+                                            <input type="number" min="0.01" step="0.01" inputmode="decimal"
+                                                name="quantity[{{ $requirement->id }}]"
+                                                value="{{ old('quantity.'.$requirement->id, $requirement->quantity) }}"
+                                                data-quote-quantity class="zazu-input" required>
+                                            <span class="zazu-field-help">How many {{ $requirement->unit ?: 'units' }} are needed?</span>
+                                            @error('quantity.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
+                                        </label>
+                                        <label class="zazu-field">
+                                            <span class="zazu-label">Unit price ({{ $quote->currency }}) <span class="zazu-required">*</span></span>
+                                            <input type="number" min="0" step="0.01" inputmode="decimal"
+                                                name="unit_price[{{ $requirement->id }}]"
+                                                data-quote-price data-default-price="{{ $defaultPrice ?? '' }}"
+                                                value="{{ old('unit_price.'.$requirement->id, $defaultPrice) }}" class="zazu-input" required>
+                                            @if ($item)
+                                                <span class="zazu-field-help">Carried forward from the previous revision.</span>
+                                            @elseif ($defaultPrice !== null)
+                                                <span class="zazu-field-help">Saved catalogue price reused.</span>
+                                            @else
+                                                <span class="zazu-field-help">Enter the price for this new line.</span>
+                                            @endif
+                                            @error('unit_price.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
+                                        </label>
+                                    </div>
+                                    <div class="zazu-list-meta mt-2">Line total: <strong data-quote-line-total>{{ $quote->currency }} 0.00</strong></div>
                                 </div>
-                                <label class="w-40 shrink-0">
-                                    <span class="zazu-label">Price ({{ $quote->currency }})</span>
-                                    <input type="number" min="0" step="0.01" inputmode="decimal" name="unit_price[{{ $requirement->id }}]" data-quote-quantity="{{ (float) $requirement->quantity }}" value="{{ old('unit_price.'.$requirement->id, $defaultPrice) }}" class="zazu-input" required>
-                                    @if ($item)
-                                        <span class="zazu-field-help">Carried forward from the previous revision.</span>
-                                    @elseif ($defaultPrice !== null)
-                                        <span class="zazu-field-help">Saved catalogue price reused.</span>
-                                    @else
-                                        <span class="zazu-field-help">Enter the price for this new service.</span>
-                                    @endif
-                                    @error('unit_price.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
-                                </label>
                             </div>
                         @endforeach
                     </div>
@@ -143,7 +157,8 @@
     </form>
 
     <script nonce="{{ request()->attributes->get('cspNonce') }}">
-        const editPriceInputs = [...document.querySelectorAll('[data-quote-quantity]')];
+        const editPriceInputs = [...document.querySelectorAll('[data-quote-price]')];
+        const editQuantityInputs = [...document.querySelectorAll('[data-quote-quantity]')];
         const editDepositInput = document.querySelector('input[name="deposit_percent"]');
         const editTaxSelect = document.querySelector('select[name="tax_rate_id"]');
         const editSummary = document.querySelector('[data-quote-summary]');
@@ -155,9 +170,13 @@
 
             let subtotal = 0;
             editPriceInputs.forEach((input) => {
-                const quantity = Number.parseFloat(input.dataset.quoteQuantity || '1');
+                const line = input.closest('[data-quote-line]');
+                const quantity = Number.parseFloat(line?.querySelector('[data-quote-quantity]')?.value || '');
                 const price = Number.parseFloat(input.value || '');
-                if (Number.isFinite(quantity) && Number.isFinite(price)) subtotal += quantity * price;
+                const lineTotal = Number.isFinite(quantity) && Number.isFinite(price) ? quantity * price : null;
+                if (lineTotal !== null) subtotal += lineTotal;
+                const output = line?.querySelector('[data-quote-line-total]');
+                if (output) output.textContent = lineTotal === null ? 'Enter quantity and price' : (editCurrency + ' ' + editMoney.format(lineTotal));
             });
 
             const option = editTaxSelect?.selectedOptions[0];
@@ -177,6 +196,7 @@
         }
 
         editPriceInputs.forEach((input) => input.addEventListener('input', refreshEditQuoteSummary));
+        editQuantityInputs.forEach((input) => input.addEventListener('input', refreshEditQuoteSummary));
         editDepositInput?.addEventListener('input', refreshEditQuoteSummary);
         editTaxSelect?.addEventListener('change', refreshEditQuoteSummary);
         refreshEditQuoteSummary();
