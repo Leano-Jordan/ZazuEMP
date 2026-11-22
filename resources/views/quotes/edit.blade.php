@@ -14,7 +14,7 @@
         <div>
             <div class="zazu-eyebrow">{{ $quote->reference }} · Revision v{{ $version->version }}</div>
             <h2 class="zazu-command-title">Review the current services and prices</h2>
-            <p class="zazu-command-copy">Review and confirm each line's quantity and price. Earlier quote versions remain unchanged.</p>
+            <p class="zazu-command-copy">Confirm the correct quantity, unit and price for every line. Earlier quote versions remain unchanged.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Currency</div>
@@ -102,7 +102,7 @@
                                                 name="quantity[{{ $requirement->id }}]"
                                                 value="{{ old('quantity.'.$requirement->id, $requirement->quantity) }}"
                                                 data-quote-quantity class="zazu-input" required>
-                                            <span class="zazu-field-help">How many {{ $requirement->unit ?: 'units' }} are needed?</span>
+                                            <span class="zazu-field-help">Unit: {{ $requirement->unit ?: 'not specified' }}. Enter the amount required.</span>
                                             @error('quantity.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
                                         </label>
                                         <label class="zazu-field">
