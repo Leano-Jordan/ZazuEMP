@@ -29,6 +29,49 @@
             ->whereIn('status', ['draft', 'sent', 'ordered']);
         $plannedCosts = $event->costs->where('status', 'planned');
 
+        $quoteProgressLabel = match ($latestQuote?->status) {
+            'accepted' => 'Accepted',
+            'sent' => 'Waiting for customer',
+            'draft' => 'Draft to send',
+            'declined' => 'Declined',
+            'expired' => 'Expired',
+            default => 'Not created',
+        };
+        $invoiceProgressLabel = !$latestQuote || $latestQuote->status !== 'accepted'
+            ? 'After acceptance'
+            : (!$latestInvoice ? 'Not invoiced' : ($latestInvoice->balance > 0 ? 'Balance due' : 'Paid'));
+        $deliveryProgressLabel = $event->status === 'completed'
+            ? 'Delivered'
+            : ($event->status === 'cancelled'
+                ? 'Cancelled'
+                : (($outstandingPreparation->isNotEmpty() || $activePurchaseOrders->isNotEmpty())
+                    ? $outstandingPreparation->count().' prep · '.$activePurchaseOrders->count().' orders open'
+                    : ($latestQuote?->status === 'accepted' ? 'No open items' : 'After acceptance')));
+        $closeOutProgressLabel = $event->status === 'completed'
+            ? 'Closed'
+            : ($event->status === 'cancelled'
+                ? 'Not applicable'
+                : ($plannedCosts->isNotEmpty()
+                    ? $plannedCosts->count().' planned costs'
+                    : ($latestInvoice && $latestInvoice->balance > 0
+                        ? 'Payment due'
+                        : ($latestQuote?->status === 'accepted' && $latestInvoice ? 'Ready for review' : 'After delivery'))));
+
+        $progressCurrent = null;
+        if (!in_array($event->status, ['completed', 'cancelled'], true)) {
+            if (!$hasRequirements) {
+                $progressCurrent = 'scope';
+            } elseif (!$latestQuote || in_array($latestQuote->status, ['draft', 'sent', 'declined', 'expired'], true)) {
+                $progressCurrent = 'quote';
+            } elseif (!$latestInvoice || $latestInvoice->balance > 0) {
+                $progressCurrent = 'finance';
+            } elseif ($outstandingPreparation->isNotEmpty() || $activePurchaseOrders->isNotEmpty()) {
+                $progressCurrent = 'delivery';
+            } else {
+                $progressCurrent = 'closeout';
+            }
+        }
+
         $nextAction = null;
 
         if (!in_array($event->status, ['completed', 'cancelled'], true)) {
@@ -124,20 +167,23 @@
     @endif
 
     <section class="zazu-work-progress zazu-work-progress-refined" aria-label="Job progress">
-        <a href="{{ route('work.show', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete' : 'current' }}" @if ($event->status !== 'completed') aria-current="step" @endif>
-            <span>1</span><strong>Job</strong><small>Details</small>
+        <a href="{{ route('work.show', $event) }}" class="zazu-work-progress-step complete">
+            <span>1</span><strong>Job</strong><small>Details saved</small>
         </a>
-        <a href="{{ route('work.requirements.index', $event) }}" class="zazu-work-progress-step {{ $hasRequirements ? 'complete' : '' }}">
-            <span>2</span><strong>Services</strong><small>{{ $event->requirements->count() }} added</small>
+        <a href="{{ route('work.requirements.index', $event) }}" class="zazu-work-progress-step {{ $hasRequirements ? 'complete' : ($progressCurrent === 'scope' ? 'current' : '') }}" @if ($progressCurrent === 'scope') aria-current="step" @endif>
+            <span>2</span><strong>Services</strong><small>{{ $hasRequirements ? $event->requirements->count().' added' : 'No services yet' }}</small>
         </a>
-        <a href="{{ $latestQuote ? route('quotes.show', $latestQuote) : route('work.quotes.create', $event) }}" class="zazu-work-progress-step {{ $latestQuote ? 'complete' : '' }}">
-            <span>3</span><strong>Quote</strong><small>{{ $latestQuote ? 'Created' : 'Not created' }}</small>
+        <a href="{{ $latestQuote ? route('quotes.show', $latestQuote) : route('work.quotes.create', $event) }}" class="zazu-work-progress-step {{ $latestQuote?->status === 'accepted' ? 'complete' : (in_array($latestQuote?->status, ['declined', 'expired'], true) ? 'current' : ($progressCurrent === 'quote' ? 'current' : '')) }}" @if ($progressCurrent === 'quote') aria-current="step" @endif>
+            <span>3</span><strong>Quote & decision</strong><small>{{ $quoteProgressLabel }}</small>
         </a>
-        <a href="{{ route('work.preparation.index', $event) }}" class="zazu-work-progress-step">
-            <span>4</span><strong>Prepare</strong><small>Get ready</small>
+        <a href="{{ $latestInvoice ? route('finance.invoices.show', $latestInvoice) : ($latestQuote?->status === 'accepted' ? route('finance.invoices.create', ['quote_id' => $latestQuote->id]) : ($latestQuote ? route('quotes.show', $latestQuote) : route('finance.index'))) }}" class="zazu-work-progress-step {{ $latestInvoice && $latestInvoice->balance <= 0 ? 'complete' : ($progressCurrent === 'finance' ? 'current' : '') }}" @if ($progressCurrent === 'finance') aria-current="step" @endif>
+            <span>4</span><strong>Invoice & payment</strong><small>{{ $invoiceProgressLabel }}</small>
         </a>
-        <a href="{{ route('work.edit', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete current' : '' }}" @if ($event->status === 'completed') aria-current="step" @endif>
-            <span>5</span><strong>Complete</strong><small>{{ $event->status === 'completed' ? 'Completed' : 'Update status' }}</small>
+        <a href="{{ route('work.preparation.index', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete' : ($progressCurrent === 'delivery' ? 'current' : '') }}" @if ($progressCurrent === 'delivery') aria-current="step" @endif>
+            <span>5</span><strong>Delivery readiness</strong><small>{{ $deliveryProgressLabel }}</small>
+        </a>
+        <a href="{{ route('work.costs.index', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete' : ($progressCurrent === 'closeout' ? 'current' : '') }}" @if ($progressCurrent === 'closeout') aria-current="step" @endif>
+            <span>6</span><strong>Close-out</strong><small>{{ $closeOutProgressLabel }}</small>
         </a>
     </section>
 
