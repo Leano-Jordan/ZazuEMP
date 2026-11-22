@@ -47,7 +47,7 @@
                         </label>
 
                         <label class="zazu-field zazu-field-wide">
-                            <span class="zazu-label">Work / event name</span>
+                            <span class="zazu-label">Job name</span>
                             <input name="name" value="{{ old('name', $event->name) }}" required class="zazu-input">
                             @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
