@@ -1447,3 +1447,21 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - PHPMD passed on commit 8c6a8f90364a81245c1bf7bcecc47e92265d61b1. Later product/service presentation and its feature test are on the newer main head and still require exact-head CI confirmation.
 
 **Acceptance status:** NOT VERIFIED. Latest main implementation includes product/service labels and a focused presentation regression, but exact-head Laravel, quality, formatting, security, offline browser and package workflows must complete. Rendered desktop/mobile and light/dark review is still outstanding; no visual acceptance is claimed from source inspection alone.
+
+
+## Offline cache warning — interrupted page priming — 2026-11-22
+
+**Founder-reported defect:** the app repeatedly displayed “Offline workspace is not fully prepared” / could not cache pages during ordinary page navigation.
+
+**Root cause found in source:** each page load starts the same multi-route priming operation. The service worker aborted an in-flight priming operation when a navigation occurred, and a subsequent page load started another operation that aborted the previous one again. The client treated that interrupted run as a genuine failure and displayed the warning. Repeated navigation could therefore prevent the five required routes from ever being confirmed, even while the app remained online.
+
+**Implemented on main:**
+- Same-user/business page-prime requests now share the in-flight operation instead of cancelling and restarting it.
+- Normal page navigation no longer aborts background cache preparation.
+- Existing cached HTML is reused while its referenced static assets and private media are still checked/primed.
+- Static service-worker cache version advanced from v60 to v61 so installed clients receive the corrected worker.
+- Extended `PwaOfflineFoundationTest` source regression assertions for in-flight task reuse, cache reuse and continued asset priming.
+
+**Commits:** `0e2cc49` (worker), `7c8b93e` (initial regression assertions), `e1d6f8a` (preserve asset priming), with the latest test assertion commit recorded separately below.
+
+**Acceptance:** implementation is committed to `main`; exact-head Laravel, offline-browser, quality and PHPMD runs are pending. Do not mark the founder-reported device symptom resolved until the new worker is deployed/served and the phone/PC navigation experience is confirmed. If the warning persists after v61 is active, inspect which required route is failing rather than suppressing the notice.
