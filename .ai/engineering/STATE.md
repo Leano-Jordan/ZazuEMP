@@ -1,3 +1,17 @@
+## Founder workflow-discovery clarification — 2026-11-22
+
+The Founder clarifies that "separated features" means the user does not see an obvious business-process trail. They move between pages and click around without confidence that they are following the right order. This is a workflow orientation/discoverability concern, not evidence that the individual modules are broken or should be merged.
+
+**Workspace count correction:** the populated fictional workspace contains **4 customers and 2 jobs**. This supersedes the earlier screenshot-derived count of 2 customers. Founder confirms normal connected use on PC and linked mobile.
+
+Source inspection identified a narrow Job-page next-action decision, a five-stage progress strip that omits several consequential business states, an operational chain that exposes destinations without explaining their sequence, and a floating Helper that provides optional page guidance rather than a persistent state-aware journey. Details and acceptance criteria: [Director Workflow Discovery Review](../docs/DIRECTOR_WORKFLOW_DISCOVERY_REVIEW_2026-11-22.md).
+
+**Director guardrail:** do not move, rename, merge or reorder existing modules/navigation based on this finding alone. First trace actual lifecycle transitions, prerequisites, permissions and conditional/parallel work. The safe direction is a job-contextual, state-aware orientation layer over existing records and routes, validated with a human walkthrough before broader navigation changes. No duplicate workflow authority or new source of truth.
+
+No application code changed in this review. No readiness-score uplift is claimed.
+
+---
+
 ## Founder acceptance evidence update — 2026-11-22
 
 **Repository baseline reviewed:** [`cd7762a`](https://github.com/Leano-Jordan/ZazuEMP/commit/cd7762a18976eeae7cef6d2c4fb132f69b32b0f5).
