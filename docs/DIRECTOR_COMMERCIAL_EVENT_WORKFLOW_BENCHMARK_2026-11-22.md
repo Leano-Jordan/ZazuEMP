@@ -311,3 +311,7 @@ The first Job workspace implementation always directed users to the latest quote
 The next-action guidance is now derived from persisted state: service scope, quote status, invoice balance, outstanding preparation, active purchasing and planned costs. Completed/cancelled jobs suppress the operational CTA. The change reuses existing module destinations and lifecycle records; it does not create a parallel workflow or move navigation.
 
 Regression tests were added for sent-quote and accepted-quote hand-offs. Exact-head execution remains pending.
+
+The hand-offs are deep-linked: accepted quotes open invoice creation with the accepted quote preselected, and invoices with a remaining balance open payment entry with the invoice preselected. These query parameters were confirmed against the existing FinanceController contract.
+
+CI also caught an extra blank line in WorkController under the changed-file Pint gate. That formatting issue was corrected. Exact-head workflow verification is still running.
