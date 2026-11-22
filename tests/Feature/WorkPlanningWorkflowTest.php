@@ -236,4 +236,32 @@ class WorkPlanningWorkflowTest extends TestCase
         $this->assertSame('Temporary marquee', $removedLine->fresh()->description);
     }
 
+    public function test_final_requirement_cannot_be_removed_after_a_quote_exists(): void
+    {
+        $event = $this->event();
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => 'Catering',
+            'category' => 'Catering',
+            'quantity' => 1,
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '1.00'],
+            'unit_price' => [$requirement->id => '100.00'],
+        ])->assertRedirect();
+
+        $this->delete(route('work.requirements.destroy', [$event, $requirement]))
+            ->assertSessionHasErrors('requirement');
+
+        $this->assertDatabaseHas('event_requirements', [
+            'id' => $requirement->id,
+            'event_id' => $event->id,
+        ]);
+        $this->assertDatabaseCount('quote_items', 1);
+    }
+
 }
