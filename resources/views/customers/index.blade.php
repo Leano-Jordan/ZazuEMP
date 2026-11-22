@@ -39,8 +39,8 @@
         @endif
 
         @forelse ($customers as $customer)
-            <div class="zazu-list-item" data-zazu-server-customer-id="{{ $customer->id }}">
-                <a href="{{ route('customers.show', $customer) }}" class="zazu-row-with-avatar min-w-0 flex-1">
+            <div class="zazu-list-item zazu-customer-row" data-zazu-server-customer-id="{{ $customer->id }}">
+                <a href="{{ route('customers.show', $customer) }}" class="zazu-row-with-avatar zazu-customer-primary min-w-0 flex-1">
                     <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="sm" />
                     <div class="zazu-list-main">
                         <div class="zazu-list-title">{{ $customer->name }}</div>
@@ -50,10 +50,10 @@
                         </div>
                     </div>
                 </a>
-                <div class="zazu-list-side">
+                <div class="zazu-list-side zazu-customer-work-count">
                     <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
                 </div>
-                <div class="zazu-action-group">
+                <div class="zazu-action-group zazu-customer-actions">
                     <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-btn zazu-btn-secondary">Start work</a>
                     <a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">Open</a>
                 </div>
