@@ -56,19 +56,15 @@
 
                     <section class="zazu-form-section">
                         <div class="zazu-form-section-head">
-                            <div class="zazu-form-section-title">What kind of job is it?</div>
-                            <div class="zazu-form-section-copy">Give this work a clear name so your team can identify it across the schedule, quote and job workspace.</div>
+                            <div class="zazu-form-section-title">Name the job</div>
+                            <div class="zazu-form-section-copy">Give this work a clear name and choose the closest event type so it is easy to identify across the schedule and workspace.</div>
                         </div>
                         <div class="zazu-form-grid">
                             <label class="zazu-field zazu-field-wide">
-                                <span class="zazu-label">Work / event name <span class="zazu-required">*</span></span>
+                                <span class="zazu-label">Job name <span class="zazu-required">*</span></span>
                                 <input name="name" value="{{ old('name') }}" required maxlength="255" class="zazu-input" placeholder="e.g. Mokoena family wedding">
                                 @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </label>
-                        </div>
-                        <div class="zazu-form-section-head">
-                            <div class="zazu-form-section-title">Choose the job type</div>
-                            <div class="zazu-form-section-copy">Pick the closest option. You can choose Other if none of these describes the job.</div>
                         </div>
                         <div class="zazu-choice-grid">
                             @foreach ($jobTypes as $jobType)
@@ -83,8 +79,24 @@
 
                     <section class="zazu-form-section">
                         <div class="zazu-form-section-head">
-                            <div class="zazu-form-section-title">What are you providing?</div>
-                            <div class="zazu-form-section-copy">Select everything that applies. You do not need to type service names.</div>
+                            <div class="zazu-form-section-title">When and where?</div>
+                            <div class="zazu-form-section-copy">Only the details needed to get the job onto your schedule.</div>
+                        </div>
+                        <div class="zazu-form-grid">
+                                                        @include('work._schedule-fields')
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Job location</span>
+                                <input name="event_address" value="{{ old('event_address') }}" class="zazu-input">
+                                <span class="zazu-field-help">Venue, street address or delivery location.</span>
+                                @error('event_address')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="zazu-form-section">
+                        <div class="zazu-form-section-head">
+                            <div class="zazu-form-section-title">Select the services involved</div>
+                            <div class="zazu-form-section-copy">These selections create starting service requirements. After saving the job, review each one for the correct quantity, unit and special details before preparing the quote.</div>
                             <div class="zazu-selection-summary" id="service-selection-summary" aria-live="polite">No services selected yet</div>
                         </div>
 
@@ -115,22 +127,6 @@
                             <input id="other_service" name="other_service" value="{{ old('other_service') }}" class="zazu-input" maxlength="100">
                             <span class="zazu-field-help">Only type it here if the service you need is not listed above.</span>
                             @error('other_service')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </div>
-                    </section>
-
-                    <section class="zazu-form-section">
-                        <div class="zazu-form-section-head">
-                            <div class="zazu-form-section-title">When and where?</div>
-                            <div class="zazu-form-section-copy">Only the details needed to get the job onto your schedule.</div>
-                        </div>
-                        <div class="zazu-form-grid">
-                                                        @include('work._schedule-fields')
-                            <label class="zazu-field zazu-field-wide">
-                                <span class="zazu-label">Job location</span>
-                                <input name="event_address" value="{{ old('event_address') }}" class="zazu-input">
-                                <span class="zazu-field-help">Venue, street address or delivery location.</span>
-                                @error('event_address')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                            </label>
                         </div>
                     </section>
 
@@ -173,10 +169,10 @@
                 <aside class="zazu-form-aside">
                     <div class="zazu-context-card zazu-next-card">
                         <div class="zazu-context-title">What happens next</div>
-                        <div class="zazu-context-copy">You will land on this job's workspace. Zazu will show the next useful action there, so you do not have to remember where to go.</div>
+                        <div class="zazu-context-copy">After saving, Zazu opens this job workspace. Your selected services are saved as starting requirements; review their quantities, units and special details there before preparing the quote.</div>
                         <div class="zazu-step-list">
-                            <div class="zazu-step current"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Create job</div><div class="zazu-step-copy">Customer, service and schedule</div></div></div>
-                            <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Check services</div><div class="zazu-step-copy">Add quantities and details</div></div></div>
+                            <div class="zazu-step current"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Create job</div><div class="zazu-step-copy">Customer, event details and schedule</div></div></div>
+                            <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Review services</div><div class="zazu-step-copy">Confirm quantities and special details</div></div></div>
                             <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Prepare quote</div><div class="zazu-step-copy">Add prices when you are ready</div></div></div>
                         </div>
                     </div>
