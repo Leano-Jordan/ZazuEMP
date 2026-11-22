@@ -1,3 +1,19 @@
+## Secondary-copy presence verification — 2026-11-22
+
+**Implementation:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
+
+The scheduled Windows runner now persists the secondary archive's absolute path, SHA-256, byte size and last-write timestamp after the copy passes SHA-256 verification. The Zazu backup-health check requires the recorded destination to remain a regular, non-symlink file and its size/timestamp to match the recorded values. A missing/unavailable destination or changed metadata moves backup protection to **ATTENTION** instead of leaving a stale healthy status.
+
+- Existing status files created by older runner versions do not contain this metadata; they remain **ATTENTION** until the next successful scheduled secondary copy writes it.
+- SHA-256 is verified when the runner copies the archive. The dashboard does **not** re-hash a potentially multi-gigabyte archive on every page request; it checks presence and recorded size/timestamp.
+- This check does not prove that the destination is on a physically separate disk or that a cloud-sync provider has completed upload. The operator must configure a USB/off-disk or independently stored cloud-synchronised destination and verify that it is actually independent.
+- Windows PowerShell 5.1 runner assertions for persisted path/hash/size/timestamp and preservation of prior metadata on failure passed in [workflow 44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562).
+- Exact-head PHP regression `InstallationBackupStatusTest` passed on [Laravel workflow 44989474410](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44989474410): **679 passed / 1 skipped / 4,671 assertions**. PostgreSQL migration and backup/restore recovery smoke also passed.
+
+The owner-operated backup and full restore drill on the intended PC remains mandatory.
+
+---
+
 ## Windows scheduled-backup runtime verification — CI PASS — 2026-11-21
 
 The Windows Ops workflow now runs the installer and runner, not only source-text checks. On a Windows PowerShell 5.1 runner it:
