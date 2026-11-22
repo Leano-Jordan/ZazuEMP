@@ -1,3 +1,17 @@
+## Director recovery integrity checkpoint — secondary backup presence — 2026-11-22
+
+**Implementation head:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
+
+- Fixed stale secondary-backup health: the dashboard no longer trusts a recent verified timestamp alone. It now requires the recorded archive path to resolve to a regular non-symlink file whose size and last-write timestamp match the metadata written after SHA-256-verified copy.
+- Missing drive/archive or changed metadata produces **ATTENTION**. SHA-256 is verified at copy time, not re-hashed on every dashboard request. Physical disk separation and cloud-provider upload completion still require operator verification.
+- Laravel: **679 passed / 1 skipped / 4,671 assertions**; backup status regression passed. Zazu Quality, PHPMD, Psalm, PostgreSQL recovery, populated upgrade/rollback and Windows fresh-install acceptance: **PASS**. Windows PowerShell 5.1 runner metadata test: [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) **PASS**. SonarCloud: **SKIPPED**.
+- Offline-browser acceptance was still running at this checkpoint; no pass is claimed.
+- Evidence maturity remains **77/100**. V1 remains **NOT READY** until owner-PC independent backup and full restore are demonstrated.
+
+**Next engineering target:** commercial workflow reconciliation with populated quote, invoice, payment, expense and profit records.
+
+---
+
 ## Director security review — offline session and trusted-device transitions — 2026-11-22
 
 **Reviewed source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02). Exact-head Laravel/browser/PostgreSQL [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) **PASS**.
