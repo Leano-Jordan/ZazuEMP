@@ -1609,3 +1609,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Verification:** feature assertions and documentation were committed. Exact-head CI and physical PC/phone visual acceptance are pending; do not mark this slice green until checked.
 
 **Next execution target remains the adaptive business capability-to-surface map.** Trace the current authoritative capability source, onboarding, catalogue categories, navigation, event requirements and offline sync; implement one narrow end-to-end preset slice without introducing a parallel configuration system.
+
+
+## Adaptive catalogue vertical slice — 2026-11-23
+
+**Implemented directly on main:** BusinessCapability remains the source of catalogue truth. The catalogue now separates rental items from all non-rental capability types (service, package, product and other), instead of incorrectly treating only catering/food/per-person records as the second stream. Labels and pricing basis are business-neutral, and empty streams are omitted. This allows DJ, decor, photography and other service businesses to use their actual catalogue without a catering-only tab.
+
+**Architecture map:** membership primary_niche remains a single presentation focus; active catalogue categories supplement Helper focus through NicheFocus. Onboarding persists one focus. Navigation is still role/permission-driven and static. Dashboard tool visibility remains tier/permission-driven. EventRequirement remains the per-job component source. Capability records already participate in aggregate revision/sync, but the future multi-capability workspace configuration still needs offline parity tests. Full mapping is in docs/ADAPTIVE_BUSINESS_PRESETS_AND_EVENT_COMPONENTS.md.
+
+**Next:** extend the owner-facing capability selection/review using existing BusinessCapability records, then test add/deactivate effects on catalogue and Helper. Do not introduce a parallel preset store or retroactively rewrite historical event/quote scope.
