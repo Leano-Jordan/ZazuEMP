@@ -23,9 +23,10 @@ class QuoteService
         string $currency,
         ?TaxRate $taxRate,
         ?string $notes,
-        string $depositPercent = '0.00'
+        string $depositPercent = '0.00',
+        ?array $quantities = null
     ): Quote {
-        return DB::transaction(function () use ($event, $requirements, $unitPrices, $currency, $taxRate, $notes, $depositPercent): Quote {
+        return DB::transaction(function () use ($event, $requirements, $unitPrices, $currency, $taxRate, $notes, $depositPercent, $quantities): Quote {
             $businessId = (int) Event::query()->whereKey($event->id)->value('business_id');
             abort_unless($businessId > 0, 404);
 
@@ -41,6 +42,7 @@ class QuoteService
             if ($lockedEvent->isClosed()) {
                 throw ValidationException::withMessages(['event' => 'Closed work cannot receive new quotes.']);
             }
+            $requirements = $this->syncRequirementQuantities($lockedEvent, $quantities);
             $currency = strtoupper($currency);
 
             $quote = $event->quotes()->create([
@@ -233,9 +235,10 @@ class QuoteService
         ?TaxRate $taxRate,
         bool $replaceTax,
         ?string $notes,
-        string $depositPercent = '0.00'
+        string $depositPercent = '0.00',
+        ?array $quantities = null
     ): QuoteVersion {
-        return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $replaceTax, $notes, $depositPercent): QuoteVersion {
+        return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $replaceTax, $notes, $depositPercent, $quantities): QuoteVersion {
             [$businessId, $eventId] = $this->resolveQuoteRevisionContext($quote);
 
             // All quote revisions follow the shared business → event → quote
@@ -259,6 +262,8 @@ class QuoteService
             if ($lockedEvent->isClosed()) {
                 throw ValidationException::withMessages(['quote' => 'Closed work cannot receive quote revisions.']);
             }
+
+            $requirements = $this->syncRequirementQuantities($lockedEvent, $quantities);
 
             $lockedVersion = $lockedQuote->versions()
                 ->whereKey($version->id)
@@ -300,6 +305,34 @@ class QuoteService
 
             return $lockedVersion->fresh('items');
         });
+    }
+
+    private function syncRequirementQuantities(Event $event, ?array $quantities): Collection
+    {
+        $requirements = $event->requirements()
+            ->with('capability')
+            ->lockForUpdate()
+            ->get();
+
+        if ($quantities === null) {
+            return $requirements;
+        }
+
+        $currentIds = $requirements->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
+        $submittedIds = array_map('intval', array_keys($quantities));
+        sort($submittedIds);
+
+        if ($submittedIds !== $currentIds) {
+            throw ValidationException::withMessages([
+                'quantity' => 'The quote lines changed. Refresh the page and try again.',
+            ]);
+        }
+
+        foreach ($requirements as $requirement) {
+            $requirement->update(['quantity' => $quantities[$requirement->id]]);
+        }
+
+        return $requirements->fresh(['capability']);
     }
 
     private function replaceItems(
