@@ -1495,4 +1495,8 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 
 **Regression coverage added:** correction after quote creation preserves the original line snapshot and marks the quote stale; removal preserves the detached historical line and forces a new revision containing only the remaining requirement.
 
-**Acceptance:** exact-head Laravel, Pint/quality, PHPMD and browser verification pending. No physical acceptance status is changed by this code increment.
+**Accepted-offer guard:** when a quote is accepted, its agreed requirement scope is now read-only in the online register and in offline job edits. Add/edit/remove controls are hidden in the register, and server-side checks reject direct online or queued offline scope changes. Additional work must be recorded as a separate job rather than silently changing the accepted offer.
+
+**Compatibility detail:** existing legacy categories and custom units are retained by the shared edit form. Offline custom quote lines are not mistaken for deleted requirement snapshots; detached requirement snapshots still force a new revision.
+
+**Acceptance:** exact-head Laravel, Pint/quality, PHPMD, security and browser verification pending. No physical acceptance status is changed by this code increment.
