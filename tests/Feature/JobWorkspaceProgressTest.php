@@ -161,7 +161,7 @@ class JobWorkspaceProgressTest extends TestCase
 
         $this->get(route('work.show', $event))
             ->assertOk()
-            ->assertSee('1 balance due')
+            ->assertSee('1 invoice due')
             ->assertSee('Record payment')
             ->assertSee(route('finance.payments.create', ['invoice_id' => $olderOutstanding->id]), false);
     }
