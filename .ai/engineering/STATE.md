@@ -1396,3 +1396,6 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added focused feature coverage for sent-quote customer decision guidance and accepted-quote invoice hand-off.
 - Commits: `f413fb7`, `5db08de`, `4431e04`, `31f54aa`.
 - Runtime tests and exact-head CI have not yet been verified. Do not mark this change accepted until the Laravel workflow and quality/security checks report results.
+
+- Follow-through: the accepted-quote action now opens invoice creation with the accepted quote preselected; an outstanding invoice opens payment entry with that invoice preselected. This uses the existing `quote_id` and `invoice_id` query contracts in FinanceController.
+- CI caught one existing extra blank line in WorkController when that PHP file entered the changed-file formatting gate. Corrected it in `051374f`; exact-head Laravel, quality, security, Windows package and recovery workflows are queued/running.
