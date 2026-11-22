@@ -1,3 +1,18 @@
+## Zazu Helper — origin-aware job guidance — 2026-11-22
+
+**Implementation:** committed directly to `main` in `400d092`, `ab7674b`, `df552df`, `203e77a` and `f867d44`.
+
+- Added a contextual recommendation surface inside the Helper on Job detail pages.
+- The recommendation reads the existing `work.next-action` panel; it does not calculate a second workflow state or create a competing action source.
+- Only same-origin action links are eligible. The recommendation remains hidden until the existing `/up` origin-health monitor confirms availability.
+- The existing origin monitor now publishes its result to the Helper. On host/network outage, the Helper pauses job recommendations and explains that only supported offline workspace screens should be used.
+- Extended the existing desktop/mobile host-outage Playwright journey to assert that the Helper displays the offline explanation and hides the recommendation.
+- Added focused Laravel source/render assertions for the Helper surface and origin-health contract.
+
+**Evidence status: CHANGED, NOT VERIFIED.** Every changed file was re-read from `main`. Exact-head Laravel, offline-browser, quality, PHPMD and related workflows have not yet been observed for `f867d44`; no pass is claimed. This change does not establish physical Android acceptance or broader offline parity.
+
+---
+
 ## Commercial event workflow benchmark and intake correction — 2026-11-22
 ### Requirement correction nuance
 
