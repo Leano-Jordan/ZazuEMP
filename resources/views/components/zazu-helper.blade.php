@@ -186,8 +186,9 @@
             <div class="zazu-helper-title" data-zazu-helper-title aria-live="polite">{{ $steps[0]['title'] }}</div>
             <p class="zazu-helper-copy" data-zazu-helper-copy aria-live="polite">{{ $steps[0]['copy'] }}</p>
             <div class="zazu-helper-step" data-zazu-helper-recommendation hidden>
-                <div class="zazu-helper-step-label">Recommended next action</div>
+                <div class="zazu-helper-step-label">Next best action</div>
                 <strong class="block" data-zazu-helper-recommendation-title></strong>
+                <div class="zazu-helper-step-label mt-2">Why Zazu suggests it</div>
                 <p class="zazu-helper-copy" data-zazu-helper-recommendation-copy></p>
                 <a href="#" class="zazu-helper-link" data-zazu-helper-recommendation-link></a>
             </div>
@@ -219,7 +220,7 @@
                 <div class="zazu-helper-step">
                     <div class="zazu-helper-step-label">Needs attention</div>
                     @foreach($attention as $item)
-                        <div class="mt-2" data-zazu-helper-attention-item>
+                        <div class="mt-2" data-zazu-helper-attention-item data-priority="{{ $item['priority'] ?? 100 }}">
                             <strong class="block" data-zazu-helper-attention-title>{{ $item['title'] }}</strong>
                             <span class="block" data-zazu-helper-attention-copy>{{ $item['copy'] }}</span>
                             @if(!empty($item['href']))
