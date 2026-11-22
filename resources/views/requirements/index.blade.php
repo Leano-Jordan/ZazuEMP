@@ -41,7 +41,7 @@
                     <div class="zazu-side-primary">{{ ucfirst($requirement->status) }}</div>
                     <div class="mt-2 flex flex-wrap items-center justify-end gap-2">
                     <a href="{{ route('work.requirements.edit', [$event, $requirement]) }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm">Edit</a>
-                    <form method="POST" action="{{ route('work.requirements.destroy', [$event, $requirement]) }}" onsubmit="return confirm('Remove this requirement? Earlier quote versions will remain as saved snapshots.');">
+                    <form method="POST" action="{{ route('work.requirements.destroy', [$event, $requirement]) }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="zazu-btn zazu-btn-ghost zazu-btn-sm">Remove</button>
