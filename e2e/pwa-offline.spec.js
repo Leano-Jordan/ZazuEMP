@@ -107,6 +107,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         originAvailable = true;
         await page.evaluate(() => window.dispatchEvent(new Event('focus')));
         await expect(notice).toBeHidden({ timeout: 15_000 });
+        await expect(helperConnectivity).toBeHidden({ timeout: 15_000 });
     });
 
     test('reconciles exact delivered aggregates before acknowledging receiver sync', async ({ page }, testInfo) => {
