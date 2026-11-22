@@ -1,9 +1,11 @@
-const CACHE_NAME = 'zazu-static-v60';
+const CACHE_NAME = 'zazu-static-v61';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
 let activeUserGeneration = 0;
 let activePrimeController = null;
+let activePrimeTask = null;
+let activePrimeTaskContext = null;
 const MAX_PRIME_ROUTES = 100;
 const PRIME_CONCURRENCY = 3;
 const MAX_PRIVATE_MEDIA_PRIME = 60;
@@ -441,7 +443,14 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                     if (!cache || primeGeneration !== activeUserGeneration
                         || pageUserId !== activeUserId || pageBusinessId !== activeBusinessId) return;
 
-                    await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
+                    const pageRequest = new Request(new URL(path, self.location.origin));
+                    const existingPage = await cache.match(pageRequest);
+                    if (existingPage) {
+                        primedRoutes.add(new URL(path, self.location.origin).pathname);
+                        return;
+                    }
+
+                    await cache.put(pageRequest, response.clone());
                     primedRoutes.add(new URL(path, self.location.origin).pathname);
                     await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);
                     await primePrivateMediaFromHtml(
@@ -489,15 +498,42 @@ self.addEventListener('message', (event) => {
     if (event.data?.type !== 'prime-pages') return;
 
     event.waitUntil((async () => {
-        const generation = activeUserGeneration;
-        await loadActiveContext(generation);
-        if (generation !== activeUserGeneration) return;
-        const activeGeneration = await setContext(event.data.userId, event.data.businessId, generation);
-        if (activeGeneration === null) {
+        const requestedUserId = sanitizeUserId(event.data.userId);
+        const requestedBusinessId = sanitizeBusinessId(event.data.businessId);
+        const taskContext = requestedUserId && requestedBusinessId
+            ? requestedUserId + ':' + requestedBusinessId
+            : null;
+
+        if (!taskContext) {
             event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: false });
             return;
         }
-        const completed = await primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId);
+
+        // Page navigation can trigger another app boot while the first cache
+        // warm-up is still running. Reuse that in-flight task for the same
+        // account/workspace instead of aborting it and reporting a false failure.
+        if (activePrimeTask && activePrimeTaskContext === taskContext) {
+            const completed = await activePrimeTask;
+            event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed });
+            return;
+        }
+
+        const task = (async () => {
+            const generation = activeUserGeneration;
+            await loadActiveContext(generation);
+            if (generation !== activeUserGeneration) return false;
+            const activeGeneration = await setContext(requestedUserId, requestedBusinessId, generation);
+            if (activeGeneration === null) return false;
+            return primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId);
+        })();
+
+        activePrimeTask = task;
+        activePrimeTaskContext = taskContext;
+        const completed = await task;
+        if (activePrimeTask === task) {
+            activePrimeTask = null;
+            activePrimeTaskContext = null;
+        }
         event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed });
     })());
 });
@@ -546,11 +582,6 @@ self.addEventListener('fetch', (event) => {
         && (request.mode === 'navigate' || acceptsHtml);
 
     if (isAppPage) {
-        if (request.mode === 'navigate') {
-            // Real navigation takes priority over background cache warming on constrained hosts.
-            activePrimeController?.abort();
-        }
-
         event.respondWith((async () => {
             // When the browser reports no network, do not spend four seconds
             // attempting the unreachable Laravel host. Resolve the authenticated
