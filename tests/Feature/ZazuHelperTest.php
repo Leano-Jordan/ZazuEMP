@@ -210,6 +210,64 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-zazu-helper-attention-link', false);
     }
 
+
+    public function test_helper_prioritises_real_operational_risks_before_setup_reminders(): void
+    {
+        $business = $this->makeBusiness('Helper Priority Business');
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        $overdueEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'HELPER-PRIORITY-'.Str::upper(Str::random(5)),
+            'name' => 'Overdue operational job',
+            'status' => 'confirmed',
+        ]);
+        EventPreparationItem::create([
+            'business_id' => $business->id,
+            'event_id' => $overdueEvent->id,
+            'title' => 'Missed preparation deadline',
+            'category' => 'Equipment',
+            'quantity' => '1.00',
+            'unit' => 'set',
+            'status' => 'open',
+            'due_date' => now()->subDay()->toDateString(),
+        ]);
+
+        $supplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Priority supplier',
+        ]);
+        PurchaseOrder::create([
+            'business_id' => $business->id,
+            'supplier_id' => $supplier->id,
+            'reference' => 'HELPER-PRIORITY-PO-'.Str::upper(Str::random(5)),
+            'status' => 'ordered',
+            'currency' => 'ZAR',
+            'total_amount' => '400.00',
+        ]);
+        Event::create([
+            'business_id' => $business->id,
+            'reference' => 'HELPER-PRIORITY-DRAFT-'.Str::upper(Str::random(5)),
+            'name' => 'Draft operational job',
+            'status' => 'draft',
+        ]);
+
+        $html = $this->actingAs($user)->get(route('dashboard'))->assertOk()->getContent();
+        $overdue = strpos($html, 'data-priority="10"');
+        $purchasing = strpos($html, 'data-priority="20"');
+        $draft = strpos($html, 'data-priority="30"');
+        $setup = strpos($html, 'data-priority="40"');
+
+        $this->assertNotFalse($overdue);
+        $this->assertNotFalse($purchasing);
+        $this->assertNotFalse($draft);
+        $this->assertNotFalse($setup);
+        $this->assertLessThan($purchasing, $overdue);
+        $this->assertLessThan($draft, $purchasing);
+        $this->assertLessThan($setup, $draft);
+    }
+
     public function test_helper_does_not_expose_work_attention_to_a_member_without_work_view_permission(): void
     {
         config(['zazu.permissions.roles.staff' => ['dashboard.view']]);
