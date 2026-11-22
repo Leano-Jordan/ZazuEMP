@@ -35,6 +35,7 @@
             'decor_image' => ['title' => 'Decor and reception image', 'copy' => 'Styling, table settings and reception detail.', 'preview' => 'Decor preview'],
         ];
         $firstImage = $library ? reset($library)['url'] : '';
+        $firstImageKey = $library ? array_key_first($library) : '';
         $maxUploadFiles = (int) config('zazu.landing_media_uploads.max_files', 8);
         $maxUploadKilobytes = (int) config('zazu.landing_media_uploads.max_kilobytes', 5120);
     @endphp
@@ -57,11 +58,11 @@
                         @php
                             $selectedUrl = $current[$field] ?: $firstImage;
                         @endphp
-                        <article class="zazu-landing-slot">
+                        <article class="zazu-landing-slot zazu-landing-slot-{{ $field }}" data-zazu-landing-slot>
                             <div class="zazu-field">
                                 <label class="zazu-label" for="zazu-{{ $field }}">{{ $slot['title'] }}</label>
                                 <span class="zazu-field-help">{{ $slot['copy'] }}</span>
-                                <select id="zazu-{{ $field }}" name="{{ $field }}" class="zazu-select" required data-zazu-landing-select>
+                                <select id="zazu-{{ $field }}" name="{{ $field }}" class="zazu-select" required data-zazu-landing-select data-zazu-slot-field="{{ $field }}">
                                     @foreach($library as $key => $image)
                                         <option value="{{ $key }}" data-image-url="{{ $image['url'] }}" @selected($selectedUrl === $image['url'])>
                                             {{ $image['label'] }} · {{ $image['source'] }}
@@ -70,9 +71,9 @@
                                 </select>
                                 @error($field)<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </div>
-                            <div class="zazu-admin-image-preview" aria-label="{{ $slot['preview'] }}">
+                            <div class="zazu-admin-image-preview zazu-admin-image-preview-{{ $field }}" aria-label="{{ $slot['preview'] }}" data-zazu-slot-preview>
                                 <img src="{{ $selectedUrl }}" alt="{{ $slot['preview'] }}" loading="lazy" data-zazu-landing-preview>
-                                <span>Live selection preview</span>
+                                <span>Live crop preview · {{ $slot['preview'] }}</span>
                             </div>
                         </article>
                     @endforeach
@@ -88,13 +89,14 @@
                     <span class="zazu-chip zazu-chip-neutral">{{ count($library) }} images</span>
                 </div>
 
+                <p class="zazu-field-help" data-zazu-active-slot-label>Choose a landing position above, then click any image below to assign it. The preview uses that position’s crop.</p>
                 <div class="zazu-landing-library-grid">
                     @forelse($library as $image)
-                        <figure class="zazu-landing-library-card">
+                        <figure class="zazu-landing-library-card" role="button" tabindex="0" aria-label="Use {{ $image['label'] }} for the selected landing position" data-zazu-library-image data-image-url="{{ $image['url'] }}" data-image-key="{{ $key }}">
                             <img src="{{ $image['url'] }}" alt="{{ $image['label'] }}" loading="lazy">
                             <figcaption>
                                 <strong>{{ $image['label'] }}</strong>
-                                <span>{{ $image['source'] }}</span>
+                                <span>{{ $image['source'] }} · Click to use</span>
                             </figcaption>
                         </figure>
                     @empty
@@ -153,13 +155,52 @@
 
                 const refresh = () => {
                     const option = select.selectedOptions[0];
-                    if (!option?.dataset.imageUrl) return;
+                    if (!option?.dataset.imageUrl) {
+                        preview.removeAttribute('src');
+                        preview.closest('[data-zazu-slot-preview]')?.classList.add('is-empty');
+                        return;
+                    }
                     preview.src = option.dataset.imageUrl;
                     preview.alt = option.textContent.trim();
+                    preview.closest('[data-zazu-slot-preview]')?.classList.remove('is-empty', 'is-broken');
                 };
+                preview.addEventListener('error', () => preview.closest('[data-zazu-slot-preview]')?.classList.add('is-broken'));
 
+                select.addEventListener('focus', () => {
+                    window.zazuActiveLandingSlot = select;
+                    document.querySelector('[data-zazu-active-slot-label]')?.replaceChildren(document.createTextNode('Selected position: ' + (select.closest('.zazu-landing-slot')?.querySelector('.zazu-label')?.textContent || 'Landing image')));
+                });
                 select.addEventListener('change', refresh);
                 refresh();
+            });
+
+            const libraryImages = document.querySelectorAll('[data-zazu-library-image]');
+            const activateLibraryImage = card => {
+                const target = window.zazuActiveLandingSlot || document.querySelector('[data-zazu-slot-field="hero_image"]');
+                if (!target || !card.dataset.imageKey) return;
+                target.value = card.dataset.imageKey;
+                target.dispatchEvent(new Event('change', { bubbles: true }));
+                target.focus({ preventScroll: true });
+                document.querySelector('[data-zazu-active-slot-label]')?.replaceChildren(document.createTextNode('Assigned preview to: ' + (target.closest('.zazu-landing-slot')?.querySelector('.zazu-label')?.textContent || 'Landing image')));
+            };
+            libraryImages.forEach(card => {
+                card.addEventListener('click', () => activateLibraryImage(card));
+                card.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activateLibraryImage(card); }
+                });
+            });
+
+            const form = document.querySelector('[data-zazu-landing-media-form]');
+            form?.addEventListener('submit', event => {
+                const selects = [...form.querySelectorAll('[data-zazu-landing-select]')];
+                const valid = selects.length === 6 && selects.every(select => select.value && select.selectedOptions[0]?.dataset.imageUrl);
+                const previewsReady = [...form.querySelectorAll('[data-zazu-landing-preview]')].every(img => img.complete && img.naturalWidth > 0);
+                if (!valid || !previewsReady) {
+                    event.preventDefault();
+                    const firstInvalid = selects.find(select => !select.value || !select.selectedOptions[0]?.dataset.imageUrl);
+                    firstInvalid?.focus();
+                    alert('Choose a valid image for all six positions and wait for each preview to load before saving.');
+                }
             });
 
             const input = document.querySelector('[data-zazu-landing-uploads]');
