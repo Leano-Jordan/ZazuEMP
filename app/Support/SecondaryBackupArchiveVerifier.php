@@ -11,14 +11,14 @@ final class SecondaryBackupArchiveVerifier
     {
         $path = $state['secondary_archive_path'] ?? null;
 
-        if (! $this->hasValidMetadata($state, $path)) {
+        if ($this->hasValidMetadata($state, $path) === false) {
             return 'invalid';
         }
 
         $path = (string) $path;
         clearstatcache(true, $path);
 
-        if (! $this->isRegularArchive($path)) {
+        if ($this->isRegularArchive($path) === false) {
             return 'missing';
         }
 
@@ -60,7 +60,7 @@ final class SecondaryBackupArchiveVerifier
 
     private function isRegularArchive(string $path): bool
     {
-        return is_file($path) && !is_link($path);
+        return is_file($path) && is_link($path) === false;
     }
 
     /**
