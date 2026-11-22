@@ -420,6 +420,96 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertSame([], $snapshot['related']);
     }
 
+    public function test_expense_rejects_corrupted_local_identity_rows_that_point_to_foreign_records(): void
+    {
+        $business = $this->business('Corrupted expense identity owner');
+        $foreignBusiness = $this->business('Corrupted expense identity target');
+        $device = $this->device($business);
+
+        $foreignEvent = Event::create([
+            'business_id' => $foreignBusiness->id,
+            'reference' => 'CORRUPT-EXPENSE-EVENT',
+            'name' => 'Foreign event target',
+            'status' => 'confirmed',
+        ]);
+        $foreignSupplier = Supplier::create([
+            'business_id' => $foreignBusiness->id,
+            'name' => 'Foreign supplier target',
+        ]);
+        $foreignOrder = PurchaseOrder::create([
+            'business_id' => $foreignBusiness->id,
+            'event_id' => $foreignEvent->id,
+            'supplier_id' => $foreignSupplier->id,
+            'idempotency_key' => (string) Str::uuid(),
+            'reference' => 'PO-CORRUPT-EXPENSE',
+            'status' => 'received',
+            'currency' => 'ZAR',
+            'total_amount' => '450.00',
+        ]);
+
+        $cases = [
+            [
+                'entity_type' => 'job',
+                'record' => $foreignEvent,
+                'field' => 'event_local_id',
+                'error_field' => 'payload',
+            ],
+            [
+                'entity_type' => 'supplier',
+                'record' => $foreignSupplier,
+                'field' => 'supplier_local_id',
+                'error_field' => 'supplier_local_id',
+            ],
+            [
+                'entity_type' => 'purchase_order',
+                'record' => $foreignOrder,
+                'field' => 'purchase_order_local_id',
+                'error_field' => 'purchase_order_local_id',
+            ],
+        ];
+
+        foreach ($cases as $index => $case) {
+            $localIdentity = (string) Str::uuid();
+
+            // Simulate a corrupted identity table: the identity is scoped to
+            // this business and has the expected morph type, but its target
+            // record belongs to a different business.
+            SyncEntityIdentity::create([
+                'business_id' => $business->id,
+                'entity_type' => $case['entity_type'],
+                'entity_uuid' => $localIdentity,
+                'record_type' => $case['record']->getMorphClass(),
+                'record_id' => $case['record']->id,
+            ]);
+
+            $mutation = $this->recordExpense($device, array_merge([
+                'description' => 'Corrupted identity attempt '.$index,
+                'amount' => '25.00',
+                'status' => 'unpaid',
+                'expense_date' => now()->toDateString(),
+                'supplier_local_id' => null,
+                'event_local_id' => null,
+                'purchase_order_local_id' => null,
+            ], [$case['field'] => $localIdentity]));
+
+            try {
+                app(SyncMutationApplier::class)->apply($mutation, [
+                    'expense' => app(OfflineDomainMutationHandler::class),
+                ]);
+                $this->fail('An expense must not resolve a local identity to a foreign business record.');
+            } catch (ValidationException $exception) {
+                $this->assertArrayHasKey($case['error_field'], $exception->errors());
+            }
+
+            $this->assertSame('pending', $mutation->fresh()->status);
+        }
+
+        $this->assertSame(0, FinanceExpense::query()->where('business_id', $business->id)->count());
+        $this->assertSame('Foreign event target', $foreignEvent->fresh()->name);
+        $this->assertSame('Foreign supplier target', $foreignSupplier->fresh()->name);
+        $this->assertSame('PO-CORRUPT-EXPENSE', $foreignOrder->fresh()->reference);
+    }
+
     private function business(string $name): Business
     {
         return Business::create([
