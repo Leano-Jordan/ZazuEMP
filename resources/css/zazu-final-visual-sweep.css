@@ -1686,8 +1686,8 @@ color: var(--zazu-primary-deep);
 }
 
 @media (max-width: 820px) {
-    .zazu-customer-directory .zazu-record-header[data-record-cols="2"] {
-        grid-template-columns: minmax(0, 1fr) minmax(118px, max-content) minmax(228px, max-content);
+    .zazu-customer-directory .zazu-record-header {
+        display: none;
     }
 
     .zazu-customer-directory .zazu-customer-row {
