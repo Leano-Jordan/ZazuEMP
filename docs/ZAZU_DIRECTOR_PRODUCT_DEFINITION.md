@@ -101,6 +101,43 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 
 39. **Visual-first calculation explanations:** Zazu should automate common spreadsheet calculations and business analysis, but never present important results as unexplained numbers. When a calculation matters, show a clear visual explanation in business language: what was calculated, which inputs were used, the result, and where useful the simple underlying calculation. Users should be able to drill down without being forced to understand spreadsheet formulas or cell references. The interface should teach through visual hierarchy, labels, examples, summaries, charts and progressive detail rather than dense grids or formula syntax. This is a core Zazu usability principle: **if Excel makes the user decode the screen, Zazu should explain the screen.**
 
+
+## Products, suppliers, purchasing, inventory and assets — product language and workflow
+
+These are first-class operational capabilities in Zazu, not secondary setup screens or late-stage extras. A job may depend on what the business sells, what it already owns, what it has in stock, and what it must obtain from suppliers. The Job workflow must make those choices visible while scope and delivery are being planned, not introduce purchasing only after the quote is finished.
+
+Use these terms consistently in navigation, headings, forms, empty states, summaries and helper guidance:
+
+- **Products and services (catalogue):** what the business offers customers or uses as reusable quoted line definitions. A catalogue entry describes an offering, its type, pricing basis and unit. It does not, by itself, prove that physical stock exists or that the business owns an asset.
+- **Inventory (stock):** consumable or quantity-managed items tracked by units and stock movements. Examples: food ingredients, beverages, disposable plates, packaging and cleaning supplies. Show on-hand quantity, unit, receipts, issues, returns, adjustments and reorder level. Inventory is counted in quantities; it is not an individually identified piece of equipment.
+- **Assets (owned equipment):** durable, reusable physical things tracked individually because identity, condition, location, availability or return matters. Examples: a specific oven, chafing dish, tent, table, speaker or vehicle. Track asset tag, condition, status, location and job allocation/return. Assets are not consumable stock, even when several identical units exist.
+- **Suppliers:** the businesses or people the company buys from. Supplier records are operational relationships used to source products, stock, equipment and job-specific services. Supplier discovery, maintenance and selection must be easy from purchasing workflows.
+- **Purchase orders (POs):** formal records of what the business intends to buy from a selected supplier, in what quantity, at what price and by when. POs can be linked to a job or remain general business purchases. A PO is a supplier commitment, not an inventory movement, an asset registration or proof of receipt.
+- **Receiving:** what actually arrived, in what quantity and condition. Receiving must preserve the PO line and supplier trail, then route the received item according to its classification: stock receipt into inventory; individually tracked durable equipment into the asset register; or a job-specific/non-stock purchase into its cost/expense trail. Do not silently treat every PO line as stock.
+
+### Job planning must expose the fulfilment choice
+
+When a user adds or reviews a job requirement, Zazu should help them identify how it will be fulfilled:
+
+1. Use existing inventory/stock.
+2. Allocate an owned asset/equipment item.
+3. Purchase from a supplier (create or link a PO).
+4. Hire/obtain externally where appropriate.
+5. Deliver as a service or labour requirement.
+
+The user should see demand, available quantity/assets, shortages, supplier/PO status and expected arrival in the job context. Purchasing and resource planning should be visible alongside quote, preparation and delivery planning; they must not be hidden behind a generic “later” step. A PO or stock receipt should update the correct operational record and job readiness without duplicating costs or counts.
+
+### Language acceptance rules
+
+- Never use **asset** as a synonym for inventory, stock, product or generic resource.
+- Never use **inventory** when the intended meaning is the asset register.
+- Use **stock/on hand** for quantity-controlled inventory; use **asset/equipment** for individually tracked durable property.
+- Use **catalogue product/offering** when referring to what the business sells or quotes, and **inventory item/stock item** when referring to quantities physically held.
+- If a catalogue offering is linked to an inventory item or asset capability, explain that relationship explicitly; the link does not make the records interchangeable.
+- Avoid generic labels such as “resources” where the user needs to choose between stock, owned equipment, supplier purchase or external hire.
+
+This direction strengthens the existing V1 modules and their connections. It does not authorize a warehouse-management suite, a full procurement platform or enterprise asset management.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
