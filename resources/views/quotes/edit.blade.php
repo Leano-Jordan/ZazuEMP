@@ -83,7 +83,7 @@
                                     'rental' => 'Hire / rental',
                                     'package' => 'Package',
                                     'other' => 'Other',
-                                    default => 'Custom line',
+                                    default => $requirement->unit === 'service' ? 'Service' : 'Custom line',
                                 };
                                 $item = $itemsByRequirement->get($requirement->id);
                                 $defaultPrice = $item?->unit_price;
