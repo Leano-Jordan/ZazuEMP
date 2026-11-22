@@ -79,6 +79,14 @@
                         @foreach ($event->requirements as $requirement)
                             @php
                                 $capability = $requirement->capability;
+                                $capabilityTypeLabel = match ($capability?->capability_type) {
+                                    'product' => 'Product',
+                                    'service' => 'Service',
+                                    'rental' => 'Hire / rental',
+                                    'package' => 'Package',
+                                    'other' => 'Other',
+                                    default => 'Custom line',
+                                };
                                 $initialPrice = $capability
                                     && $capability->default_price !== null
                                     && ($capability->currency ?? $defaultCurrency) === old('currency', $defaultCurrency)
@@ -89,6 +97,7 @@
                                 <div class="zazu-list-main">
                                     <div class="zazu-list-title">{{ $requirement->description }}</div>
                                     <div class="zazu-list-meta">
+                                        <span class="zazu-chip zazu-chip-info">{{ $capabilityTypeLabel }}</span>
                                         {{ $requirement->category ?: 'General' }}
                                         @if ($capability) · {{ $capability->name }} @endif
                                     </div>
