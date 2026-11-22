@@ -14,7 +14,7 @@
 Product: Zazu – Event Management Platform (Zazu EMP)
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main only
-Context updated: 2026-11-21
+Context updated: 2026-11-22
 
 ## Owner V1 shipping mandate — binding
 Primary objective: get a working Zazu V1 into the hands of the first real businesses. V1 is a practical first release, not an enterprise-scale perfection exercise.
@@ -27,6 +27,12 @@ Primary objective: get a working Zazu V1 into the hands of the first real busine
 - Work directly on main. Never create branches. Do not introduce Render or AMPPS deployment workflows.
 - Never claim unobserved runtime, CI, browser or release evidence.
 
+
+## DB-001 disposition — Founder clarification (2026-11-22)
+
+**DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
+
+Do not chase this historical anomaly, request diagnostic captures, or ask the Founder to run `Test-ZazuDatabaseSchema.ps1` or `Get-ZazuIncident.ps1`. Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new diagnostic evidence appears. The separate installation backup/restore acceptance gate remains independent and must not be conflated with DB-001.
 
 ## Founder commercial decision — 2026-11-21
 Zazu EMP has exactly three commercial tiers: **Basic (permanent Free), Intermediate (paid), Advanced (paid)**. These are also the canonical experience/entitlement names. The Founder approved the tier structure only; exact paid monthly prices, feature matrix and quotas remain unapproved. The old Starter/Team/Business and R499/R899/R1,499 proposal is withdrawn and must not be represented as current pricing. See DEC-027 in .ai/engineering/DECISION_LOG.md and the reconciled product specification/valuation.
@@ -56,6 +62,6 @@ Also implemented: query-builder mass-write guard for revision-tracked tables, da
 Offline capability remains bounded: IndexedDB workspace and durable mutation queue; local customer and Work directories/inspection; dashboard quote detail/acceptance panel; phone-local Work/attachment journey. Cached Laravel HTML is a snapshot, not a general local route renderer. Do not claim app-wide offline parity.
 Sync protections include business-scoped stable record identity, mutation replay checks, ordered delivery, atomic apply/publication, retryable infrastructure handling, contiguous pull/acknowledgement and revision-aware stale-write rejection.
 
-**Remaining release gates:** owner-PC scheduled backup observation, off-disk copy and full restore drill; physical Android cold launch/restart/reconnect; populated live-business quote-to-payment-to-profit reconciliation; POPIA operational sign-off; ZAZU name clearance. PostgreSQL commercial/sync suite is conditional on selecting a PostgreSQL host; current owner-PC V1 uses SQLite. DB-001 remains dormant/monitoring per Founder report. Pairing remains closed.
+**Remaining release gates:** owner-PC scheduled backup observation, off-disk copy and full restore drill; physical Android cold launch/restart/reconnect; populated live-business quote-to-payment-to-profit reconciliation; POPIA operational sign-off; ZAZU name clearance. PostgreSQL commercial/sync suite is conditional on selecting a PostgreSQL host; current owner-PC V1 uses SQLite. DB-001 is dormant, historical and non-critical per the 2026-11-22 Founder clarification; do not pursue unless reproduced on current main. Pairing remains closed.
 Evidence maturity remains **77/100**. V1 remains **NOT READY**; do not award score uplift without owner-side operational evidence.
 Current state: .ai/engineering/STATE.md. Sole readiness register: .ai/engineering/READINESS_REGISTER.md. Release acceptance: docs/V1_RELEASE_CHECKLIST.md.
