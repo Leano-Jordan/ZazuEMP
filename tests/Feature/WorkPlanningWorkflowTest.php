@@ -163,4 +163,74 @@ class WorkPlanningWorkflowTest extends TestCase
 
         $this->assertSame('open', $item->fresh()->status);
     }
+    public function test_requirement_can_be_corrected_online_without_rewriting_an_existing_quote_snapshot(): void
+    {
+        $event = $this->event();
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id, 'description' => 'Starter catering', 'category' => 'Catering',
+            'quantity' => 1, 'unit' => 'service', 'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR', 'quantity' => [$requirement->id => '1.00'],
+            'unit_price' => [$requirement->id => '2500.00'],
+        ])->assertRedirect();
+
+        $quote = Quote::query()->firstOrFail();
+        $originalVersion = $quote->latestVersion()->firstOrFail();
+        $originalItem = $originalVersion->items()->firstOrFail();
+
+        $this->put(route('work.requirements.update', [$event, $requirement]), [
+            'description' => 'Full-service catering', 'category' => 'Catering',
+            'quantity' => '80.00', 'unit' => 'guests', 'notes' => 'Includes setup and service',
+        ])->assertRedirect(route('work.requirements.index', $event));
+
+        $requirement->refresh();
+        $originalItem->refresh();
+        $this->assertSame('Full-service catering', $requirement->description);
+        $this->assertSame('80.00', (string) $requirement->quantity);
+        $this->assertSame('Starter catering', $originalItem->description);
+        $this->assertSame('1.00', (string) $originalItem->quantity);
+        $this->assertFalse($originalVersion->fresh()->matchesRequirements($event->requirements()->get()));
+    }
+
+    public function test_removing_a_quoted_requirement_preserves_old_line_snapshot_and_forces_new_revision(): void
+    {
+        $event = $this->event();
+        $removed = EventRequirement::create([
+            'event_id' => $event->id, 'description' => 'Temporary marquee', 'category' => 'Equipment',
+            'quantity' => 1, 'unit' => 'unit', 'status' => 'open',
+        ]);
+        $remaining = EventRequirement::create([
+            'event_id' => $event->id, 'description' => 'Catering', 'category' => 'Catering',
+            'quantity' => 80, 'unit' => 'guests', 'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'quantity' => [$removed->id => '1.00', $remaining->id => '80.00'],
+            'unit_price' => [$removed->id => '500.00', $remaining->id => '100.00'],
+        ])->assertRedirect();
+
+        $quote = Quote::query()->firstOrFail();
+        $originalVersion = $quote->latestVersion()->firstOrFail();
+        $removedLine = $originalVersion->items()->where('event_requirement_id', $removed->id)->firstOrFail();
+
+        $this->delete(route('work.requirements.destroy', [$event, $removed]))
+            ->assertRedirect(route('work.requirements.index', $event));
+
+        $removedLine->refresh();
+        $this->assertNull($removedLine->event_requirement_id);
+        $this->assertSame('Temporary marquee', $removedLine->description);
+        $this->assertSame('Temporary marquee', $removedLine->source_snapshot['description']);
+        $this->assertFalse($originalVersion->fresh()->matchesRequirements($event->requirements()->get()));
+
+        $this->post(route('quotes.versions.store', $quote))->assertRedirect();
+        $newVersion = $quote->refresh()->versions()->where('version', 2)->with('items')->firstOrFail();
+        $this->assertCount(1, $newVersion->items);
+        $this->assertSame('Catering', $newVersion->items->first()->description);
+        $this->assertSame('superseded', $originalVersion->fresh()->status);
+        $this->assertSame('Temporary marquee', $removedLine->fresh()->description);
+    }
+
 }
