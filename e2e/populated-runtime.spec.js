@@ -303,6 +303,70 @@ test.describe('Zazu populated runtime challenge', () => {
         await expectNoServerFailures(page, responses, errors);
     });
 
+    test('customer pages keep actions aligned at desktop and phone widths', async ({ page }) => {
+        test.setTimeout(60_000);
+        await login(page, DEMO_EMAIL, DEMO_PASSWORD);
+
+        await page.setViewportSize({ width: 1280, height: 900 });
+        const directory = await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+        expect(directory?.status()).toBe(200);
+
+        const row = page.locator('.zazu-customer-row').first();
+        await expect(row).toBeVisible();
+        const actionLinks = row.locator('.zazu-customer-actions .zazu-btn');
+        await expect(actionLinks).toHaveCount(2);
+
+        for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
+            await page.setViewportSize(viewport);
+            const layout = await row.evaluate((element) => {
+                const rowRect = element.getBoundingClientRect();
+                const actions = element.querySelector('.zazu-customer-actions');
+                const buttons = [...element.querySelectorAll('.zazu-customer-actions .zazu-btn')];
+                return {
+                    row: { left: rowRect.left, right: rowRect.right },
+                    actions: actions ? actions.getBoundingClientRect().toJSON() : null,
+                    buttons: buttons.map(button => button.getBoundingClientRect().toJSON()),
+                };
+            });
+
+            expect(layout.actions).not.toBeNull();
+            expect(layout.actions.left).toBeGreaterThanOrEqual(layout.row.left);
+            expect(layout.actions.right).toBeLessThanOrEqual(layout.row.right + 1);
+            expect(layout.buttons).toHaveLength(2);
+            for (const button of layout.buttons) {
+                expect(button.width).toBeGreaterThanOrEqual(96);
+                expect(button.height).toBeGreaterThanOrEqual(40);
+                expect(button.left).toBeGreaterThanOrEqual(layout.row.left);
+                expect(button.right).toBeLessThanOrEqual(layout.row.right + 1);
+            }
+            const [first, second] = layout.buttons;
+            const separated = first.right <= second.left || second.right <= first.left ||
+                first.bottom <= second.top || second.bottom <= first.top;
+            expect(separated).toBe(true);
+        }
+
+        const customerHref = await row.locator('.zazu-customer-primary').getAttribute('href');
+        expect(customerHref).toBeTruthy();
+        await page.goto(customerHref, { waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('link', { name: 'Edit customer' })).toBeVisible();
+        await expect(page.getByRole('link', { name: /Customers/ })).toBeVisible();
+
+        const editHref = await page.getByRole('link', { name: 'Edit customer' }).getAttribute('href');
+        await page.goto(editHref, { waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('button', { name: 'Save changes' })).toBeVisible();
+        await expect(page.locator('.zazu-actionbar-sticky')).toBeVisible();
+        const stickyActions = await page.locator('.zazu-actionbar-sticky').evaluate(element => {
+            const rects = [...element.querySelectorAll('.zazu-btn')].map(button => button.getBoundingClientRect().toJSON());
+            return rects;
+        });
+        expect(stickyActions.length).toBeGreaterThanOrEqual(2);
+        for (const rect of stickyActions) {
+            expect(rect.left).toBeGreaterThanOrEqual(0);
+            expect(rect.right).toBeLessThanOrEqual(391);
+            expect(rect.height).toBeGreaterThanOrEqual(40);
+        }
+    });
+
     test('critical field surfaces remain usable without horizontal viewport overflow', async ({ page }) => {
         test.setTimeout(60_000);
         await login(page, DEMO_EMAIL, DEMO_PASSWORD);
