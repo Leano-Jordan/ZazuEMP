@@ -72,6 +72,11 @@ class BusinessArchiveInvoiceSequenceTest extends TestCase
         $archive = $service->download($source);
         $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
+        $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        unset($manifest['tables']['invoice_number_sequences']);
+        $zip->deleteName('manifest.json');
+        $zip->addFromString('manifest.json', json_encode($manifest, JSON_THROW_ON_ERROR));
+
         $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
         unset($data['invoice_number_sequences']);
         $zip->deleteName('data.json');
