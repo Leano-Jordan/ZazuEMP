@@ -69,11 +69,11 @@ class ZazuHelperTest extends TestCase
         $script = file_get_contents(resource_path('js/app.js'));
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
-        $this->assertStringContainsString("safeStorageGet(storageKey)", $script);
+        $this->assertStringContainsString('safeStorageGet(storageKey)', $script);
         $this->assertStringContainsString("safeStorageSet(storageKey, 'off')", $script);
-        $this->assertStringContainsString("[data-zazu-anchor]", $script);
-        $this->assertStringContainsString("prefers-reduced-motion", $script);
-        $this->assertStringContainsString(".zazu-helper-target-highlight", $css);
+        $this->assertStringContainsString('[data-zazu-anchor]', $script);
+        $this->assertStringContainsString('prefers-reduced-motion', $script);
+        $this->assertStringContainsString('.zazu-helper-target-highlight', $css);
     }
 
     public function test_public_landing_authentication_modal_does_not_render_the_workspace_helper(): void
