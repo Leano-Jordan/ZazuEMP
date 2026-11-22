@@ -265,16 +265,30 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 ]);
             }
 
-            if (array_key_exists('services', $payload) && $event->quotes()->where('status', 'accepted')->exists()) {
-                throw ValidationException::withMessages([
-                    'services' => 'An accepted quote locks the agreed job scope. Create a separate job for additional work.',
-                ]);
+            if (array_key_exists('services', $payload)) {
+                $requestedRequirements = $this->offlineJobRequirementDefinitions(
+                    $payload['services'],
+                    $payload['other_service'] ?? null
+                );
+                $acceptedQuoteExists = $event->quotes()->where('status', 'accepted')->exists();
+
+                if ($acceptedQuoteExists) {
+                    $currentDescriptions = $event->requirements()->pluck('description')->all();
+                    $requestedDescriptions = array_keys($requestedRequirements);
+                    sort($currentDescriptions);
+                    sort($requestedDescriptions);
+
+                    if ($currentDescriptions !== $requestedDescriptions) {
+                        throw ValidationException::withMessages([
+                            'services' => 'An accepted quote locks the agreed job scope. Create a separate job for additional work.',
+                        ]);
+                    }
+                } else {
+                    $this->syncOfflineJobRequirements($event, $payload);
+                }
             }
 
             $event->update($attributes);
-            if (array_key_exists('services', $payload)) {
-                $this->syncOfflineJobRequirements($event, $payload);
-            }
 
             return $event->fresh(['requirements']);
         }
