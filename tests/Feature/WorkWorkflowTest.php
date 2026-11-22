@@ -363,7 +363,7 @@ class WorkWorkflowTest extends TestCase
             'unit' => 'service',
             'status' => 'open',
         ]);
-        $event->quotes()->create([
+        $quote = $event->quotes()->create([
             'reference' => 'QUO-NEXT-ACCEPTED-001',
             'status' => 'accepted',
             'currency' => 'ZAR',
@@ -373,6 +373,7 @@ class WorkWorkflowTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Create invoice')
+            ->assertSee(route('finance.invoices.create', ['quote_id' => $quote->id]), false)
             ->assertSee('The customer accepted the quote. Create the invoice from this accepted quote to begin tracking payment.');
     }
 
