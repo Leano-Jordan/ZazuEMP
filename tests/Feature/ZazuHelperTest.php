@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\EventRequirement;
 use App\Models\EventPreparationItem;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
@@ -308,6 +309,44 @@ class ZazuHelperTest extends TestCase
                 ->assertSee('data-zazu-helper-focus="'.$focus.'"', false)
                 ->assertSee($expectedGuidance);
         }
+    }
+
+    public function test_helper_shows_only_the_current_jobs_saved_components(): void
+    {
+        $business = $this->makeBusiness('Helper Event Scope');
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'owner']);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'HELPER-SCOPE-'.Str::upper(Str::random(5)),
+            'name' => 'Tent and chair booking',
+            'status' => 'confirmed',
+        ]);
+        EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => '100 white chairs',
+            'category' => 'Furniture & equipment',
+            'quantity' => '100.00',
+            'unit' => 'chair',
+            'status' => 'open',
+        ]);
+        EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => 'Two stretch tents',
+            'category' => 'Rentals',
+            'quantity' => '2.00',
+            'unit' => 'unit',
+            'status' => 'open',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('work.show', $event))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-event-components="2"', false)
+            ->assertSee('100 white chairs')
+            ->assertSee('Two stretch tents')
+            ->assertDontSee('Catering preparation')
+            ->assertDontSee('Camera editing');
     }
 
     private function makeBusiness(string $name): Business
