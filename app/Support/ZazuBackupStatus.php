@@ -144,48 +144,7 @@ final class ZazuBackupStatus
         return ($state['status'] ?? null) === 'verified'
             && $ageHours !== null
             && $ageHours <= self::MAX_AGE_HOURS
-            && $this->secondaryArchiveIntegrity($state) === 'present';
-    }
-
-    /**
-     * @param array<string, mixed> $state
-     */
-    private function secondaryArchiveIntegrity(array $state): string
-    {
-        $path = $state['secondary_archive_path'] ?? null;
-        $sha256 = $state['secondary_archive_sha256'] ?? null;
-        $sizeBytes = $state['secondary_archive_size_bytes'] ?? null;
-        $modifiedUnix = $state['secondary_archive_modified_unix'] ?? null;
-
-        if (! is_string($path) || $path === ''
-            || (! str_starts_with($path, DIRECTORY_SEPARATOR)
-                && preg_match('/^[A-Za-z]:[\\\\\\/]/', $path) !== 1
-                && ! str_starts_with($path, '\\\\'))
-            || ! is_string($sha256)
-            || preg_match('/^[a-f0-9]{64}$/i', $sha256) !== 1
-            || ! is_numeric($sizeBytes)
-            || (int) $sizeBytes < 1
-            || ! is_numeric($modifiedUnix)
-            || (int) $modifiedUnix < 1) {
-            return 'invalid';
-        }
-
-        clearstatcache(true, $path);
-        if (! is_file($path) || is_link($path)) {
-            return 'missing';
-        }
-
-        $actualSize = @filesize($path);
-        $actualModifiedUnix = @filemtime($path);
-        if ($actualSize === false || $actualModifiedUnix === false) {
-            return 'missing';
-        }
-
-        if ((int) $actualSize !== (int) $sizeBytes || (int) $actualModifiedUnix !== (int) $modifiedUnix) {
-            return 'changed';
-        }
-
-        return 'present';
+            && (new SecondaryBackupArchiveVerifier())->inspect($state) === 'present';
     }
 
     /**
@@ -229,7 +188,7 @@ final class ZazuBackupStatus
         }
 
         if (($state['status'] ?? null) === 'verified') {
-            return match ($this->secondaryArchiveIntegrity($state)) {
+            return match ((new SecondaryBackupArchiveVerifier())->inspect($state)) {
                 'missing' => 'The last verified independent backup archive is missing or its drive is unavailable.',
                 'changed' => 'The last verified independent backup archive changed after verification. Run a new backup.',
                 'invalid' => 'The last verified independent backup archive has no valid integrity record. Run a new backup.',
