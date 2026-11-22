@@ -125,23 +125,34 @@ class QuoteQuantityReviewTest extends TestCase
             'unit' => 'hour',
             'status' => 'open',
         ]);
+        $starterServiceRequirement = $event->requirements()->create([
+            'description' => 'Setup and cleanup',
+            'category' => 'Event operations',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
 
         $this->get(route('work.quotes.create', $event))
             ->assertOk()
             ->assertSee('Product')
             ->assertSee('Service')
             ->assertSee('Chicken portions')
-            ->assertSee('Waiter service');
+            ->assertSee('Waiter service')
+            ->assertSee('Setup and cleanup')
+            ->assertDontSee('Custom line');
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
             'quantity' => [
                 $productRequirement->id => '100.00',
                 $serviceRequirement->id => '8.00',
+                $starterServiceRequirement->id => '1.00',
             ],
             'unit_price' => [
                 $productRequirement->id => '45.00',
                 $serviceRequirement->id => '120.00',
+                $starterServiceRequirement->id => '300.00',
             ],
         ])->assertRedirect();
 
@@ -152,7 +163,9 @@ class QuoteQuantityReviewTest extends TestCase
         $this->get(route('quotes.versions.edit', [$quote, $revision]))
             ->assertOk()
             ->assertSee('Product')
-            ->assertSee('Service');
+            ->assertSee('Service')
+            ->assertSee('Setup and cleanup')
+            ->assertDontSee('Custom line');
     }
 
     public function test_quote_creation_rejects_missing_quantity_confirmation(): void
