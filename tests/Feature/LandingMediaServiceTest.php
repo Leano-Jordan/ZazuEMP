@@ -32,6 +32,44 @@ class LandingMediaServiceTest extends TestCase
         }
     }
 
+
+    public function test_complete_bundled_image_library_exposes_every_unique_image_asset(): void
+    {
+        $expectedPaths = [];
+        foreach (config('zazu.landing_image_library', []) as $entry) {
+            foreach (['url', 'fallback'] as $field) {
+                $path = (string) ($entry[$field] ?? '');
+                if ($path !== '' && is_file(public_path(ltrim($path, '/')))) {
+                    $expectedPaths[$path] = true;
+                }
+            }
+        }
+
+        $actualPaths = collect(app(LandingMediaService::class)->library())
+            ->pluck('url')
+            ->unique()
+            ->all();
+
+        foreach (array_keys($expectedPaths) as $path) {
+            $this->assertContains($path, $actualPaths);
+        }
+
+        $this->assertGreaterThanOrEqual(6, count($actualPaths));
+    }
+
+    public function test_venue_and_decor_landing_positions_use_their_saved_assignments(): void
+    {
+        PlatformLandingSetting::current()->update([
+            'venue_image_path' => config('zazu.landing_image_library.venue.url'),
+            'decor_image_path' => config('zazu.landing_image_library.luxury_banquet.url'),
+        ]);
+
+        $images = app(LandingMediaService::class)->images();
+
+        $this->assertSame(config('zazu.landing_image_library.venue.url'), $images['venue']);
+        $this->assertSame(config('zazu.landing_image_library.luxury_banquet.url'), $images['decor']);
+    }
+
     public function test_legacy_remote_landing_paths_fall_back_to_bundled_assets(): void
     {
         PlatformLandingSetting::current()->update([
