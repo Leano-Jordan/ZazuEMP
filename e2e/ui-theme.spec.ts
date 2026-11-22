@@ -195,6 +195,20 @@ test.describe('Zazu UI theme and navigation', () => {
         expect(inspectorGeometry.top).toBeGreaterThanOrEqual(0);
         expect(inspectorGeometry.bottom).toBeLessThanOrEqual(inspectorGeometry.viewportHeight + 1);
 
-        expect(responses).toEqual([]);
+        const scopeTab = inspector.getByRole('tab', { name: 'Scope & preparation' });
+        const resourcesTab = inspector.getByRole('tab', { name: 'Resources & setup' });
+        const commercialTab = inspector.getByRole('tab', { name: 'Commercial position' });
+        await expect(scopeTab).toHaveAttribute('aria-selected', 'true');
+        await resourcesTab.click();
+        await expect(resourcesTab).toHaveAttribute('aria-selected', 'true');
+        await expect(inspector.locator('[data-zazu-tab-panel="equipment"]')).toBeVisible();
+        await commercialTab.click();
+        await expect(commercialTab).toHaveAttribute('aria-selected', 'true');
+        await expect(inspector.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
+        await scopeTab.focus();
+        await page.keyboard.press('ArrowRight');
+        await expect(resourcesTab).toBeFocused();
+
+        await expect(responses).toEqual([]);
     });
 });
