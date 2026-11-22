@@ -253,7 +253,7 @@ class ZazuHelperTest extends TestCase
             'status' => 'draft',
         ]);
 
-        $items = app(\\App\\Support\\ZazuHelperService::class)->attention($user, $business, 'dashboard');
+        $items = app(\App\Support\ZazuHelperService::class)->attention($user, $business, 'dashboard');
 
         $this->assertSame([10, 20, 30, 40], array_column($items, 'priority'));
         $this->assertSame('1 preparation item overdue', $items[0]['title']);
