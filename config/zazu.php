@@ -18,47 +18,38 @@ return [
         'catering_service' => [
             'label' => 'Elegant event reception',
             'url' => '/images/landing/stock/hero.jpg',
-            'fallback' => '/images/landing/hero.svg',
         ],
         'event_catering' => [
             'label' => 'Catering buffet',
             'url' => '/images/landing/stock/catering.jpg',
-            'fallback' => '/images/landing/operations.svg',
         ],
         'sound_stage' => [
             'label' => 'Outdoor event stage and sound setup',
             'url' => '/images/landing/stock/sound.jpg',
-            'fallback' => '/images/landing/resources.svg',
         ],
         'wedding_catering' => [
             'label' => 'Elegant event venue',
             'url' => '/images/landing/stock/venue.jpg',
-            'fallback' => '/images/landing/control.svg',
         ],
         'luxury_banquet' => [
             'label' => 'Decorated reception venue',
             'url' => '/images/landing/stock/decor.jpg',
-            'fallback' => '/images/landing/control.svg',
         ],
         'stage_av' => [
             'label' => 'Outdoor event stage and sound setup',
             'url' => '/images/landing/stock/sound.jpg',
-            'fallback' => '/images/landing/resources.svg',
         ],
         'venue' => [
             'label' => 'Outdoor event tent setup',
             'url' => '/images/landing/stock/tent.jpg',
-            'fallback' => '/images/landing/operations.svg',
         ],
         'tent' => [
             'label' => 'Outdoor event tent setup',
             'url' => '/images/landing/stock/tent.jpg',
-            'fallback' => '/images/landing/operations.svg',
         ],
         'decor' => [
             'label' => 'Decorated reception venue',
             'url' => '/images/landing/stock/decor.jpg',
-            'fallback' => '/images/landing/control.svg',
         ],
     ],
     'landing_media_uploads' => [
