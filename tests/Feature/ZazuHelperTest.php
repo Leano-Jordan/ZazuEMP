@@ -201,7 +201,11 @@ class ZazuHelperTest extends TestCase
             ->assertSee('1 preparation item overdue')
             ->assertSee('1 purchase order still open')
             ->assertSee('1 job still in draft')
-            ->assertDontSee('2 purchase orders still open');
+            ->assertDontSee('2 purchase orders still open')
+            ->assertSee('data-zazu-helper-attention-item', false)
+            ->assertSee('data-zazu-helper-attention-title', false)
+            ->assertSee('data-zazu-helper-attention-copy', false)
+            ->assertSee('data-zazu-helper-attention-link', false);
     }
 
     public function test_helper_does_not_expose_work_attention_to_a_member_without_work_view_permission(): void
