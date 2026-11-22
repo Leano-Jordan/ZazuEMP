@@ -242,12 +242,24 @@ Working commercial hypotheses:
 ## DEC-026 — Founder-led commercial V1 convergence and one-target WIP
 
 - **Date:** 2026-11-18
-- **Status:** ACTIVE
+- **Status:** ACTIVE, with the initial DB-001-first sequencing superseded by DEC-028.
 - **Authority:** Explicit Founder direction and the Founder-supplied current-state research report.
-- **Decision:** Zazu execution is now governed by a one-active-target WIP limit and a commercial V1 convergence mission. The first target is DB-001 on the Founder's actual installation, investigated in one focused owner-assisted session using the existing schema check and classified incident record. Root cause must be established before correction; closure requires successful repetition of the affected installed workflow.
-- **Priority sequence:** (1) DB-001 real-install closure; (2) populated-record quote → invoice → manual/EFT payment recording → costs → event profit proof; (3) manual EFT-paid signed licence keys for the first ten customers; (4) legal/privacy and Information Officer/POPIA operational readiness plus a real WhatsApp support contact; (5) a two-week pilot with 2–3 operators, with fixes driven by observed use.
-- **Scope freeze:** Sentinel and diagnostics are feature-frozen except verified maintenance; offline/sync scope does not expand; no new subsystem, broad refactor or subscription automation without explicit Founder approval. Known unchanged browser smoke tests are not repeated. CI syntax churn is reduced through local PHP verification where available and mandatory failure classification.
-- **Commercial decisions:** Manual payment recording is sufficient for initial pilot acceptance. Pricing remains unresolved because existing tier models conflict; Director must surface the conflict for Founder decision rather than silently choose.
-- **Founder/operator model:** The Founder is the sole human operator and final authority. Jarvis must declare the exact repository/ref, intended actions and stop boundary before each distinct autonomous work batch; no fictional staff/team assumptions.
+- **Decision:** Zazu execution is governed by a one-active-target WIP limit and a commercial V1 convergence mission. The original proposal to make DB-001 the first owner-assisted target is historical and is explicitly superseded by DEC-028. The one-target WIP limit, scope discipline, commercial convergence mission and evidence vocabulary remain active.
+- **Historical priority sequence:** The original sequence placed DB-001 real-install closure first. Do not execute that superseded priority. Continue with reproducible engineering risks and genuine remaining acceptance gaps.
+- **Scope freeze:** Sentinel and diagnostics are feature-frozen except verified maintenance; offline/sync scope does not expand without evidence; no new subsystem, broad refactor or subscription automation without explicit Founder approval. Known unchanged browser smoke tests are not repeated. CI syntax churn is reduced through local PHP verification where available and mandatory failure classification.
+- **Commercial decisions:** Manual payment recording is sufficient for initial pilot acceptance. Pricing remains unresolved unless explicitly approved by the Founder.
+- **Founder/operator model:** The Founder is the sole human operator and final authority. No fictional staff/team assumptions.
 - **Acceptance vocabulary:** ENGINEERING COMPLETE, TESTS PASSED, VERIFIED ON FOUNDER PC, COMMERCIALLY USABLE and CUSTOMER VALIDATED are separate evidence states. Documentation and CI cannot substitute for actual installed-workflow or customer evidence.
 - **Reason:** Prevent the engineering loop from optimising for internal tooling and documentation instead of a reliable, usable and sellable first release.
+
+## DEC-028 — DB-001 historical disposition; stop repeat investigation
+
+- **Date:** 2026-11-22
+- **Status:** ACTIVE
+- **Authority:** Explicit Founder clarification.
+- **Finding:** The DB-001 occurrence under discussion happened during testing of offline event creation and a calendar-related task. It has not happened again since the subsequent offline-architecture work. It is not a confirmed current database defect; no root cause or corrective fix has been established.
+- **Decision:** Classify DB-001 as **DORMANT / HISTORICAL / NON-CRITICAL**. It is not an active engineering task, not a V1 release blocker and not the current sprint target. Stop requesting owner-side schema/incident captures and stop spending engineering cycles investigating this occurrence.
+- **Reopen condition:** Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new evidence establishes a current defect. Do not infer recurrence from old diagnostic references, stale migration notes or unrelated installation-recovery work.
+- **Separation of concerns:** The owner-operated installation backup/off-disk copy/full-restore acceptance remains a separate V1 recovery gate. It must not be labelled DB-001 or used to revive the dormant incident.
+- **Recordkeeping:** Retain historical references and diagnostic tooling for traceability, but mark old DB-001 OPEN/critical/next-target notes as superseded. The top-level dispositions in `.ai/engineering/STATE.md` and `docs/V1_RELEASE_CHECKLIST.md` are authoritative.
+- **Reason:** Keep Director effort focused on reproducible defects and real release risks instead of repeatedly pursuing an unconfirmed historical test-time anomaly.
