@@ -2151,7 +2151,7 @@ body.zazu-dashboard-page .zazu-dash-hero-image {
     height: 100% !important;
     object-fit: cover !important;
     object-position: center 42% !important;
-    opacity: .88 !important;
+    opacity: .96 !important;
     filter: none !important;
 }
 body.zazu-dashboard-page .zazu-dash-capability-copy {
@@ -2159,7 +2159,7 @@ body.zazu-dashboard-page .zazu-dash-capability-copy {
     inset: auto 0 0 !important;
     z-index: 2 !important;
     padding: 22px 14px 10px !important;
-    background: linear-gradient(180deg, transparent 0%, rgba(10, 28, 42, .82) 100%) !important;
+    background: linear-gradient(180deg, transparent 0%, rgba(10, 28, 42, .54) 100%) !important;
     color: #fff !important;
 }
 body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-dash-side-label,
