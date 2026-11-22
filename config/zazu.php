@@ -61,6 +61,12 @@ return [
             'fallback' => '/images/landing/control.svg',
         ],
     ],
+    'landing_media_uploads' => [
+        'directory' => env('ZAZU_LANDING_MEDIA_UPLOAD_DIRECTORY', public_path('images/landing/uploads')),
+        'url_prefix' => '/images/landing/uploads',
+        'max_files' => 8,
+        'max_kilobytes' => 5120,
+    ],
     'errors' => [
         'AUTH-001' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 401, 'headline' => 'Sign-in required.', 'message' => 'Please sign in to continue.'],
         'AUTH-002' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 419, 'headline' => 'Your session has expired.', 'message' => 'Please refresh the page or sign in again to continue.'],
