@@ -524,7 +524,7 @@ V1 remains **NOT READY**. The latest exact-main verification is recorded at the 
 
 The incident logger records privacy-minimised metadata only (request ID, classification, exception class, route/action, method/path, timestamp and source file/line). It intentionally excludes exception messages, SQL, bindings and stack traces. The incident-framework documentation has been corrected to match this implementation.
 
-The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` remains required. Use it to identify the exception class, source file/line and route; if those bounded fields do not isolate the cause, reproduce locally under controlled diagnostics. This documentation correction does not close DB-001 or verify the startup migration against the intended installation.
+At that historical checkpoint, the owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` was requested to identify the exception class, source file/line and route. That request is superseded by the 2026-11-22 Founder clarification at the top of this checklist; do not pursue it unless DB-001 recurs on current `main`.
 
 
 ### Backup-first verification hardening — 2026-11-17
@@ -570,7 +570,7 @@ This section records the diagnostic tooling added at the time. Its original open
 - [x] Online invoices and offline invoice sync share consecutive business/month-scoped numbers in the existing `INV-YYYYMM-` format; offline records refresh to the canonical server number and voided numbers are not reused.
 - [ ] Tax-adviser/legal review of invoice numbering and tax-invoice presentation.
 - [ ] Direct generated PDF-file attachment and desktop/Android practical acceptance remain open.
-- DB-001 is DORMANT / MONITORING by current Founder report; the separate installation-recovery gate remains OPEN.
+- DB-001 is DORMANT / HISTORICAL / NON-CRITICAL. The Founder clarifies it occurred during offline event-creation/calendar-related task testing and has not recurred after subsequent offline-architecture work. The separate installation-recovery gate remains OPEN.
 
 
 ### Offline revision-aware sync hardening — 2026-11-20
