@@ -98,6 +98,12 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(notice.getByRole('link', { name: 'Open offline workspace' })).toHaveAttribute('href', '/dashboard');
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
 
+        await page.locator('[data-zazu-helper-toggle]').click();
+        const helperConnectivity = page.locator('[data-zazu-helper-connectivity]');
+        await expect(helperConnectivity).toBeVisible();
+        await expect(helperConnectivity).toContainText('Job recommendations are paused');
+        await expect(page.locator('[data-zazu-helper-recommendation]')).toBeHidden();
+
         originAvailable = true;
         await page.evaluate(() => window.dispatchEvent(new Event('focus')));
         await expect(notice).toBeHidden({ timeout: 15_000 });
