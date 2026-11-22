@@ -52,9 +52,9 @@
                         break;
                     case 'accepted':
                         if (!$latestInvoice) {
-                            $nextAction = ['label' => 'Create invoice', 'route' => route('finance.index'), 'copy' => 'The customer accepted the quote. Create the invoice to begin tracking payment.'];
+                            $nextAction = ['label' => 'Create invoice', 'route' => route('finance.invoices.create', ['quote_id' => $latestQuote->id]), 'copy' => 'The customer accepted the quote. Create the invoice from this accepted quote to begin tracking payment.'];
                         } elseif ($latestInvoice->balance > 0) {
-                            $nextAction = ['label' => 'Review invoice', 'route' => route('finance.invoices.show', $latestInvoice), 'copy' => 'Check the invoice balance and record payments as they arrive.'];
+                            $nextAction = ['label' => 'Record payment', 'route' => route('finance.payments.create', ['invoice_id' => $latestInvoice->id]), 'copy' => 'This invoice still has an outstanding balance. Record the customer payment here when it arrives.'];
                         } elseif (!$outstandingPreparation->isEmpty()) {
                             $nextAction = ['label' => 'Complete preparation', 'route' => route('work.preparation.index', $event), 'copy' => $outstandingPreparation->count().' preparation item(s) still need attention.'];
                         } elseif (!$activePurchaseOrders->isEmpty()) {
