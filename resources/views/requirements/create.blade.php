@@ -1,6 +1,6 @@
 <x-app-layout>
-    <x-slot:title>Add service to job</x-slot:title>
-    <x-slot:heading>Add service to job</x-slot:heading>
+    <x-slot:title>{{ isset($requirement) ? 'Edit requirement' : 'Add service to job' }}</x-slot:title>
+    <x-slot:heading>{{ isset($requirement) ? 'Edit requirement' : 'Add service to job' }}</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
@@ -8,13 +8,14 @@
     <section class="zazu-command-band zazu-requirement-editor-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->name }}</div>
-            <h2 class="zazu-command-title">What does this job need?</h2>
-            <p class="zazu-command-copy">Choose a service from the list. You only need to type something when the service is not listed.</p>
+            <h2 class="zazu-command-title">{{ isset($requirement) ? "Correct this job requirement" : "What does this job need?" }}</h2>
+            <p class="zazu-command-copy">Choose a catalogue item or correct the description, quantity, unit and details. Existing quote versions are preserved.</p>
         </div>
     </section>
 
-    <form method="POST" action="{{ route('work.requirements.store', $event) }}" id="service-form">
-        <input type="hidden" name="capability_id" id="capability_id" value="{{ old('capability_id') }}">
+    <form method="POST" action="{{ isset($requirement) ? route('work.requirements.update', [$event, $requirement]) : route('work.requirements.store', $event) }}" id="service-form">
+        @if (isset($requirement)) @method('PUT') @endif
+        <input type="hidden" name="capability_id" id="capability_id" value="{{ old('capability_id', $requirement?->capability_id) }}">
         @csrf
         <div class="zazu-editor">
             <div class="zazu-form-main">
@@ -54,13 +55,13 @@
                                 <div class="zazu-choice-grid">
                                     @foreach ($services as $service)
                                         <label class="zazu-choice-card zazu-service-choice">
-                                            <input type="radio" name="category" value="{{ $group }}" data-service-name="{{ $service }}" @checked(old('category') === $group && old('description') === $service)>
+                                            <input type="radio" name="category" value="{{ $group }}" data-service-name="{{ $service }}" @checked(old('category', $requirement?->category) === $group && old('description', $requirement?->description) === $service)>
                                             <span>{{ $service }}</span>
                                         </label>
                                     @endforeach
                                     @if ($group === 'Other')
                                         <label class="zazu-choice-card zazu-service-choice">
-                                            <input type="radio" name="category" value="Other" data-other-service @checked(old('category') === 'Other' && old('description') !== '')>
+                                            <input type="radio" name="category" value="Other" data-other-service @checked(old('category', $requirement?->category) === 'Other' && old('description', $requirement?->description) !== '')>
                                             <span>Something else</span>
                                         </label>
                                     @endif
@@ -73,13 +74,13 @@
                     <div class="zazu-form-grid mt-6">
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Service description <span class="zazu-required">*</span></span>
-                            <input id="description" name="description" value="{{ old('description') }}" required class="zazu-input">
+                            <input id="description" name="description" value="{{ old('description', $requirement?->description) }}" required class="zazu-input">
                             @error('description')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
                         <label class="zazu-field">
                             <span class="zazu-label">How many?</span>
-                            <input type="number" step="0.01" min="0.01" name="quantity" value="{{ old('quantity', 1) }}" required class="zazu-input">
+                            <input type="number" step="0.01" min="0.01" name="quantity" value="{{ old('quantity', $requirement?->quantity ?? 1) }}" required class="zazu-input">
                             @error('quantity')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
@@ -88,7 +89,7 @@
                             <select name="unit" class="zazu-select" id="unit-select">
                                 <option value="">Not specified</option>
                                 @foreach (config('zazu.units') as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('unit') === $value)>{{ $label }}</option>
+                                    <option value="{{ $value }}" @selected(old('unit', $requirement?->unit) === $value)>{{ $label }}</option>
                                 @endforeach
                             </select>
                             <span class="zazu-field-help">Use Other only if the unit is not listed.</span>
@@ -97,7 +98,7 @@
 
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Special details</span>
-                            <textarea name="notes" rows="4" class="zazu-textarea">{{ old('notes') }}</textarea>
+                            <textarea name="notes" rows="4" class="zazu-textarea">{{ old('notes', $requirement?->notes) }}</textarea>
                             <span class="zazu-field-help">Colour, size, menu, timing, quantity details or anything else the team needs to know.</span>
                         </label>
                     </div>
@@ -105,7 +106,7 @@
 
                 <div class="zazu-actionbar zazu-actionbar-sticky">
                     <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
-                    <button class="zazu-btn zazu-btn-primary">Add service to job</button>
+                    <button class="zazu-btn zazu-btn-primary">{{ isset($requirement) ? 'Save changes' : 'Add service to job' }}</button>
                 </div>
             </div>
 
@@ -123,6 +124,7 @@
         const capabilityId = document.getElementById('capability_id');
         const unitSelect = document.getElementById('unit-select');
          document.querySelectorAll('[data-capability-id]').forEach((button) => {
+            if (button.dataset.capabilityId === capabilityId.value) button.classList.add('selected');
             button.addEventListener('click', () => {
                 document.querySelectorAll('.zazu-catalogue-mini').forEach(item => item.classList.remove('selected'));
                 button.classList.add('selected');
