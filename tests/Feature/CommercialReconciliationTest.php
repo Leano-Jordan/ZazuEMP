@@ -368,7 +368,9 @@ class CommercialReconciliationTest extends TestCase
 
         $profit = app(EventProfitabilityService::class)
             ->forBusiness($business)
-            ->first(fn (array $row): bool => $row['event_id'] === $event->id && $row['currency'] === 'ZAR');
+            ->first(function (array $row) use ($event): bool {
+                return $row['event_id'] === $event->id && $row['currency'] === 'ZAR';
+            });
 
         $this->assertNotNull($profit);
         $this->assertSame(1000000, $profit['net_sales_cents']);
