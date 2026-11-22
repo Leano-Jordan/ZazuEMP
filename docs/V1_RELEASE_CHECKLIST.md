@@ -12,9 +12,9 @@ The Founder confirms physical operation of Zazu EMP on the PC and linked mobile 
 - **Data classification:** Founder confirms all test/business records supplied for this exercise are fictional.
 
 Do not ask the Founder to recreate records or repeat basic connected PC/mobile startup checks. Do not infer that connected operation proves disconnected cold-start, offline write/restart/reconnect, attachment sync, full installation restore, or transaction-level quote-to-profit reconciliation. Keep those distinct evidence gates open until directly demonstrated. The owner-PC off-disk backup/restore and POPIA/name-clearance gates are also unaffected.
-## Physical acceptance seed — READY FOR OWNER RUN
+## Physical Android acceptance — REQUIRED / PENDING
 
-**Seed status: PRESENT.** The Founder-confirmed fictional workspace already contains customers, quotes, invoices, suppliers, purchase orders and inventory. The PC and linked Android phone already use that same workspace. No duplicate seed records or re-pairing are required.
+**Acceptance status: NOT YET PERFORMED.** The Founder-confirmed fictional workspace already contains customers, quotes, invoices, suppliers, purchase orders and inventory. The PC and linked Android phone already use that same workspace. Do not create duplicate setup records, reseed the workspace or re-pair devices. The physical acceptance run itself is still required.
 
 **Physical Android acceptance sequence:**
 1. Record the tested main commit and installed build. Confirm the phone is using the installed Zazu PWA over its supported HTTPS origin and that the local mutation/attachment queues are clear before starting.
@@ -22,13 +22,13 @@ Do not ask the Founder to recreate records or repeat basic connected PC/mobile s
 3. Open the cached dashboard, Customers and Work screens. Create one clearly named offline acceptance job against an existing fictional customer and attach one small file from the phone.
 4. Force-close the installed PWA/browser completely while the host remains stopped. Relaunch it and verify the job, its details and attachment remain available, with the mutation still pending locally.
 5. Restart the PC host. Wait for the queue to reconcile. Verify on both devices that exactly one job exists, its attachment is present and opens, and no pending mutation or attachment remains.
-6. Using the existing populated fictional commercial records, trace an accepted quote version through invoice, recorded payments, actual costs and the resulting profit/margin. Record the actual values; do not substitute the seeded automated test's example amounts.
+6. Using the existing populated fictional commercial records, trace an accepted quote version through invoice, recorded payments, actual costs and the resulting profit/margin. Record the actual values; do not substitute automated test example amounts.
 
 **Stop conditions:** if the queue does not drain, the attachment is missing, a duplicate appears, or the app asks to clear/re-pair the device, stop and preserve local data. Do not clear browser storage, uninstall the PWA or repeat the operation until the cause is captured.
 
 **Evidence to record:** exact commit/build, Android model and browser/PWA version, host-offline and restart observations, queue state before/after, the single reconciled job, attachment open result, and commercial totals. Browser emulation is supporting evidence only; it does not close this physical gate.
 
-**Automated gate:** PASS on source/test head `a0baea5901b139b1c7397a12d780af245841d3ce`: Laravel 691 passed / 1 skipped / 4,794 assertions; PostgreSQL migration/recovery; 63 desktop Chromium, 7 mobile viewport, 1 mobile host-outage and 1 phone-local attachment/reconnect; public/auth accessibility 1 passed; Zazu Quality, PHPMD, Director Health and Push-on-main passed. Windows V1 package/fresh-install passed on runtime implementation head `b9f9a146c5a1310ef75e1f3edf5a341851be005b`. SonarCloud was skipped. Physical acceptance is now **SEEDED AND READY**; it remains OPEN until the Founder performs and records the actual-device run.
+**Automated gate:** PASS on source/test head `a0baea5901b139b1c7397a12d780af245841d3ce`: Laravel 691 passed / 1 skipped / 4,794 assertions; PostgreSQL migration/recovery; 63 desktop Chromium, 7 mobile viewport, 1 mobile host-outage and 1 phone-local attachment/reconnect; public/auth accessibility 1 passed; Zazu Quality, PHPMD, Director Health and Push-on-main passed. Windows V1 package/fresh-install passed on runtime implementation head `b9f9a146c5a1310ef75e1f3edf5a341851be005b`. SonarCloud was skipped. Physical acceptance is **REQUIRED / PENDING**; it remains OPEN until the Founder performs and records the actual-device run. No physical acceptance result is claimed.
 
 
 ## DB-001 disposition — Founder clarification (2026-11-22)
