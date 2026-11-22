@@ -167,7 +167,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY)', $worker);
         $this->assertStringContainsString('function contextCacheName()', $worker);
         $this->assertStringContainsString("const ACTIVE_CONTEXT_STATE = new Request('/__zazu-active-context__');", $worker);
-        $this->assertStringContainsString('data-zazu-user-id='(\\d+)'', $worker);
+        $this->assertStringContainsString('data-zazu-user-id="(\\d+)"', $worker);
         $this->assertStringContainsString("CACHE_NAME + '-user-' + activeUserId + '-business-' + activeBusinessId", $worker);
         $this->assertStringContainsString('await cache.put(pageRequest, response.clone())', $worker);
     }
