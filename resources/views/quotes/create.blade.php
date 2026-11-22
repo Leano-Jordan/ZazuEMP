@@ -85,7 +85,7 @@
                                     'rental' => 'Hire / rental',
                                     'package' => 'Package',
                                     'other' => 'Other',
-                                    default => 'Custom line',
+                                    default => $requirement->unit === 'service' ? 'Service' : 'Custom line',
                                 };
                                 $initialPrice = $capability
                                     && $capability->default_price !== null
