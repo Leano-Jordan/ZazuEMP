@@ -1407,5 +1407,5 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Preserved the existing module routes and the Job workspace as the orientation surface. The six-stage strip now has a matching six-column desktop layout and retains the existing responsive breakpoints.
 - Split the two new Job workspace hand-off tests into a focused JobWorkspaceProgressTest class. This also resolves the current WorkWorkflowTest PHPMD public-method limit and the Pint class-attribute ordering finding.
 - Commits: d992046 (test class correction), b8a819e (progress state), 9d58102 / 04dfb32 (focused tests), e949b7f (six-column layout).
-- Exact-head Laravel, formatting, PHPMD, offline-browser and security checks are queued for 04dfb323911978bcd9397af60e39f3701d109f12; do not treat this implementation as accepted until those checks complete.
+- A final contextual fallback keeps the Invoice & payment stage inside the current Job (quote creation or quote detail) until an accepted quote exists; commit 8bdc66c. Exact-head Laravel, formatting, PHPMD, offline-browser and security checks are queued for the current main head; do not treat this implementation as accepted until those checks complete.
 - Rendered visual and mobile review remain unverified; source-level changes do not establish visual acceptance.
