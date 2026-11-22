@@ -176,7 +176,21 @@ All ten behaviours must follow these rules:
 - every movement can be cancelled safely;
 - the Helper returns to a valid resting state after completion.
 
-## 13. Production proof order
+## 13. Implemented first slice — semantic Guide Me
+
+The first production slice is now implemented on the dashboard, Work register and Quote register:
+
+- Guide steps can declare a semantic `target` independently of the selected character skin.
+- The page registers the matching `data-zazu-anchor` on its real workspace section.
+- Opening or advancing the guide resolves that semantic key against the current DOM, scrolls the target into view and briefly highlights it.
+- The highlight is removed on timeout or when the guide closes; it does not replace the target's normal controls or permissions.
+- Motion respects `prefers-reduced-motion`.
+- Guide preference reads/writes use the existing guarded storage helpers, so blocked browser storage does not break the Helper.
+- Missing anchors fail quietly: the guide text remains available and the Helper does not invent a screen coordinate.
+
+This is an initial proof across three core workspaces, not completion of all ten behaviours. Further anchors should be added only alongside a tested workflow that needs them.
+
+## 14. Production proof order
 
 Implement and prove in this order:
 
@@ -184,18 +198,18 @@ Implement and prove in this order:
 
 This sequence gives Zazu a usable Helper before introducing richer agent behaviour.
 
-## 14. Cross-skin proof
+## 15. Cross-skin proof
 
 Each of the ten behaviours must be demonstrated against the same semantic test cases for Gecko, Ant and Chameleon.
 
 The implementation should be considered correct when changing skin changes only the physical expression, not the event, state, target, approval or outcome.
 
-## 15. R0 implementation rule
+## 16. R0 implementation rule
 
 None of these ten behaviours requires a paid animation platform.
 
 The V1 proof can be built with owner-supplied SVG artwork plus CSS and the browser Web Animations API. The engine contract must remain separate from that renderer.
 
-## 16. Definition of done
+## 17. Definition of done
 
 The first production pass is complete when the ten behaviours work on desktop and mobile, respect reduced-motion preferences, survive navigation/interruption cleanly, do not cover important UI, and remain semantically identical across the selected skin implementations.
