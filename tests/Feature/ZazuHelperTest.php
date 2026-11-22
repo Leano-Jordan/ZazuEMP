@@ -286,6 +286,51 @@ class ZazuHelperTest extends TestCase
             ->assertDontSee('preparation item overdue');
     }
 
+    public function test_helper_hides_linked_booking_record_counts_without_their_workspace_permission(): void
+    {
+        config(['zazu.permissions.roles.staff' => ['dashboard.view', 'work.view']]);
+
+        $business = $this->makeBusiness('Helper Record Permissions');
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'staff']);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'HELPER-PERMISSION-'.Str::upper(Str::random(5)),
+            'name' => 'Restricted booking records',
+            'status' => 'confirmed',
+        ]);
+        EventPreparationItem::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'title' => 'Prepare equipment',
+            'category' => 'Equipment',
+            'quantity' => '1.00',
+            'unit' => 'set',
+            'status' => 'open',
+        ]);
+        $supplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Restricted supplier',
+        ]);
+        PurchaseOrder::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'supplier_id' => $supplier->id,
+            'reference' => 'HELPER-RESTRICTED-PO-'.Str::upper(Str::random(5)),
+            'status' => 'sent',
+            'currency' => 'ZAR',
+            'total_amount' => '350.00',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('work.show', $event))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-event-records="1"', false)
+            ->assertSee('1 preparation item')
+            ->assertDontSee('purchase order');
+    }
+
     public function test_helper_guidance_adapts_to_the_saved_business_focus(): void
     {
         $cases = [
