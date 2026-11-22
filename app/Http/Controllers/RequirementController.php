@@ -21,19 +21,21 @@ class RequirementController extends Controller
         $this->ensureBusiness($event, $request);
 
         $event->load('customer');
+        $scopeLocked = $event->quotes()->where('status', 'accepted')->exists();
         $requirements = $event->requirements()
             ->with('capability')
             ->orderBy('status')
             ->orderBy('created_at')
             ->get();
 
-        return view('requirements.index', compact('event', 'requirements'));
+        return view('requirements.index', compact('event', 'requirements', 'scopeLocked'));
     }
 
     public function create(Request $request, Event $event): View
     {
         $this->ensureBusiness($event, $request);
         $event->load('customer');
+        abort_if($event->quotes()->where('status', 'accepted')->exists(), 422, 'An accepted quote locks the agreed job scope. Create a separate job for additional work.');
 
         $capabilities = BusinessCapability::query()
             ->where('business_id', $event->business_id)
@@ -55,6 +57,7 @@ class RequirementController extends Controller
         $this->ensureBusiness($event, $request);
         abort_unless((int) $requirement->event_id === (int) $event->id, 404);
         abort_if($event->isClosed(), 422, 'Closed work cannot be edited.');
+        abort_if($event->quotes()->where('status', 'accepted')->exists(), 422, 'An accepted quote locks the agreed job scope. Create a separate job for additional work.');
 
         $capabilities = BusinessCapability::query()
             ->where('business_id', $event->business_id)
@@ -89,6 +92,11 @@ class RequirementController extends Controller
             $businessId = app(CurrentBusiness::class)->id($request->user());
             $lockedEvent = $lifecycle->lock($businessId, $event->id);
             $lifecycle->assertOperational($lockedEvent);
+            if ($lockedEvent->quotes()->where('status', 'accepted')->exists()) {
+                throw ValidationException::withMessages([
+                    'requirement' => 'An accepted quote locks the agreed job scope. Create a separate job for additional work.',
+                ]);
+            }
             $lockedRequirement = $lockedEvent->requirements()->whereKey($requirement->id)->lockForUpdate()->firstOrFail();
             $lockedRequirement->update($validated);
         });
@@ -106,6 +114,11 @@ class RequirementController extends Controller
             $businessId = app(CurrentBusiness::class)->id($request->user());
             $lockedEvent = $lifecycle->lock($businessId, $event->id);
             $lifecycle->assertOperational($lockedEvent);
+            if ($lockedEvent->quotes()->where('status', 'accepted')->exists()) {
+                throw ValidationException::withMessages([
+                    'requirement' => 'An accepted quote locks the agreed job scope. Create a separate job for additional work.',
+                ]);
+            }
             $lockedRequirement = $lockedEvent->requirements()->whereKey($requirement->id)->lockForUpdate()->firstOrFail();
             if ($lockedEvent->quotes()->exists() && $lockedEvent->requirements()->count() === 1) {
                 throw ValidationException::withMessages([
@@ -142,6 +155,11 @@ class RequirementController extends Controller
             $businessId = app(CurrentBusiness::class)->id($request->user());
             $lockedEvent = $lifecycle->lock($businessId, $event->id);
             $lifecycle->assertOperational($lockedEvent);
+            if ($lockedEvent->quotes()->where('status', 'accepted')->exists()) {
+                throw ValidationException::withMessages([
+                    'requirement' => 'An accepted quote locks the agreed job scope. Create a separate job for additional work.',
+                ]);
+            }
 
             $lockedEvent->requirements()->create($validated + ['status' => 'open']);
         });
