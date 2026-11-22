@@ -1,3 +1,9 @@
+## DB-001 disposition — Founder clarification (2026-11-22)
+
+**DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
+
+Do not chase this historical anomaly, request diagnostic captures, or ask the Founder to run `Test-ZazuDatabaseSchema.ps1` or `Get-ZazuIncident.ps1`. Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new diagnostic evidence appears. The separate installation backup/restore acceptance gate remains independent and must not be conflated with DB-001.
+
 # Secondary backup health integrity — 2026-11-22
 
 **Implementation head:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
@@ -10,7 +16,7 @@
 - Exact-head offline-browser acceptance [44989474410](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44989474410): **63 desktop + 7 mobile viewport + 1 host-outage + 1 phone-local attachment/reconnect passed**; public/auth accessibility acceptance passed.
 - Evidence maturity remains **77/100**. V1 remains **NOT READY** until the owner-PC scheduled backup, independent off-disk copy and controlled full restore are demonstrated.
 
-**Next active target (one-target WIP limit): DB-001 owner-installation evidence.** In the actual installed Zazu folder, run `.\ops\windows\Test-ZazuDatabaseSchema.ps1` and `.\ops\windows\Get-ZazuIncident.ps1 -Reference '895e2c23-bc6b-4919-a891-1e8e5c1e27e4'`. Return the Desktop JSON schema report and safe incident report/no-match output. Do not run migrations, reset, reinstall or alter the database. Commercial quote-to-profit proof is priority 2. Physical Android acceptance and POPIA/name clearance remain open.
+**DB-001 disposition:** dormant, historical and non-critical; not an active engineering task or V1 release blocker. The Founder confirms it occurred during offline event-creation/calendar-related task testing and has not recurred after subsequent offline-architecture work. Do not request or run DB-001 diagnostics unless it recurs on current `main`. Commercial, physical-device, recovery and legal/brand gates remain assessed separately.
 
 ---
 
@@ -386,11 +392,11 @@ Evidence maturity is 75/100 (+2) after exact-head backend, PostgreSQL and deskto
 DB-001 remains DORMANT / MONITORING by Founder report; its historical root cause is unproven and it is not an active release blocker. Installation recovery remains OPEN independently. V1 remains NOT READY; evidence maturity is 75/100, with physical Android, intended-PC recovery, real-business reconciliation and POPIA operations still open.
 
 ---
-## Dormant database incident — owner installation (status updated 2026-11-20)
+## Dormant database incident — owner installation (Founder clarification 2026-11-22)
 
-- **Disposition: DORMANT / MONITORING — not an active V1 blocker.** Founder reports DB-001 has not appeared recently.
-- Historical references retained: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`; later recurrence history remains in the incident record.
-- Root cause remains unproven. Do not claim a fix or spend active engineering time reproducing it unless the error recurs or new evidence appears.
+- **Disposition: DORMANT / HISTORICAL / NON-CRITICAL — not an active V1 blocker.** The Founder clarifies that the occurrence under discussion happened only during offline event-creation and calendar-related task testing. It has not recurred after subsequent offline-architecture work.
+- Historical references and diagnostic tooling remain in the record for traceability; they do not create a current investigation task.
+- Root cause and fix remain unproven. Do not claim resolution, request captures or spend active engineering time on it unless it recurs on current `main` or materially new evidence appears.
 - Windows startup source checks migration status, creates and verifies a full database/private-files backup before applying pending migrations, and verifies final migration state.
 - [ ] **Separate V1 gate:** complete the controlled installation recovery drill on the intended Windows installation with representative data and private files. This remains open regardless of DB-001 recurrence status.
 
