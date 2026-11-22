@@ -760,10 +760,18 @@ function setupZazuHelper() {
         const syncRecommendation = () => {
             if (!recommendation || !recommendationTitle || !recommendationCopy || !recommendationLink) return;
 
+            // Prefer the job's state-derived next action. On other workspaces,
+            // promote the first permission-filtered attention item from the server.
             const source = document.querySelector('[data-zazu-anchor="work.next-action"]');
-            const titleText = source?.querySelector('.zazu-next-action-title')?.textContent?.trim() || '';
-            const copyText = source?.querySelector('.zazu-next-action-copy')?.textContent?.trim() || '';
-            const sourceLink = source?.querySelector('a[href]');
+            const attentionSource = document.querySelector('[data-zazu-helper-attention-item]');
+            const titleText = source?.querySelector('.zazu-next-action-title')?.textContent?.trim()
+                || attentionSource?.querySelector('[data-zazu-helper-attention-title]')?.textContent?.trim()
+                || '';
+            const copyText = source?.querySelector('.zazu-next-action-copy')?.textContent?.trim()
+                || attentionSource?.querySelector('[data-zazu-helper-attention-copy]')?.textContent?.trim()
+                || '';
+            const sourceLink = source?.querySelector('a[href]')
+                || attentionSource?.querySelector('[data-zazu-helper-attention-link][href]');
             let safeHref = '';
 
             if (sourceLink) {
