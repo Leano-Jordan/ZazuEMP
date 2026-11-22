@@ -35,11 +35,15 @@ class InstallationBackupStatusTest extends TestCase
     }
 
 
-    public function test_fresh_local_archive_without_verified_independent_copy_remains_attention(): void
+    public function test_secondary_backup_health_requires_the_verified_archive_to_remain_present_and_unchanged(): void
     {
         $directory = storage_path('framework/testing/zazu-backup-status-'.Str::uuid());
+        $secondaryDirectory = $directory.'-secondary';
+        $secondaryArchive = $secondaryDirectory.DIRECTORY_SEPARATOR.'zazu-backup-fresh.zip';
         File::ensureDirectoryExists($directory);
-        File::put($directory.DIRECTORY_SEPARATOR.'zazu-backup-fresh.zip', 'archive');
+        File::ensureDirectoryExists($secondaryDirectory);
+        File::put($directory.DIRECTORY_SEPARATOR.'zazu-backup-fresh.zip', 'local archive');
+        File::put($secondaryArchive, 'verified archive');
 
         try {
             $status = (new ZazuBackupStatus($directory))->inspect();
@@ -51,14 +55,31 @@ class InstallationBackupStatusTest extends TestCase
             File::put($directory.DIRECTORY_SEPARATOR.'.secondary-copy-status.json', json_encode([
                 'status' => 'verified',
                 'last_successful_at' => now()->toIso8601String(),
-                'archive' => 'zazu-backup-fresh.zip',
+                'archive' => basename($secondaryArchive),
+                'secondary_archive_path' => $secondaryArchive,
+                'secondary_archive_sha256' => hash_file('sha256', $secondaryArchive),
+                'secondary_archive_size_bytes' => filesize($secondaryArchive),
+                'secondary_archive_modified_unix' => filemtime($secondaryArchive),
             ], JSON_THROW_ON_ERROR));
 
             $verified = (new ZazuBackupStatus($directory))->inspect();
             $this->assertSame('healthy', $verified['status']);
             $this->assertSame('healthy', $verified['secondary_status']);
+
+            File::delete($secondaryArchive);
+            $missing = (new ZazuBackupStatus($directory))->inspect();
+            $this->assertSame('attention', $missing['status']);
+            $this->assertSame('attention', $missing['secondary_status']);
+            $this->assertStringContainsString('missing or its drive is unavailable', $missing['secondary_message']);
+
+            File::put($secondaryArchive, 'tampered archive with changed size');
+            $changed = (new ZazuBackupStatus($directory))->inspect();
+            $this->assertSame('attention', $changed['status']);
+            $this->assertSame('attention', $changed['secondary_status']);
+            $this->assertStringContainsString('changed after verification', $changed['secondary_message']);
         } finally {
             File::deleteDirectory($directory);
+            File::deleteDirectory($secondaryDirectory);
         }
     }
 
