@@ -10,6 +10,8 @@ The Founder reports that the current Zazu installation has been physically exerc
 
 The supplied dashboard screenshots show the Zazu Demo Catering workspace, two customer records, one active event (Isaac's Birthday Party), and the dashboard's connected workspace-health indicators. They are useful visual evidence of a populated, rendered workspace, but they do not expose the detailed quote, invoice, supplier, PO or inventory records.
 
+The Founder notes that the business areas can feel operationally separate/disjointed, while still working as intended in their respective modules. Record module-level functionality as owner-reported; do not infer a fully integrated end-to-end transaction chain from the populated workspace alone.
+
 **Acceptance recorded from owner report:**
 - PC physical operation: **OWNER-VERIFIED PASS** for normal application use.
 - Linked mobile physical operation: **OWNER-VERIFIED PASS** for normal application use.
