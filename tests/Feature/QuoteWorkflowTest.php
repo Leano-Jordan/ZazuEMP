@@ -6,7 +6,6 @@ use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventRequirement;
 use App\Models\Quote;
-use App\Services\QuoteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
