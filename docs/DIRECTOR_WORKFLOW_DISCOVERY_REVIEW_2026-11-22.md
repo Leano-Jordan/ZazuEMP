@@ -104,3 +104,17 @@ This is a source and documentation review. No runtime usability observation, scr
 The Founder-confirmed workspace population is **4 customers and 2 jobs**. The Founder reports normal connected PC and linked-mobile operation. This correction supersedes the earlier dashboard count of 2 customers. The fictional records are accepted as test data.
 
 No V1 readiness score change is justified by this UX finding alone.
+
+
+## Follow-up lifecycle trace
+
+A second source pass checked how far the existing hand-offs already go:
+
+- The accepted-quote detail page explicitly offers **Create invoice** when no invoice exists, or links the existing invoice when one does. The hand-off exists, but it appears after the user has navigated from the Job page into the Quote page.
+- The event lifecycle service prevents completion while linked preparation remains open/blocked, a linked cost remains planned, or a linked purchase order remains draft/sent/ordered. These are real prerequisites, not merely suggested labels.
+- The quote and job surfaces therefore contain useful pieces of the journey, but the guidance is distributed across pages. The Job page's own next-action panel does not currently surface the accepted-quote-to-invoice hand-off, nor does its five-step progress strip explain the lifecycle blockers.
+- This confirms that the correct next design task is to consolidate *orientation* at the Job context, not to move the underlying modules.
+
+Important nuance: do not imply every job must have purchasing, costs or an invoice in every circumstance. The lifecycle service's completion guards establish specific blockers; they do not prove a universal mandatory ordering for all other work. The workflow layer must reflect actual persisted conditions and applicable rules.
+
+The existing `WorkCompletionGuardTest` covers open/blocked preparation, planned costs and active purchase orders as completion blockers. Preserve and extend these domain tests if the orientation logic is later implemented; do not duplicate lifecycle rules in Blade or JavaScript.
