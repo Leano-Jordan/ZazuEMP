@@ -338,6 +338,28 @@ class ZazuHelperTest extends TestCase
             'unit' => 'unit',
             'status' => 'open',
         ]);
+        EventPreparationItem::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'title' => 'Prepare tent hardware',
+            'category' => 'Equipment',
+            'quantity' => '2.00',
+            'unit' => 'set',
+            'status' => 'open',
+        ]);
+        $supplier = Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Event component supplier',
+        ]);
+        PurchaseOrder::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'supplier_id' => $supplier->id,
+            'reference' => 'HELPER-EVENT-PO-'.Str::upper(Str::random(5)),
+            'status' => 'sent',
+            'currency' => 'ZAR',
+            'total_amount' => '250.00',
+        ]);
 
         $this->actingAs($user)
             ->get(route('work.show', $event))
@@ -345,6 +367,9 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-zazu-helper-event-components="2"', false)
             ->assertSee('100 white chairs')
             ->assertSee('Two stretch tents')
+            ->assertSee('data-zazu-helper-event-records="2"', false)
+            ->assertSee('1 preparation item')
+            ->assertSee('1 purchase order')
             ->assertDontSee('Catering preparation')
             ->assertDontSee('Camera editing');
     }
