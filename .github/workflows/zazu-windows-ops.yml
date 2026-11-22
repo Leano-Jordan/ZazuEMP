@@ -410,6 +410,20 @@ jobs:
           if ($verifiedStatus.status -ne 'verified' -or -not $verifiedStatus.last_successful_at) {
             throw 'The successful secondary-copy status was not persisted.'
           }
+          $secondaryItem = Get-Item -LiteralPath $secondaryCopy
+          $secondaryModifiedUnix = ([DateTimeOffset]$secondaryItem.LastWriteTimeUtc).ToUnixTimeSeconds()
+          if ([string]$verifiedStatus.secondary_archive_path -ne [System.IO.Path]::GetFullPath($secondaryCopy)) {
+            throw 'The verified secondary archive path was not persisted.'
+          }
+          if ([string]$verifiedStatus.secondary_archive_sha256 -ne $copyHash) {
+            throw 'The verified secondary archive SHA-256 was not persisted.'
+          }
+          if ([long]$verifiedStatus.secondary_archive_size_bytes -ne [long]$secondaryItem.Length) {
+            throw 'The verified secondary archive size was not persisted.'
+          }
+          if ([long]$verifiedStatus.secondary_archive_modified_unix -ne [long]$secondaryModifiedUnix) {
+            throw 'The verified secondary archive timestamp was not persisted.'
+          }
           $lastSuccess = [string]$verifiedStatus.last_successful_at
 
           $missingDrive = @('Z','Y','X','W','V','U','T','S','R','Q','P','O','N','M','L','K','J','I','H','G','F','E','D') |
@@ -427,8 +441,14 @@ jobs:
           if ([string]$failedStatus.last_successful_at -ne $lastSuccess) {
             throw 'A failed secondary copy must preserve the timestamp of the previous verified copy.'
           }
+          if ([string]$failedStatus.secondary_archive_path -ne [string]$verifiedStatus.secondary_archive_path
+              -or [string]$failedStatus.secondary_archive_sha256 -ne [string]$verifiedStatus.secondary_archive_sha256
+              -or [long]$failedStatus.secondary_archive_size_bytes -ne [long]$verifiedStatus.secondary_archive_size_bytes
+              -or [long]$failedStatus.secondary_archive_modified_unix -ne [long]$verifiedStatus.secondary_archive_modified_unix) {
+            throw 'A failed secondary copy must preserve the previous verified archive integrity metadata.'
+          }
 
-          Write-Host 'PASS: Windows backup runner creates an archive, prunes both copies to 14, verifies SHA-256, and preserves last success after secondary-copy failure.'
+          Write-Host 'PASS: Windows backup runner creates an archive, prunes both copies to 14, verifies SHA-256 and persists secondary archive integrity metadata.'
           exit 0
 
       - name: Verify LAN HTTPS command wrappers
