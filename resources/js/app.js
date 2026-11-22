@@ -690,6 +690,24 @@ function setupZazuHelper() {
         let enabled = safeStorageGet(storageKey) !== 'off';
         let targetTimer = null;
 
+        const clearTargetHighlight = () => {
+            window.clearTimeout(targetTimer);
+            document.querySelectorAll('.zazu-helper-target-highlight').forEach((element) => {
+                element.classList.remove('zazu-helper-target-highlight');
+            });
+        };
+
+        const resolveVisibleTarget = (key) => [...document.querySelectorAll('[data-zazu-anchor]')]
+            .find((element) => {
+                if (element.dataset.zazuAnchor !== key || !element.isConnected) return false;
+                if (element.closest('[hidden], [aria-hidden="true"]')) return false;
+                const style = window.getComputedStyle(element);
+
+                return element.getClientRects().length > 0
+                    && style.display !== 'none'
+                    && style.visibility !== 'hidden';
+            });
+
         const render = (guideTarget = false) => {
             const step = data[index];
 
@@ -705,15 +723,24 @@ function setupZazuHelper() {
             }
 
             if (guideTarget && step.target) {
-                const target = [...document.querySelectorAll('[data-zazu-anchor]')]
-                    .find((element) => element.dataset.zazuAnchor === step.target);
+                clearTargetHighlight();
+                const target = resolveVisibleTarget(step.target);
 
                 if (target) {
-                    window.clearTimeout(targetTimer);
-                    document.querySelectorAll('.zazu-helper-target-highlight').forEach((element) => element.classList.remove('zazu-helper-target-highlight'));
                     target.classList.add('zazu-helper-target-highlight');
-                    target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
-                    targetTimer = window.setTimeout(() => target.classList.remove('zazu-helper-target-highlight'), 2400);
+
+                    try {
+                        target.scrollIntoView({
+                            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                            block: 'center',
+                        });
+                    } catch {
+                        target.scrollIntoView();
+                    }
+
+                    targetTimer = window.setTimeout(() => {
+                        if (target.isConnected) target.classList.remove('zazu-helper-target-highlight');
+                    }, 2400);
                 }
             }
 
@@ -726,11 +753,13 @@ function setupZazuHelper() {
             toggleLabel.textContent = enabled ? 'Guide' : 'Guide off';
         };
 
-        const close = () => {
-            window.clearTimeout(targetTimer);
-            document.querySelectorAll('.zazu-helper-target-highlight').forEach((element) => element.classList.remove('zazu-helper-target-highlight'));
+        const close = (restoreFocus = true) => {
+            clearTargetHighlight();
             panel.hidden = true;
             toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', 'Open Zazu guide');
+
+            if (restoreFocus) toggle.focus();
         };
 
         const open = () => {
@@ -742,6 +771,8 @@ function setupZazuHelper() {
             render(true);
             panel.hidden = false;
             toggle.setAttribute('aria-expanded', 'true');
+            toggle.setAttribute('aria-label', 'Close Zazu guide');
+            closeButton?.focus();
         };
 
         const turnOff = () => {
