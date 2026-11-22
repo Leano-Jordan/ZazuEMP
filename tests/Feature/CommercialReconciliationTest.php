@@ -103,9 +103,9 @@ class CommercialReconciliationTest extends TestCase
             ->assertSee('Event contribution')
             ->assertSee('ZAR 7,200.00')
             ->assertSee('72.00%')
-            ->assertViewHas('financeTotalsByCurrency', fn ($totals): bool =>
-                $totals->get('ZAR')['invoiced_cents'] === 1150000
-            );
+            ->assertViewHas('financeTotalsByCurrency', function ($totals): bool {
+                return $totals->get('ZAR')['invoiced_cents'] === 1150000;
+            });
     }
 
     private function prepareCommercialScenario(): array
