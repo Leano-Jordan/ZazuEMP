@@ -353,7 +353,7 @@ class WorkController extends Controller
             'preparationItems',
             'purchaseOrders',
             'costs',
-            'invoices',
+            'invoices.payments',
         ]);
 
         return view('work.show', compact('event'));
