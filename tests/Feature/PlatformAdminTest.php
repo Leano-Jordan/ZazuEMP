@@ -19,14 +19,22 @@ class PlatformAdminTest extends TestCase
         $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
-        $this->actingAs($admin)
-            ->get(route('admin.landing.settings'))
+        $response = $this->actingAs($admin)->get(route('admin.landing.settings'));
+
+        $response
             ->assertOk()
             ->assertSee('Landing page positions')
             ->assertSee('Venue image')
             ->assertSee('Decor and reception image')
             ->assertSee('Complete image library')
-            ->assertSee('Upload image experiments');
+            ->assertSee('Upload image experiments')
+            ->assertSee('data-zazu-upload-previews', false);
+
+        foreach (app(\App\Services\LandingMediaService::class)->library() as $image) {
+            $response->assertSee($image['url'], false);
+        }
+
+        $this->assertSame(6, substr_count($response->getContent(), 'data-zazu-landing-preview'));
 
         $this->actingAs($admin)
             ->put(route('admin.landing.settings.update'), [
