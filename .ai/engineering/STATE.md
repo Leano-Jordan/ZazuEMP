@@ -1425,3 +1425,25 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Verification status:** implementation and regression test are committed; local PHPUnit, Blade compilation, JS execution and rendered desktop/mobile + light/dark visual review have not been run in this environment. Exact-head GitHub Actions results must be checked before acceptance. Do not mark this target VERIFIED until those gates are evidenced.
 
 **Known UI acceptance points:** confirm the quantity field, unit hint, line total and live summary are clear at phone width; confirm validation errors remain visible and no horizontal overflow is introduced. This is a workflow correctness fix as well as a visual hierarchy change.
+
+
+## Quote line-item clarity and quantity guard — 2026-11-22
+
+**User finding:** a draft quote containing one product and one service was created with both quantities left at the starter value of one. The editor did not make the quantity decision sufficiently visible.
+
+**Current implementation on main:**
+- Starter requirements whose quantity is exactly 1.00 now render with a blank quantity input. The user must deliberately enter the quantity instead of unknowingly accepting the starter value.
+- Initial quote creation and draft quote revision saves both require a quantity array server-side; HTML required is not the only protection.
+- Quantity and unit are shown prominently beside unit price. Each line has a live line total; the live quote summary recalculates subtotal, tax, total and deposit.
+- The editor labels each line by its catalogue type (Product, Service, Hire / rental, Package, Other, or Custom line) and names the section Products and services rather than implying every line is a service.
+- The selected quantities are synchronized to the job requirements and quote snapshot inside the quote transaction. Previous quote versions remain immutable snapshots.
+- Added focused regression coverage for quantity confirmation, quantity changes across revisions, missing quantity rejection on create and revision, and visible product/service type distinctions.
+- Split quote tests into QuoteWorkflowTest, QuoteQuantityReviewTest and QuoteRevisionWorkflowTest to keep test classes within the PHPMD public-method limit.
+
+**CI findings and corrections:**
+- The first Laravel run exposed three test defects: an HTML assertion needed literal matching for an ampersand, a workflow test lacked its EventRequirement import, and an older revision fixture did not submit the now-required quantity. These have been corrected.
+- PHPMD then caught a malformed test class reference and a public-method count over the configured limit. The reference was corrected and the tests were split.
+- Pint caught trait/import ordering in QuoteWorkflowTest; corrected.
+- PHPMD passed on commit 8c6a8f90364a81245c1bf7bcecc47e92265d61b1. Later product/service presentation and its feature test are on the newer main head and still require exact-head CI confirmation.
+
+**Acceptance status:** NOT VERIFIED. Latest main implementation includes product/service labels and a focused presentation regression, but exact-head Laravel, quality, formatting, security, offline browser and package workflows must complete. Rendered desktop/mobile and light/dark review is still outstanding; no visual acceptance is claimed from source inspection alone.
