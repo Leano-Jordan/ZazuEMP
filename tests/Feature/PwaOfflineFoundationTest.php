@@ -92,7 +92,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertNotFalse($offlineScriptPosition);
         $this->assertNotFalse($viteScriptPosition);
         $this->assertLessThan($viteScriptPosition, $offlineScriptPosition);
-        $this->assertStringContainsString('<script src='/zazu-offline.js' defer></script>', $html);
+        $this->assertStringContainsString("<script src='/zazu-offline.js' defer></script>", $html);
         $this->assertStringContainsString('window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true', $client);
         $boot = substr($client, strpos($client, 'async function boot()'));
         $readyPosition = strpos($boot, 'resolveReady(state);');
