@@ -42,6 +42,13 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame($sourceEvent->id, $sourceAttachment->event_id);
 
         $this->seedPurchaseOrderRecords($source, $sourceEvent);
+        DB::table('invoice_number_sequences')->insert([
+            'business_id' => $source->id,
+            'period' => now()->format('Ym'),
+            'next_number' => 42,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $foreign = Business::create([
             'name' => 'Foreign Archive Tenant',
@@ -64,6 +71,7 @@ class BusinessArchiveTest extends TestCase
         $archiveData = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame($source->id, (int) $archiveData['events'][0]['business_id']);
         $this->assertContains($sourceEvent->id, array_map('intval', array_column($archiveData['events'], 'id')));
+        $this->assertSame(42, (int) $archiveData['invoice_number_sequences'][0]['next_number']);
         $zip->close();
 
         $target = Business::create([
@@ -79,8 +87,8 @@ class BusinessArchiveTest extends TestCase
             @unlink($archive);
         }
 
-        $this->assertSame(28, $result['tables']);
-        $this->assertSame(11, $result['records']);
+        $this->assertSame(29, $result['tables']);
+        $this->assertSame(12, $result['records']);
         $this->assertSame(2, $result['files']);
 
         $this->assertRestoredArchive($target, $sourceEvent, $result);
@@ -637,8 +645,8 @@ class BusinessArchiveTest extends TestCase
 
     private function assertRestoredArchive(Business $target, Event $sourceEvent, array $result): void
     {
-        $this->assertSame(28, $result['tables']);
-        $this->assertSame(11, $result['records']);
+        $this->assertSame(29, $result['tables']);
+        $this->assertSame(12, $result['records']);
         $this->assertSame(2, $result['files']);
 
         $restoredCustomer = Customer::query()->where('business_id', $target->id)->firstOrFail();
@@ -646,6 +654,7 @@ class BusinessArchiveTest extends TestCase
         $restoredSupplier = DB::table('suppliers')->where('business_id', $target->id)->first();
         $restoredPurchaseOrder = DB::table('purchase_orders')->where('business_id', $target->id)->first();
         $restoredPurchaseOrderItem = DB::table('purchase_order_items')->where('business_id', $target->id)->first();
+        $restoredInvoiceSequence = DB::table('invoice_number_sequences')->where('business_id', $target->id)->where('period', now()->format('Ym'))->first();
         $restoredContact = CustomerContact::query()->where('customer_id', $restoredCustomer->id)->firstOrFail();
         $restoredQuote = Quote::query()->where('event_id', $restoredEvent->id)->firstOrFail();
         $restoredVersion = QuoteVersion::query()->where('quote_id', $restoredQuote->id)->firstOrFail();
@@ -659,6 +668,8 @@ class BusinessArchiveTest extends TestCase
         $this->assertNotNull($restoredSupplier);
         $this->assertNotNull($restoredPurchaseOrder);
         $this->assertNotNull($restoredPurchaseOrderItem);
+        $this->assertNotNull($restoredInvoiceSequence);
+        $this->assertSame(42, (int) $restoredInvoiceSequence->next_number);
         $this->assertSame($restoredEvent->id, (int) $restoredPurchaseOrder->event_id);
         $this->assertSame($restoredSupplier->id, $restoredPurchaseOrder->supplier_id);
         $this->assertSame($restoredPurchaseOrder->id, $restoredPurchaseOrderItem->purchase_order_id);
