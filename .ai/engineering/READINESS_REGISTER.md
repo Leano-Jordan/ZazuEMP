@@ -1,3 +1,9 @@
+## DB-001 disposition — Founder clarification (2026-11-22)
+
+**DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
+
+Do not chase this historical anomaly, request diagnostic captures, or ask the Founder to run `Test-ZazuDatabaseSchema.ps1` or `Get-ZazuIncident.ps1`. Reopen only if the same failure is reproduced in a supported workflow on current `main`, or materially new diagnostic evidence appears. The separate installation backup/restore acceptance gate remains independent and must not be conflated with DB-001.
+
 ## Closed security checkpoint — stale device credential writes — 2026-11-21
 
 - Mutation application revalidates the original authenticated credential and mutation business/device ownership inside the same transaction as the domain write.
@@ -205,18 +211,18 @@ The Founder has explicitly added end-to-end offline sync quality across the supp
 
 **Scope boundary:** no parallel offline engine, no cache-only workaround, no weakening of business isolation/idempotency/conflict tests, and no unsupported app-wide offline claim. Work within the existing offline client, mutation protocol, domain handlers, identity registry, attachment subsystem and documented offline workflow matrix.
 
-## Dormant incident record — DB-001 (first reported 2026-11-17; current status updated 2026-11-20)
+## Dormant incident record — DB-001 (Founder disposition clarified 2026-11-22)
 
 **Status:** DORMANT / MONITORING — no recent recurrence reported by Founder; cause remains unproven.  
 **Owner-reported references:** `2bc77a48-5c6c-4095-afe2-fa079f60e4ba`, `aa9080f4-9580-41c9-a643-439b31928ffa`
 
-Historical record: the owner previously reported database errors on the installed Windows application. The exact triggering action for the earlier references was not recorded. The Founder now reports that DB-001 has not appeared recently, so active investigation is paused.
+Founder clarification: the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since subsequent offline-architecture work. Earlier summaries that described it as a current account/workspace-save failure are superseded; do not use those summaries to infer a separate active defect.
 
-**Source finding:** Work creation/editing now writes five scheduling columns introduced by migration `2026_11_17_000001_add_event_schedule_fields.php`. The previous shared Windows start script did not check or apply pending migrations. This makes local schema drift the leading hypothesis, but the reference number alone does not reveal the SQL exception.
+**Historical source context only:** Work scheduling uses columns introduced by migration `2026_11_17_000001_add_event_schedule_fields.php`, and Windows startup migration safeguards have since been strengthened. This does not establish the cause of the historical test-time DB-001. Local schema drift was an unconfirmed hypothesis, not a verified root cause or current finding.
 
 **Correction on main:** Windows startup now checks migration status. If migrations are pending, it creates and verifies a full installation backup containing the database and private files before applying them, then checks that all migrations completed. Startup stops if backup, migration or final status verification fails.
 
-**Current handling:** no active reproduction chase. Reopen only if DB-001 recurs or new evidence materially changes the assessment. No root cause or runtime fix is claimed. The separate installation-recovery gate still requires a controlled drill on the intended installed target.
+**Current handling:** no active investigation, no diagnostic script requested, and no owner action required for DB-001. Reopen only after reproducible recurrence on current `main` or materially new diagnostic evidence. No root cause or runtime fix is claimed. The separate installation-recovery gate still requires a controlled drill on the intended installed target.
 
 ## Existing release gates
 | Gate | Disposition | Closure evidence |
