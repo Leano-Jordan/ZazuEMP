@@ -78,7 +78,7 @@ Zazu EMP is designed as a reusable commercial event-management platform.
 
 The event/job is the central operational record. Related information such as customer, requirements, quote, services, purchasing, preparation, costs, payments, documents and activity should remain connected to that job where practical.
 
-Supported capability examples include catering, rentals, sound/DJ, decor, baking, photography, camera hire and combinations of event services. Businesses define their own reusable capability catalogue rather than receiving a fixed industry list.
+Supported capability examples include catering, rentals, sound/DJ, decor, baking, photography, camera hire and combinations of event services. Businesses define their own reusable capability catalogue rather than receiving a fixed industry list. **Zazu must adapt its default workspace to the business capabilities selected by the owner:** presets and combinations must meaningfully shape relevant navigation, catalogue suggestions, event intake, requirements, operational guidance, reporting and Helper recommendations. Irrelevant service options should not clutter a business's normal workflow, while shared event records, historical data, permissions and the ability to enable additional capabilities remain intact. This is a mandatory product requirement; see [Adaptive Business Presets and Event Components](docs/ADAPTIVE_BUSINESS_PRESETS_AND_EVENT_COMPONENTS.md).
 
 The product is intended to work across desktop/laptop workflows and responsive phone use.
 
