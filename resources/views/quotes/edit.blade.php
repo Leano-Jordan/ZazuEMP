@@ -70,12 +70,21 @@
 
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
-                        <div class="zazu-form-section-title">Current Work services</div>
-                        <div class="zazu-form-section-copy">Confirm quantities and unit prices for every line. Line totals and the quote summary update as you type.</div>
+                        <div class="zazu-form-section-title">Products and services</div>
+                        <div class="zazu-form-section-copy">Confirm the quantity, unit and price for every product and service. Line totals and the quote summary update as you type.</div>
                     </div>
                     <div class="zazu-card zazu-list zazu-quote-line-editor">
                         @foreach ($quote->event->requirements as $requirement)
                             @php
+                                $capability = $requirement->capability;
+                                $capabilityTypeLabel = match ($capability?->capability_type) {
+                                    'product' => 'Product',
+                                    'service' => 'Service',
+                                    'rental' => 'Hire / rental',
+                                    'package' => 'Package',
+                                    'other' => 'Other',
+                                    default => 'Custom line',
+                                };
                                 $item = $itemsByRequirement->get($requirement->id);
                                 $defaultPrice = $item?->unit_price;
 
@@ -92,8 +101,9 @@
                                         @endif
                                     </div>
                                     <div class="zazu-list-meta">
+                                        <span class="zazu-chip zazu-chip-info">{{ $capabilityTypeLabel }}</span>
                                         {{ $requirement->category ?: 'General' }}
-                                        @if ($requirement->capability) · {{ $requirement->capability->name }} @endif
+                                        @if ($capability) · {{ $capability->name }} @endif
                                     </div>
                                     <div class="zazu-form-grid mt-3">
                                         <label class="zazu-field">
