@@ -1,3 +1,18 @@
+## Director execution checkpoint — offline expense identity isolation — 2026-11-22
+
+**Verified source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02).
+
+- Added adversarial coverage for a corrupted business-local identity row that points at another business's event, supplier or purchase order during an offline expense mutation.
+- Laravel: **679 passed / 1 skipped / 4,665 assertions**; the new isolation regression passed.
+- Offline browser: **63 desktop Chromium + 7 mobile viewport + 1 mobile host-outage + 1 phone-local attachment/reconnect passed**.
+- PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push-on-main: **PASS**. SonarCloud skipped.
+- The implementation already rejects these mappings through morph-type and business-scoped record checks; this is an adversarial regression closure, not a newly discovered production exploit.
+- **Score disposition: 77/100 unchanged.** One focused regression does not justify a weighted score uplift or close the remaining operational V1 gates. V1 remains **NOT READY**.
+
+**Next engineering target:** offline account/session transition adversarial review; retain DEC-019's owner-approved business-trusted device semantics and test expiry, re-authentication, stale responses and queue durability.
+
+---
+
 ## Director execution checkpoint — offline mutation operation integrity — 2026-11-21
 
 **Code/test head:** [e95dd5c](https://github.com/Leano-Jordan/ZazuEMP/commit/e95dd5cd8966c7457de70e9a4bc882709db7d30b).
