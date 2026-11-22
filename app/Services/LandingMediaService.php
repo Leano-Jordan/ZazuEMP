@@ -207,15 +207,17 @@ class LandingMediaService
             }
 
             $filename = Str::uuid()->toString().'.'.self::IMAGE_MIME_EXTENSIONS[$mimeType];
+            $label = $this->uploadLabel($file);
+            $fileSize = (int) ($file->getSize() ?? 0);
             $file->move($directory, $filename);
             $path = $urlPrefix.'/'.$filename;
 
             try {
                 PlatformLandingMedia::query()->create([
-                    'label' => $this->uploadLabel($file),
+                    'label' => $label,
                     'path' => $path,
                     'mime_type' => $mimeType,
-                    'file_size' => (int) ($file->getSize() ?? 0),
+                    'file_size' => $fileSize,
                 ]);
             } catch (Throwable $exception) {
                 File::delete(rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename);
