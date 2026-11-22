@@ -11,7 +11,7 @@ final class SecondaryBackupArchiveVerifier
     {
         $path = $state['secondary_archive_path'] ?? null;
 
-        if ($this->hasValidMetadata($state, $path) === false) {
+        if ($this->hasValidMetadata($state) === false) {
             return 'invalid';
         }
 
@@ -22,15 +22,16 @@ final class SecondaryBackupArchiveVerifier
             return 'missing';
         }
 
-        return $this->matchesRecordedMetadata($path, $state) ? 'present' : 'changed';
+        return $this->matchesRecordedMetadata($state) ? 'present' : 'changed';
     }
 
     /**
      * @param array<string, mixed> $state
-     * @param mixed $path
      */
-    private function hasValidMetadata(array $state, mixed $path): bool
+    private function hasValidMetadata(array $state): bool
     {
+        $path = $state['secondary_archive_path'] ?? null;
+
         return $this->isAbsolutePath($path)
             && $this->isValidSha256($state['secondary_archive_sha256'] ?? null)
             && $this->isPositiveInteger($state['secondary_archive_size_bytes'] ?? null)
@@ -65,11 +66,11 @@ final class SecondaryBackupArchiveVerifier
     }
 
     /**
-     * @param string $path
      * @param array<string, mixed> $state
      */
-    private function matchesRecordedMetadata(string $path, array $state): bool
+    private function matchesRecordedMetadata(array $state): bool
     {
+        $path = (string) $state['secondary_archive_path'];
         $actualSize = @filesize($path);
         $actualModifiedUnix = @filemtime($path);
 
