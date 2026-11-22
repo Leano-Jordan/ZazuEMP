@@ -1,3 +1,19 @@
+## Director execution checkpoint — offline expense identity isolation challenge — 2026-11-22
+
+**Source/test head:** [8803746](https://github.com/Leano-Jordan/ZazuEMP/commit/88037465ddacbc4b60a81efe343e4210b6b1dc02) on `main`.
+
+- Added an adversarial regression for corrupted `sync_entity_identities` rows whose business scope and entity type look local/correct, but whose record target belongs to another business.
+- The test challenges offline expense links for event, supplier and purchase order. Each mutation must remain pending; no expense is created and no foreign record is changed.
+- The server-side resolver already fails closed: it checks the expected morph type and loads the target record through a business-scoped query. The event resolver likewise scopes both identity and event to the authenticated business. Finance transaction checks also enforce purchase-order/job and supplier/order consistency. No application-code change was warranted.
+- Exact-head Laravel feature/unit suite: **679 passed / 1 skipped / 4,665 assertions**; the new `OfflineExpenseReferenceIsolationTest` passed.
+- Zazu Quality (incremental Pint, application checks, Composer security audit and secret scan), PHPMD, PostgreSQL migration/rollback/registration/backup/private-file recovery, Director Health and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- Exact-head offline-browser job in Laravel workflow [44987764883](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44987764883) remained **IN PROGRESS** at last observation. Do not describe its browser suite as passed; the server-side regression result above is independently complete.
+- Evidence maturity remains **77/100**; no score uplift is claimed from one additional adversarial regression. V1 remains **NOT READY** pending the owner-operated Android, PC recovery, commercial and legal/brand gates.
+
+**Next engineering target:** continue the offline account/session transition adversarial review, especially expiry/re-authentication, preservation of queued local work, and ensuring a stale session cannot regain online mutation authority.
+
+---
+
 ## Director execution checkpoint — trusted-device credential race closure — 2026-11-21
 
 **Verified code/test head:** [04db872](https://github.com/Leano-Jordan/ZazuEMP/commit/04db8722a66ff8c97d62fef855f7ba07073934c7).
