@@ -41,14 +41,10 @@ class BusinessCapabilityController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Keep the catalogue useful for every business type: non-rental capabilities
+        // include DJ, decor, photography, catering, products and packaged services.
         $catering = (clone $base)
-            ->whereIn('capability_type', ['package', 'service'])
-            ->where(function ($query) {
-                $query->where('category', 'like', '%Cater%')
-                    ->orWhere('category', 'like', '%Food%')
-                    ->orWhere('category', 'like', '%Hospitality%')
-                    ->orWhere('pricing_basis', 'per_person');
-            })
+            ->whereIn('capability_type', ['package', 'service', 'product', 'other'])
             ->orderByDesc('is_active')
             ->orderBy('category')
             ->orderBy('name')
