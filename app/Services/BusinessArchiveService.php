@@ -167,6 +167,13 @@ final class BusinessArchiveService
         $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
         $definitions = $this->definitions();
 
+        // Version-1 archives created before invoice sequences were added contain
+        // the previous complete table set. Keep those archives restorable.
+        $legacyTables = array_values(array_diff(array_keys($definitions), ['invoice_number_sequences']));
+        if (is_array($data) && array_keys($data) === $legacyTables) {
+            $data = array_replace(array_fill_keys(array_keys($definitions), []), $data);
+        }
+
         if (! is_array($data) || array_keys($data) !== array_keys($definitions)) {
             throw new RuntimeException('The archive does not contain the complete supported business dataset.');
         }
