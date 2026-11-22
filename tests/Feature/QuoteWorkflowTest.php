@@ -367,7 +367,7 @@ class QuoteWorkflowTest extends TestCase
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
-            'quantity' => [$requirement->id => '50.00'],
+            'quantity' => [$requirement->id => '80.00'],
             'unit_price' => [$requirement->id => 40],
         ]);
 
@@ -463,6 +463,35 @@ class QuoteWorkflowTest extends TestCase
         $response->assertSee('Quote needs review');
         $response->assertSee('Revise quote');
         $response->assertSee(route('quotes.versions.store', $event->quotes()->first()), false);
+    }
+
+    public function test_quote_creation_rejects_missing_quantity_confirmation(): void
+    {
+        $customer = Customer::create(['name' => 'Quantity Required Customer']);
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-QTY-002',
+            'name' => 'Quantity Required Event',
+            'event_date' => now()->addDays(12)->toDateString(),
+            'status' => 'draft',
+        ]);
+        $requirement = $event->requirements()->create([
+            'description' => 'Single service starter',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
+
+        $this->from(route('work.quotes.create', $event))
+            ->post(route('work.quotes.store', $event), [
+                'currency' => 'ZAR',
+                'unit_price' => [$requirement->id => '500.00'],
+            ])
+            ->assertRedirect(route('work.quotes.create', $event))
+            ->assertSessionHasErrors('quantity');
+
+        $this->assertDatabaseCount('quotes', 0);
+        $this->assertSame('1.00', (string) $requirement->fresh()->quantity);
     }
 
     public function test_quote_creation_requires_a_price_for_each_current_requirement(): void
