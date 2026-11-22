@@ -49,6 +49,70 @@ class RequirementController extends Controller
         ]);
     }
 
+    public function edit(Request $request, Event $event, EventRequirement $requirement): View
+    {
+        $this->ensureBusiness($event, $request);
+        abort_unless((int) $requirement->event_id === (int) $event->id, 404);
+        abort_if($event->isClosed(), 422, 'Closed work cannot be edited.');
+
+        $capabilities = BusinessCapability::query()
+            ->where('business_id', $event->business_id)
+            ->where('is_active', true)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
+
+        return view('requirements.create', [
+            'event' => $event,
+            'requirement' => $requirement,
+            'capabilities' => $capabilities,
+            'serviceCategories' => config('zazu.service_categories'),
+            'businessCurrency' => app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR',
+        ]);
+    }
+
+    public function update(Request $request, Event $event, EventRequirement $requirement, EventLifecycleService $lifecycle): RedirectResponse
+    {
+        $this->ensureBusiness($event, $request);
+        abort_unless((int) $requirement->event_id === (int) $event->id, 404);
+        $validated = $request->validate([
+            'capability_id' => ['nullable', Rule::exists('business_capabilities', 'id')->where(fn ($query) => $query->where('business_id', $event->business_id)->where('is_active', true))],
+            'description' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:100', Rule::in(array_keys(config('zazu.service_categories')))],
+            'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
+            'unit' => ['nullable', 'string', 'max:50'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        DB::transaction(function () use ($request, $event, $requirement, $validated, $lifecycle): void {
+            $businessId = app(CurrentBusiness::class)->id($request->user());
+            $lockedEvent = $lifecycle->lock($businessId, $event->id);
+            $lifecycle->assertOperational($lockedEvent);
+            $lockedRequirement = $lockedEvent->requirements()->whereKey($requirement->id)->lockForUpdate()->firstOrFail();
+            $lockedRequirement->update($validated);
+        });
+
+        return redirect()->route('work.requirements.index', $event)
+            ->with('success', 'Requirement updated. Existing quote versions remain unchanged and may need a new revision.');
+    }
+
+    public function destroy(Request $request, Event $event, EventRequirement $requirement, EventLifecycleService $lifecycle): RedirectResponse
+    {
+        $this->ensureBusiness($event, $request);
+        abort_unless((int) $requirement->event_id === (int) $event->id, 404);
+
+        DB::transaction(function () use ($request, $event, $requirement, $lifecycle): void {
+            $businessId = app(CurrentBusiness::class)->id($request->user());
+            $lockedEvent = $lifecycle->lock($businessId, $event->id);
+            $lifecycle->assertOperational($lockedEvent);
+            $lockedRequirement = $lockedEvent->requirements()->whereKey($requirement->id)->lockForUpdate()->firstOrFail();
+            $lockedRequirement->delete();
+        });
+
+        return redirect()->route('work.requirements.index', $event)
+            ->with('success', 'Requirement removed. Earlier quote versions are preserved and the current quote may need a new revision.');
+    }
+
     public function store(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
