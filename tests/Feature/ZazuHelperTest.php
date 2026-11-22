@@ -28,6 +28,8 @@ class ZazuHelperTest extends TestCase
             ->assertSee('aria-expanded="false"', false)
             ->assertDontSee('data-zazu-helper-toggle aria-expanded="false" aria-pressed', false)
             ->assertSee('data-zazu-guide-enabled="on"', false);
+            ->assertSee('data-zazu-helper-recommendation', false)
+            ->assertSee('data-zazu-helper-connectivity', false);
     }
 
     public function test_helper_guides_resolve_real_semantic_targets_on_core_workspaces(): void
@@ -81,6 +83,10 @@ class ZazuHelperTest extends TestCase
         $this->assertStringContainsString('closeButton?.focus()', $script);
         $this->assertStringContainsString('prefers-reduced-motion', $script);
         $this->assertStringContainsString('.zazu-helper-target-highlight', $css);
+        $this->assertStringContainsString("window.addEventListener('zazu:origin-availability'", $script);
+        $this->assertStringContainsString('originAvailable === true', $script);
+        $this->assertStringContainsString('data-zazu-helper-recommendation', $script);
+        $this->assertStringContainsString('Connection to Zazu is unavailable', $script);
     }
 
     public function test_public_landing_authentication_modal_does_not_render_the_workspace_helper(): void
