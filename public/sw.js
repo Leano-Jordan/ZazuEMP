@@ -408,7 +408,6 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
 
     const primedPrivateMediaUrls = new Set();
     const primedStaticAssetUrls = new Set();
-    const primedRoutes = new Set();
 
     try {
         for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
@@ -446,7 +445,6 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                     const pageRequest = new Request(new URL(path, self.location.origin));
                     await cache.put(pageRequest, response.clone());
 
-                    primedRoutes.add(new URL(path, self.location.origin).pathname);
                     await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);
                     await primePrivateMediaFromHtml(
                         html,
@@ -466,8 +464,19 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     }
 
     const requiredOfflineRoutes = ['/dashboard', '/customers', '/customers/create', '/work', '/work/create'];
-    return !controller.signal.aborted
-        && requiredOfflineRoutes.every((path) => primedRoutes.has(path));
+    if (controller.signal.aborted || primeGeneration !== activeUserGeneration) return false;
+
+    // A transient fetch failure must not report the workspace as unprepared
+    // when the required authenticated pages are already safely cached.
+    const cache = await dynamicCache();
+    if (!cache || primeGeneration !== activeUserGeneration
+        || primeUserId !== activeUserId || primeBusinessId !== activeBusinessId) return false;
+
+    const requiredCachedPages = await Promise.all(requiredOfflineRoutes.map((path) => (
+        cache.match(new Request(new URL(path, self.location.origin)))
+    )));
+
+    return requiredCachedPages.every(Boolean);
 }
 
 async function clearActiveContext() {
