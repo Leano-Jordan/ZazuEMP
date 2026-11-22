@@ -14,7 +14,7 @@
         </div>
     </section>
 
-    <section class="zazu-card zazu-list">        <div class="zazu-card-header">
+    <section class="zazu-card zazu-list" data-zazu-anchor="quotes.register">        <div class="zazu-card-header">
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Records</div>
