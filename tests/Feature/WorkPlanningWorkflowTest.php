@@ -298,4 +298,51 @@ class WorkPlanningWorkflowTest extends TestCase
         $this->assertTrue($version->fresh()->matchesRequirements($event->requirements()->get()));
     }
 
+    public function test_accepted_quote_locks_requirement_scope_for_add_edit_and_remove(): void
+    {
+        $event = $this->event();
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => 'Agreed catering',
+            'category' => 'Catering',
+            'quantity' => 40,
+            'unit' => 'guests',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'quantity' => [$requirement->id => '40.00'],
+            'unit_price' => [$requirement->id => '150.00'],
+        ])->assertRedirect();
+
+        $quote = Quote::query()->firstOrFail();
+        $quote->update(['status' => 'accepted']);
+        $quote->latestVersion()->update(['status' => 'accepted']);
+
+        $this->put(route('work.requirements.update', [$event, $requirement]), [
+            'description' => 'Changed scope',
+            'category' => 'Catering',
+            'quantity' => '50.00',
+            'unit' => 'guests',
+        ])->assertSessionHasErrors('requirement');
+
+        $this->delete(route('work.requirements.destroy', [$event, $requirement]))
+            ->assertSessionHasErrors('requirement');
+
+        $this->post(route('work.requirements.store', $event), [
+            'description' => 'Extra service',
+            'category' => 'Catering',
+            'quantity' => '1.00',
+            'unit' => 'service',
+        ])->assertSessionHasErrors('requirement');
+
+        $this->assertSame('Agreed catering', $requirement->fresh()->description);
+        $this->assertDatabaseCount('event_requirements', 1);
+        $this->get(route('work.requirements.index', $event))
+            ->assertOk()
+            ->assertSee('Its agreed scope is locked')
+            ->assertDontSee(route('work.requirements.edit', [$event, $requirement]), false);
+    }
+
 }
