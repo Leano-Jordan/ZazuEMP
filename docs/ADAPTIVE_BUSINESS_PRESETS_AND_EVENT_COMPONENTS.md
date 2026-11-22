@@ -129,6 +129,12 @@ The first Helper adaptation slice now reads the existing saved primary business 
 
 This is deliberately partial. The current focus is a single presentation preference, not a complete multi-capability configuration. Active catalogue categories can identify supporting areas, but they are not yet a unified capability-selection contract for navigation, event intake, event components and downstream operations. The slice does not prove that irrelevant modules are hidden or that every specialist workflow exists.
 
+## Current implementation evidence — event-aware Helper context
+
+The Helper now reads the saved requirements belonging to the current Job detail page and displays a concise “This booking includes” list. It verifies the event belongs to the active business and scopes capability-name fallback data to that same business. Feature coverage asserts that a tent/chair booking displays its actual saved components without unrelated catering or camera prompts.
+
+This is a context-display slice only. It does not yet calculate component-specific operational recommendations, alter navigation visibility or establish complete preset behaviour.
+
 ## Implementation sequencing
 
 This is a product-wide requirement, but implementation must be incremental:
