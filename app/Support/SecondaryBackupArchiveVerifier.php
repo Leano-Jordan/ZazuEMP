@@ -4,9 +4,6 @@ namespace App\Support;
 
 final class SecondaryBackupArchiveVerifier
 {
-    /**
-     * @param array<string, mixed> $state
-     */
     public function inspect(array $state): string
     {
         $path = $state['secondary_archive_path'] ?? null;
