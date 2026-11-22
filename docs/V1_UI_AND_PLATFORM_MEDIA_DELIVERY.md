@@ -30,7 +30,7 @@ Playwright coverage checks actual action geometry at desktop (1280px) and phone 
 
 The public landing page uses six image positions: hero, operations, resources, commercial control, venue and decor. The platform settings page previously exposed only four of them. The settings model and controller now expose all six.
 
-The image library includes each distinct existing bundled photograph and local illustration fallback, deduplicated by path, plus validated admin uploads. Every slot has a live preview. A gallery displays the library, and local upload previews are created before submission.
+The selectable image library now contains only bundled raster photography and validated admin uploads. The locally drawn SVG illustration fallbacks were removed from all six default/library mappings so they cannot be selected as landing artwork. Each position has a dimension-specific crop preview (hero 16:9; supporting positions 4:3). The library is directly clickable: choose a position, then click or keyboard-activate a photograph to assign it and update that position's preview. Upload previews remain local until saved into the library.
 
 Upload rules:
 - JPEG, PNG and WebP only; SVG and arbitrary markup are not accepted.
@@ -74,3 +74,16 @@ The Helper now visibly identifies active business services as compact chips. On 
 ## Quality gate correction
 
 The earlier PHPMD workflow did not remain queued: GitHub completed it with **failure** on the previous code batch. The Laravel and Zazu quality workflows were still queued at the time of the follow-up inspection, and the Director Health workflow completed successfully. PHPMD's job log was not available through the repository connector, so its exact finding has not been attributed to a particular changed file. This is an open quality gate; do not treat the batch as green until the PHPMD output is retrieved and addressed, and the new commits receive fresh test runs.
+
+
+## Founder-requested media correction — 2026-11-23
+
+- Removed the four bundled SVG illustration fallbacks from the landing-image configuration and therefore from the selectable media library. Public defaults now resolve to the bundled photographic assets; no blank default is introduced.
+- Added direct, keyboard-accessible image-card assignment to the currently focused landing position while retaining the per-position dropdowns.
+- Added per-slot crop frames: hero 16:9, supporting sections 4:3, with cover cropping so the administrator can judge composition before publishing.
+- Added a save guard that requires all six slots to have a selected library entry and all six previews to have loaded successfully. Server-side LandingMediaService::save() continues to verify each submitted key exists in the safe library and that the referenced file exists before storing a path.
+- Corrected workspace wallpaper rendering by using a valid gradient plus wallpaper image layer and allowing the application shell/content canvas to remain transparent. This addresses the invalid previous background-image composition where a surface colour token was supplied as an image layer.
+- Restored the business-selected dashboard picture in the dashboard capability panel. The previous dashboard authority explicitly hid .zazu-dash-hero-image; the new presentation shows the image at useful opacity with a restrained lower text gradient instead of a darkened full-panel treatment.
+- Added feature assertions for direct-pick controls, crop-preview hooks and removal of the SVG illustration fallbacks from the rendered media library.
+
+**Verification boundary:** code and tests are committed to main; this record does not claim tests or visual acceptance have passed. Check exact-head GitHub Actions, then visually inspect the six public crops, settings wallpaper and dashboard picture on PC and phone.
