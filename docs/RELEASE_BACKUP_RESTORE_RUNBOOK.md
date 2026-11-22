@@ -75,6 +75,8 @@ The current `zazu:backup` and `zazu:restore` commands operate on the **entire in
 
 Business-level export/restore is implemented separately through the owner-only Export business data screen (`/exports`). It uses a tenant-scoped `.zazu` archive with an explicit record allowlist and referenced business files; it excludes credentials, sessions, device-pairing tokens, licence entitlements and sensitive tax credentials. Restore is restricted to an empty, unpaired workspace and remaps record IDs. This does not replace installation-wide operator recovery.
 
+The allowlist includes `invoice_number_sequences`, so the per-business invoice counter moves with the invoice records. Existing format-v1 archives created before this dataset was added remain restorable; the importer supplies an empty sequence dataset, and the invoice generator reconciles the next number against invoices already restored. Keep the sequence table in archive coverage tests whenever invoice issuance or archive datasets change.
+
 ## Backup
 
 1. Confirm the target installation and record that the operation affects every business in that installation.

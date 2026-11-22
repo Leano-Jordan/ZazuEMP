@@ -1,3 +1,15 @@
+## Business archive invoice-sequence portability — 2026-11-22
+
+**Implementation:** [e52d1bf](https://github.com/Leano-Jordan/ZazuEMP/commit/e52d1bfd0f8fbbfa4148f05ad77ed3a387c8124f). **Legacy compatibility:** [c8afa0e](https://github.com/Leano-Jordan/ZazuEMP/commit/c8afa0e4117980519463574917f1c8cdce4ae831). **Regression coverage:** [c9f0c7b](https://github.com/Leano-Jordan/ZazuEMP/commit/c9f0c7b8e113eec67d93d77a22a8a0150882bb69).
+
+- Added `invoice_number_sequences` to the tenant-scoped business archive dataset. Its rows are remapped to the destination business and are included in the empty-target check.
+- Existing format-v1 archives created before this addition remain restorable. When the only missing dataset is `invoice_number_sequences`, the reader supplies an empty dataset; the invoice generator reconciles its next allocation against restored invoice numbers.
+- Regression coverage verifies both that the counter survives export/import and that the real generator allocates the expected next invoice number, plus that a pre-sequence archive remains importable.
+- Exact Laravel workflow [45022740123](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45022740123): **682 passed / 1 skipped / 4,712 assertions**. PostgreSQL migration/recovery and PHPMD passed. Final-head Zazu Quality [45022856858](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45022856858): formatting, application checks, secret scan and Composer audit **PASS**. SonarCloud **SKIPPED**.
+- This closes an archive-portability gap; it does not close the owner-operated off-disk installation recovery gate or change the V1 readiness score.
+
+---
+
 ## DB-001 disposition — Founder clarification (2026-11-22)
 
 **DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
