@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PurchaseOrder;
 use App\Models\Quote;
+use App\Models\TaxRate;
 use App\Models\User;
 use App\Services\EventProfitabilityService;
 use Database\Seeders\DemoScenarioSeeder;
@@ -300,5 +301,79 @@ class CommercialReconciliationTest extends TestCase
                 ->count()
         );
     }
+
+
+    public function test_work_store_created_job_reconciles_through_quote_invoice_payments_and_profit(): void
+    {
+        [$user, $business] = array_slice($this->prepareCommercialScenario(), 0, 2);
+
+        $customer = \App\Models\Customer::query()
+            ->where('business_id', $business->id)
+            ->where('name', 'Mokoena Family Events')
+            ->firstOrFail();
+
+        $this->actingAs($user)
+            ->withSession(['zazu_business_id' => $business->id])
+            ->post(route('work.store'), [
+                'customer_id' => $customer->id,
+                'name' => 'Commercial acceptance — newly created job',
+                'event_type' => 'Catering order',
+                'event_date' => now()->addDays(14)->toDateString(),
+                'other_service' => 'Catering package',
+                'start_intent' => 'quote',
+            ])
+            ->assertRedirect();
+
+        $event = Event::query()
+            ->where('business_id', $business->id)
+            ->where('name', 'Commercial acceptance — newly created job')
+            ->firstOrFail();
+        $requirement = $event->requirements()->firstOrFail();
+        $taxRate = TaxRate::query()
+            ->where('business_id', $business->id)
+            ->where('is_default', true)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'tax_rate_id' => $taxRate->id,
+            'deposit_percent' => '30.00',
+            'unit_price' => [$requirement->id => '10000.00'],
+        ])->assertRedirect();
+
+        $quote = Quote::query()->where('event_id', $event->id)->firstOrFail();
+        $quote->update(['status' => 'sent']);
+        $quote->latestVersion()->update(['status' => 'sent']);
+
+        $this->acceptQuote($business, $quote, $event);
+        $invoice = $this->createInvoice($user, $business, $quote);
+        $this->recordDeposit($business, $invoice);
+        $this->recordFinalPayment($business, $invoice);
+        $this->assertPaidInvoice($business, $invoice);
+
+        $this->post(route('work.costs.store', $event), [
+            'category' => 'Food',
+            'description' => 'Ingredients and catering supplies',
+            'currency' => 'ZAR',
+            'projected_amount' => '2800.00',
+            'actual_amount' => '2800.00',
+            'status' => 'incurred',
+            'notes' => 'Commercial acceptance workflow.',
+        ])->assertRedirect();
+
+        $this->completeEvent($event);
+
+        $profit = app(EventProfitabilityService::class)
+            ->forBusiness($business)
+            ->first(fn (array $row): bool => $row['event_id'] === $event->id && $row['currency'] === 'ZAR');
+
+        $this->assertNotNull($profit);
+        $this->assertSame(1000000, $profit['net_sales_cents']);
+        $this->assertSame(280000, $profit['actual_cost_cents']);
+        $this->assertSame(720000, $profit['indicative_result_cents']);
+        $this->assertSame(72.0, $profit['indicative_margin_percentage']);
+    }
+
 
 }
