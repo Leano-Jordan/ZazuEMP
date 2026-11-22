@@ -2,14 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Asset;
-use App\Models\AssetAllocation;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventCost;
-use App\Models\InventoryItem;
-use App\Models\InventoryMovement;
 use App\Models\FinanceExpense;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
