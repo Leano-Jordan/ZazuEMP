@@ -3339,15 +3339,44 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-        await expect.poll(() => page.evaluate(() => document.documentElement.dataset.zazuOfflinePagesPrimed || 'pending'), {
-            timeout: 45_000,
-        }).toBe('true');
 
         await page.evaluate(async () => {
             await navigator.serviceWorker.ready;
         });
         await page.reload({ waitUntil: 'domcontentloaded' });
         await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+
+        // A navigation/reload can boot the client while cache priming is already
+        // running. Concurrent requests for the same business must join that task,
+        // not cancel it and report a false offline-preparation failure.
+        const primingResults = await page.evaluate(async () => {
+            const registration = await navigator.serviceWorker.ready;
+            const target = navigator.serviceWorker.controller || registration.active;
+            if (!target) throw new Error('No active Zazu service worker is available');
+
+            const routes = ['/dashboard', '/customers', '/work', '/customers/create', '/work/create'];
+            const prime = () => new Promise(resolve => {
+                const channel = new MessageChannel();
+                channel.port1.onmessage = event => {
+                    channel.port1.close();
+                    resolve(event.data);
+                };
+                target.postMessage({
+                    type: 'prime-pages',
+                    userId: document.body.dataset.zazuUserId,
+                    businessId: document.body.dataset.zazuBusinessId,
+                    routes,
+                }, [channel.port2]);
+            });
+
+            return Promise.all([prime(), prime(), prime()]);
+        });
+        expect(primingResults.map(result => result?.success)).toEqual([true, true, true]);
+        await expect.poll(() => page.evaluate(() => document.documentElement.dataset.zazuOfflinePagesPrimed || 'pending'), {
+            timeout: 45_000,
+        }).toBe('true');
+        await expect(page.locator('[data-zazu-offline-pages-notice]')).toHaveCount(0);
+
         await context.setOffline(true);
 
         try {
