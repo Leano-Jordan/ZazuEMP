@@ -331,7 +331,6 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertSame([], $related);
     }
 
-
     public function test_bootstrap_delivery_fallback_rejects_wrong_morph_identity_targets(): void
     {
         $business = $this->business('Bootstrap identity type business');
@@ -394,7 +393,6 @@ class OfflineExpenseReferenceIsolationTest extends TestCase
         $this->assertTrue($snapshot['deleted']);
         $this->assertSame([], $snapshot['record']);
     }
-
 
     public function test_sync_snapshot_does_not_serialize_a_foreign_business_record(): void
     {
