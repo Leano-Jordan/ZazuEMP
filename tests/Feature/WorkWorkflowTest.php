@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
+use App\Models\EventRequirement;
 use App\Models\EventCost;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
