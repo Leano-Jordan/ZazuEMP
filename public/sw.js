@@ -474,6 +474,8 @@ async function clearActiveContext() {
     activeUserGeneration += 1;
     activePrimeController?.abort();
     activePrimeController = null;
+    activePrimeTask = null;
+    activePrimeTaskContext = null;
     activeUserId = null;
     activeBusinessId = null;
 
