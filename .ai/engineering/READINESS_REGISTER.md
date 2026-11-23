@@ -1,3 +1,16 @@
+## Founder installation and business backup verification — 2026-11-23
+
+Founder reports the following live owner-PC checks while starting the Zazu server:
+
+- Startup database check displayed: “The Zazu database is up to date.” Record this as **OWNER-VERIFIED database migration check PASS** for the installed environment at this observation.
+- The latest installation-backup file is visible on the PC; the Zazu backup UI shows it as approximately **7 hours old** at the time of the observation.
+- A business-level backup was downloaded.
+- Founder independently verified the installation and business backup files.
+
+**Recorded status:** installation backup present and independently verified — OWNER-VERIFIED PASS; business archive downloaded and independently verified — OWNER-VERIFIED PASS; installed database reports no pending migrations — OWNER-VERIFIED PASS.
+
+**Still separate / NOT CLOSED:** a file existing and being independently verified does not prove that the intended installation can be fully restored. The controlled owner-PC restore drill, including database, configuration/key handling, private media and post-restore startup/workspace verification, remains OPEN until a restore is actually performed and checked. Preserve the existing installation and backup files; do not ask the Founder to repeat checks already completed.
+
 ## DB-001 disposition — Founder clarification (2026-11-22)
 
 **DORMANT / HISTORICAL / NON-CRITICAL — not an active engineering task or V1 release blocker.** The Founder clarifies that the DB-001 occurrence under discussion happened while testing offline event creation and a calendar-related task. It has not recurred since the subsequent offline-architecture work. It is not a confirmed current database defect, and no root cause or fix is claimed.
