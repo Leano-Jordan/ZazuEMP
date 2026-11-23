@@ -318,7 +318,7 @@
                 </div>
                 <span class="sentinel-pill">{{ strtoupper(str_replace('_', ' ', $health['status'])) }}</span>
             </div>
-            <div class="sentinel-muted sentinel-retention-note">Checked {{ $health['checked_at'] }}. This check does not query or modify business records.</div>
+            <div class="sentinel-muted sentinel-retention-note">Checked {{ !empty($health['checked_at']) ? \Illuminate\Support\Carbon::parse($health['checked_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') : 'Unknown' }}. This check does not query or modify business records.</div>
             <div class="sentinel-health-grid">
                 @foreach($health['checks'] as $check)
                     <article class="sentinel-health-card sentinel-health-{{ $check['status'] }}">

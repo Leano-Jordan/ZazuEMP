@@ -81,4 +81,19 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('background-attachment: scroll, scroll !important;', $css);
         $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page.zazu-has-wallpaper', $css);
     }
+
+    public function test_all_user_facing_health_timestamps_use_local_human_dates(): void
+    {
+        $owner = file_get_contents(resource_path('views/owner/index.blade.php'));
+        $admin = file_get_contents(resource_path('views/admin/sentinel.blade.php'));
+        $recovery = file_get_contents(resource_path('views/sentinel/local-recovery.blade.php'));
+        $config = file_get_contents(base_path('config/app.php'));
+        $environment = file_get_contents(base_path('.env.example'));
+
+        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $owner);
+        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $admin);
+        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $recovery);
+        $this->assertStringContainsString("'timezone' => env('APP_TIMEZONE', 'Africa/Johannesburg')", $config);
+        $this->assertStringContainsString('APP_TIMEZONE=Africa/Johannesburg', $environment);
+    }
 }

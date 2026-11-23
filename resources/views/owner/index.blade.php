@@ -70,7 +70,7 @@
             </div>
 
             <div class="owner-health-note">
-                Checked {{ $health['checked_at'] }}. These checks are scoped to the active business and do not expose platform incident records or other businesses' information. They do not certify phone offline operation or synchronisation.
+                Checked {{ !empty($health['checked_at']) ? \Illuminate\Support\Carbon::parse($health['checked_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') : 'Unknown' }}. These checks are scoped to the active business and do not expose platform incident records or other businesses' information. They do not certify phone offline operation or synchronisation.
                 If you need help, <a href="mailto:rosscorelabs@outlook.com?subject=Zazu%20business%20health%20support">contact Zazu support</a>.
             </div>
         </section>

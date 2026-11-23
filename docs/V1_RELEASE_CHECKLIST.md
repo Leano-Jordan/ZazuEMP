@@ -6,6 +6,7 @@
 - [x] Business wallpaper now applies to Dashboard as well as other authenticated pages, with light/dark overlays and mobile-safe background attachment.
 - [x] Business mix moved below primary navigation without changing permissions or data.
 - [x] Dashboard and Founder Control Centre backup timestamps now use local human-readable dates.
+- [x] Owner health and Local Recovery timestamps now use local human-readable dates; app default timezone is configurable and defaults to Africa/Johannesburg.
 - [x] Tabler Icons (MIT) selected as the future local icon standard; licence retention and offline delivery are documented.
 - [ ] Exact-head Laravel, Zazu Quality and browser acceptance for these changes.
 - [x] Local Tabler icon subset, shared Blade component and licence notice added; primary navigation and Dashboard icons migrated.

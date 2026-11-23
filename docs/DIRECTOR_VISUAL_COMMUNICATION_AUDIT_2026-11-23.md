@@ -41,3 +41,9 @@ The current `package.json` has no icon package dependency. The dashboard current
 - [ ] Run a page-by-page visual communication sweep for labels, empty/loading/error states, spacing, responsive composition, contrast and reduced-motion behaviour.
 
 **Scope guard:** this is a usability and visual-communication pass, not permission to rewrite workflows, change business rules, or replace Zazu's established identity. Preserve offline behaviour, permissions, business isolation and existing user data.
+
+
+## Additional presentation root causes confirmed
+
+- Business wallpaper and dashboard hero photography are separate settings. The business wallpaper was excluded from dashboard pages by the old `body.zazu-has-wallpaper:not(.zazu-dashboard-page)` selector. A dashboard-specific light/dark wallpaper layer now uses the existing `--zazu-wallpaper` variable; shell/content surfaces are transparent and mobile uses scroll attachment.
+- The application previously hard-coded `UTC` as its default timezone. Zazu's South African default is now `Africa/Johannesburg`, overridable with `APP_TIMEZONE`. Backup and health timestamps in Dashboard, Founder Control Centre, Owner health and Local Recovery are now formatted as `j M Y, H:i` in the configured timezone. API/sync timestamps remain ISO-8601.

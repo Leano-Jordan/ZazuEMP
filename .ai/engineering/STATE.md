@@ -2106,3 +2106,12 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Added a dashboard-specific wallpaper rule using the existing authenticated `--zazu-wallpaper` variable, with light/dark readability overlays, transparent shell/content surfaces and scroll attachment on small screens.
 - This is separate from the dashboard hero image. Both business image settings are now handled independently.
 - Added regression coverage for dashboard wallpaper visibility and both themes. Physical visual acceptance remains pending.
+
+
+## Human time presentation — complete user-facing health surfaces — 2026-11-23
+
+- Set the application default timezone to `Africa/Johannesburg` through `APP_TIMEZONE`, while allowing deployments to override it. This avoids rendering UTC as the everyday user's local time in Zazu's South African default deployment.
+- Formatted health-check timestamps in Owner health, Founder Control Centre and Local Recovery using the configured application timezone and `j M Y, H:i`.
+- Dashboard and Founder Control Centre backup timestamps were already converted in the preceding visual slice.
+- ISO-8601 remains unchanged for API, sync, persistence and machine-facing contracts.
+- Added regression coverage for all user-facing health timestamp surfaces and the timezone default.
