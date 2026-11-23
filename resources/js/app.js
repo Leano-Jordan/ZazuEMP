@@ -3111,7 +3111,7 @@ function setupZazuOfflineForms() {
                 const offlineState = window.ZazuOffline.getState();
                 const serverId = form.dataset.zazuOfflineServerId;
                 const existing = serverId
-                    ? offlineState?.customers?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
+                    ? offlineState?.customers?.find(item => Number(item.server_id ?? item.id) === Number(serverId))
                     : null;
 
                 if (serverId && !existing?.local_id) {
@@ -3292,7 +3292,7 @@ function setupZazuOfflineForms() {
                 );
                 const capabilityId = get('capability_id');
                 const capability = capabilityId
-                    ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(capabilityId))
+                    ? state?.catalogue?.find(item => Number(item.server_id ?? item.id) === Number(capabilityId))
                     : null;
                 payload = {
                     local_id: existing?.local_id || localRecordId || localId,
