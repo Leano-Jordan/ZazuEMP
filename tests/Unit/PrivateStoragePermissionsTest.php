@@ -18,6 +18,8 @@ class PrivateStoragePermissionsTest extends TestCase
         $root = sys_get_temp_dir().'/zazu-private-stage-'.Str::uuid();
         $nested = $root.'/nested';
         $secret = $nested.'/database-dump.sql';
+        $outside = $root.'-outside';
+        $link = $root.'/linked-secret';
         $permissions = app(PrivateStoragePermissions::class);
 
         try {
@@ -30,14 +32,18 @@ class PrivateStoragePermissionsTest extends TestCase
             $this->assertSame(0700, fileperms($nested) & 0777);
             $this->assertSame(0600, fileperms($secret) & 0777);
 
-            $outside = $root.'-outside';
-            $link = $root.'/linked-secret';
             $this->assertNotFalse(file_put_contents($outside, 'outside sensitive data'));
             $this->assertTrue(symlink($outside, $link));
             $this->assertFalse($permissions->restrictDirectoryTree($root));
             unlink($link);
             unlink($outside);
         } finally {
+            if (is_link($link)) {
+                unlink($link);
+            }
+            if (is_file($outside)) {
+                unlink($outside);
+            }
             File::deleteDirectory($root);
         }
     }
