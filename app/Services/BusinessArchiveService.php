@@ -139,7 +139,10 @@ final class BusinessArchiveService
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function restore(string $archivePath, Business $target): array
+    /**
+     * @param null|callable(array{tables:int,records:int,files:int}):void $afterRestore
+     */
+    public function restore(string $archivePath, Business $target, ?callable $afterRestore = null): array
     {
         $zip = new ZipArchive();
         if ($zip->open($archivePath) !== true) {
@@ -150,7 +153,14 @@ final class BusinessArchiveService
             [$manifest, $data, $definitions] = $this->readArchiveEnvelope($zip);
             $filePayloads = $this->files->readArchiveFilePayloads($zip, $manifest, $data);
 
-            return $this->restoreRows($target, $definitions, $data, $filePayloads, $manifest['source_business']);
+            return $this->restoreRows(
+                $target,
+                $definitions,
+                $data,
+                $filePayloads,
+                $manifest['source_business'],
+                $afterRestore
+            );
         } finally {
             $zip->close();
         }
@@ -365,22 +375,38 @@ final class BusinessArchiveService
         throw new RuntimeException("Restore stopped: unresolved {$table}.{$column} -> {$foreignTable}#{$oldForeignId}.");
     }
 
-    private function restoreRows(Business $target, array $definitions, array $data, array $filePayloads, array $sourceProfile): array
-    {
+    /**
+     * @param null|callable(array{tables:int,records:int,files:int}):void $afterRestore
+     * @return array{tables:int,records:int,files:int}
+     */
+    private function restoreRows(
+        Business $target,
+        array $definitions,
+        array $data,
+        array $filePayloads,
+        array $sourceProfile,
+        ?callable $afterRestore = null
+    ): array {
         $idMaps = [];
         $createdFiles = [];
         $records = 0;
+        $result = ['tables' => count($definitions), 'records' => 0, 'files' => count($filePayloads)];
 
         try {
-            DB::transaction(function () use ($target, $definitions, $data, $filePayloads, $sourceProfile, &$idMaps, &$createdFiles, &$records): void {
+            DB::transaction(function () use ($target, $definitions, $data, $filePayloads, $sourceProfile, $afterRestore, &$idMaps, &$createdFiles, &$records, &$result): void {
                 DB::table('businesses')->where('id', $target->id)->lockForUpdate()->first();
                 $this->assertTargetIsEmpty($target, $definitions);
                 $this->restoreArchiveTables($target, $definitions, $data, $idMaps, $records);
                 $this->restoreArchiveFiles($target, $filePayloads, $idMaps, $createdFiles);
                 $this->restoreBusinessProfile($target, $sourceProfile);
+
+                $result['records'] = $records;
+                if ($afterRestore !== null) {
+                    $afterRestore($result);
+                }
             });
 
-            return ['tables' => count($definitions), 'records' => $records, 'files' => count($filePayloads)];
+            return $result;
         } catch (\Throwable $exception) {
             foreach ($createdFiles as $file) {
                 Storage::disk($file['disk'])->delete($file['path']);
