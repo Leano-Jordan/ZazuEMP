@@ -2744,7 +2744,10 @@ function setupZazuOfflineDirectoryViews() {
                             form.className = 'zazu-form mt-3';
                             form.dataset.zazuOfflineEntity = 'inventory_item';
                             form.dataset.zazuOfflineLocalId = current.local_id;
-                            const serverId = current.server_id ?? current.id;
+                            const serverIdCandidate = current.server_id ?? current.id;
+                            const serverId = Number.isFinite(Number(serverIdCandidate)) && Number(serverIdCandidate) > 0
+                                ? Number(serverIdCandidate)
+                                : null;
                             if (serverId) form.dataset.zazuOfflineServerId = String(serverId);
                             form.dataset.zazuOfflineForceQueue = '1';
                             form.dataset.zazuOfflineInventoryEdit = '1';
@@ -2787,7 +2790,10 @@ function setupZazuOfflineDirectoryViews() {
                             noCapability.textContent = 'Not linked';
                             capabilitySelect.append(noCapability);
                             for (const capability of window.ZazuOffline.getState()?.catalogue || []) {
-                                const capabilityId = capability.server_id ?? capability.id;
+                                const capabilityIdCandidate = capability.server_id ?? capability.id;
+                                const capabilityId = Number.isFinite(Number(capabilityIdCandidate)) && Number(capabilityIdCandidate) > 0
+                                    ? Number(capabilityIdCandidate)
+                                    : null;
                                 if (!capabilityId) continue;
                                 const option = document.createElement('option');
                                 option.value = String(capabilityId);
