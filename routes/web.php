@@ -23,6 +23,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\OnboardingBusinessController;
 use App\Http\Controllers\OfflineLicenseController;
 use App\Http\Controllers\OfflineWorkspaceController;
 use App\Http\Controllers\PasswordResetController;
@@ -154,9 +155,9 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         Route::post('/setup/catalogue/skip', [OnboardingController::class, 'skipCatalogue'])->name('onboarding.catalogue.skip');
         Route::get('/setup/experience', [OnboardingController::class, 'experience'])->name('onboarding.experience');
         Route::post('/setup/experience', [OnboardingController::class, 'storeExperience'])->name('onboarding.experience.store');
-        Route::get('/setup/business', [OnboardingController::class, 'business'])->name('onboarding.business');
-        Route::post('/setup/business', [OnboardingController::class, 'storeBusiness'])->name('onboarding.business.store');
-        Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
+        Route::get('/setup/business', [OnboardingBusinessController::class, 'business'])->name('onboarding.business');
+        Route::post('/setup/business', [OnboardingBusinessController::class, 'storeBusiness'])->name('onboarding.business.store');
+        Route::post('/setup/business/skip', [OnboardingBusinessController::class, 'skipBusiness'])->name('onboarding.business.skip');
 
         Route::get('/exports', [BusinessExportController::class, 'index'])->name('exports.index');
         Route::post('/exports/archive/download', [BusinessExportController::class, 'downloadArchive'])->middleware('throttle:business-archive-export')->name('exports.archive.download');
