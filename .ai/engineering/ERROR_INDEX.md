@@ -62,7 +62,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-DATA-002 | CASE-ZAZU-0017 | Finance payment replay returns 422 instead of idempotent redirect | F1/F2/F3 | VERIFIED — current browser suite green |
 | ENG-DATA-003 | CASE-ZAZU-0033 | Stale offline snapshot overwrites an intervening record update | F1 | CLOSED — exact-head paired-device, causal-chain, conflict and writer-audit evidence passed on 51a75eb |
 | ENG-DATA-004 | CASE-ZAZU-0034 | Receiver bootstrap acknowledges an incomplete bounded snapshot | F1/F7 | CLOSED — exact-head CI verified on 559e66b |
-| ENG-RECOVERY-002 | CASE-ZAZU-0043 | Business archive restore committed before its success audit entry | F1 | IMPLEMENTED — exact-head regression pending |
+| ENG-RECOVERY-002 | CASE-ZAZU-0043 | Business archive restore committed before its success audit entry | F1 | CLOSED — exact-head Laravel PASS |
 | ENG-RUNTIME-003 | CASE-ZAZU-0044 | Windows PHP host upload limits inherited from machine php.ini | F4 | CLOSED AT LAUNCHER/CI LEVEL — installed restore still open |
 | ENG-AUTH-001 | CASE-ZAZU-0035 | Bootstrap trusts a stale authenticated device snapshot after revocation or credential replacement | F1/F7 | CLOSED — exact-head CI verified on 559e66b |
 | ENG-UI-003 | CASE-ZAZU-0018 | Calendar agenda hidden on desktop/tablet | F1/F2 | VERIFIED — current browser suite green |
