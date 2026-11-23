@@ -14,6 +14,14 @@
 - [x] Removed the obsolete GHSA-fc5q-39xc-vjpf / CVE-2026-112366 npm audit exception. GitHub marks the advisory withdrawn on 2026-11-18; the audit wrapper now applies the normal high-severity threshold without a package-specific bypass.
 - [ ] Exact-head CI for the consolidation commits: not yet confirmed. Do not infer a pass from earlier green runs.
 
+### Recovery confidentiality and staging hardening
+
+- [x] Restricted POSIX installation backup staging and published ZIP permissions to owner-only access.
+- [x] Restricted POSIX restore staging, extracted private media and rollback snapshots before activation.
+- [x] Added regression coverage for private staging and restored private-media permissions.
+- [x] Added an owner-facing warning that business archives are not password-encrypted.
+- [ ] Decide whether V1 requires application-level archive encryption or whether encrypted storage/NTFS ACL controls are the accepted release boundary. Both archive formats remain plain ZIP files; integrity checks are not confidentiality.
+
 ### Capability-to-Job integration coverage
 
 - [x] Added a mixed Job fixture proving saved Decor, Photography & video and Transport requirements drive the matching Job-specific Helper guidance.
