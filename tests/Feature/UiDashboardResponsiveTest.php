@@ -49,11 +49,11 @@ class UiDashboardResponsiveTest extends TestCase
         ];
 
         foreach ($canonicalSelectors as $selector) {
-            $pattern = '/^[ \\t]*' . preg_quote($selector, '/') . '\\s*\\{/m';
+            $pattern = '/^[ \\t]*'.preg_quote($selector, '/').'\\s*\\{/m';
             $this->assertSame(
                 1,
                 preg_match_all($pattern, $appCss),
-                $selector . ' should have one canonical base rule.'
+                $selector.' should have one canonical base rule.'
             );
         }
 
@@ -93,11 +93,11 @@ class UiDashboardResponsiveTest extends TestCase
             '.zazu-eyebrow',
             '.zazu-theme-toggle',
         ] as $selector) {
-            $pattern = '/^' . preg_quote($selector, '/') . '\\s*\\{/m';
+            $pattern = '/^'.preg_quote($selector, '/').'\\s*\\{/m';
             $this->assertSame(
                 1,
                 preg_match_all($pattern, $appCss),
-                $selector . ' should have one canonical desktop base rule.'
+                $selector.' should have one canonical desktop base rule.'
             );
         }
 
@@ -160,7 +160,7 @@ class UiDashboardResponsiveTest extends TestCase
 
         $this->assertIsString($controller);
         $this->assertIsString($css);
-        $this->assertStringContainsString("->limit(5)", $controller);
+        $this->assertStringContainsString('->limit(5)', $controller);
         $this->assertStringContainsString(".zazu-dash-event {\n    min-height: 64px;", $css);
         $this->assertStringContainsString('View all events', file_get_contents(resource_path('views/dashboard.blade.php')));
     }
