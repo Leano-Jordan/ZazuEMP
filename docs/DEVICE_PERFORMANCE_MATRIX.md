@@ -65,6 +65,14 @@ A short smoke capture can be used to validate the sampler:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\ops\windows\Measure-ZazuResources.ps1 -DurationSeconds 5 -IntervalSeconds 1
 ```
 
+After capture, generate a local p50/p95 report from the matching CSV and JSON manifest:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\ops\windows\Summarize-ZazuResources.ps1 -CsvPath '<sample-csv-path>' -ManifestPath '<manifest-json-path>'
+```
+
+The report includes sample counts, p50, p95, minimum and maximum for host and Zazu-scoped measurements. It deliberately omits the Windows computer name. Missing process matches and unsupported counters remain marked as unavailable, never as zero.
+
 The sampler looks for the PHP process listening on the configured Zazu ports and its child processes, plus matching local database/proxy processes. It records the provisional hardware cohort, source commit and optional installer SHA-256. The first Zazu CPU sample is intentionally blank because a real CPU delta requires two observations. If it cannot identify the Zazu process, it marks `ZazuProcessMatched=false` and leaves process CPU/memory/I/O values blank; missing data is never reported as zero usage. Network adapter and host disk metrics remain system-wide. PHP process I/O is labelled process I/O because Windows process I/O counters include more than disk activity. This is a local test instrument, not an always-on product telemetry service.
 
 ## Evidence still required
