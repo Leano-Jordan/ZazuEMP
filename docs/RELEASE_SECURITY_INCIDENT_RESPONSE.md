@@ -6,11 +6,13 @@
 **Operating address:** [Operating address — see private records]
 **Information Officer:** Isaac Junior Lehlogonolo Maluleka — formal registration/appointment status to be confirmed before publication  
 **Deputy / escalation:** Not applicable to the current solo-operator model; external legal/regulatory support to be engaged when required  
-**Regulatory contact process:** `[APPROVED CHANNEL TO BE CONFIRMED BEFORE PUBLICATION]`
+**Regulatory contact process:** Information Regulator eServices Security Compromise portal — https://eservices.inforegulator.org.za/compromises/default.aspx
 
 ## Purpose
 
 Control suspected or confirmed unauthorised access, disclosure, loss, corruption, malicious modification, credential compromise or private-media exposure.
+
+**Role boundary:** do not describe the named solo operator as a formally registered Information Officer until the appointment and registration status have been verified. The internal incident owner is not, by itself, proof of regulatory registration. The current provisional customer-reporting email is rosscorelabs@outlook.com; it must be monitored and tested. It is not the Regulator reporting channel.
 
 ## Severity
 
