@@ -78,22 +78,6 @@
                 </button>
             </div>
 
-            @if($business && $workspaceProfile)
-                <section class="zazu-workspace-profile" aria-label="Business mix" data-zazu-workspace-profile>
-                    <div class="zazu-workspace-profile-heading">
-                        <span>YOUR BUSINESS MIX</span>
-                        <strong data-zazu-workspace-profile-count>{{ $workspaceProfile['active_offerings'] }} active {{ \Illuminate\Support\Str::plural('offering', $workspaceProfile['active_offerings']) }}</strong>
-                    </div>
-                    <div class="zazu-workspace-profile-focuses" data-zazu-workspace-profile-focuses>
-                        @foreach($workspaceProfile['focus_labels'] as $focusLabel)
-                            <span>{{ $focusLabel }}</span>
-                        @endforeach
-                    </div>
-                    @if($workspaceProfile['catalogue_categories'])
-                        <p data-zazu-workspace-profile-categories>{{ implode(' · ', $workspaceProfile['catalogue_categories']) }}</p>
-                    @else
-                        <p>Your service catalogue is ready to be configured.</p>
-                    @endif
                     @if($can('capabilities.view'))
                         <a href="{{ route('capabilities.index') }}">Manage services &amp; prices <span aria-hidden="true">→</span></a>
                     @endif
@@ -158,6 +142,23 @@
                     @endif
                 </div>
             </nav>
+
+            @if($business && $workspaceProfile)
+                <section class="zazu-workspace-profile" aria-label="Business mix" data-zazu-workspace-profile>
+                    <div class="zazu-workspace-profile-heading">
+                        <span>YOUR BUSINESS MIX</span>
+                        <strong data-zazu-workspace-profile-count>{{ $workspaceProfile['active_offerings'] }} active {{ \Illuminate\Support\Str::plural('offering', $workspaceProfile['active_offerings']) }}</strong>
+                    </div>
+                    <div class="zazu-workspace-profile-focuses" data-zazu-workspace-profile-focuses>
+                        @foreach($workspaceProfile['focus_labels'] as $focusLabel)
+                            <span>{{ $focusLabel }}</span>
+                        @endforeach
+                    </div>
+                    @if($workspaceProfile['catalogue_categories'])
+                        <p data-zazu-workspace-profile-categories>{{ implode(' · ', $workspaceProfile['catalogue_categories']) }}</p>
+                    @else
+                        <p>Your service catalogue is ready to be configured.</p>
+                    @endif
 
             <div class="zazu-sidebar-footer">
                 <div class="zazu-footer-workspace">
