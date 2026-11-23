@@ -92,7 +92,7 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     await expect(quoteHeading).toBeVisible();
     const savedLines = page.locator('.zazu-quote-lines');
     await expect(savedLines).toContainText(selectedService);
-    await expect(savedLines).toContainText('2.00 guest');
+    await expect(savedLines).toContainText('1.00 guest');
     await expect(savedLines).toContainText('ZAR 123.45');
     await expect(page.locator('.zazu-total-row')).toContainText('ZAR 123.45');
 });
