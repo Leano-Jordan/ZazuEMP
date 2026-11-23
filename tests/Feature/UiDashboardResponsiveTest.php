@@ -70,6 +70,7 @@ class UiDashboardResponsiveTest extends TestCase
         $this->assertStringContainsString('.zazu-nav-area-chevron {', $appCss);
         $this->assertStringContainsString('overflow-y: auto;', $responsiveCss);
         $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-sidebar {', $mobileCss);
+        $this->assertStringContainsString(".zazu-nav-area.is-open > .zazu-nav-flyout {\n        display: block;\n        pointer-events: auto;", $appCss);
         $this->assertStringContainsString('min-height: 44px;', $mobileCss);
     }
 
