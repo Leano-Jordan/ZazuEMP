@@ -1647,14 +1647,14 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 
 ## Director execution — catalogue-driven Job intake parity — 2026-11-23
 
-**Implemented directly on `main`; latest implementation commit:** [0a4fea3](https://github.com/Leano-Jordan/ZazuEMP/commit/0a4fea35df95df86df106bb54675cd9813dba209).
+**Implemented directly on `main`; latest code commit:** [9b44f20](https://github.com/Leano-Jordan/ZazuEMP/commit/9b44f2082f994a1ed7d70dfa8d2943d28987eca4).
 
 - New Job now reads its selectable offerings from active `BusinessCapability` records belonging to the current business. It no longer presents the generic static service-category list as the business's catalogue.
 - Disabled offerings are omitted from new intake. An empty catalogue explains how to add an offering, while one-off custom services remain available separately.
 - Online Job creation validates selected names against the active business catalogue inside the transaction, locks the selected catalogue records, and creates `EventRequirement` rows linked to the correct `capability_id`, category and default unit.
 - Offline create/update keeps the existing `services[]` payload contract. Server reconciliation resolves names only against the mutation's business, links matching capability records and carries category/default-unit context. Legacy queued names retain the former static-category fallback; custom one-off services remain unlinked.
 - Duplicate same-name catalogue entries fail closed during offline reconciliation rather than linking an arbitrary capability. Existing requirement quantity, notes and status are retained on matching offline updates; accepted quote scope checks remain unchanged.
-- Added feature coverage for active versus disabled catalogue visibility and online requirement linkage/default unit.
+- Added feature coverage for active versus disabled catalogue visibility, online requirement linkage/default unit, and one-off custom services. Duplicate one-off/catalogue names are de-duplicated in both online and offline reconciliation.
 
 **Verification boundary:** implementation and test files were read back from `main`. Exact-head Laravel, PHPMD, Zazu Quality, Psalm, Director Health, browser/offline, PostgreSQL and Windows workflows have not yet been confirmed for this implementation head. No test pass or physical offline acceptance is claimed. The latest GitHub combined-status response contained no status entries.
 
