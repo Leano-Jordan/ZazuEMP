@@ -58,3 +58,10 @@ The current `package.json` has no icon package dependency. The dashboard current
 - The actual width issue is long form fields: `zazu-field-wide` spans the entire form grid and could become excessively wide on large screens. It is now capped at 760px while remaining full-width on mobile.
 - Field helper text is raised to 12px. Inputs/selects/textareas use 14px on desktop and 16px on mobile for legibility and to avoid mobile browser auto-zoom. Existing 13.5px labels and 42px control height are retained.
 - Existing reduced-motion handling is preserved. Zazu already has hover/focus/active transitions; the next motion pass should add feedback only where state changes need explaining, not animate every control.
+
+
+## Dashboard colour semantics
+
+- The dashboard previously assigned KPI card fills and icon colours by `:nth-child` position. Optional modules change the order/count of cards, so a colour could describe a different metric in another business workspace.
+- KPI surfaces are now neutral in both themes. Explicit metric classes drive icon accents: blue for work/customers/calendar, amber for outstanding quotes or invoices, green when those queues are clear and for revenue received.
+- This preserves colour as a cue for meaning/state rather than decoration or card position.

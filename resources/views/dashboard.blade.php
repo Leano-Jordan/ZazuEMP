@@ -43,20 +43,20 @@
     <section class="zazu-dash-overview" data-zazu-anchor="dashboard.overview" aria-label="Live business records at a glance">
         <aside class="zazu-dash-metrics">
             @if($workspaceTools['work'])
-            <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="calendar-event" size="20" /></span><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><b>→</b></a>
+            <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface zazu-dash-metric--work"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="calendar-event" size="20" /></span><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><b>→</b></a>
             @endif
             @if($workspaceTools['quotes'])
-            <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="file-invoice" size="20" /></span><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><b>→</b></a>
+            <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface zazu-dash-metric--quotes {{ $metrics['draft_quotes'] > 0 ? 'is-warning' : 'is-clear' }}"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="file-invoice" size="20" /></span><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><b>→</b></a>
             @elseif($workspaceTools['finance'] && $experienceLevel !== 'basic')
-            <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="file-invoice" size="20" /></span><span>Unpaid invoices</span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong><small>Issued invoices with a balance</small><b>→</b></a>
+            <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface zazu-dash-metric--invoices {{ $metrics['unpaid_invoices'] > 0 ? 'is-warning' : 'is-clear' }}"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="file-invoice" size="20" /></span><span>Unpaid invoices</span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong><small>Issued invoices with a balance</small><b>→</b></a>
             @endif
             @if($workspaceTools['customers'])
-            <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="users" size="20" /></span><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><b>→</b></a>
+            <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface zazu-dash-metric--customers"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="users" size="20" /></span><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><b>→</b></a>
             @endif
             @if($workspaceTools['finance'])
-            <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="credit-card" size="20" /></span><span>Payments received (this month)</span><strong>{{ $business->currency ?? 'ZAR' }} {{ $metrics['payments_received_this_month'] }}</strong><b>→</b></a>
+            <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface zazu-dash-metric--revenue"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="credit-card" size="20" /></span><span>Payments received (this month)</span><strong>{{ $business->currency ?? 'ZAR' }} {{ $metrics['payments_received_this_month'] }}</strong><b>→</b></a>
             @elseif($workspaceTools['calendar'])
-            <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="calendar-event" size="20" /></span><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><b>→</b></a>
+            <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface zazu-dash-metric--calendar"><span class="zazu-dash-metric-icon" aria-hidden="true"><x-icon name="calendar-event" size="20" /></span><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><b>→</b></a>
             @endif
         </aside>
 

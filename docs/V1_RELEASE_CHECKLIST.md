@@ -10,7 +10,7 @@
 - [x] Tabler Icons (MIT) selected as the future local icon standard; licence retention and offline delivery are documented.
 - [ ] Exact-head Laravel, Zazu Quality and browser acceptance for these changes.
 - [x] Local Tabler icon subset, shared Blade component and licence notice added; primary navigation and Dashboard icons migrated.
-- [ ] Complete remaining status/form icon migration and product-wide visual communication rollout. See [Director visual communication audit](DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md).
+- [x] Dashboard KPI colours now follow metric meaning/state rather than nth-child position.\n- [ ] Complete remaining status/form icon migration and product-wide visual communication rollout. See [Director visual communication audit](DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md).
 
 
 **Audit:** [Widespread engineering audit and formal scorecard](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md)  

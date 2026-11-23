@@ -2025,3 +2025,33 @@ body.zazu-dashboard-page.zazu-has-wallpaper .zazu-content {
         font-size: 16px;
     }
 }
+
+
+/* Metric surfaces stay neutral; accent colour communicates the meaning of the metric. */
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(n) {
+    background: var(--dash-surface) !important;
+    border-color: var(--dash-border) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(n) {
+    background: var(--dash-surface) !important;
+}
+body.zazu-dashboard-page .zazu-dash-metric--work .zazu-dash-metric-icon,
+body.zazu-dashboard-page .zazu-dash-metric--customers .zazu-dash-metric-icon,
+body.zazu-dashboard-page .zazu-dash-metric--calendar .zazu-dash-metric-icon {
+    background: var(--zazu-primary-soft) !important;
+    color: var(--zazu-primary) !important;
+}
+body.zazu-dashboard-page .zazu-dash-metric--quotes .zazu-dash-metric-icon,
+body.zazu-dashboard-page .zazu-dash-metric--invoices .zazu-dash-metric-icon {
+    background: var(--zazu-warning-soft) !important;
+    color: var(--zazu-warning-ink) !important;
+}
+body.zazu-dashboard-page .zazu-dash-metric--quotes.is-clear .zazu-dash-metric-icon,
+body.zazu-dashboard-page .zazu-dash-metric--invoices.is-clear .zazu-dash-metric-icon {
+    background: var(--zazu-success-soft) !important;
+    color: var(--zazu-success-ink) !important;
+}
+body.zazu-dashboard-page .zazu-dash-metric--revenue .zazu-dash-metric-icon {
+    background: var(--zazu-success-soft) !important;
+    color: var(--zazu-success-ink) !important;
+}

@@ -109,4 +109,18 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('font-size: 16px;', $css);
         $this->assertStringContainsString('@media (max-width: 760px)', $css);
     }
+
+    public function test_dashboard_metric_colours_are_semantic_not_position_based(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+
+        $this->assertStringContainsString('zazu-dash-metric--work', $dashboard);
+        $this->assertStringContainsString('zazu-dash-metric--quotes', $dashboard);
+        $this->assertStringContainsString('zazu-dash-metric--customers', $dashboard);
+        $this->assertStringContainsString('zazu-dash-metric--revenue', $dashboard);
+        $this->assertStringContainsString('zazu-dash-overview .zazu-dash-metric:nth-child(n)', $css);
+        $this->assertStringContainsString('var(--zazu-warning-soft)', $css);
+        $this->assertStringContainsString('var(--zazu-success-soft)', $css);
+    }
 }

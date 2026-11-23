@@ -2129,3 +2129,10 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Bounded `.zazu-field-wide` to 760px on larger screens while preserving full-width mobile behaviour.
 - Increased field helper text to 12px and control text to 14px desktop / 16px mobile. Existing label hierarchy and touch-target heights retained.
 - Confirmed shared buttons are content-sized by default; 100% widths are limited to mobile stacks and action-grid cells. No blanket button sizing change was made.
+
+
+## Dashboard metric colour semantics — 2026-11-23
+
+- Replaced positional KPI colour meaning with explicit classes for work, quotes, invoices, customers, revenue and calendar metrics.
+- Metric cards now use a consistent neutral surface; icon accents use semantic blue, amber and green states. Zero outstanding quotes/invoices switch to a clear/success accent.
+- Added regression coverage so optional module visibility cannot silently remap metric colours by card order.
