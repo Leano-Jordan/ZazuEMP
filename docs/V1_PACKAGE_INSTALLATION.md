@@ -35,6 +35,7 @@ The package does not contain a customer database, `.env`, application key, priva
 
 - Windows 10/11, 64-bit.
 - PHP 8.4 or newer, with the extensions listed by `Install-Zazu.ps1`.
+- PHP Sodium must be enabled for encrypted business archive V2 export and restore; the installer checks this prerequisite.
 - PowerShell 5.1 or newer.
 - Enough free disk space for the extracted app, database, private files and local backups.
 
