@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
@@ -111,7 +112,13 @@ class WorkController extends Controller
             'selectedCustomerId' => $selectedCustomerId,
             'customerOptions' => $customerOptions,
             'jobTypes' => config('zazu.job_types'),
-            'serviceCategories' => config('zazu.service_categories'),
+            'serviceCategories' => BusinessCapability::query()
+                ->where('business_id', $business->id)
+                ->where('is_active', true)
+                ->orderBy('category')
+                ->orderBy('name')
+                ->get()
+                ->groupBy(fn (BusinessCapability $capability) => $capability->category ?: 'Other'),
         ]);
     }
 
@@ -126,17 +133,26 @@ class WorkController extends Controller
             $services[] = Str::limit(trim($validated['other_service']), 100, '');
         }
 
-        $categoryByService = [];
-        foreach (config('zazu.service_categories') as $category => $availableServices) {
-            foreach ($availableServices as $service) {
-                $categoryByService[$service] = $category;
-            }
-        }
-
-        $event = DB::transaction(function () use ($validated, $services, $business, $categoryByService) {
+        $event = DB::transaction(function () use ($validated, $services, $business) {
             // Serialize customer/contact selection against concurrent customer
             // edits before taking the snapshot copied into the new Work record.
             DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
+
+            $capabilities = BusinessCapability::query()
+                ->where('business_id', $business->id)
+                ->where('is_active', true)
+                ->whereIn('name', $services)
+                ->lockForUpdate()
+                ->get()
+                ->groupBy('name');
+
+            foreach ($services as $service) {
+                if ($capabilities->get($service)?->count() !== 1) {
+                    throw ValidationException::withMessages([
+                        'services' => 'Choose services from your active business catalogue. Refresh the form if your catalogue has changed.',
+                    ]);
+                }
+            }
 
             $customer = Customer::query()
                 ->where('business_id', $business->id)
@@ -171,12 +187,14 @@ class WorkController extends Controller
             ]);
 
             foreach ($services as $service) {
+                $capability = $capabilities->get($service)->first();
                 EventRequirement::create([
                     'event_id' => $event->id,
-                    'description' => $service,
-                    'category' => $categoryByService[$service] ?? 'Other',
+                    'capability_id' => $capability->id,
+                    'description' => $capability->name,
+                    'category' => $capability->category ?: 'Other',
                     'quantity' => 1,
-                    'unit' => 'service',
+                    'unit' => $capability->default_unit ?: 'service',
                     'status' => 'open',
                 ]);
             }
