@@ -219,3 +219,15 @@ Regression tests cover a mixed DJ/sound/rental/product provider, a DJ-only busin
 ## Next vertical slice — active catalogue to online/offline Job intake
 
 The current New Job form still renders `config('zazu.service_categories')` and submits the legacy `services[]` field. Offline job creation and synchronization also reconcile this existing service list. The next implementation must derive choices from the active business-owned `BusinessCapability` catalogue while preserving one shared online/offline contract, business isolation, requirement quantities/units and accepted quote history. Do not replace the online form field with an unrelated IDs-only contract or leave phone-local creation using the old generic list.
+
+
+
+## Catalogue-driven Job intake — implementation checkpoint 2026-11-23
+
+New Job now presents active offerings from the current business's existing `BusinessCapability` records instead of the generic static service-category configuration. Disabled offerings are excluded. When no active offerings exist, the form explains how to add one; one-off custom services remain a separate option.
+
+Online creation validates the selected offering names against the active business catalogue within the creation transaction and stores the matching capability relationship, category and default unit on each starter `EventRequirement`. The existing `services[]` field is retained so the offline client contract does not change. Offline server application resolves those names within the mutation's business and links matching capability records. Existing legacy queued service names retain the prior category fallback, and accepted-quote scope protection is unchanged.
+
+**Scope of this slice:** catalogue-driven Job intake and capability-linked starter requirements. It does not complete multi-capability onboarding, adaptive navigation/dashboard visibility, specialist operational workflows or physical offline parity.
+
+**Verification:** feature tests were added for active/disabled offering visibility and online capability linkage. Exact-head CI and physical PC/phone acceptance are pending; this checkpoint must not be treated as a passing release gate until those results are recorded.
