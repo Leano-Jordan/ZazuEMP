@@ -72,7 +72,6 @@ class SearchTest extends TestCase
             ->assertViewHas('results', static fn (array $results): bool => $results === []);
     }
 
-
     public function test_document_search_finds_job_files_and_keeps_results_inside_the_active_business(): void
     {
         $first = Business::create([
@@ -213,7 +212,6 @@ class SearchTest extends TestCase
             ->assertViewHas('results', static fn (array $results): bool => $results === []);
     }
 
-
     public function test_search_results_respect_the_member_domain_permissions(): void
     {
         config(['zazu.permissions.roles.staff' => ['customers.view']]);
@@ -249,7 +247,6 @@ class SearchTest extends TestCase
             ->assertSee('0 records')
             ->assertViewHas('results', static fn (array $results): bool => $results === []);
     }
-
 
     public function test_customer_search_matches_active_contact_details_without_exposing_deleted_contacts(): void
     {
