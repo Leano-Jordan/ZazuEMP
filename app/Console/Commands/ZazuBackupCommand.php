@@ -511,4 +511,5 @@ class ZazuBackupCommand extends Command
         }
 
         return true;
-    }}
+    }
+}
