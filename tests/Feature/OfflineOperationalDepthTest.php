@@ -91,8 +91,36 @@ class OfflineOperationalDepthTest extends TestCase
         $applier->apply($movementMutation, ['inventory_movement' => $handler]);
         $applier->apply($movementMutation, ['inventory_movement' => $handler]);
 
+        $revision = (int) DB::table('sync_entity_identities')
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'inventory_item')
+            ->where('entity_uuid', $itemIdentity)
+            ->value('revision');
+        $this->assertSame(2, $revision);
+
+        $updateMutation = $recorder->record($device, 'inventory_item', $itemIdentity, 'update', [
+            'local_id' => $itemIdentity,
+            'expected_revision' => $revision,
+            'record' => [
+                'name' => 'Serving Trays Updated',
+                'sku' => 'TRAY-002',
+                'unit' => 'tray',
+                'reorder_level' => '3.00',
+            ],
+        ]);
+        $applier->apply($updateMutation, ['inventory_item' => $handler]);
+        $applier->apply($updateMutation, ['inventory_item' => $handler]);
+
+        $this->assertSame('Serving Trays Updated', $item->fresh()->name);
+        $this->assertSame('TRAY-002', $item->fresh()->sku);
+        $this->assertSame('3.00', $item->fresh()->reorder_level);
         $this->assertSame(10.0, $item->fresh()->on_hand);
         $this->assertSame(1, InventoryMovement::query()->where('business_id', $business->id)->count());
+        $this->assertSame(3, (int) DB::table('sync_entity_identities')
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'inventory_item')
+            ->where('entity_uuid', $itemIdentity)
+            ->value('revision'));
         $this->assertDatabaseHas('audit_logs', [
             'business_id' => $business->id,
             'action' => 'inventory.movement.recorded',
