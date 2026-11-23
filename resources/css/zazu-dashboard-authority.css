@@ -2181,3 +2181,24 @@ body.zazu-dashboard-page .zazu-dash-capability-copy > span:not(.zazu-dash-side-l
     body.zazu-dashboard-page .zazu-dash-hero { grid-template-columns: minmax(0, 1fr) !important; }
     body.zazu-dashboard-page .zazu-dash-hero-side { min-height: 150px; }
 }
+
+/* Quote-stage labels retain semantic status colors with WCAG AA contrast. */
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-draft > span,
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-draft > small {
+    color: var(--zazu-warning-ink) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-sent > span,
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-sent > small {
+    color: var(--zazu-info-ink) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-accepted > span,
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-accepted > small {
+    color: var(--zazu-success-ink) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-closed > span,
+body.zazu-dashboard-page .zazu-dash-quote-stage.is-closed > small {
+    color: var(--zazu-ink-2) !important;
+}
