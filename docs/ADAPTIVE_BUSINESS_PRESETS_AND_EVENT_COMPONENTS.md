@@ -253,3 +253,10 @@ These focus areas are also available as explicit primary business-focus choices 
 This remains contextual guidance, not capability-driven authorization or module hiding. Existing permission checks and route middleware remain authoritative. Regression coverage verifies all three explicit focus choices and verifies that active Decor/Photography catalogue entries drive mixed-business guidance while an inactive Catering entry does not.
 
 **Next:** verify the resulting guidance against actual Decor, Photography and Transport Job records, then continue low-risk workspace progressive disclosure only where existing permissions and operational data support it. Offline capability aggregate parity and physical device acceptance remain separate gates.
+
+
+## Owner capability summary — 2026-11-23
+
+The Setup Centre now reads the current business's existing `BusinessCapability` records and shows the owner the active offering count, hidden offering count and active mix by capability type. This is a read-only summary with a direct path to the existing catalogue configuration. It does not create a second settings store or expose this owner-only setup surface to staff. The query remains scoped through the current business relationship.
+
+Regression coverage includes active service, active rental and inactive service records. This summary complements the existing owner create/edit/deactivate controls; the catalogue remains the authoritative place to change offerings.
