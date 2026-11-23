@@ -1,6 +1,19 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+const DEMO_EMAIL = process.env.ZAZU_DEMO_EMAIL || 'demo@zazu.local';
+const DEMO_PASSWORD = process.env.ZAZU_DEMO_PASSWORD || 'password';
+
+async function login(page) {
+    await page.goto('/?auth=login', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
+    await page.getByLabel('Username or email').fill(DEMO_EMAIL);
+    await page.locator('#auth_password').fill(DEMO_PASSWORD);
+    await page.locator('[data-auth-submit]').click();
+    await page.waitForURL(url => url.pathname !== '/login');
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+}
+
 async function expectNoSeriousAccessibilityViolations(page, surface) {
     // Axe must inspect settled colors, not intermediate frames of intentional CSS transitions.
     await page.waitForTimeout(300);
@@ -32,3 +45,28 @@ test('public landing and authentication surfaces meet serious WCAG accessibility
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
     await expectNoSeriousAccessibilityViolations(page, 'login modal');
 });
+
+test('authenticated core workspace surfaces meet serious WCAG accessibility checks', async ({ page }) => {
+    await login(page);
+
+    const surfaces = [
+        ['/dashboard', 'authenticated dashboard'],
+        ['/search', 'workspace search'],
+        ['/customers', 'customer directory'],
+        ['/work', 'work directory'],
+        ['/quotes', 'quote directory'],
+        ['/finance', 'finance dashboard'],
+        ['/purchasing', 'purchasing directory'],
+        ['/inventory', 'inventory directory'],
+        ['/reports', 'business reports'],
+        ['/settings', 'business settings'],
+    ];
+
+    for (const [path, label] of surfaces) {
+        const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+        expect(response?.status(), `${label} must load successfully`).toBe(200);
+        await expect(page.locator('main')).toBeVisible();
+        await expectNoSeriousAccessibilityViolations(page, label);
+    }
+});
+
