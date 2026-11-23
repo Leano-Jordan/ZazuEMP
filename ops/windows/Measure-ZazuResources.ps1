@@ -138,11 +138,17 @@ if (($null -ne $installedMemoryGB -and $installedMemoryGB -le 8) -or $logicalPro
     $deviceTier = 'High-performance'
 }
 
-if ([string]::IsNullOrWhiteSpace($BuildCommitSha) -and (Get-Command git.exe -ErrorAction SilentlyContinue)) {
-    try {
-        $BuildCommitSha = (& git.exe -C $resolvedProject rev-parse HEAD 2>$null | Select-Object -First 1)
-        if ($LASTEXITCODE -ne 0) { $BuildCommitSha = '' }
-    } catch { $BuildCommitSha = '' }
+if ([string]::IsNullOrWhiteSpace($BuildCommitSha) -and -not [string]::IsNullOrWhiteSpace($env:GITHUB_SHA)) {
+    $BuildCommitSha = $env:GITHUB_SHA
+}
+if ([string]::IsNullOrWhiteSpace($BuildCommitSha)) {
+    $gitCommand = Get-Command git -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($gitCommand) {
+        try {
+            $BuildCommitSha = (& $gitCommand.Source -C $resolvedProject rev-parse HEAD 2>$null | Select-Object -First 1)
+            if ($LASTEXITCODE -ne 0) { $BuildCommitSha = '' }
+        } catch { $BuildCommitSha = '' }
+    }
 }
 $packageSha256 = $null
 if (-not [string]::IsNullOrWhiteSpace($PackagePath) -and (Test-Path -LiteralPath $PackagePath -PathType Leaf)) {
