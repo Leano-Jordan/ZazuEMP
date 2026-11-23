@@ -3,7 +3,8 @@
 **Date:** 2026-11-23  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Canonical branch:** `main` (no branches created)  
-**Current source head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`  
+**Current repository HEAD:** `a963094a53174b507ca83d14ac2892459fd22f5c` (documentation-only).  
+**Verified application/test head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`  
 **Disposition:** V1 remains **NOT READY**. The product foundation is substantial; recovery acceptance, offline physical proof, populated commercial reconciliation and legal/brand closure remain release gates.
 
 ## 1. Scope and method
@@ -52,7 +53,7 @@ The connected PC/phone passes do not imply offline cold-start/restart passes. No
 
 **Regression:** the encrypted restore flow installs a SQLite trigger that deliberately rejects the restore audit insert. The test asserts that no customer record remains in the target and that newly written private files are removed while the source file remains.
 
-**Status:** implemented on `main`; exact-head Laravel verification is queued at this audit checkpoint. This is a separately discovered source defect, not a proven explanation for the Founder's earlier upload failure.
+**Status:** CLOSED at code/automated-test level. The exact-head `c57bbd72` Laravel run passed 744 tests / 1 skipped / 5,230 assertions, including the forced audit-write failure rollback regression. This is a separately discovered source defect, not a proven explanation for the Founder's earlier upload failure.
 
 ### RUNTIME-001 — Windows PHP upload limits were implicit (P1, corrected at launcher level)
 
@@ -78,11 +79,11 @@ A Windows Ops contract check verifies these settings remain attached to the actu
 - Extracted authenticated Sodium stream processing into `BusinessArchiveEncryptionStream`; `BusinessArchiveEncryptionService` now owns passphrase validation and private temporary-file lifecycle.
 - Removed obsolete stream read/write helpers left in the encryption service after extraction.
 
-**Verification:** PHPMD passed on `2d7b1146` [run 45205108169](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45205108169). The final route wiring is on `620ab99b`; Laravel and Quality workflows for that final head were queued at the time of this report.
+**Verification:** PHPMD passed on `2d7b1146` [run 45205108169](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45205108169). Final route wiring is retained on current `main`; exact-head Laravel and Zazu Quality passed on `c57bbd72`.
 
 ### MAINT-002 — Archive controller PHPDoc formatting (P2, corrected)
 
-Pint rejected non-canonical array PHPDoc spacing in `BusinessExportController`. The docblocks were corrected. No mass formatting of unrelated legacy files was performed.
+Pint rejected non-canonical array PHPDoc spacing in `BusinessExportController`. The docblocks and route import ordering were corrected; exact-head Zazu Quality passed on `c57bbd72`. No mass formatting of unrelated legacy files was performed.
 
 ### OFFLINE-001 — Customer metadata discarded when photo change is deferred (P1, corrected)
 
@@ -107,7 +108,7 @@ Pint rejected non-canonical array PHPDoc spacing in `BusinessExportController`. 
 | Purchasing/inventory | Receiving, idempotency, stock and event-cost linkage have regression coverage. | Physical stock/GRN reconciliation on the populated workspace. |
 | Tenant/data integrity | Business-scoped queries, FK remapping, identity validation and adversarial isolation tests are present in reviewed paths. | No independent live-install penetration test is claimed. |
 | Offline continuity | IndexedDB workspace, mutation queue, host-outage detection, reconnect and phone-local attachment journeys have automated coverage. | Actual Android cold launch, force-close/restart and disconnected write/reconnect remain unverified in the recorded evidence. |
-| Recovery | Encrypted V2 business archives, legacy V1 compatibility, tenant-scoped remapping and Windows/CI recovery tests exist. Two defects were found and corrected as recorded above. | Original installed restore failure has not been physically cleared; full installation recovery remains a separate gate. |
+| Recovery | Encrypted V2 business archives, legacy V1 compatibility, tenant-scoped remapping and Windows/CI recovery tests exist. Three defects were found and corrected as recorded above. | Original installed restore failure has not been physically cleared; full installation recovery remains a separate gate. |
 | Privacy/legal | POPIA documentation, data minimisation guidance and operational templates exist. | Information Officer, real provider/operator inventory and terms, retention/disposal, operational exercises and legal approval remain open. |
 | Brand | No software defect identified in this audit. | ZAZU name clearance remains open. |
 
@@ -128,7 +129,6 @@ No additional confirmed finance/tenant-isolation defect was established in the s
 | Zazu Quality on `c57bbd72` | PASS — [run 45229070049](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229070049) |
 | Windows V1 package/fresh install on runtime-identical application code `51f809ce` | PASS — [run 45229065626](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229065626) |
 | Director Health on runtime-identical application code `51f809ce` | PASS — [run 45229065739](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229065739) |
-| SonarCloud | SKIPPED — not counted as a pass |
 | SonarCloud | SKIPPED — not counted as a pass |
 
 The earlier 743-test result is historical baseline only. The exact-head `c57bbd72` run now verifies the archive transaction change, maintainability refactors, offline customer metadata/photo boundary and the complete current browser acceptance suite.
@@ -154,15 +154,15 @@ The canonical 13-domain method remains the formal scoring basis. Each domain is 
 | Legal, privacy and brand clearance | 1/5 |
 | **Total** | **46/65 = 3.54/5 = 70.8/100, reported as 71/100** |
 
-**Score action: REAFFIRMED at 71/100.** No numerical uplift is awarded for code refactors or queued CI. Recovery remains 4/5 for its automated archive/installation evidence, but the failed installed restore attempt blocks release acceptance and prevents a 5/5 operational score.
+**Score action: REAFFIRMED at 71/100.** No numerical uplift is awarded for code refactors or newly closed automated defects. Recovery remains 4/5 for its automated archive/installation evidence, but the failed installed restore attempt blocks release acceptance and prevents a 5/5 operational score.
 
 ## 7. Director decision and next execution order
 
 **V1: NOT READY.** Do not widen feature scope.
 
-1. Finish exact-head Laravel, Zazu Quality, Psalm, PHPMD and Windows verification for `620ab99b` and correct any genuine failures without suppressing thresholds.
-2. Reconcile today's owner testing evidence into the checklist; strike off only outcomes explicitly demonstrated. Do not ask the Founder to repeat connected PC/mobile checks or backup verification.
-3. Keep the failed disposable archive restore preserved. After the launcher and restore fixes pass CI, use the original failure reference/log evidence to establish whether a controlled retest is safe; never use the live business as the test target.
+1. [x] Exact-head Laravel, desktop/mobile offline acceptance, PostgreSQL migration/recovery and Zazu Quality passed on `c57bbd72`; Windows package/fresh install passed on runtime-identical application code `51f809ce`. SonarCloud was skipped.
+2. [x] Reconciled the Founder-confirmed connected PC/phone, shared workspace, populated modules, migration check, backup verification, onboarding feedback and failed disposable archive restore into the release checklist. Do not repeat those checks.
+3. Preserve the failed disposable archive restore evidence. Do not retry until the first failure stage is identified and the Founder is ready for a controlled retest; never use the live business as the test target.
 4. Close the remaining owner acceptance gates: Android offline/restart/reconnect, populated commercial reconciliation, full installation restore, POPIA operations and ZAZU name clearance.
 
 All changes in this audit were committed directly to `main`. No branch was created. No live business data, database or production environment was changed by this audit.
