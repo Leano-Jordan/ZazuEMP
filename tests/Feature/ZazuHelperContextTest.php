@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Models\Event;
+use App\Models\EventCost;
 use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Models\PurchaseOrder;
@@ -188,17 +189,29 @@ class ZazuHelperContextTest extends TestCase
             'category' => 'Equipment',
             'quantity' => '2.00',
             'unit' => 'set',
-            'status' => 'open',
+            'status' => 'blocked',
         ]);
+        EventCost::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'category' => 'Equipment',
+            'description' => 'Confirm equipment supplier cost',
+            'currency' => 'ZAR',
+            'projected_amount' => '250.00',
+            'actual_amount' => null,
+            'status' => 'planned',
+        ]);
+
         $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Event component supplier',
         ]);
+        $purchaseOrderReference = 'HELPER-EVENT-PO-'.Str::upper(Str::random(5));
         PurchaseOrder::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
             'supplier_id' => $supplier->id,
-            'reference' => 'HELPER-EVENT-PO-'.Str::upper(Str::random(5)),
+            'reference' => $purchaseOrderReference,
             'status' => 'sent',
             'currency' => 'ZAR',
             'total_amount' => '250.00',
@@ -222,6 +235,14 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('href="'.route('purchasing.index', ['event_id' => $event->id]).'"', false)
             ->assertSee('Review purchasing')
             ->assertSee('data-zazu-helper-event-record-link', false)
+            ->assertSee('data-zazu-helper-event-operational-details="3"', false)
+            ->assertSee('Current operational state')
+            ->assertSee('Prepare tent hardware')
+            ->assertSee('Blocked')
+            ->assertSee($purchaseOrderReference)
+            ->assertSee('Sent')
+            ->assertSee('Confirm equipment supplier cost')
+            ->assertSee('Planned')
             ->assertDontSee('Catering preparation')
             ->assertDontSee('Camera editing');
     }
