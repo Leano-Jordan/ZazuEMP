@@ -226,7 +226,7 @@ class OnboardingTest extends TestCase
         $this->assertNull($business->catalogue_setup_completed_at);
         $this->assertNotNull($business->catalogue_setup_skipped_at);
 
-        $this->get(route('onboarding.catalogue'))->assertRedirect(route('onboarding.experience'));
+        $this->get(route('onboarding.catalogue'))->assertRedirect(route('onboarding.business'));
         $this->get(route('onboarding.index'))->assertOk();
 
         $this->post(route('onboarding.catalogue.finish'))
@@ -411,6 +411,7 @@ class OnboardingTest extends TestCase
             ->assertSee('Quick actions')
             ->assertSee('Open finance');
     }
+
     private function selectBusinessFocus(User $user, Business $business): void
     {
         $user->businesses()->updateExistingPivot($business->id, [
