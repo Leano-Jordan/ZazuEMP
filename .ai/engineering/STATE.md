@@ -1788,3 +1788,18 @@ Added feature regressions for the next adaptive-business vertical slice:
 - Existing Job requirement description/category and Job-specific Decor guidance survive capability deactivation; saved Job scope is not rewritten.
 
 The test uses the actual owner update route and verifies owner/staff catalogue presentation. No new configuration store, permission or offline contract was introduced. Exact-head CI is required before marking the change green.
+
+
+## Recovery staging confidentiality hardening — 2026-11-23
+
+**Source changes on main:**
+- Added `PrivateStoragePermissions` to create owner-only POSIX staging trees (0700 directories, 0600 files) and reject links/special entries in those trees.
+- Installation backup staging and temporary ZIP publication now use restrictive permissions; the completed archive is restricted before it is published.
+- Restore staging, extracted private media, preserved private-storage rollback, SQLite staging/rollback files and MySQL/PostgreSQL rollback snapshots are restricted before activation/use.
+- All temporary backup, restore and rollback artifacts now live under `storage/app/zazu-backups/`, not the broadly inherited `storage/app` root. The Windows installer already applies a restricted ACL to `storage/app/zazu-backups` for the installation owner, SYSTEM and local Administrators.
+- Added a POSIX permission unit test and extended the installation backup/restore round-trip to assert the published archive and restored private media permissions.
+- Added an owner-facing warning on the business archive screen that `.zazu` exports are not password-encrypted.
+
+**Open confidentiality decision:** installation and business archives remain plain ZIP files. Checksums/allowlist validation do not encrypt or authenticate the archive. POSIX staging permissions and Windows NTFS ACLs reduce local exposure but do not protect copied archives. Off-disk storage must be encrypted and access-controlled. Decide whether application-level passphrase encryption is mandatory for V1 before making any confidentiality claim.
+
+**Verification boundary:** source and test changes are committed/read back from `main`; exact-head Laravel, Windows PowerShell, PHPMD, formatting and quality checks are pending. No new CI pass is claimed.
