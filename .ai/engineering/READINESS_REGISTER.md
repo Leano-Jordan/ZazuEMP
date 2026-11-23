@@ -1,3 +1,19 @@
+## Director audit reconciliation — 2026-11-23
+
+**Current source head:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`.  
+**Full audit:** [docs/DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md](../../docs/DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md).
+
+- Owner-verified PASS: connected PC normal use; connected linked-phone normal use; shared workspace; populated fictional customer/quote/invoice/supplier/PO/inventory records; installed DB migration check; installation and business backup presence/download plus independent verification.
+- Owner-tested but failed: encrypted business archive restore against disposable empty workspace. The initial failure stage is not conclusively identified; later SYS-002/429 is rate limiting, not the root cause.
+- Corrected on main: Windows PHP host now explicitly sets 100M upload / 110M POST and 300-second execution/input limits; restore audit writes are now inside the restore transaction with rollback/file cleanup on audit failure.
+- Maintainability: onboarding flow and archive encryption stream responsibilities split into focused classes; obsolete encryption helpers removed. PHPMD passed on `2d7b1146`; final route wiring is on `620ab99b`.
+- Exact-head Laravel and Quality for `620ab99b` were queued at this checkpoint. Do not report them as passed until their runs complete.
+- Formal 13-domain evidence-maturity score remains **71/100 (46/65)**; 77/100 in older hardening notes is not the canonical recalculated score. V1 remains **NOT READY**.
+
+Do not repeat connected startup, populated-record creation, or backup verification. Keep offline physical acceptance, successful business restore, full installation recovery, populated quote-to-profit reconciliation, POPIA and ZAZU clearance separate.
+
+---
+
 ## POPIA documentation and data-minimisation checkpoint — 2026-11-23
 
 **Documentation refreshed on main:**
