@@ -1955,3 +1955,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - The map recommends a read-only profile derived from existing sources, permission-preserving progressive disclosure in navigation, then a versioned offline contract. It explicitly rejects capability-based authorization and parallel workflow state.
 - Source-map commit: `ce06d534ffd2d5cab79d3f0a6c77bd4db88be586`.
 - Exact-head CI for this documentation-only commit is pending. No capability-driven navigation or offline parity is claimed as implemented.
+
+
+## Derived workspace profile and navigation context — 2026-11-23
+
+- Added `App\\Support\\WorkspaceProfile`, a read-only profile derived from the signed-in member's existing business focus membership and active `BusinessCapability` records. It does not persist duplicate state, include inactive offerings, or grant permissions.
+- Integrated a compact “Your business mix” context panel into the authenticated sidebar. It shows selected/inferred focus labels, active catalogue categories, active offering count, and a permission-gated link to Services & prices.
+- The panel is presentation context only. Existing Work, Sales, Resources, Finance and System routes remain discoverable and retain their existing role/permission checks. No navigation route is hidden and no access policy changed.
+- Added a feature regression for a mixed DJ/catering catalogue, ensuring inactive photography offerings are excluded while shared Jobs, Quotes and Finance remain visible.
+- Code/test commits: `afaab2e` (resolver), `35d1f4f` (layout), `52109a0` (styles), `2929945` (feature test). Exact-head CI is required before treating this slice as accepted.
+- Remaining: richer capability-to-module prioritisation and explicit offline profile contract; neither is claimed complete.
