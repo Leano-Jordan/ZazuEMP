@@ -191,16 +191,7 @@ class ZazuHelperContextTest extends TestCase
             'unit' => 'set',
             'status' => 'blocked',
         ]);
-        EventCost::create([
-            'business_id' => $business->id,
-            'event_id' => $event->id,
-            'category' => 'Equipment',
-            'description' => 'Confirm equipment supplier cost',
-            'currency' => 'ZAR',
-            'projected_amount' => '250.00',
-            'actual_amount' => null,
-            'status' => 'planned',
-        ]);
+        $this->createPlannedHelperCost($business, $event);
 
         $supplier = Supplier::create([
             'business_id' => $business->id,
@@ -245,6 +236,20 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('Planned')
             ->assertDontSee('Catering preparation')
             ->assertDontSee('Camera editing');
+    }
+
+    private function createPlannedHelperCost(Business $business, Event $event): EventCost
+    {
+        return EventCost::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'category' => 'Equipment',
+            'description' => 'Confirm equipment supplier cost',
+            'currency' => 'ZAR',
+            'projected_amount' => '250.00',
+            'actual_amount' => null,
+            'status' => 'planned',
+        ]);
     }
 
     private function makeBusiness(string $name): Business
