@@ -19,9 +19,9 @@ class UiShellThemeRegressionTest extends TestCase
             $layout
         );
         $this->assertStringContainsString("return 'light';", $appJs);
-        $this->assertStringNotContainsString("prefers-color-scheme: dark", $layout);
-        $this->assertStringNotContainsString("prefers-color-scheme: dark", $appJs);
-        $this->assertStringContainsString("safeStorageSet(storageKey, next);", $appJs);
+        $this->assertStringNotContainsString('prefers-color-scheme: dark', $layout);
+        $this->assertStringNotContainsString('prefers-color-scheme: dark', $appJs);
+        $this->assertStringContainsString('safeStorageSet(storageKey, next);', $appJs);
     }
 
     public function test_light_shell_uses_blue_navigation_and_separate_light_topbar_surfaces(): void
