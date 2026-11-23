@@ -2146,3 +2146,18 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Windows V1 Package run `45268313088`: candidate build, encrypted/legacy archive recovery, first-install script and local launcher HTTP-readiness checks passed.
 - SonarCloud run `45268315558`: all configured analyses passed.
 - Visual appearance on the user's physical device remains unverified; no claim of physical acceptance is made.
+
+
+## Director UI corrective pass — sidebar, icons and calendar — 2026-11-23
+
+**Implemented directly on `main`:**
+- Replaced hover-positioned sidebar flyouts with an in-flow accordion. The current route's group (including Work) is expanded on first render; other groups open by click and no longer overlap adjacent navigation destinations.
+- Made the sidebar navigation region the scroll owner so the navigation, business-mix panel and account footer do not compress into one unusable mobile column.
+- Increased primary sidebar icon rendering to 23px while retaining the existing local/offline icon source and licence decision.
+- Restored the complete seven-column month grid on narrow screens inside a touch-scrollable viewport. The grid no longer disappears behind the mobile agenda fallback or compresses dates into unreadable columns.
+- Reflowed calendar toolbar, month controls and summary metrics for tablet/phone widths.
+- Added Playwright regression coverage for active Work expansion, no hover flyout overlap, icon dimensions, all seven calendar weekdays and mobile horizontal grid scrolling.
+
+**Source commits:** `ae22ad8d` (server-rendered active navigation state), `e94c07a4` (accordion/icon/calendar responsive styles), `def0966d` (browser regressions).
+
+**Verification:** the prior exact-head workflow `45268313094` passed its listed Laravel, PostgreSQL, offline browser, mobile navigation, accessibility and coverage jobs. That result predates this corrective pass and is not evidence for these new changes. Exact-head CI and physical device acceptance for `def0966d` remain pending. Do not close this item until the new browser regression and normal quality gates pass.
