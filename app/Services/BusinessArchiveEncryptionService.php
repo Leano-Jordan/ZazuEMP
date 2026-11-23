@@ -46,6 +46,7 @@ final class BusinessArchiveEncryptionService
         }
 
         $key = null;
+        $state = null;
         try {
             $salt = random_bytes(SODIUM_CRYPTO_PWHASH_SALTBYTES);
             $key = sodium_crypto_pwhash(
@@ -96,6 +97,9 @@ final class BusinessArchiveEncryptionService
                 ? $exception
                 : new RuntimeException('The business archive could not be encrypted.', 0, $exception);
         } finally {
+            if (is_string($state)) {
+                sodium_memzero($state);
+            }
             if (is_string($key)) {
                 sodium_memzero($key);
             }
