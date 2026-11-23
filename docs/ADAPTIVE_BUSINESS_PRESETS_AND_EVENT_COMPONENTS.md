@@ -230,4 +230,4 @@ Online creation validates the selected offering names against the active busines
 
 **Scope of this slice:** catalogue-driven Job intake and capability-linked starter requirements. It does not complete multi-capability onboarding, adaptive navigation/dashboard visibility, specialist operational workflows or physical offline parity.
 
-**Verification:** feature tests were added for active/disabled offering visibility and online capability linkage. Exact-head CI and physical PC/phone acceptance are pending; this checkpoint must not be treated as a passing release gate until those results are recorded.
+**Verification:** feature tests were added for active/disabled offering visibility, online capability linkage/default unit and the one-off custom-service path. Exact-head CI and physical PC/phone acceptance are pending; this checkpoint must not be treated as a passing release gate until those results are recorded.
