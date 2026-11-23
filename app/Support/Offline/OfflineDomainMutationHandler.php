@@ -556,7 +556,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $otherService = $this->nullableString($otherService, 100);
-        if ($otherService !== null) {
+        if ($otherService !== null && ! array_key_exists($otherService, $requirements)) {
             $requirements[$otherService] = [
                 'category' => 'Other',
                 'capability_id' => null,
