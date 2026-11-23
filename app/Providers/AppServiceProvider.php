@@ -131,6 +131,18 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by('quote-public:'.$request->ip());
         });
 
+        RateLimiter::for('business-archive-export', function (Request $request) {
+            $identity = $request->user()?->getAuthIdentifier() ?? $request->ip();
+
+            return Limit::perMinutes(10, 3)->by('business-archive-export:'.$identity);
+        });
+
+        RateLimiter::for('business-archive-restore', function (Request $request) {
+            $identity = $request->user()?->getAuthIdentifier() ?? $request->ip();
+
+            return Limit::perMinutes(10, 3)->by('business-archive-restore:'.$identity);
+        });
+
         RateLimiter::for('sync', function (Request $request) {
             $token = $request->bearerToken();
 
