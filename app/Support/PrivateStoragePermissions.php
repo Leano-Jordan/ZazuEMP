@@ -29,26 +29,35 @@ final class PrivateStoragePermissions
         }
 
         try {
-            $entries = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::CHILD_FIRST
-            );
-
-            foreach ($entries as $entry) {
-                if ($entry->isLink() || (! $entry->isDir() && ! $entry->isFile())) {
-                    return false;
-                }
-
-                $mode = $entry->isDir() ? 0700 : 0600;
-                if (! @chmod($entry->getPathname(), $mode)) {
-                    return false;
-                }
+            if (! $this->restrictDirectoryEntries($path)) {
+                return false;
             }
-        } catch (\Throwable) {
+        } catch (\\Throwable) {
             return false;
         }
 
         return @chmod($path, 0700);
+    }
+
+    private function restrictDirectoryEntries(string $path): bool
+    {
+        $entries = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($entries as $entry) {
+            if ($entry->isLink() || (! $entry->isDir() && ! $entry->isFile())) {
+                return false;
+            }
+
+            $mode = $entry->isDir() ? 0700 : 0600;
+            if (! @chmod($entry->getPathname(), $mode)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function restrictFile(string $path): bool
