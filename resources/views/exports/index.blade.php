@@ -43,12 +43,24 @@
                 <div class="zazu-panel-title">Complete business archive</div>
                 <div class="zazu-panel-copy mt-1">Package this workspace's linked operational records and private uploaded files into one portable archive. Account passwords, user sessions, device pairing tokens, licence entitlements and the SARS TCS PIN are never included. Re-enter the TCS PIN after restoring.</div>
             </div>
-            <span class="zazu-chip zazu-chip-neutral">ZAZU ARCHIVE V1</span>
+            <span class="zazu-chip zazu-chip-neutral">ZAZU ARCHIVE V2 · ENCRYPTED</span>
         </div>
-        <p class="zazu-panel-copy mt-3"><strong>Security:</strong> this archive is not password-encrypted. It contains sensitive business records and uploaded files. Store it only in a protected location; do not email it or place it in public file-sharing.</p>
-        <div class="flex flex-wrap gap-3 mt-4">
-            <a href="{{ route('exports.archive.download') }}" class="zazu-btn zazu-btn-primary">Download business archive</a>
-        </div>
+        <p class="zazu-panel-copy mt-3"><strong>Security:</strong> new business archives are encrypted with XChaCha20-Poly1305 and an Argon2id-derived key. Choose a strong, unique passphrase and keep it separately from the archive. Zazu cannot recover a forgotten passphrase. Older V1 archives remain importable but are unencrypted.</p>
+        <form method="POST" action="{{ route('exports.archive.download') }}" class="mt-4 grid gap-3 sm:grid-cols-2">
+            @csrf
+            <label class="zazu-field-label" for="archive-export-password">New archive passphrase
+                <input id="archive-export-password" name="archive_password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required class="zazu-input mt-1 w-full">
+            </label>
+            <label class="zazu-field-label" for="archive-export-password-confirmation">Confirm passphrase
+                <input id="archive-export-password-confirmation" name="archive_password_confirmation" type="password" minlength="12" maxlength="128" autocomplete="new-password" required class="zazu-input mt-1 w-full">
+            </label>
+            @error('archive_password')
+                <p class="text-sm text-red-600 sm:col-span-2">{{ $message }}</p>
+            @enderror
+            <div class="sm:col-span-2">
+                <button type="submit" class="zazu-btn zazu-btn-primary">Encrypt and download business archive</button>
+            </div>
+        </form>
         <div class="zazu-detail-row mt-4">
             <div class="zazu-detail-label">Restore boundary</div>
             <div class="zazu-detail-value">Restore is allowed only into an empty, unpaired business workspace. Existing records and offline sync state are never overwritten or merged. Record IDs are remapped and business ownership is re-bound to this workspace.</div>
@@ -57,7 +69,12 @@
             @csrf
             <label for="business-archive" class="zazu-field-label">Restore a Zazu business archive (.zazu)</label>
             <input id="business-archive" name="archive" type="file" accept=".zazu,application/zip" required class="zazu-input w-full">
+            <label for="archive-restore-password" class="zazu-field-label">Archive passphrase <span class="font-normal opacity-70">(required for encrypted V2 archives)</span></label>
+            <input id="archive-restore-password" name="archive_password" type="password" minlength="12" maxlength="128" autocomplete="off" class="zazu-input w-full">
             @error('archive')
+                <p class="text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            @error('archive_password')
                 <p class="text-sm text-red-600">{{ $message }}</p>
             @enderror
             <button type="submit" class="zazu-btn zazu-btn-secondary">Validate and restore archive</button>
