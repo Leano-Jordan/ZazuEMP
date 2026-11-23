@@ -1,6 +1,6 @@
 <x-app-layout>
-    <x-slot:title>Workspace focus</x-slot:title>
-    <x-slot:heading>Workspace focus</x-slot:heading>
+    <x-slot:title>Business profile</x-slot:title>
+    <x-slot:heading>Your business</x-slot:heading>
     <section class="zazu-page-intro">
         <div>
             <span class="zazu-eyebrow">Step 1 · Understand your business</span>
@@ -21,6 +21,7 @@
             <legend class="zazu-fieldset-legend">Your business activities</legend>
             <p class="zazu-fieldset-help">Choose as many as apply. A business can provide DJ and sound, catering, photography, decor, rentals and more.</p>
             @php($chosenFocuses = old('business_focuses', $selectedFocuses))
+            @php($defaultPrimaryFocus = old('primary_niche', $selectedNiche ?? (count($chosenFocuses) === 1 ? $chosenFocuses[0] : 'mixed')))
             <input type="hidden" name="business_focuses_present" value="1">
             <div class="zazu-niche-grid">
                 @foreach($nicheOptions as $key => $option)
@@ -39,10 +40,10 @@
             <label class="zazu-field mt-4">
                 <span class="zazu-label">Which activity should Zazu prioritise?</span>
                 <select name="primary_niche" class="zazu-select">
-                    <option value="mixed" @selected(old('primary_niche', $selectedNiche ?? 'mixed') === 'mixed')>Balanced view across my business</option>
+                    <option value="mixed" @selected($defaultPrimaryFocus === 'mixed')>Balanced view across my business</option>
                     @foreach($nicheOptions as $key => $option)
                         @continue($key === 'mixed')
-                        <option value="{{ $key }}" @selected(old('primary_niche', $selectedNiche) === $key)>{{ $option['label'] }}</option>
+                        <option value="{{ $key }}" @selected($defaultPrimaryFocus === $key)>{{ $option['label'] }}</option>
                     @endforeach
                 </select>
                 <span class="zazu-field-help">This affects guidance and starting suggestions, not what you are allowed to sell or manage.</span>
