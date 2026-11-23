@@ -5,6 +5,16 @@
 
 ### Owner checks already completed — do not repeat
 
+### Engineering defects corrected — 2026-11-23
+
+- [x] Windows host PHP upload contract made explicit (100M upload / 110M POST / 300-second execution and input limits); Windows Ops workflow PASS.
+- [x] Restore audit moved inside the business restore transaction; deliberate audit-write failure regression passed in Laravel (744 passed, 1 skipped, 5,230 assertions on application head 620ab99b).
+- [x] Onboarding controller complexity and public-method count reduced by extracting progress state and business-profile actions; PHPMD PASS.
+- [x] Archive encryption stream handling extracted from temporary-file lifecycle; obsolete helpers removed; PHPMD PASS.
+- [x] Business archive controller PHPDoc and route import formatting corrected; Zazu Quality PASS on 22300930.
+- [ ] Final offline browser acceptance and full exact-head regression reconciliation on 22300930 still running.
+
+
 - [x] Installed PC normal connected operation.
 - [x] Linked phone normal connected operation.
 - [x] PC and phone use the same workspace.
