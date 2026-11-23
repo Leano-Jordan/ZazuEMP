@@ -106,7 +106,16 @@ class BusinessExportController extends Controller
             ]);
 
             $errors = $exception->errors();
-            $errors['archive'][] = 'Restore request reference: '.$incidentId;
+            $archiveErrors = $errors['archive'] ?? [];
+            $reference = 'Restore request reference: '.$incidentId;
+
+            if ($archiveErrors === []) {
+                $archiveErrors[] = $reference;
+            } else {
+                $archiveErrors[0] = rtrim($archiveErrors[0]).' '.$reference;
+            }
+
+            $errors['archive'] = $archiveErrors;
 
             return back()->withErrors($errors);
         }
