@@ -307,6 +307,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $requestedRequirements = $this->offlineJobRequirementDefinitions(
+            (int) $event->business_id,
             $payload['services'],
             $payload['other_service'] ?? null
         );
@@ -489,6 +490,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     private function syncOfflineJobRequirements(Event $event, array $payload): void
     {
         $requirements = $this->offlineJobRequirementDefinitions(
+            (int) $event->business_id,
             $payload['services'],
             $payload['other_service'] ?? null
         );
@@ -501,56 +503,91 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         $event->requirements()->whereNotIn('description', array_keys($requirements))->delete();
 
-        foreach ($requirements as $description => $category) {
-            $this->upsertOfflineJobRequirement($event, $description, $category);
+        foreach ($requirements as $description => $definition) {
+            $this->upsertOfflineJobRequirement($event, $description, $definition);
         }
     }
 
     /**
+     * Resolve selected offerings against this business while retaining support
+     * for service names already queued by older offline clients.
+     *
      * @param mixed $services
-     * @return array<string, string>
+     * @return array<string, array{category: string, capability_id: int|null, unit: string}>
      */
-    private function offlineJobRequirementDefinitions(mixed $services, mixed $otherService): array
+    private function offlineJobRequirementDefinitions(int $businessId, mixed $services, mixed $otherService): array
     {
         if (! is_array($services) || ! array_is_list($services)) {
             throw ValidationException::withMessages(['services' => 'Offline job services must be a list.']);
         }
 
-        $categoryByService = [];
+        $legacyCategories = [];
         foreach (config('zazu.service_categories', []) as $category => $availableServices) {
             foreach ($availableServices as $service) {
-                $categoryByService[$service] = $category;
+                $legacyCategories[$service] = $category;
             }
         }
 
+        $names = array_values(array_unique(array_map(
+            fn (mixed $service): string => $this->requiredString($service, 'services', 100),
+            $services
+        )));
+        $catalogue = BusinessCapability::query()
+            ->where('business_id', $businessId)
+            ->whereIn('name', $names)
+            ->get()
+            ->groupBy('name');
+
         $requirements = [];
-        foreach ($services as $service) {
-            $description = $this->requiredString($service, 'services', 100);
-            $requirements[$description] = $categoryByService[$description] ?? 'Other';
+        foreach ($names as $description) {
+            $matches = $catalogue->get($description, collect());
+            if ($matches->count() > 1) {
+                throw ValidationException::withMessages([
+                    'services' => 'A selected catalogue offering has an ambiguous name. Rename duplicate offerings before synchronising this job.',
+                ]);
+            }
+
+            $capability = $matches->first();
+            $requirements[$description] = [
+                'category' => $capability?->category ?: ($legacyCategories[$description] ?? 'Other'),
+                'capability_id' => $capability?->id,
+                'unit' => $capability?->default_unit ?: 'service',
+            ];
         }
 
         $otherService = $this->nullableString($otherService, 100);
         if ($otherService !== null) {
-            $requirements[$otherService] = 'Other';
+            $requirements[$otherService] = [
+                'category' => 'Other',
+                'capability_id' => null,
+                'unit' => 'service',
+            ];
         }
 
         return $requirements;
     }
 
-    private function upsertOfflineJobRequirement(Event $event, string $description, string $category): void
+    /**
+     * @param array{category: string, capability_id: int|null, unit: string} $definition
+     */
+    private function upsertOfflineJobRequirement(Event $event, string $description, array $definition): void
     {
         $requirement = $event->requirements()->where('description', $description)->first();
         if ($requirement) {
-            $requirement->update(['category' => $category]);
+            $requirement->update([
+                'category' => $definition['category'],
+                'capability_id' => $definition['capability_id'],
+            ]);
 
             return;
         }
 
         $event->requirements()->create([
+            'capability_id' => $definition['capability_id'],
             'description' => $description,
-            'category' => $category,
+            'category' => $definition['category'],
             'quantity' => 1,
-            'unit' => 'service',
+            'unit' => $definition['unit'],
             'status' => 'open',
         ]);
     }
@@ -560,35 +597,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      */
     private function createOfflineJobRequirements(Event $event, array $payload): void
     {
-        $services = $payload['services'] ?? [];
-        if (! is_array($services)) {
-            throw ValidationException::withMessages(['services' => 'Offline job services must be a list.']);
-        }
+        $requirements = $this->offlineJobRequirementDefinitions(
+            (int) $event->business_id,
+            $payload['services'] ?? [],
+            $payload['other_service'] ?? null
+        );
 
-        $categoryByService = [];
-        foreach (config('zazu.service_categories', []) as $category => $availableServices) {
-            foreach ($availableServices as $service) {
-                $categoryByService[$service] = $category;
-            }
-        }
-
-        $requirements = [];
-        foreach ($services as $service) {
-            $description = $this->requiredString($service, 'services', 100);
-            $requirements[$description] = $categoryByService[$description] ?? 'Other';
-        }
-
-        $otherService = $this->nullableString($payload['other_service'] ?? null, 100);
-        if ($otherService !== null) {
-            $requirements[$otherService] = 'Other';
-        }
-
-        foreach ($requirements as $description => $category) {
+        foreach ($requirements as $description => $definition) {
             $event->requirements()->create([
+                'capability_id' => $definition['capability_id'],
                 'description' => $description,
-                'category' => $category,
+                'category' => $definition['category'],
                 'quantity' => 1,
-                'unit' => 'service',
+                'unit' => $definition['unit'],
                 'status' => 'open',
             ]);
         }
