@@ -65,6 +65,20 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         );
 
         try {
+            $missingPasswordUpload = UploadedFile::fake()->createWithContent(
+                'business.zazu',
+                (string) file_get_contents($encrypted)
+            );
+            $missingPasswordResponse = $this->post(route('exports.archive.restore'), [
+                'archive' => $missingPasswordUpload,
+            ]);
+            $missingPasswordResponse->assertRedirect();
+            $missingPasswordResponse->assertSessionHasErrors('archive_password');
+            $this->assertDatabaseMissing('customers', [
+                'business_id' => $target->id,
+                'name' => 'Encrypted Archive Customer',
+            ]);
+
             $wrongPasswordUpload = UploadedFile::fake()->createWithContent(
                 'business.zazu',
                 (string) file_get_contents($encrypted)
