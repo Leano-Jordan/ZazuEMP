@@ -28,7 +28,7 @@ class InstallationBackupStatusTest extends TestCase
                 ->assertOk()
                 ->assertSee('Installation backup')
                 ->assertSee('No scheduled backup has been recorded')
-                ->assertSee('separate USB/cloud storage');
+                ->assertSee('BitLocker-protected USB');
         } finally {
             File::deleteDirectory($directory);
         }
