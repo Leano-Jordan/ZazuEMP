@@ -33,6 +33,19 @@ The owner reported a runtime database error indicating `events.deleted_at` was m
 
 This is an engineering consistency issue, not evidence of a privacy breach.
 
+## Current POPIA regulatory update — 2026-11-23
+
+The following amendments/regulations have been checked against official publications and should inform the deployment-specific privacy review:
+
+- **Amended 2018 POPIA Regulations, GN 6126 / GG 52523 (17 April 2025):** the amendment was published for implementation with immediate effect. It updates objection and correction/deletion request routes. Where applicable, Form 1 objections and Form 2 correction/deletion requests must be free of charge and reasonably accessible; the amended text lists email, SMS and WhatsApp among accepted channels. Telephonic correction/deletion requests must be electronically recorded. Regulation 3.6 requires written notification of the action taken within its stated 30-day period. Do not interpret this as a universal 30-day completion deadline for every request; route and timing depend on the request and legal context.
+- **GN 7198 / GG 54268 (6 March 2026):** these Regulations concern health-information processing by specified categories of responsible parties and their applicable operators. The scope names insurers, medical schemes and administrators, managed healthcare organisations, administrative bodies, pension funds, employers and institutions working for those bodies. They are not a blanket new rule applying to every Zazu customer or every type of personal information.
+- **Zazu product implication:** event free-text may contain allergy or dietary information. Treat it as potentially sensitive; encourage the minimum practical instruction (for example, an allergen to avoid) rather than a diagnosis or medical history. Customers in the named 2026 regulation categories must assess their own role and processing before using Zazu for health information. Hosted Zazu's operator/responsible-party role must be documented per processing purpose.
+
+Official references:
+- [GN 6126 / GG 52523 — amended POPIA Regulations, 17 April 2025](https://www.justice.gov.za/legislation/notices/2025/20250417-gg52523gon6126-POPIA-Regulations-Amendment.pdf)
+- [GN 7198 / GG 54268 — POPIA Regulations, 6 March 2026](https://www.justice.gov.za/legislation/notices/2026/20260306-gg54268gon7198-Paia-Regulations-Amended.pdf)
+- [Information Regulator — handling security compromises, 19 August 2025](https://inforegulator.org.za/2025/08/19/fact-sheet-handling-of-security-compromises/)
+
 ## Security and commercial engineering implications
 
 Before real customer or staff personal information is processed in production, Zazu still needs production acceptance evidence for:
@@ -54,7 +67,7 @@ Before real customer or staff personal information is processed in production, Z
 - WCAG 2.2: https://www.w3.org/TR/wcag/
 - WCAG 3.3.1 Error Identification: https://www.w3.org/WAI/WCAG22/Understanding/error-identification
 
-The 2026 POPIA regulations should also be checked against the specific processing activity before production release.
+The 2025 amended POPIA Regulations and the specific-scope 2026 health-information Regulations are summarised above; re-check current primary sources against the actual deployment and processing activity before production release.
 
 
 ## Other South African legal lenses considered
