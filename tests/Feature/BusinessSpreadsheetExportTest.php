@@ -77,7 +77,7 @@ class BusinessSpreadsheetExportTest extends TestCase
 
         $this->get(route('exports.index'))
             ->assertOk()
-            ->assertSee('class="zazu-nav-area is-active" data-zazu-nav-area', false)
+            ->assertSee('class="zazu-nav-area is-active is-open" data-zazu-nav-area', false)
             ->assertSee('aria-current="page"', false)
             ->assertSee('Data export &amp; recovery', false);
     }
