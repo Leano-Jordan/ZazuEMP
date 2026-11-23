@@ -517,47 +517,99 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      */
     private function offlineJobRequirementDefinitions(int $businessId, mixed $services, mixed $otherService): array
     {
+        $names = $this->offlineJobServiceNames($services);
+        $legacyCategories = $this->legacyOfflineServiceCategories();
+        $catalogue = $this->offlineJobCatalogue($businessId, $names);
+        $requirements = [];
+
+        foreach ($names as $description) {
+            $requirements[$description] = $this->offlineJobRequirementDefinition(
+                $description,
+                $catalogue->get($description, collect()),
+                $legacyCategories
+            );
+        }
+
+        return $this->appendOfflineCustomService($requirements, $otherService);
+    }
+
+    /**
+     * @param mixed $services
+     * @return array<int, string>
+     */
+    private function offlineJobServiceNames(mixed $services): array
+    {
         if (! is_array($services) || ! array_is_list($services)) {
             throw ValidationException::withMessages(['services' => 'Offline job services must be a list.']);
         }
 
-        $legacyCategories = [];
-        foreach (config('zazu.service_categories', []) as $category => $availableServices) {
-            foreach ($availableServices as $service) {
-                $legacyCategories[$service] = $category;
-            }
-        }
-
-        $names = array_values(array_unique(array_map(
+        return array_values(array_unique(array_map(
             fn (mixed $service): string => $this->requiredString($service, 'services', 255),
             $services
         )));
-        $catalogue = BusinessCapability::query()
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function legacyOfflineServiceCategories(): array
+    {
+        $categories = [];
+
+        foreach (config('zazu.service_categories', []) as $category => $availableServices) {
+            foreach ($availableServices as $service) {
+                $categories[$service] = $category;
+            }
+        }
+
+        return $categories;
+    }
+
+    /**
+     * @param array<int, string> $names
+     * @return \Illuminate\Support\Collection<string, \Illuminate\Support\Collection<int, BusinessCapability>>
+     */
+    private function offlineJobCatalogue(int $businessId, array $names): \Illuminate\Support\Collection
+    {
+        return BusinessCapability::query()
             ->where('business_id', $businessId)
             ->whereIn('name', $names)
             ->get()
             ->groupBy('name');
+    }
 
-        $requirements = [];
-        foreach ($names as $description) {
-            $matches = $catalogue->get($description, collect());
-            if ($matches->count() > 1) {
-                throw ValidationException::withMessages([
-                    'services' => 'A selected catalogue offering has an ambiguous name. Rename duplicate offerings before synchronising this job.',
-                ]);
-            }
-
-            $capability = $matches->first();
-            $requirements[$description] = [
-                'category' => $capability?->category ?: ($legacyCategories[$description] ?? 'Other'),
-                'capability_id' => $capability?->id,
-                'unit' => $capability?->default_unit ?: 'service',
-            ];
+    /**
+     * @param \Illuminate\Support\Collection<int, BusinessCapability> $matches
+     * @param array<string, string> $legacyCategories
+     * @return array{category: string, capability_id: int|null, unit: string}
+     */
+    private function offlineJobRequirementDefinition(string $description, $matches, array $legacyCategories): array
+    {
+        if ($matches->count() > 1) {
+            throw ValidationException::withMessages([
+                'services' => 'A selected catalogue offering has an ambiguous name. Rename duplicate offerings before synchronising this job.',
+            ]);
         }
 
-        $otherService = $this->nullableString($otherService, 100);
-        if ($otherService !== null && ! array_key_exists($otherService, $requirements)) {
-            $requirements[$otherService] = [
+        $capability = $matches->first();
+
+        return [
+            'category' => $capability?->category ?: ($legacyCategories[$description] ?? 'Other'),
+            'capability_id' => $capability?->id,
+            'unit' => $capability?->default_unit ?: 'service',
+        ];
+    }
+
+    /**
+     * @param array<string, array{category: string, capability_id: int|null, unit: string}> $requirements
+     * @return array<string, array{category: string, capability_id: int|null, unit: string}>
+     */
+    private function appendOfflineCustomService(array $requirements, mixed $otherService): array
+    {
+        $customService = $this->nullableString($otherService, 100);
+
+        if ($customService !== null && ! array_key_exists($customService, $requirements)) {
+            $requirements[$customService] = [
                 'category' => 'Other',
                 'capability_id' => null,
                 'unit' => 'service',
