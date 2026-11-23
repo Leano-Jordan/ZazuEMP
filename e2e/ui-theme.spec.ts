@@ -211,4 +211,34 @@ test.describe('Zazu UI theme and navigation', () => {
 
         await expect(responses).toEqual([]);
     });
+
+    test('keeps sidebar navigation expanded without hover flyout overlap and preserves the full mobile month grid', async ({ browser }) => {
+        const desktop = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+        await login(desktop);
+        const workArea = desktop.locator('[data-zazu-nav-area]').filter({ has: desktop.getByRole('button', { name: 'Work', exact: true }) });
+        await expect(workArea).toHaveClass(/is-open/);
+        await expect(workArea.locator('.zazu-nav-flyout')).toBeVisible();
+        const navIcon = workArea.locator('.zazu-nav-icon');
+        await expect.poll(() => navIcon.evaluate((node) => Math.round(node.getBoundingClientRect().width))).toBeGreaterThanOrEqual(22);
+        await desktop.getByRole('button', { name: 'Sales' }).hover();
+        await expect(workArea.locator('.zazu-nav-flyout')).toBeVisible();
+        await expect(desktop.locator('[data-zazu-nav-area].is-open')).toHaveCount(1);
+        await desktop.close();
+
+        const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+        await login(mobile);
+        await mobile.goto('/calendar');
+        const monthGrid = mobile.locator('.zazu-calendar-grid-scroll > .zazu-calendar-grid');
+        await expect(monthGrid).toBeVisible();
+        await expect(monthGrid.locator('.zazu-calendar-label')).toHaveCount(7);
+        const dimensions = await mobile.locator('.zazu-calendar-grid-scroll').evaluate((element) => ({
+            clientWidth: element.clientWidth,
+            scrollWidth: element.scrollWidth,
+            gridWidth: element.querySelector('.zazu-calendar-grid').getBoundingClientRect().width,
+        }));
+        expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
+        expect(dimensions.gridWidth).toBeGreaterThanOrEqual(700);
+        await expectNoViewportOverflow(mobile);
+        await mobile.close();
+    });
 });
