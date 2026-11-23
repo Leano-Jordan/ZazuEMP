@@ -1104,10 +1104,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             ->firstOrFail();
     }
 
-
-
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      * @return array{0: Event|null, 1: PurchaseOrder|null, 2: Supplier|null}
      */
     private function resolveOfflineExpenseReferences(int $businessId, array $payload): array
