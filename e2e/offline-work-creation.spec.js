@@ -76,6 +76,60 @@ test('offline workspace remains visible for synced device-local records when the
     await expect(workspace).toBeHidden();
 });
 
+test('offline workspace stays visible after reconnect while a non-core mutation remains queued', async ({ page }) => {
+    let healthChecks = 0;
+    await page.route('**/up', async route => {
+        healthChecks += 1;
+        await route.fulfill({ status: 200, body: 'OK' });
+    });
+
+    await login(page);
+    await page.context().setOffline(true);
+    await page.evaluate(async () => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        const localId = 'pending-inventory-update';
+        state.customers = [];
+        state.jobs = [];
+        state.quotes = [];
+        state.inventory_items = [{
+            id: 7654399,
+            server_id: 7654399,
+            local_id: localId,
+            name: 'Offline stock pending update',
+            sku: 'PENDING-01',
+            unit: 'box',
+            on_hand: '12.00',
+            reorder_level: '3.00',
+            pending_sync: true,
+        }];
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+        await window.ZazuOffline.queueMutation('inventory_item', 'update', {
+            local_id: localId,
+            server_id: 7654399,
+            record: { name: 'Offline stock pending update' },
+        });
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    });
+
+    const workspace = page.locator('[data-zazu-offline-workspace]');
+    await expect(workspace).toBeVisible();
+    const inventory = workspace.locator('[data-zazu-offline-collection="inventory_items"]');
+    await expect(inventory.getByText('Offline stock pending update')).toBeVisible();
+    await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+
+    const checksBeforeReconnect = healthChecks;
+    await page.context().setOffline(false);
+    await expect.poll(() => healthChecks).toBeGreaterThan(checksBeforeReconnect);
+    await expect(page.locator('[data-zazu-origin-offline-notice]')).toBeHidden();
+
+    // A queued inventory edit must keep the workspace available even though
+    // customers, jobs and quotes have no pending local records.
+    await expect(workspace).toBeVisible();
+    await expect(inventory.getByText('Offline stock pending update')).toBeVisible();
+    await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+});
+
 test('offline workspace exposes locally stored quotes with their sync state', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const jobLocalId = randomUUID();
