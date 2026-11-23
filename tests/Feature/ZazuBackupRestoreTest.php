@@ -691,7 +691,7 @@ class ZazuBackupRestoreTest extends TestCase
             ])->assertExitCode(0);
 
             $this->assertSame(':memory:', config('database.connections.sqlite.database'));
-            $this->assertSame([], File::glob(storage_path('app/.zazu-test-restore-*.sqlite')), 'Temporary file-backed targets used for in-memory restore must not leak into later commands or tests.');
+            $this->assertSame([], File::glob(storage_path('app/zazu-backups/.zazu-test-restore-*.sqlite')), 'Temporary file-backed targets used for in-memory restore must not leak into later commands or tests.');
         } finally {
             DB::purge('sqlite');
             config([
@@ -700,7 +700,7 @@ class ZazuBackupRestoreTest extends TestCase
             ]);
             DB::purge('sqlite');
             File::deleteDirectory($root);
-            foreach (File::glob(storage_path('app/.zazu-test-restore-*.sqlite')) as $temporaryDatabase) {
+            foreach (File::glob(storage_path('app/zazu-backups/.zazu-test-restore-*.sqlite')) as $temporaryDatabase) {
                 File::delete($temporaryDatabase);
             }
         }
@@ -711,7 +711,7 @@ class ZazuBackupRestoreTest extends TestCase
         foreach ([$database, $database.'-wal', $database.'-shm'] as $path) {
             File::delete($path);
         }
-        foreach (File::glob(storage_path('app/.zazu-database-rollback-*')) as $rollbackFile) {
+        foreach (File::glob(storage_path('app/zazu-backups/.zazu-database-rollback-*')) as $rollbackFile) {
             File::delete($rollbackFile);
         }
     }
@@ -726,7 +726,7 @@ class ZazuBackupRestoreTest extends TestCase
 
     private function assertNoSqliteRollbackArtifacts(): void
     {
-        $this->assertSame([], File::glob(storage_path('app/.zazu-database-rollback-*')), 'Successful restore must clean the old database and WAL/SHM rollback artifacts.');
+        $this->assertSame([], File::glob(storage_path('app/zazu-backups/.zazu-database-rollback-*')), 'Successful restore must clean the old database and WAL/SHM rollback artifacts.');
     }
 
     private function assertVersionTwoArchive(ZipArchive $zip): void
