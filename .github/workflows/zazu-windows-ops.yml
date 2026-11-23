@@ -63,6 +63,23 @@ jobs:
             Write-Host "PASS: $($script.Name)"
           }
 
+      - name: Smoke-test local Zazu resource sampler
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $output = Join-Path $env:RUNNER_TEMP 'zazu-performance-smoke'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ops/windows/Measure-ZazuResources.ps1' -DurationSeconds 3 -IntervalSeconds 1 -ProjectPath $PWD.Path -OutputDirectory $output
+          if ($LASTEXITCODE -ne 0) { throw 'The Zazu resource sampler exited unsuccessfully.' }
+          $csv = Get-ChildItem -LiteralPath $output -Filter 'zazu-resource-samples-*.csv' -File | Select-Object -First 1
+          $manifest = Get-ChildItem -LiteralPath $output -Filter 'zazu-resource-manifest-*.json' -File | Select-Object -First 1
+          if (-not $csv -or -not $manifest) { throw 'The resource sampler did not produce both CSV samples and a JSON manifest.' }
+          $samples = @(Import-Csv -LiteralPath $csv.FullName)
+          if ($samples.Count -lt 2) { throw 'The resource sampler must produce at least two samples in the smoke run.' }
+          $metadata = Get-Content -LiteralPath $manifest.FullName -Raw | ConvertFrom-Json
+          if (-not $metadata.cpuModel -or -not $metadata.logicalProcessors -or -not $metadata.installedMemoryGB) { throw 'The resource manifest is missing hardware identification fields.' }
+          if ($metadata.privacy -notmatch 'No telemetry is uploaded') { throw 'The sampler privacy declaration is missing.' }
+          Write-Host "PASS: Resource sampler produced $($samples.Count) local samples and a hardware manifest."
+
       - name: Verify LAN launchers use compiled frontend assets
         shell: pwsh
         run: |
