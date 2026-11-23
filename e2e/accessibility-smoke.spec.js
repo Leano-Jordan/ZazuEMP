@@ -10,7 +10,7 @@ async function login(page) {
     await page.getByLabel('Username or email').fill(DEMO_EMAIL);
     await page.locator('#auth_password').fill(DEMO_PASSWORD);
     await page.locator('[data-auth-submit]').click();
-    await page.waitForURL(url => url.pathname !== '/login');
+    await page.waitForURL(url => url.pathname === '/dashboard');
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
 
