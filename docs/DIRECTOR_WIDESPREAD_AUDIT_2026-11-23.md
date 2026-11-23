@@ -1,0 +1,149 @@
+# Zazu EMP — Director Widespread Engineering Audit
+
+**Date:** 2026-11-23  
+**Repository:** `Leano-Jordan/ZazuEMP`  
+**Canonical branch:** `main` (no branches created)  
+**Current source head:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`  
+**Disposition:** V1 remains **NOT READY**. The product foundation is substantial; recovery acceptance, offline physical proof, populated commercial reconciliation and legal/brand closure remain release gates.
+
+## 1. Scope and method
+
+Repository inventory at the audited head: **849 tracked files**, including 198 application PHP files, 46 controllers, 41 services, 79 migrations, 146 PHP tests, 10 Playwright E2E specs, 84 Blade views and 125 Markdown documents.
+
+This was a broad repository/control review with deeper source inspection across:
+- onboarding, business focus, capability catalogue and workspace profile;
+- business archive encryption, upload, restore, tenant remapping, private media and installation recovery;
+- finance, quote-to-invoice, payment, purchase-order receiving, inventory and event profitability;
+- offline sync endpoints, trusted-device checks, mutation identity/revision handling and phone-local attachments;
+- route/middleware boundaries, security/privacy controls, Windows launch/package workflows and CI definitions.
+
+The audit also reconciled owner-reported installed-PC/linked-phone results and current GitHub Actions evidence. It is not a line-by-line manual review of every tracked file, a live production penetration test, or a physical-device certification.
+
+## 2. Owner acceptance ledger — strike-off reconciliation
+
+These are the owner-reported checks already completed. They are recorded as completed and must not be assigned back to the Founder:
+
+- [x] Zazu starts on the installed PC and the database reports it is up to date.
+- [x] Normal connected operation on the PC.
+- [x] Normal connected operation on the linked phone.
+- [x] PC and phone operate against the same workspace.
+- [x] Fictional customers, quotes, invoices, suppliers, purchase orders and inventory records are populated; the Founder reports these areas function as intended.
+- [x] Installation backup exists and was independently verified.
+- [x] Business archive was downloaded and independently verified.
+- [x] Onboarding was exercised and feedback was supplied; implementation was revised to capture business focus before catalogue setup and support multiple business activities.
+- [x] An encrypted business archive restore was attempted against a disposable empty workspace. **Result: FAIL** (“archive failed to load”; subsequent SYS-002/429). This is a completed test attempt, not a passed restore gate. The original archive, passphrase and disposable target must be preserved; do not retry against the live business.
+
+Still not recorded as accepted:
+- [ ] Successful encrypted business archive restore on the intended installed environment.
+- [ ] Full installation restore on the intended PC, including database, configuration/key handling, private media and post-restore workspace verification.
+- [ ] Actual Android offline cold launch, host outage, offline write, force-close/restart and reconnect acceptance.
+- [ ] Transaction-level reconciliation using the existing populated owner workspace from accepted quote through invoice, payments, actual costs and profit.
+- [ ] POPIA operational sign-off and ZAZU name clearance.
+
+The connected PC/phone passes do not imply offline cold-start/restart passes. No duplicate records, re-pairing, backup recreation or basic connected-startup repetition is required.
+
+## 3. Confirmed defects found and corrections made
+
+### REC-001 — Restore committed before its audit entry (P1, corrected)
+
+**Defect:** `BusinessArchiveService::restore()` committed imported rows and files. `BusinessExportController` then wrote `business.archive_restored` after the service returned. If the audit insert failed, the request reported failure after the target workspace had already been populated. A retry would then be rejected because the target was no longer empty.
+
+**Correction:** the archive service now accepts a post-restore callback and executes it inside the same database transaction as row/profile restoration. Any audit exception rolls back the database work; the service's existing failure path removes newly written files.
+
+**Regression:** the encrypted restore flow installs a SQLite trigger that deliberately rejects the restore audit insert. The test asserts that no customer record remains in the target and that newly written private files are removed while the source file remains.
+
+**Status:** implemented on `main`; exact-head Laravel verification is queued at this audit checkpoint. This is a separately discovered source defect, not a proven explanation for the Founder's earlier upload failure.
+
+### RUNTIME-001 — Windows PHP upload limits were implicit (P1, corrected at launcher level)
+
+**Defect:** the Windows host launcher started PHP's built-in server without explicit `upload_max_filesize`, `post_max_size`, `max_execution_time` or `max_input_time` values, while the restore form accepted uploads up to 100 MiB. The effective limits were therefore inherited from whichever PHP CLI configuration the machine supplied. A lower `post_max_size` can cause PHP to discard the request before Laravel receives the uploaded archive.
+
+**Correction:** the shared Windows host launcher now starts PHP with:
+- `upload_max_filesize=100M`
+- `post_max_size=110M`
+- `max_execution_time=300`
+- `max_input_time=300`
+
+A Windows Ops contract check verifies these settings remain attached to the actual server argument list.
+
+**Status:** Windows Ops workflow [45202625276](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45202625276) passed on `9b95591`. The installed-PC archive failure's exact original cause remains unproven; successful physical restore after the updated launcher is still required.
+
+### MAINT-001 — Onboarding and archive encryption classes exceeded maintainability limits (P2, refactored)
+
+**Findings:** PHPMD identified `OnboardingController` class complexity 55 (threshold 50), `BusinessArchiveEncryptionService` complexity 67, and later `OnboardingController`'s 11 public methods (threshold 10).
+
+**Corrections:**
+- Extracted onboarding progress/prerequisite state into `OnboardingProgressService`.
+- Moved business-profile onboarding actions into `OnboardingBusinessController`, keeping route names and user-facing paths unchanged.
+- Extracted authenticated Sodium stream processing into `BusinessArchiveEncryptionStream`; `BusinessArchiveEncryptionService` now owns passphrase validation and private temporary-file lifecycle.
+- Removed obsolete stream read/write helpers left in the encryption service after extraction.
+
+**Verification:** PHPMD passed on `2d7b1146` [run 45205108169](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45205108169). The final route wiring is on `620ab99b`; Laravel and Quality workflows for that final head were queued at the time of this report.
+
+### MAINT-002 — Archive controller PHPDoc formatting (P2, corrected)
+
+Pint rejected non-canonical array PHPDoc spacing in `BusinessExportController`. The docblocks were corrected. No mass formatting of unrelated legacy files was performed.
+
+## 4. Cross-domain review conclusions
+
+| Area | Assessment | Remaining boundary |
+|---|---|---|
+| Onboarding and business focus | Multi-focus persistence and niche-relevant catalogue categories are implemented with feature tests. | Owner must accept the revised first-run experience; do not claim usability closure from tests alone. |
+| Core event lifecycle | Event-centred model and lifecycle guards remain coherent. | Real operator acceptance of end-to-end job completion. |
+| Commercial workflow | Automated quote acceptance, invoice conversion, deposits/final payments, actual costs and profit reconciliation exist. | Reconcile the existing populated owner workspace with actual values. |
+| Purchasing/inventory | Receiving, idempotency, stock and event-cost linkage have regression coverage. | Physical stock/GRN reconciliation on the populated workspace. |
+| Tenant/data integrity | Business-scoped queries, FK remapping, identity validation and adversarial isolation tests are present in reviewed paths. | No independent live-install penetration test is claimed. |
+| Offline continuity | IndexedDB workspace, mutation queue, host-outage detection, reconnect and phone-local attachment journeys have automated coverage. | Actual Android cold launch, force-close/restart and disconnected write/reconnect remain unverified in the recorded evidence. |
+| Recovery | Encrypted V2 business archives, legacy V1 compatibility, tenant-scoped remapping and Windows/CI recovery tests exist. Two defects were found and corrected as recorded above. | Original installed restore failure has not been physically cleared; full installation recovery remains a separate gate. |
+| Privacy/legal | POPIA documentation, data minimisation guidance and operational templates exist. | Information Officer, real provider/operator inventory and terms, retention/disposal, operational exercises and legal approval remain open. |
+| Brand | No software defect identified in this audit. | ZAZU name clearance remains open. |
+
+No additional confirmed finance/tenant-isolation defect was established in the sampled controller/service/test review. That is not a claim that the entire product is vulnerability-free.
+
+## 5. Evidence and CI disposition
+
+| Evidence | Result |
+|---|---|
+| Laravel + desktop/mobile offline + PostgreSQL baseline on `e948f0a` | PASS — 743 passed, 1 skipped, 5,225 assertions; 64 desktop E2E + 7 mobile E2E; PostgreSQL migration/recovery passed — [run 45198671060](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45198671060) |
+| Windows Ops host-script checks including explicit PHP upload limits | PASS — [run 45202625276](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45202625276) |
+| Windows V1 package/fresh-install and encrypted/legacy archive acceptance | PASS — [run 45202614826](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45202614826) |
+| PHPMD after onboarding/encryption refactor | PASS — [run 45205108169](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45205108169) |
+| Director Health on final code head `620ab99b` | PASS — [run 45205116118](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45205116118) |
+| Laravel and Zazu Quality on final head `620ab99b` | QUEUED at report time — do not count as passes yet |
+| SonarCloud | SKIPPED — not counted as a pass |
+
+The Laravel 743-test result predates the latest archive transaction and maintainability refactors. It is supporting baseline evidence, not exact-head verification of those changes.
+
+## 6. Formal V1 scorecard
+
+The canonical 13-domain method remains the formal scoring basis. Each domain is scored 0–5 for evidence maturity; it is not a percentage of features built. The previous 77/100 figure in the hardening notes was not independently recalculated under the canonical 13-domain method and must not be presented as the formal weighted V1 score.
+
+| V1 domain | Score |
+|---|---:|
+| Platform, accounts, onboarding | 4/5 |
+| Core lifecycle | 4/5 |
+| Commercial workflow | 4/5 |
+| Purchasing, receiving, inventory, costs | 4/5 |
+| Data integrity and auditability | 4/5 |
+| Security and tenant isolation | 4/5 |
+| Offline continuity | 3/5 |
+| Documents and attachments | 4/5 |
+| Search, reporting and Zazu Helper | 3/5 |
+| UX, mobile, tablet and accessibility | 3/5 |
+| Recovery and data portability | 4/5 |
+| Deployment, upgrade and rollback | 4/5 |
+| Legal, privacy and brand clearance | 1/5 |
+| **Total** | **46/65 = 3.54/5 = 70.8/100, reported as 71/100** |
+
+**Score action: REAFFIRMED at 71/100.** No numerical uplift is awarded for code refactors or queued CI. Recovery remains 4/5 for its automated archive/installation evidence, but the failed installed restore attempt blocks release acceptance and prevents a 5/5 operational score.
+
+## 7. Director decision and next execution order
+
+**V1: NOT READY.** Do not widen feature scope.
+
+1. Finish exact-head Laravel, Zazu Quality, Psalm, PHPMD and Windows verification for `620ab99b` and correct any genuine failures without suppressing thresholds.
+2. Reconcile today's owner testing evidence into the checklist; strike off only outcomes explicitly demonstrated. Do not ask the Founder to repeat connected PC/mobile checks or backup verification.
+3. Keep the failed disposable archive restore preserved. After the launcher and restore fixes pass CI, use the original failure reference/log evidence to establish whether a controlled retest is safe; never use the live business as the test target.
+4. Close the remaining owner acceptance gates: Android offline/restart/reconnect, populated commercial reconciliation, full installation restore, POPIA operations and ZAZU name clearance.
+
+All changes in this audit were committed directly to `main`. No branch was created. No live business data, database or production environment was changed by this audit.
