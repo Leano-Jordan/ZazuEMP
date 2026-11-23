@@ -21,6 +21,7 @@
             <legend class="zazu-fieldset-legend">Your business activities</legend>
             <p class="zazu-fieldset-help">Choose as many as apply. A business can provide DJ and sound, catering, photography, decor, rentals and more.</p>
             @php($chosenFocuses = old('business_focuses', $selectedFocuses))
+            <input type="hidden" name="business_focuses_present" value="1">
             <div class="zazu-niche-grid">
                 @foreach($nicheOptions as $key => $option)
                     @continue($key === 'mixed')
