@@ -2,49 +2,60 @@
 
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BusinessCapabilityController;
 use App\Http\Controllers\BusinessContextController;
 use App\Http\Controllers\BusinessExportController;
+use App\Http\Controllers\BusinessMediaController;
 use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ComplianceDocumentController;
+use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerImportController;
-use App\Http\Controllers\CustomerContactController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EventAttachmentController;
 use App\Http\Controllers\EventCostController;
 use App\Http\Controllers\EventPreparationController;
-use App\Http\Controllers\EventAttachmentController;
 use App\Http\Controllers\ExperiencePreferenceController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\SentinelController;
-use App\Http\Controllers\FounderSupportController;
-use App\Http\Controllers\SentinelLicenseController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\FounderSupportController;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\OnboardingBusinessController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\OfflineLicenseController;
 use App\Http\Controllers\OfflineWorkspaceController;
 use App\Http\Controllers\PasswordResetController;
-use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PlatformLandingSettingsController;
+use App\Http\Controllers\ProfileMediaController;
+use App\Http\Controllers\PublicInvoiceController;
+use App\Http\Controllers\PublicPaymentReceiptController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RequirementController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SentinelController;
+use App\Http\Controllers\SentinelLicenseController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SyncController;
 use App\Http\Controllers\TravelCostController;
 use App\Http\Controllers\WorkController;
+use App\Http\Middleware\EnsureFounderSupportSession;
+use App\Models\Event;
+use App\Services\LandingMediaService;
+use App\Support\CurrentBusiness;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function (\Illuminate\Http\Request $request) {
+Route::get('/', function (Request $request) {
     $isAuthenticated = (bool) $request->user();
     $business = $isAuthenticated
-        ? app(\App\Support\CurrentBusiness::class)->resolve($request->user())
+        ? app(CurrentBusiness::class)->resolve($request->user())
         : null;
     $hasActiveWorkspace = $business !== null;
 
-    $landingImages = app(\App\Services\LandingMediaService::class)->images();
+    $landingImages = app(LandingMediaService::class)->images();
 
     $telemetry = [
         'all_work' => 1,
@@ -63,9 +74,9 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
 
     if ($hasActiveWorkspace) {
         $today = now()->startOfDay();
-        $active = \App\Models\Event::query()
+        $active = Event::query()
             ->where('business_id', $business->id)
-            ->whereNotIn('status', \App\Models\Event::TERMINAL_STATUSES);
+            ->whereNotIn('status', Event::TERMINAL_STATUSES);
 
         $latest = (clone $active)->latest('event_date')->latest()->first();
 
@@ -89,8 +100,8 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
 })->name('landing');
 
 Route::middleware('signed')->group(function () {
-    Route::get('/invoices/{invoice}/view', [\App\Http\Controllers\PublicInvoiceController::class, 'show'])->middleware('throttle:quote.public')->name('finance.invoices.public');
-    Route::get('/payments/{payment}/receipt', [\App\Http\Controllers\PublicPaymentReceiptController::class, 'show'])->middleware('throttle:quote.public')->name('finance.payments.receipt');
+    Route::get('/invoices/{invoice}/view', [PublicInvoiceController::class, 'show'])->middleware('throttle:quote.public')->name('finance.invoices.public');
+    Route::get('/payments/{payment}/receipt', [PublicPaymentReceiptController::class, 'show'])->middleware('throttle:quote.public')->name('finance.payments.receipt');
     Route::get('/quotes/{quote}/view', [QuoteController::class, 'publicShow'])->middleware('throttle:quote.public')->name('quotes.public');
     Route::post('/quotes/{quote}/accept', [QuoteController::class, 'publicAccept'])->middleware('throttle:quote.public')->name('quotes.public.accept');
 });
@@ -102,25 +113,25 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [PasswordResetController::class, 'send'])->middleware('throttle:password.email')->name('password.email');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
     Route::post('/reset-password', [PasswordResetController::class, 'update'])->middleware('throttle:password.reset')->name('password.update');
-    Route::post('/login', [\App\Http\Controllers\AuthController::class, 'store'])->middleware('throttle:login')->name('login.store');
+    Route::post('/login', [AuthController::class, 'store'])->middleware('throttle:login')->name('login.store');
     Route::get('/register', fn () => redirect()->route('landing', ['auth' => 'register']))->name('register');
-    Route::post('/register', [\App\Http\Controllers\AuthController::class, 'storeRegistration'])->middleware('throttle:register')->name('register.store');
+    Route::post('/register', [AuthController::class, 'storeRegistration'])->middleware('throttle:register')->name('register.store');
 });
 
 Route::middleware(['auth', 'auth.session'])->group(function () {
-    Route::get('/workspace/recover', [\App\Http\Controllers\AuthController::class, 'workspaceRecovery'])->name('workspace.recovery');
-    Route::post('/workspace/recover', [\App\Http\Controllers\AuthController::class, 'storeWorkspaceRecovery'])->name('workspace.recovery.store');
+    Route::get('/workspace/recover', [AuthController::class, 'workspaceRecovery'])->name('workspace.recovery');
+    Route::post('/workspace/recover', [AuthController::class, 'storeWorkspaceRecovery'])->name('workspace.recovery.store');
 });
 
 Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
-    Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
+    Route::get('/owner', [AuthController::class, 'owner'])->name('owner.dashboard');
 });
 
 Route::middleware(['auth', 'auth.session', 'sentinel.admin'])->group(function () {
     Route::get('/admin/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');
     Route::get('/admin/sentinel/businesses/{business}', [SentinelController::class, 'showBusiness'])->whereNumber('business')->name('admin.sentinel.businesses.show');
     Route::post('/admin/sentinel/businesses/{business}/support', [FounderSupportController::class, 'start'])->whereNumber('business')->middleware('throttle:5,1')->name('admin.sentinel.support.start');
-    Route::get('/admin/sentinel/support/{supportSession}', [FounderSupportController::class, 'show'])->middleware(\App\Http\Middleware\EnsureFounderSupportSession::class)->name('admin.sentinel.support.show');
+    Route::get('/admin/sentinel/support/{supportSession}', [FounderSupportController::class, 'show'])->middleware(EnsureFounderSupportSession::class)->name('admin.sentinel.support.show');
     Route::post('/admin/sentinel/support/{supportSession}/end', [FounderSupportController::class, 'end'])->name('admin.sentinel.support.end');
     Route::post('/admin/sentinel/licence-customers', [SentinelLicenseController::class, 'register'])->middleware('throttle:10,1')->name('admin.sentinel.licence-customers.store');
     Route::post('/admin/sentinel/licences', [SentinelLicenseController::class, 'issue'])->middleware('throttle:10,1')->name('admin.sentinel.licences.issue');
@@ -191,8 +202,8 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
             ->name('exports.download');
     });
 
-    Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
-    Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
+    Route::get('/media/profile/{type}/{id}', [ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
+    Route::get('/media/business/{type}', [BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
     Route::get('/calendar', CalendarController::class)->middleware('permission:calendar.view')->name('calendar.index');
     Route::get('/search', SearchController::class)->name('search.index');
     Route::get('/preferences/experience', [ExperiencePreferenceController::class, 'edit'])->name('preferences.experience');
@@ -234,7 +245,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::post('/assets/{asset}/allocate', [AssetController::class, 'allocate'])->middleware('permission:assets.allocate')->name('assets.allocate');
     Route::post('/assets/{asset}/release', [AssetController::class, 'release'])->middleware('permission:assets.release')->name('assets.release');
 
-    Route::get('/reports', \App\Http\Controllers\ReportController::class)->middleware('permission:reports.view')->name('reports.index');
+    Route::get('/reports', ReportController::class)->middleware('permission:reports.view')->name('reports.index');
 
     Route::middleware('owner')->group(function () {
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
@@ -329,5 +340,5 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
 
 Route::middleware('auth')->group(function () {
     Route::post('/business/switch', [BusinessContextController::class, 'change'])->name('business.switch');
-    Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'destroy'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 });
