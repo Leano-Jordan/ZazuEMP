@@ -234,8 +234,8 @@ final class BusinessArchiveEncryptionService
 
     private function assertPassphrase(string $passphrase): void
     {
-        $characters = mb_strlen($passphrase, 'UTF-8');
-        if ($characters < 12 || $characters > 128 || strlen($passphrase) > 512) {
+        $characters = preg_match_all('/./us', $passphrase);
+        if ($characters === false || $characters < 12 || $characters > 128 || strlen($passphrase) > 512) {
             throw new RuntimeException('Use a business archive passphrase between 12 and 128 characters.');
         }
     }
