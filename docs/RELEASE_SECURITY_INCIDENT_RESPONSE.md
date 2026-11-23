@@ -75,6 +75,9 @@ If the phone is recovered, preserve its browser storage until the owner decides 
 
 ## Investigation
 
+Use the blank [Privacy Operations Register Template](RELEASE_PRIVACY_OPERATIONS_REGISTER_TEMPLATE.md) to record incident metadata and protected evidence references. Keep completed incident records and all supporting personal information in a restricted location outside GitHub.
+
+
 Determine:
 
 - what happened;
