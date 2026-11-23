@@ -174,7 +174,7 @@ class RouteIntegrityTest extends TestCase
 
         foreach (File::allFiles(resource_path('views')) as $file) {
             preg_match_all(
-                '/route\(\s*[\'\"]([^\'\"]+)[\'\"]/',
+                '/(?<!->)\broute\(\s*[\'\"]([^\'\"]+)[\'\"]/',
                 $file->getContents(),
                 $matches
             );
