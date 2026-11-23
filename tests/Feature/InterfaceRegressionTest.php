@@ -21,7 +21,7 @@ class InterfaceRegressionTest extends TestCase
     {
         $business = Business::create([
             'name' => 'Regression Business',
-            'slug' => 'regression-' . Str::lower(Str::random(6)),
+            'slug' => 'regression-'.Str::lower(Str::random(6)),
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
@@ -226,7 +226,8 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('var(--zazu-dashboard-image)', $css);
         $this->assertStringContainsString('.zazu-command-band .zazu-eyebrow', $css);
         $this->assertStringContainsString('.zazu-command-meta {', $css);
-        $this->assertStringContainsString('background: rgba(2, 15, 27, .44);', $css);        $sweep = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $this->assertStringContainsString('background: rgba(2, 15, 27, .44);', $css);
+        $sweep = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertStringContainsString('.zazu-command-band', $sweep);
         $this->assertStringContainsString('protected shared banner contrast', $sweep);
