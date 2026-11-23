@@ -27,6 +27,7 @@
     const blank = () => ({
         version: new Date().toISOString(),
         business: null,
+        workspace_profile: null,
         catalogue: [],
         customers: [],
         jobs: [],
@@ -250,6 +251,9 @@
         const normalizeList = (items) => (items || []).map(normalizeRecord);
 
         state.business = bootstrap.business || state.business;
+        if (Object.prototype.hasOwnProperty.call(bootstrap, 'workspace_profile')) {
+            state.workspace_profile = bootstrap.workspace_profile;
+        }
         const has = (key) => Object.prototype.hasOwnProperty.call(bootstrap, key);
         if (has('catalogue') || has('capabilities')) state.catalogue = normalizeList(bootstrap.catalogue ?? bootstrap.capabilities);
         if (has('suppliers')) state.suppliers = normalizeList(bootstrap.suppliers);
