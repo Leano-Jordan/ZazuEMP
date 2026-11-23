@@ -86,15 +86,13 @@ class UiAccessibilityTest extends TestCase
             ->assertSee('Quotes');
     }
 
-    
-
     public function test_quote_register_uses_semantic_status_classes(): void
     {
         $view = file_get_contents(resource_path('views/quotes/index.blade.php'));
 
-        $this->assertStringContainsString("zazu-chip-danger", $view);
-        $this->assertStringContainsString("declined", $view);
-        $this->assertStringContainsString("expired", $view);
+        $this->assertStringContainsString('zazu-chip-danger', $view);
+        $this->assertStringContainsString('declined', $view);
+        $this->assertStringContainsString('expired', $view);
     }
 
     public function test_customer_form_uses_mobile_friendly_contact_inputs(): void
@@ -143,6 +141,7 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('data-mobile-sidebar-close', false);
         $response->assertDontSee('data-mobile-nav', false);
     }
+
     public function test_settings_page_renders_without_malformed_closing_markup(): void
     {
         $response = $this->get(route('settings.index'));
@@ -152,8 +151,6 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('Save business appearance', false);
         $response->assertSee('Open activity audit', false);
     }
-
-
 
     public function test_purchase_order_editor_exposes_multi_line_workflow(): void
     {
@@ -214,7 +211,6 @@ class UiAccessibilityTest extends TestCase
         $this->assertStringContainsString('Browser privacy/storage restrictions must not prevent the page from rendering.', $layout);
     }
 
-
     public function test_workspace_focus_ui_exposes_niche_choices_and_progressive_disclosure(): void
     {
         $onboarding = $this->get(route('onboarding.experience'));
@@ -249,7 +245,6 @@ class UiAccessibilityTest extends TestCase
         );
     }
 
-
     public function test_theme_contrast_contract_keeps_shell_and_surface_foregrounds_explicit(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
@@ -276,6 +271,5 @@ class UiAccessibilityTest extends TestCase
         $this->assertStringContainsString('--zazu-font-size-label: 12px;', $appCss);
         $this->assertStringNotContainsString(':root {', $visualCss);
     }
-
 
 }
