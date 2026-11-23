@@ -412,6 +412,45 @@ class OnboardingTest extends TestCase
             ->assertSee('Open finance');
     }
 
+    public function test_workspace_navigation_reflects_active_business_mix_without_hiding_shared_surfaces(): void
+    {
+        $business = Business::create([
+            'name' => 'Mixed Services Workspace',
+            'slug' => 'mixed-services-workspace',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = $this->signInAsOwner($business);
+        $this->selectBusinessFocus($user, $business);
+
+        foreach ([
+            ['name' => 'DJ and sound package', 'category' => 'Sound & entertainment', 'capability_type' => 'service', 'is_active' => true],
+            ['name' => 'Buffet catering', 'category' => 'Catering', 'capability_type' => 'service', 'is_active' => true],
+            ['name' => 'Archived photo service', 'category' => 'Photography & video', 'capability_type' => 'service', 'is_active' => false],
+        ] as $capability) {
+            BusinessCapability::create($capability + [
+                'business_id' => $business->id,
+                'pricing_basis' => 'custom',
+                'currency' => 'ZAR',
+            ]);
+        }
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-zazu-workspace-profile', false)
+            ->assertSee('YOUR BUSINESS MIX')
+            ->assertSee('2 active offerings')
+            ->assertSee('Catering & baking')
+            ->assertSee('Sound & DJ')
+            ->assertSee('Catering')
+            ->assertSee('Sound &amp; entertainment')
+            ->assertDontSee('Photography &amp; video')
+            ->assertSee('Jobs')
+            ->assertSee('Quotes')
+            ->assertSee('Finance');
+    }
+
     private function selectBusinessFocus(User $user, Business $business): void
     {
         $user->businesses()->updateExistingPivot($business->id, [
