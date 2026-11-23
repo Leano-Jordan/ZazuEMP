@@ -111,6 +111,21 @@ return [
             'description' => 'Keep bookings, equipment, setup/travel and money close to the work.',
             'capability_categories' => ['Sound & entertainment', 'Audio & entertainment'],
         ],
+        'decor' => [
+            'label' => 'Decor & styling',
+            'description' => 'Keep styling scope, materials, setup, venue coordination and collection connected to each booking.',
+            'capability_categories' => ['Decor'],
+        ],
+        'photography' => [
+            'label' => 'Photography & video',
+            'description' => 'Keep coverage, shot lists, crew, equipment, venue timing and delivery connected to each booking.',
+            'capability_categories' => ['Photography & video'],
+        ],
+        'transport' => [
+            'label' => 'Transport & delivery',
+            'description' => 'Keep vehicle capacity, routes, loading, delivery windows and collection connected to each booking.',
+            'capability_categories' => ['Transport'],
+        ],
         'mixed' => [
             'label' => 'Mixed event services',
             'description' => 'Keep the shared event workflow visible without prioritising one service type.',
