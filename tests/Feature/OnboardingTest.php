@@ -65,6 +65,51 @@ class OnboardingTest extends TestCase
         );
     }
 
+    public function test_dj_only_business_gets_relevant_catalogue_categories_without_catering_clutter(): void
+    {
+        $business = Business::create([
+            'name' => 'DJ Only Business',
+            'slug' => 'dj-only-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $this->post(route('onboarding.experience.store'), [
+            'experience_level' => 'basic',
+            'primary_niche' => 'sound_dj',
+            'business_focuses_present' => '1',
+            'business_focuses' => ['sound_dj'],
+        ])->assertRedirect(route('onboarding.catalogue'));
+
+        $this->get(route('onboarding.catalogue'))
+            ->assertOk()
+            ->assertSee('Sound &amp; entertainment')
+            ->assertSee('Other')
+            ->assertDontSee('value="Catering"', false)
+            ->assertDontSee('value="Baking"', false);
+    }
+
+    public function test_business_details_wait_until_business_focus_and_offerings_are_handled(): void
+    {
+        $business = Business::create([
+            'name' => 'Ordered Onboarding Business',
+            'slug' => 'ordered-onboarding-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = $this->signInAsOwner($business);
+        $user->businesses()->updateExistingPivot($business->id, [
+            'experience_level' => 'basic',
+            'primary_niche' => 'sound_dj',
+        ]);
+
+        $this->get(route('onboarding.business'))
+            ->assertRedirect(route('onboarding.catalogue'));
+    }
+
     public function test_owner_can_save_catalogue_setup_with_minimum_information(): void
     {
         $business = Business::create([
