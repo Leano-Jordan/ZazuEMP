@@ -4,7 +4,7 @@
 - Source review found refreshOfflineWorkspaceVisibility() only considered unsynced customer, job and quote records. A pending inventory, supplier, purchase-order, invoice, expense, asset, catalogue or preparation mutation could therefore be queued while the origin was online again and the dashboard offline workspace would be hidden.
 - Updated the shared visibility decision to retain the workspace when the durable mutation queue is dirty, an open conflict exists, or any supported local collection contains an unsynced/pending record. This includes all collections already rendered by the offline workspace plus preparations.
 - Added a targeted Playwright regression: queue an inventory-item update while disconnected, restore origin reachability, and verify the offline workspace and inventory record remain visible while the mutation is still pending. The shared light-theme sidebar-muted token was also corrected from `#536B7F` to `#475569` after confirming its contrast was 4.14:1 on the sidebar surface.
-- **Verification pending:** exact-head Laravel/browser acceptance and quality checks must pass before this correction is considered closed.
+- **Verification:** on application head `fdfa692a`, Laravel tests, coverage, PostgreSQL migration/recovery, accessibility acceptance and desktop/mobile navigation checks passed. The offline browser acceptance suite is still running and includes the new queued-inventory visibility regression. Windows V1 Package run on `86b960d8` passed the real launcher HTTP-readiness/login/session-cookie smoke and stopped its server cleanly. Current `main` head `e7123530` additionally tightens sidebar muted text; its exact-head checks are pending.
 
 ---
 
