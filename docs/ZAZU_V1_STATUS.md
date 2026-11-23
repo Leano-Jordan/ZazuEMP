@@ -4,7 +4,7 @@
 - Moved backup, restore, private-storage rollback and SQLite staging artifacts under `storage/app/zazu-backups/`. The Windows installer already applies a restricted ACL to this directory; POSIX staging is explicitly restricted to 0700 directories and 0600 files.
 - Added permission regression coverage and an owner-facing warning that business `.zazu` archives are not password-encrypted.
 - Restore still validates archive structure/checksums before mutation and retains database/private-media rollback paths. Existing verified backup files were not touched.
-- **Open risk:** installation and business archives remain plain ZIP files. Application-level encryption is not implemented; off-disk copies must be stored in encrypted, access-controlled locations.
+- **Updated 2026-11-23:** new business V2 `.zazu` exports are passphrase-encrypted using Sodium secretstream XChaCha20-Poly1305 and Argon2id. Installation-wide scheduled backups remain unattended plain ZIP files; off-disk copies must be stored in encrypted, access-controlled locations. Legacy plaintext V1 business archives remain importable for compatibility.
 - **Verification:** latest source/test changes are committed and read back from main. Exact-head CI is not yet confirmed. No pass is claimed.
 
 ---
