@@ -127,88 +127,18 @@ class WorkController extends Controller
         $business = $this->business($request);
         $validated = $request->validate($this->rules(), $this->validationMessages());
         $scheduleValidator->validate($validated);
+        [$services, $catalogueServices] = $this->selectedJobServices($validated);
 
-        $catalogueServices = array_values(array_unique($validated['services'] ?? []));
-        $services = $catalogueServices;
-        if (!empty($validated['other_service'])) {
-            $customService = Str::limit(trim($validated['other_service']), 100, '');
-            if (! in_array($customService, $services, true)) {
-                $services[] = $customService;
-            }
-        }
-
-        $event = DB::transaction(function () use ($validated, $services, $catalogueServices, $business) {
-            // Serialize customer/contact selection against concurrent customer
-            // edits before taking the snapshot copied into the new Work record.
-            DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
-
-            $capabilities = BusinessCapability::query()
-                ->where('business_id', $business->id)
-                ->where('is_active', true)
-                ->whereIn('name', $catalogueServices)
-                ->lockForUpdate()
-                ->get()
-                ->groupBy('name');
-
-            foreach ($catalogueServices as $service) {
-                if ($capabilities->get($service)?->count() !== 1) {
-                    throw ValidationException::withMessages([
-                        'services' => 'Choose services from your active business catalogue. Refresh the form if your catalogue has changed.',
-                    ]);
-                }
-            }
-
-            $customer = Customer::query()
-                ->where('business_id', $business->id)
-                ->whereKey($validated['customer_id'])
-                ->with('primaryContact')
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
-            $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
-
-            $event = Event::create([
-                'business_id' => $business->id,
-                'customer_id' => $customer->id,
-                'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
-                'event_night_contact_id' => $validated['event_night_contact_id'] ?? null,
-                'reference' => 'ZAZU-' . Str::upper(Str::random(8)),
-                'name' => trim($validated['name']),
-                'event_type' => $validated['event_type'],
-                'customer_name' => $customer->name,
-                'customer_phone' => $customer->primaryContact?->phone,
-                'customer_email' => $customer->primaryContact?->email,
-                'event_date' => $validated['event_date'],
-                'event_end_date' => $validated['event_end_date'] ?? null,
-                'event_start_time' => $validated['event_start_time'] ?? null,
-                'event_end_time' => $validated['event_end_time'] ?? null,
-                'setup_date' => $validated['setup_date'] ?? null,
-                'collection_date' => $validated['collection_date'] ?? null,
-                'event_address' => $validated['event_address'] ?? null,
-                'notes' => $validated['notes'] ?? null,
-                'status' => 'draft',
-            ]);
-
-            foreach ($services as $service) {
-                $capability = $capabilities->get($service)?->first();
-                EventRequirement::create([
-                    'event_id' => $event->id,
-                    'capability_id' => $capability?->id,
-                    'description' => $capability?->name ?? $service,
-                    'category' => $capability?->category ?: 'Other',
-                    'quantity' => 1,
-                    'unit' => $capability?->default_unit ?: 'service',
-                    'status' => 'open',
-                ]);
-            }
-
-            return $event;
-        });
+        $event = DB::transaction(fn () => $this->createJobWithRequirements(
+            $validated,
+            $services,
+            $catalogueServices,
+            $business
+        ));
 
         $scheduleConflicts = $conflictDetector->conflicts($business->id, $validated, $event->id);
         $scheduleWarning = $scheduleConflicts->isNotEmpty()
-            ? 'This job clashes with other scheduled work: '. $scheduleConflicts->pluck('name')->implode(', ').'. Check the calendar before you confirm it.'
+            ? 'This job clashes with other scheduled work: '.$scheduleConflicts->pluck('name')->implode(', ').'. Check the calendar before you confirm it.'
             : null;
 
         if ($request->string('start_intent')->toString() === 'quote') {
@@ -222,6 +152,138 @@ class WorkController extends Controller
             ->route('work.show', $event)
             ->with('success', 'Job created. Start by checking the services below.')
             ->with('schedule_warning', $scheduleWarning);
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     * @return array{0: array<int, string>, 1: array<int, string>}
+     */
+    private function selectedJobServices(array $validated): array
+    {
+        $catalogueServices = array_values(array_unique($validated['services'] ?? []));
+        $services = $catalogueServices;
+        $customService = trim((string) ($validated['other_service'] ?? ''));
+
+        if ($customService !== '') {
+            $customService = Str::limit($customService, 100, '');
+            if (! in_array($customService, $services, true)) {
+                $services[] = $customService;
+            }
+        }
+
+        return [$services, $catalogueServices];
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     * @param array<int, string> $services
+     * @param array<int, string> $catalogueServices
+     */
+    private function createJobWithRequirements(
+        array $validated,
+        array $services,
+        array $catalogueServices,
+        Business $business
+    ): Event {
+        DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
+
+        $capabilities = $this->lockJobCatalogueCapabilities($business, $catalogueServices);
+        $customer = $this->selectedJobCustomer($validated, $business);
+        $event = $this->createJobRecord($validated, $business, $customer);
+        $this->createJobStarterRequirements($event, $services, $capabilities);
+
+        return $event;
+    }
+
+    /**
+     * @param array<int, string> $catalogueServices
+     * @return Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, BusinessCapability>>
+     */
+    private function lockJobCatalogueCapabilities(Business $business, array $catalogueServices): \Illuminate\Support\Collection
+    {
+        $capabilities = BusinessCapability::query()
+            ->where('business_id', $business->id)
+            ->where('is_active', true)
+            ->whereIn('name', $catalogueServices)
+            ->lockForUpdate()
+            ->get()
+            ->groupBy('name');
+
+        foreach ($catalogueServices as $service) {
+            if ($capabilities->get($service)?->count() !== 1) {
+                throw ValidationException::withMessages([
+                    'services' => 'Choose services from your active business catalogue. Refresh the form if your catalogue has changed.',
+                ]);
+            }
+        }
+
+        return $capabilities;
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    private function selectedJobCustomer(array $validated, Business $business): Customer
+    {
+        $customer = Customer::query()
+            ->where('business_id', $business->id)
+            ->whereKey($validated['customer_id'])
+            ->with('primaryContact')
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
+        $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
+
+        return $customer;
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    private function createJobRecord(array $validated, Business $business, Customer $customer): Event
+    {
+        return Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
+            'event_night_contact_id' => $validated['event_night_contact_id'] ?? null,
+            'reference' => 'ZAZU-'.Str::upper(Str::random(8)),
+            'name' => trim($validated['name']),
+            'event_type' => $validated['event_type'],
+            'customer_name' => $customer->name,
+            'customer_phone' => $customer->primaryContact?->phone,
+            'customer_email' => $customer->primaryContact?->email,
+            'event_date' => $validated['event_date'],
+            'event_end_date' => $validated['event_end_date'] ?? null,
+            'event_start_time' => $validated['event_start_time'] ?? null,
+            'event_end_time' => $validated['event_end_time'] ?? null,
+            'setup_date' => $validated['setup_date'] ?? null,
+            'collection_date' => $validated['collection_date'] ?? null,
+            'event_address' => $validated['event_address'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'draft',
+        ]);
+    }
+
+    /**
+     * @param array<int, string> $services
+     * @param Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, BusinessCapability>> $capabilities
+     */
+    private function createJobStarterRequirements(Event $event, array $services, \Illuminate\Support\Collection $capabilities): void
+    {
+        foreach ($services as $service) {
+            $capability = $capabilities->get($service)?->first();
+            EventRequirement::create([
+                'event_id' => $event->id,
+                'capability_id' => $capability?->id,
+                'description' => $capability?->name ?? $service,
+                'category' => $capability?->category ?: 'Other',
+                'quantity' => 1,
+                'unit' => $capability?->default_unit ?: 'service',
+                'status' => 'open',
+            ]);
+        }
     }
 
     public function edit(Request $request, Event $event): View
