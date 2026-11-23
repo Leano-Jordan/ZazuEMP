@@ -37,14 +37,6 @@
                     <a href="{{ route('capabilities.index') }}" class="zazu-text-action">View services →</a>
                 @endif
             </div>
-            @if($business?->dashboard_image_path)
-                <img
-                    src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}"
-                    alt=""
-                    aria-hidden="true"
-                    class="zazu-dash-hero-image"
-                >
-            @endif
         </aside>
     </section>
 
