@@ -10,7 +10,7 @@ async function login(page) {
     await page.getByLabel('Username or email').fill(DEMO_EMAIL);
     await page.locator('#auth_password').fill(DEMO_PASSWORD);
     await page.locator('[data-auth-submit]').click();
-    await expect(page).toHaveURL(/\\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
 }
 
 test('quote builder blocks an unconfirmed quantity of one and recalculates after correction', async ({ page }) => {
@@ -42,7 +42,7 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     await form.locator('input[name="event_date"]').fill(eventDate);
     await form.getByRole('button', { name: 'Create job & continue to quote' }).click();
 
-    await expect(page).toHaveURL(/\\/work\\/\\d+\\/quotes\\/create$/);
+    await expect(page).toHaveURL(/\/work\/\d+\/quotes\/create$/);
     const line = page.locator('[data-quote-line]').first();
     await expect(line).toBeVisible();
 
@@ -83,6 +83,6 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     await confirmation.check();
 
     await page.getByRole('button', { name: 'Save quote v1' }).click();
-    await expect(page).toHaveURL(/\\/quotes\\/\\d+$/);
+    await expect(page).toHaveURL(/\/quotes\/\d+$/);
     await expect(page.getByText('Draft quote created.', { exact: true })).toBeVisible();
 });
