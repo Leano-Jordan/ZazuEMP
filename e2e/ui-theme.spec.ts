@@ -135,11 +135,11 @@ test.describe('Zazu UI theme and navigation', () => {
         const mobileNavigationToggle = page.getByRole('button', { name: 'Open navigation' });
         if (await mobileNavigationToggle.isVisible()) {
             await mobileNavigationToggle.click();
-            await expect(workArea).toHaveClass(/is-open/);
-        } else {
-            await workTrigger.click();
-            await expect(workArea).toHaveClass(/is-open/);
         }
+        // The active desktop group is expanded on first render; clicking its
+        // trigger would correctly collapse it and invalidate this assertion.
+        await expect(workArea).toHaveClass(/is-open/);
+        await expect(workTrigger).toHaveAttribute('aria-expanded', 'true');
 
         await expect(calendarLink).toBeVisible();
         await expect(calendarLink).toHaveAttribute('href', /\/calendar$/);
