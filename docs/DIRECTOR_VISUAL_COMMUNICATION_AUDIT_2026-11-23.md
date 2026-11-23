@@ -36,7 +36,8 @@ The current `package.json` has no icon package dependency. The dashboard current
 - [x] Humanise backup timestamps in Dashboard and Founder Control Centre.
 - [x] Select a commercially permissive, offline-safe icon library.
 - [x] Add a local curated Tabler subset, retain the upstream MIT notice and create a shared Blade icon component. No runtime package or CDN is used.
-- [x] Migrate primary navigation groups, Dashboard metric icons and quick actions to the shared icon system. Status indicators and form actions remain in the next migration slice.
+- [x] Migrate primary navigation groups, Dashboard metric icons and quick actions to the shared icon system.
+- [x] Start the status/action migration on Data export & recovery: local Tabler download/upload, lock and shield-check icons now replace the two Unicode archive arrows and clarify the protected actions. This is a first workflow slice, not a product-wide migration.
 - [ ] Audit and correct button/input widths and hierarchy on the highest-use workflows first: Jobs, Quotes, Customers, Purchasing, Inventory and Finance.
 - [ ] Run a page-by-page visual communication sweep for labels, empty/loading/error states, spacing, responsive composition, contrast and reduced-motion behaviour.
 
@@ -65,3 +66,11 @@ The current `package.json` has no icon package dependency. The dashboard current
 - The dashboard previously assigned KPI card fills and icon colours by `:nth-child` position. Optional modules change the order/count of cards, so a colour could describe a different metric in another business workspace.
 - KPI surfaces are now neutral in both themes. Explicit metric classes drive icon accents: blue for work/customers/calendar, amber for outstanding quotes or invoices, green when those queues are clear and for revenue received.
 - This preserves colour as a cue for meaning/state rather than decoration or card position.
+
+
+## Recovery action icon migration — 2026-11-24
+
+- Expanded the local curated Tabler subset with download, upload, lock, shield-check, alert, info and check symbols. All remain inline/local; no CDN, runtime package or network dependency was introduced.
+- Replaced Unicode arrows on the business archive create/restore cards with consistent download/upload icons. Added lock and shield-check cues to the encryption/restore actions and download icons to CSV exports.
+- Added a focused feature regression covering icon usage and removal of the two ambiguous arrow glyphs.
+- Remaining: continue status and form-action migration in the highest-use workflows. This slice does not claim the full UI icon rollout is complete.
