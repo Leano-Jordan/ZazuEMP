@@ -22,9 +22,6 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     await page.goto('/work/create?start=quote', { waitUntil: 'domcontentloaded' });
     const form = page.locator('#new-job-form');
     await expect(form).toBeVisible();
-    // This test isolates quantity confirmation; tax behaviour has separate coverage.
-    await page.locator('select[name="tax_rate_id"]').selectOption('');
-
     const customers = await page.locator('#customer_id option').evaluateAll(options =>
         options.filter(option => option.value !== '').map(option => option.value)
     );
@@ -48,6 +45,8 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     await form.getByRole('button', { name: 'Create job & continue to quote' }).click();
 
     await expect(page).toHaveURL(/\/work\/\d+\/quotes\/create$/);
+    // This test isolates quantity confirmation; tax behaviour has separate coverage.
+    await page.locator('select[name="tax_rate_id"]').selectOption('');
     const line = page.locator('[data-quote-line]').first();
     await expect(line).toBeVisible();
 
