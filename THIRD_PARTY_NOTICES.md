@@ -19,11 +19,14 @@ Versions below are the exact versions currently locked on `main`, not the wider 
 | Laravel PAO | 1.1.6 | MIT | laravel/pao | Development/operations tooling. |
 | Laravel Pint | 1.32.3 | MIT | laravel/pint | PHP formatter. |
 | PHPUnit | 13.4.8 | BSD-3-Clause | phpunit/phpunit | Development/test dependency. |
+| Mockery | 1.6.15 | BSD-3-Clause | mockery/mockery | Development/test dependency. |
+| Collision | 8.9.6 | MIT | nunomaduro/collision | Development/test tooling. |
 | Vite | 8.3.8 | MIT | vitejs/vite | Frontend build tooling; generated bundles may include transitive dependencies under additional licences. |
 | Tailwind CSS | 4.3.5 | MIT | tailwindlabs/tailwindcss | Frontend styling tooling. |
 | @tailwindcss/vite | 4.3.5 | MIT | tailwindlabs/tailwindcss | Vite integration for Tailwind CSS. |
 | laravel-vite-plugin | 3.2.1 | MIT | laravel/vite-plugin | Laravel/Vite integration. |
 | @playwright/test | 1.65.1 | Apache-2.0 | microsoft/playwright | Development/browser acceptance dependency. |
+| @types/node | 26.6.6 | MIT | DefinitelyTyped/DefinitelyTyped | Development type definitions; CI currently runs Node 22. |
 | concurrently | 10.0.7 | MIT | open-cli-tools/concurrently | Development process orchestration. |
 | @laravel/multiplex | 0.4.5 | MIT | kolossal-io/laravel-multiplex | Optional dependency; retain upstream notices if distributed. |
 
