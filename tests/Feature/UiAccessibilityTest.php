@@ -220,7 +220,7 @@ class UiAccessibilityTest extends TestCase
         $onboarding = $this->get(route('onboarding.experience'));
 
         $onboarding->assertOk()
-            ->assertSee('What do you mainly provide?')
+            ->assertSee('Your business activities')
             ->assertSee('Sound &amp; DJ', false)
             ->assertSee('Catering &amp; baking', false)
             ->assertSee('Chairs &amp; tents', false)
