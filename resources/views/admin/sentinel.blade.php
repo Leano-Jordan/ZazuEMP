@@ -358,7 +358,7 @@
                 <p class="sentinel-health-attention">{{ $backupStatus['secondary_message'] }}</p>
             @endif
             <p class="sentinel-muted">Independent copy: {{ $backupStatus['secondary_message'] }}</p>
-            <p class="sentinel-muted sentinel-retention-note">The daily task retains 14 local archives. Copy the latest archive to separate USB/cloud storage; a recent local archive alone does not protect against disk failure. A recent archive does not replace the controlled restore drill.</p>
+            <p class="sentinel-muted sentinel-retention-note">The daily task retains 14 local archives. Copy the latest archive to BitLocker-protected USB or an encrypted, access-controlled cloud vault; the runner verifies copy integrity but does not encrypt or verify destination encryption. A recent local archive alone does not protect against disk failure or replace the controlled restore drill.</p>
         </section>
 
         <section class="sentinel-panel" id="incident-patterns">
