@@ -1,3 +1,9 @@
+## Formal score supersession — 2026-11-23
+
+The earlier `77/100` figure in this historical hardening log is not the canonical 13-domain V1 score and was not independently recalculated under that method. For formal V1 reporting, use `docs/ZAZU_V1_SCORECARD_2026-11-04.md`: **71/100 (46/65)**, reaffirmed on 2026-11-23. The 2026-11-23 Director audit records the current owner evidence, new defects/fixes and release gates. V1 remains **NOT READY**.
+
+---
+
 ## Director recovery integrity checkpoint — secondary backup presence — 2026-11-22
 
 **Implementation head:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
