@@ -2122,3 +2122,10 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Kept Laravel's system timezone at UTC to preserve existing database, sync and API timestamp behaviour.
 - Added a separate `ZAZU_DISPLAY_TIMEZONE` setting, defaulting to `Africa/Johannesburg`, and changed human-facing date/time formatting to use it.
 - This keeps ISO-8601 machine contracts stable while presenting local dates to everyday users.
+
+
+## Form readability and width correction — 2026-11-23
+
+- Bounded `.zazu-field-wide` to 760px on larger screens while preserving full-width mobile behaviour.
+- Increased field helper text to 12px and control text to 14px desktop / 16px mobile. Existing label hierarchy and touch-target heights retained.
+- Confirmed shared buttons are content-sized by default; 100% widths are limited to mobile stacks and action-grid cells. No blanket button sizing change was made.

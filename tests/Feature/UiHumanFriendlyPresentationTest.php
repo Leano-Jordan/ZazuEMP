@@ -97,4 +97,16 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('ZAZU_DISPLAY_TIMEZONE=Africa/Johannesburg', $environment);
         $this->assertStringContainsString("'timezone' => 'UTC'", $config);
     }
+
+    public function test_form_controls_use_readable_type_and_bounded_wide_fields(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('max-width: 760px;', $css);
+        $this->assertStringContainsString('font-size: 12px;', $css);
+        $this->assertStringContainsString('font-size: 14px;', $css);
+        $this->assertStringContainsString('font-size: 16px;', $css);
+        $this->assertStringContainsString('@media (max-width: 760px)', $css);
+    }
 }

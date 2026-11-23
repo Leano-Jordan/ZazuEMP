@@ -50,3 +50,11 @@ The current `package.json` has no icon package dependency. The dashboard current
 
 
 **Timezone boundary decision:** keep Laravel's application/system timezone at UTC so database, sync and machine-facing timestamps do not silently change offset. Use the separate `ZAZU_DISPLAY_TIMEZONE` (South African default) only when rendering human-facing dates and times.
+
+
+## Control sizing and everyday readability
+
+- The shared button base is already content-sized (`inline-flex`); full-width buttons are scoped to mobile stacks or individual cells in action grids. A global button-width reduction would damage legitimate mobile and card actions, so those exceptions remain contextual.
+- The actual width issue is long form fields: `zazu-field-wide` spans the entire form grid and could become excessively wide on large screens. It is now capped at 760px while remaining full-width on mobile.
+- Field helper text is raised to 12px. Inputs/selects/textareas use 14px on desktop and 16px on mobile for legibility and to avoid mobile browser auto-zoom. Existing 13.5px labels and 42px control height are retained.
+- Existing reduced-motion handling is preserved. Zazu already has hover/focus/active transitions; the next motion pass should add feedback only where state changes need explaining, not animate every control.

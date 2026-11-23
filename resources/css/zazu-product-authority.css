@@ -1999,3 +1999,29 @@ body.zazu-dashboard-page.zazu-has-wallpaper .zazu-content {
         background-attachment: scroll, scroll !important;
     }
 }
+
+
+/* Everyday form sizing: readable controls, bounded long fields, no blanket full-width buttons. */
+.zazu-field-wide {
+    width: 100%;
+    max-width: 760px;
+}
+.zazu-field-help {
+    font-size: 12px;
+    line-height: 1.5;
+}
+.zazu-input,
+.zazu-select,
+.zazu-textarea {
+    font-size: 14px;
+}
+@media (max-width: 760px) {
+    .zazu-field-wide {
+        max-width: 100%;
+    }
+    .zazu-input,
+    .zazu-select,
+    .zazu-textarea {
+        font-size: 16px;
+    }
+}
