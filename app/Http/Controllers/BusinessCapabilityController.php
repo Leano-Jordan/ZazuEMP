@@ -18,9 +18,13 @@ class BusinessCapabilityController extends Controller
     public function index(Request $request): View
     {
         $business = $this->business($request);
+        $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
 
+        // Owners retain visibility of disabled entries so they can restore them.
+        // Operational members only see offerings that can actually be selected.
         $base = BusinessCapability::query()
             ->where('business_id', $business->id)
+            ->when(!$isOwner, fn ($query) => $query->where('is_active', true))
             ->when($request->filled('category'), fn ($query) => $query->where('category', $request->string('category')))
             ->when($request->filled('search'), fn ($query) => $query->where('name', 'like', '%' . $request->string('search') . '%'));
 
@@ -53,13 +57,13 @@ class BusinessCapabilityController extends Controller
 
         $categories = BusinessCapability::query()
             ->where('business_id', $business->id)
+            ->when(!$isOwner, fn ($query) => $query->where('is_active', true))
             ->whereNotNull('category')
             ->where('category', '<>', '')
             ->distinct()
             ->orderBy('category')
             ->pluck('category');
 
-        $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
         $canViewAssets = app(PermissionService::class)->allows('assets.view', $request->user(), $business);
 
         return view('capabilities.index', compact('capabilities', 'categories', 'isOwner', 'equipment', 'services', 'canViewAssets'));
