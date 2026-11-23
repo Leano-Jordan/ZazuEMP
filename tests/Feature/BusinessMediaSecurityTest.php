@@ -143,7 +143,7 @@ class BusinessMediaSecurityTest extends TestCase
         $response->assertOk();
         $response->assertSee('class="zazu-brand-logo"', false);
         $response->assertSee(route('business.media', ['type' => 'logo']).'?v='.$version, false);
-        $response->assertSee('class="zazu-dash-hero-image"', false);
+        $response->assertSee('--zazu-dashboard-image:', false);
         $response->assertSee(route('business.media', ['type' => 'dashboard']).'?v='.$version, false);
         $response->assertSee('zazu-has-wallpaper', false);
         $response->assertSee('--zazu-wallpaper:', false);

@@ -105,7 +105,7 @@ class UiShellThemeRegressionTest extends TestCase
         $this->assertIsString($css);
         // Includes finance and calendar alternative branches; only one is rendered for a workspace.
         $this->assertSame(6, substr_count($dashboard, 'class="zazu-dash-metric-icon"'));
-        preg_match_all('/<span class="zazu-dash-metric-icon"[^>]*>\\s*<svg/s', $dashboard, $metricIcons);
+        preg_match_all('/<span class="zazu-dash-metric-icon"[^>]*>\\s*<x-icon name=/s', $dashboard, $metricIcons);
         $this->assertCount(6, $metricIcons[0]);
         $this->assertStringContainsString('grid-template-columns: 48px minmax(0, 1fr);', $css);
         $this->assertStringContainsString('@media (max-width: 520px)', $css);

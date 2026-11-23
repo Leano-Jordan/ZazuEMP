@@ -197,10 +197,10 @@ class InterfaceRegressionTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk()
-            ->assertSee('>Work<', false)
-            ->assertSee('>Sales<', false)
-            ->assertSee('>Resources<', false)
-            ->assertSee('>Finance<', false)
+            ->assertSee(' Work</span>', false)
+            ->assertSee(' Sales</span>', false)
+            ->assertSee(' Resources</span>', false)
+            ->assertSee(' Finance</span>', false)
             ->assertSee('>Calendar<', false)
             ->assertSee('>Setup<', false)
             ->assertDontSee('Sales &amp; operations', false)
