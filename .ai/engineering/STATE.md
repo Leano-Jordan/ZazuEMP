@@ -1642,3 +1642,20 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Current verification boundary:** later catalogue filtering changes triggered new exact-head Laravel, PHPMD, Zazu Quality, Psalm and Director Health runs. Do not attribute the earlier PHPMD pass to the latest head until those newer results complete. PC/phone visual and physical offline acceptance are still not verified.
 
 **Next execution target:** connect active business-owned catalogue offerings to New Job service requirements through the existing `services[]` contract used by offline creation. Update online and offline paths together; preserve requirement quantity/unit correction, historical quote snapshots and capability/business isolation. No parallel configuration store.
+
+
+
+## Director execution — catalogue-driven Job intake parity — 2026-11-23
+
+**Implemented directly on `main`; latest implementation commit:** [0a4fea3](https://github.com/Leano-Jordan/ZazuEMP/commit/0a4fea35df95df86df106bb54675cd9813dba209).
+
+- New Job now reads its selectable offerings from active `BusinessCapability` records belonging to the current business. It no longer presents the generic static service-category list as the business's catalogue.
+- Disabled offerings are omitted from new intake. An empty catalogue explains how to add an offering, while one-off custom services remain available separately.
+- Online Job creation validates selected names against the active business catalogue inside the transaction, locks the selected catalogue records, and creates `EventRequirement` rows linked to the correct `capability_id`, category and default unit.
+- Offline create/update keeps the existing `services[]` payload contract. Server reconciliation resolves names only against the mutation's business, links matching capability records and carries category/default-unit context. Legacy queued names retain the former static-category fallback; custom one-off services remain unlinked.
+- Duplicate same-name catalogue entries fail closed during offline reconciliation rather than linking an arbitrary capability. Existing requirement quantity, notes and status are retained on matching offline updates; accepted quote scope checks remain unchanged.
+- Added feature coverage for active versus disabled catalogue visibility and online requirement linkage/default unit.
+
+**Verification boundary:** implementation and test files were read back from `main`. Exact-head Laravel, PHPMD, Zazu Quality, Psalm, Director Health, browser/offline, PostgreSQL and Windows workflows have not yet been confirmed for this implementation head. No test pass or physical offline acceptance is claimed. The latest GitHub combined-status response contained no status entries.
+
+**Next execution:** inspect/run exact-head CI and repair only failures introduced or exposed by this slice. Add explicit offline regression coverage for capability linkage, business isolation, legacy queued payloads and custom one-off services. Do not expand into a new preset store or navigation rewrite.
