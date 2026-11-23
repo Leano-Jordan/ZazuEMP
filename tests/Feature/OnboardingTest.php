@@ -32,16 +32,7 @@ class OnboardingTest extends TestCase
             ->assertSee('What kind of business do you run?')
             ->assertSee('name="business_focuses[]"', false)
             ->assertSee('name="primary_niche"', false);
-        private function selectBusinessFocus(User $user, Business $business): void
-    {
-        $user->businesses()->updateExistingPivot($business->id, [
-            'experience_level' => 'basic',
-            'primary_niche' => 'catering_baking',
-            'business_focuses' => json_encode(['catering_baking']),
-        ]);
     }
-
-}
 
     public function test_owner_can_save_multiple_business_focuses_and_a_primary_focus(): void
     {
@@ -420,4 +411,13 @@ class OnboardingTest extends TestCase
             ->assertSee('Quick actions')
             ->assertSee('Open finance');
     }
+    private function selectBusinessFocus(User $user, Business $business): void
+    {
+        $user->businesses()->updateExistingPivot($business->id, [
+            'experience_level' => 'basic',
+            'primary_niche' => 'catering_baking',
+            'business_focuses' => json_encode(['catering_baking']),
+        ]);
+    }
+
 }
