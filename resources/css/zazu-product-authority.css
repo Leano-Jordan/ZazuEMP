@@ -1882,3 +1882,64 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-
     border-color: var(--zazu-primary) !important;
     color: var(--zazu-primary-ink) !important;
 }
+
+
+/* Compact business-derived context above navigation; presentation only. */
+.zazu-workspace-profile {
+    margin: 10px 12px 14px;
+    padding: 12px;
+    border: 1px solid var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+    background: var(--zazu-surface-2);
+}
+.zazu-workspace-profile-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+.zazu-workspace-profile-heading > span {
+    color: var(--zazu-faint);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .09em;
+}
+.zazu-workspace-profile-heading > strong {
+    color: var(--zazu-ink-2);
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+.zazu-workspace-profile-focuses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 9px;
+}
+.zazu-workspace-profile-focuses span {
+    padding: 4px 7px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 5px;
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.25;
+}
+.zazu-workspace-profile > p {
+    margin: 8px 0 0;
+    color: var(--zazu-muted);
+    font-size: 10px;
+    line-height: 1.45;
+}
+.zazu-workspace-profile > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 9px;
+    color: var(--zazu-primary-deep);
+    font-size: 10px;
+    font-weight: 750;
+    text-decoration: none;
+}
+.zazu-workspace-profile > a:hover { text-decoration: underline; }
