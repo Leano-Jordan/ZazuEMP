@@ -1064,7 +1064,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
 
         await page.locator('input[name="name"]').fill('Offline service image boundary');
-        await page.locator('input[name="category"]').first().check();
+        await page.locator('input[name="category"]').first().check({ force: true });
         await page.locator('select[name="capability_type"]').selectOption('service');
         await page.locator('select[name="currency"]').selectOption('ZAR');
         await page.locator('select[name="pricing_basis"]').selectOption('custom');
