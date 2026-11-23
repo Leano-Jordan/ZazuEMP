@@ -216,9 +216,9 @@ The business catalogue now treats the existing `BusinessCapability` records as t
 
 Regression tests cover a mixed DJ/sound/rental/product provider, a DJ-only business, owner visibility of hidden entries, staff suppression of hidden entries and missing asset permission. This is a catalogue/workspace-discoverability slice, not proof of complete adaptive navigation, dashboard or offline intake.
 
-## Next vertical slice — active catalogue to online/offline Job intake
+## Completed vertical slice — active catalogue to online/offline Job intake
 
-The current New Job form still renders `config('zazu.service_categories')` and submits the legacy `services[]` field. Offline job creation and synchronization also reconcile this existing service list. The next implementation must derive choices from the active business-owned `BusinessCapability` catalogue while preserving one shared online/offline contract, business isolation, requirement quantities/units and accepted quote history. Do not replace the online form field with an unrelated IDs-only contract or leave phone-local creation using the old generic list.
+**Implementation is now on `main`.** The New Job form derives selectable offerings from active business-owned `BusinessCapability` records, retains the existing `services[]` contract, and creates capability-linked starter requirements online and during offline server reconciliation. Disabled offerings are excluded from new online intake; old queued offline service names retain the legacy category fallback. One-off custom services remain supported separately. See the implementation checkpoint below for scope and verification limits.
 
 
 
