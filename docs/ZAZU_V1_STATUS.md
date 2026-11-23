@@ -1,3 +1,22 @@
+## Director execution checkpoint — 2026-11-23 — dependency and capability consolidation
+
+**Repository:** `Leano-Jordan/ZazuEMP` · canonical branch: `main`  
+**Latest capability regression source/test commit:** `3ca0b72e4a370f94b3e9c12f42fb8840ce20d12d`  
+**Latest engineering state checkpoint:** `053182a1b5c37529a170af994d88210cb4674f81`
+
+- Reconciled direct Composer/npm requirements with their lockfiles and refreshed the transitive licence inventory: 77 Composer runtime, 34 Composer development and 147 npm entries, all with declared licence metadata.
+- Updated third-party notices to exact direct locked versions and pinned remaining floating workflow actions; PHPMD now uses the repository's pinned CodeQL v4.39.3 SARIF uploader.
+- GitHub withdrew GHSA-fc5q-39xc-vjpf / CVE-2026-112366 on 2026-11-18. Removed the obsolete package-specific npm audit exception; strict high-severity npm auditing remains in place.
+- Added regression coverage for Job-specific Decor, Photography and Transport guidance and for capability deactivation. Business-wide active focus and staff catalogue visibility update, while owner reactivation visibility and saved Job requirements remain intact.
+
+**Verification boundary:** these changes are committed and read back from `main`; exact-head Laravel, PHPMD, formatting, browser and Zazu Quality results for the newest commits are not yet confirmed. No new CI pass is claimed.
+
+**Release disposition:** V1 remains **NOT READY**. The remaining acceptance gates include physical Android disconnected cold launch/restart/reconnect and attachment opening, controlled full restore on the intended Windows installation, populated live-business commercial reconciliation, POPIA operational sign-off and Zazu name clearance. Automated browser/device emulation is supporting evidence, not physical acceptance.
+
+**Next engineering direction:** recovery integrity review and controlled restore readiness, without touching the Founder’s verified backups or asking for repeated basic checks. Inspect the business archive and installation-wide restore boundaries, rollback safety, key/configuration handling, private media and post-restore validation; preserve existing backup files and data.
+
+---
+
 ## Director execution checkpoint — 2026-11-22 — offline cache regression verified
 
 **Exact source/test HEAD:** `605e1d69f33fc295138813c732f20b5c2c07234d` on canonical `main`.
