@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Support\BackupArchiveLimits;
+use App\Support\PrivateStoragePermissions;
 use App\Support\PostgresBackupSupport;
 
 use Illuminate\Console\Command;
@@ -42,7 +43,10 @@ class ZazuBackupCommand extends Command
         $archive = $directory.DIRECTORY_SEPARATOR.'zazu-backup-'.$stamp.'.zip';
         $temporaryArchive = $archive.'.tmp';
 
-        File::ensureDirectoryExists($work);
+        if (! app(PrivateStoragePermissions::class)->createDirectory($work)) {
+            $this->error('Could not create a private backup staging directory.');
+            return self::FAILURE;
+        }
 
         try {
             $driver = config('database.default');
@@ -73,6 +77,11 @@ class ZazuBackupCommand extends Command
         $manifest = $this->buildManifest($driver, $stamp);
 
         if (!$this->snapshotDatabase($driver, $work) || !$this->backupPrivateStorage($work)) {
+            return false;
+        }
+
+        if (! app(PrivateStoragePermissions::class)->restrictDirectoryTree($work)) {
+            $this->error('Could not restrict backup staging permissions; no archive was published.');
             return false;
         }
 
@@ -474,6 +483,13 @@ class ZazuBackupCommand extends Command
             return false;
         }
 
+        if (! app(PrivateStoragePermissions::class)->restrictFile($temporaryArchive)) {
+            $zip->close();
+            File::delete($temporaryArchive);
+            $this->error('Could not restrict backup archive permissions; no archive was published.');
+            return false;
+        }
+
         foreach (File::allFiles($work) as $file) {
             $entryName = str_replace('\\', '/', $file->getRelativePathname());
 
@@ -484,8 +500,9 @@ class ZazuBackupCommand extends Command
             }
         }
 
-        if (!$zip->close() || !is_file($temporaryArchive) || filesize($temporaryArchive) === 0) {
-            $this->error('Could not finalize the backup archive.');
+        if (!$zip->close() || !is_file($temporaryArchive) || filesize($temporaryArchive) === 0
+            || ! app(PrivateStoragePermissions::class)->restrictFile($temporaryArchive)) {
+            $this->error('Could not finalize a private backup archive.');
             return false;
         }
 
