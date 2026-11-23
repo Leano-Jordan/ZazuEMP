@@ -135,4 +135,49 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
             @unlink($encrypted);
         }
     }
+
+    public function test_legacy_plaintext_business_archive_remains_restorable(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+
+        $source = Business::create([
+            'name' => 'Legacy Archive Source',
+            'slug' => 'legacy-archive-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        Customer::create(['business_id' => $source->id, 'name' => 'Legacy Archive Customer']);
+
+        $target = Business::create([
+            'name' => 'Legacy Archive Target',
+            'slug' => 'legacy-archive-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($target);
+
+        $legacyArchive = app(BusinessArchiveService::class)->download($source);
+
+        try {
+            $this->assertFalse(app(BusinessArchiveEncryptionService::class)->isEncrypted($legacyArchive));
+
+            $response = $this->post(route('exports.archive.restore'), [
+                'archive' => UploadedFile::fake()->createWithContent(
+                    'legacy-business.zip',
+                    (string) file_get_contents($legacyArchive)
+                ),
+            ]);
+
+            $response->assertRedirect(route('exports.index'));
+            $response->assertSessionHas('success');
+            $this->assertDatabaseHas('customers', [
+                'business_id' => $target->id,
+                'name' => 'Legacy Archive Customer',
+            ]);
+        } finally {
+            @unlink($legacyArchive);
+        }
+    }
+
 }
