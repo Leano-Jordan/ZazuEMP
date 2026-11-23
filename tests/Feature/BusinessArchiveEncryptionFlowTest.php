@@ -180,4 +180,26 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         }
     }
 
+    public function test_restore_validation_rejection_returns_reference_without_flashing_passphrase(): void
+    {
+        $business = Business::create([
+            'name' => 'Restore Validation Diagnostics',
+            'slug' => 'restore-validation-diagnostics',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($business);
+
+        $response = $this->post(route('exports.archive.restore'), [
+            'archive_password' => 'correct horse battery staple',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('archive');
+        $error = session('errors')->getBag('default')->first('archive');
+
+        $this->assertStringContainsString('Restore request reference:', $error);
+        $this->assertNull(session()->getOldInput('archive_password'));
+    }
+
 }
