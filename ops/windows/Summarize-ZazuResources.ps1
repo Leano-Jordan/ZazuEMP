@@ -76,6 +76,7 @@ $lines.Add(('- Device cohort: {0}' -f $manifest.deviceTier))
 $lines.Add(('- CPU: {0}' -f $manifest.cpuModel))
 $lines.Add(('- Logical processors: {0}; physical cores: {1}' -f $manifest.logicalProcessors, $manifest.physicalCores))
 $lines.Add(('- Installed RAM: {0} GB' -f $manifest.installedMemoryGB))
+$lines.Add(('- Zazu project storage type: {0}' -f $manifest.projectStorageType))
 $storageSummary = @($manifest.diskDevices | ForEach-Object {
     '{0} ({1} GB; {2})' -f $_.Model, $_.SizeGB, $_.InterfaceType
 }) -join '; '
