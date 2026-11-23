@@ -170,8 +170,12 @@
                         <div class="zazu-catalogue-drawer-rule"></div>
                         <div class="zazu-eyebrow">Your current catalogue</div>
                         <div class="zazu-drawer-specs">
-                            <div><span>Hire &amp; rental</span><strong class="font-mono">{{ $equipment->count() }} items</strong></div>
-                            <div><span>Services &amp; products</span><strong class="font-mono">{{ $services->count() }} items</strong></div>
+                            @if($equipment->isNotEmpty())
+                                <div><span>Hire &amp; rental</span><strong class="font-mono">{{ $equipment->count() }} items</strong></div>
+                            @endif
+                            @if($services->isNotEmpty())
+                                <div><span>Services &amp; products</span><strong class="font-mono">{{ $services->count() }} items</strong></div>
+                            @endif
                             <div><span>Pricing</span><strong class="font-mono">Business-defined</strong></div>
                         </div>
                     </div>
