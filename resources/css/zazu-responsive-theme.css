@@ -128,7 +128,7 @@
     width: 100%;
     max-width: 190px;
     padding: 0 10px;
-    color: var(--zazu-muted);
+    color: var(--zazu-ink-2);
     font-size: var(--zazu-font-size-small);
     font-weight: var(--zazu-weight-semibold);
     line-height: 1.35;
