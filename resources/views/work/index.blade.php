@@ -33,7 +33,7 @@
             <div>
                 <div class="zazu-eyebrow">Operational register</div>
                 <div id="work-register-title" class="zazu-card-title mt-1">Jobs</div>
-                <div class="zazu-card-description">Select a record to inspect its catering, equipment and financial context.</div>
+                <div class="zazu-card-description">Select a record to inspect its scope, resources and commercial context.</div>
             </div>
             <div class="zazu-register-key" aria-hidden="true"><span><i class="is-record"></i> Record</span><span><i class="is-status"></i> Status</span><span><i class="is-action"></i> Action</span></div>
         </div>
