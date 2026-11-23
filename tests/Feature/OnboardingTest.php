@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\BusinessCapability;
+use App\Models\SyncDevice;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -449,6 +450,48 @@ class OnboardingTest extends TestCase
             ->assertSee('Jobs')
             ->assertSee('Quotes')
             ->assertSee('Finance');
+    }
+
+    public function test_offline_bootstrap_includes_presentation_only_workspace_profile(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Mixed Workspace',
+            'slug' => 'offline-mixed-workspace',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = $this->signInAsOwner($business);
+        $this->selectBusinessFocus($user, $business);
+
+        foreach ([
+            ['name' => 'DJ package', 'category' => 'Sound & entertainment', 'capability_type' => 'service', 'is_active' => true],
+            ['name' => 'Catering package', 'category' => 'Catering', 'capability_type' => 'service', 'is_active' => true],
+            ['name' => 'Archived photography', 'category' => 'Photography & video', 'capability_type' => 'service', 'is_active' => false],
+            ['name' => 'Chair hire', 'category' => 'Equipment rental', 'capability_type' => 'rental', 'is_active' => true],
+        ] as $capability) {
+            BusinessCapability::create($capability + [
+                'business_id' => $business->id,
+                'pricing_basis' => 'custom',
+                'currency' => 'ZAR',
+            ]);
+        }
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'approved_by_user_id' => $user->id,
+            'installation_id' => (string) \\Illuminate\\Support\\Str::uuid(),
+            'status' => 'active',
+        ]);
+
+        $profile = app(\\App\\Support\\Offline\\SyncBootstrapPayloadBuilder::class)
+            ->build($device)['workspace_profile'];
+
+        $this->assertSame(['Catering & baking'], $profile['focus_labels']);
+        $this->assertSame(['Catering', 'Equipment rental', 'Sound & entertainment'], $profile['catalogue_categories']);
+        $this->assertSame(3, $profile['active_offerings']);
+        $this->assertSame(1, $profile['active_rentals']);
+        $this->assertNotContains('Photography & video', $profile['catalogue_categories']);
     }
 
     private function selectBusinessFocus(User $user, Business $business): void
