@@ -107,8 +107,16 @@ class BusinessSpreadsheetExportTest extends TestCase
             ->assertSee('Event costs')
             ->assertSee('Travel calculations')
             ->assertSee('Complete business archive')
-            ->assertSee('Download business archive')
-            ->assertSee('Validate and restore archive');
+            ->assertSee('Encrypt &amp; download archive', false)
+            ->assertSee('Validate &amp; restore', false)
+            ->assertSee('Export a specific dataset')
+            ->assertSee('People &amp; work', false)
+            ->assertSee('Catalogue &amp; assets', false)
+            ->assertSee('Event delivery')
+            ->assertSee('Money &amp; tax', false)
+            ->assertSee('Purchasing &amp; stock', false)
+            ->assertSee('zazu-export-group', false)
+            ->assertSee('Download CSV');
     }
 
     public function test_every_export_resource_streams_a_csv_for_an_empty_business(): void
