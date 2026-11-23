@@ -136,6 +136,7 @@ $requiredExtensions = @(
     'hash',
     'mbstring',
     'openssl',
+    'sodium',
     'pdo',
     'pdo_sqlite',
     'session',
