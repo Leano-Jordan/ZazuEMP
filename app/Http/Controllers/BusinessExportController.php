@@ -133,7 +133,7 @@ class BusinessExportController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $validated
+     * @param  array<string, mixed>  $validated
      */
     private function restoreValidatedArchive(
         Request $request,
@@ -200,7 +200,7 @@ class BusinessExportController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $validated
+     * @param  array<string, mixed>  $validated
      */
     private function resolveRestoreArchivePath(
         array $validated,
