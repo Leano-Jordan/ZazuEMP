@@ -2,22 +2,24 @@
 
 namespace App\Support\Offline;
 
+use App\Models\Asset;
+use App\Models\AssetAllocation;
 use App\Models\Business;
 use App\Models\BusinessCapability;
-use App\Models\FinanceExpense;
-use App\Models\Invoice;
-use App\Models\Payment;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
-use App\Models\Asset;
-use App\Models\AssetAllocation;
+use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\Quote;
+use App\Models\QuoteVersion;
 use App\Models\Supplier;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
@@ -30,6 +32,8 @@ use App\Support\Audit;
 use App\Support\Money;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -47,8 +51,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         private readonly PurchaseOrderReceivingService $receivingService,
         private readonly FinanceTransactionService $finance,
         private readonly InvoiceNumberGenerator $invoiceNumbers,
-    ) {
-    }
+    ) {}
 
     public function apply(SyncMutation $mutation): void
     {
@@ -113,7 +116,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      * @return array<string, mixed>
      */
     private function customerAttributes(int $businessId, array $payload, ?Customer $customer): array
@@ -144,7 +147,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function syncPrimaryContact(Customer $customer, array $payload): void
     {
@@ -165,6 +168,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 'phone' => array_key_exists('phone', $payload) ? $phone : $contact->phone,
                 'email' => array_key_exists('email', $payload) ? $email : $contact->email,
             ]);
+
             return;
         }
 
@@ -179,7 +183,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function syncAdditionalContact(Customer $customer, array $payload, string $period): void
     {
@@ -223,6 +227,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         if ($contact) {
             $contact->update($attributes);
+
             return;
         }
 
@@ -256,8 +261,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $payload
+     * @param  array<string, mixed>  $attributes
      */
     private function updateOfflineEvent(
         SyncMutation $mutation,
@@ -283,7 +288,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $attributes
      */
     private function assertOfflineEventCustomerUnchanged(Event $event, array $attributes): void
     {
@@ -298,7 +303,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function syncOfflineEventRequirements(Event $event, array $payload): void
     {
@@ -331,7 +336,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function resolveOfflineJobCustomer(
         SyncMutation $mutation,
@@ -359,7 +364,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      * @return array<string, mixed>
      */
     private function offlineJobAttributes(
@@ -392,7 +397,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      * @return array<string, string|null>
      */
     private function offlineScheduleAttributes(array $payload, ?Event $event): array
@@ -426,7 +431,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function offlineJobContactId(
         ?Customer $customer,
@@ -485,7 +490,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      * explicitly sends it. Existing matching rows retain quantity, notes,
      * status and capability links; removed descriptions are deleted.
      *
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function syncOfflineJobRequirements(Event $event, array $payload): void
     {
@@ -512,7 +517,6 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      * Resolve selected offerings against this business while retaining support
      * for service names already queued by older offline clients.
      *
-     * @param mixed $services
      * @return array<string, array{category: string, capability_id: int|null, unit: string}>
      */
     private function offlineJobRequirementDefinitions(int $businessId, mixed $services, mixed $otherService): array
@@ -534,7 +538,6 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param mixed $services
      * @return array<int, string>
      */
     private function offlineJobServiceNames(mixed $services): array
@@ -566,10 +569,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<int, string> $names
-     * @return \Illuminate\Support\Collection<string, \Illuminate\Support\Collection<int, BusinessCapability>>
+     * @param  array<int, string>  $names
+     * @return Collection<string, Collection<int, BusinessCapability>>
      */
-    private function offlineJobCatalogue(int $businessId, array $names): \Illuminate\Support\Collection
+    private function offlineJobCatalogue(int $businessId, array $names): Collection
     {
         return BusinessCapability::query()
             ->where('business_id', $businessId)
@@ -579,8 +582,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param \Illuminate\Support\Collection<int, BusinessCapability> $matches
-     * @param array<string, string> $legacyCategories
+     * @param  Collection<int, BusinessCapability>  $matches
+     * @param  array<string, string>  $legacyCategories
      * @return array{category: string, capability_id: int|null, unit: string}
      */
     private function offlineJobRequirementDefinition(string $description, $matches, array $legacyCategories): array
@@ -601,7 +604,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, array{category: string, capability_id: int|null, unit: string}> $requirements
+     * @param  array<string, array{category: string, capability_id: int|null, unit: string}>  $requirements
      * @return array<string, array{category: string, capability_id: int|null, unit: string}>
      */
     private function appendOfflineCustomService(array $requirements, mixed $otherService): array
@@ -620,7 +623,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array{category: string, capability_id: int|null, unit: string} $definition
+     * @param  array{category: string, capability_id: int|null, unit: string}  $definition
      */
     private function upsertOfflineJobRequirement(Event $event, string $description, array $definition): void
     {
@@ -645,7 +648,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function createOfflineJobRequirements(Event $event, array $payload): void
     {
@@ -687,7 +690,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $eventIdentity = SyncEntityIdentity::query()
             ->where('business_id', $mutation->business_id)
             ->where('entity_type', 'job')
-            ->where('record_type', (new Event())->getMorphClass())
+            ->where('record_type', (new Event)->getMorphClass())
             ->where('entity_uuid', Str::lower($eventUuid))
             ->first();
 
@@ -727,6 +730,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         if ($item instanceof EventPreparationItem) {
             $item->update($attributes);
+
             return $item->fresh();
         }
 
@@ -737,7 +741,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function quote(SyncMutation $mutation): \App\Models\Quote
+    private function quote(SyncMutation $mutation): Quote
     {
         if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
             throw ValidationException::withMessages(['operation' => 'Offline quotes only support create/upsert/update.']);
@@ -750,13 +754,14 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $quote = $this->existing($mutation);
-        if ($quote instanceof \App\Models\Quote) {
+        if ($quote instanceof Quote) {
             if ($quote->status !== 'draft') {
                 throw ValidationException::withMessages(['quote' => 'Only draft offline quotes can be edited.']);
             }
 
             $version = $quote->versions()->orderByDesc('version')->firstOrFail();
             $this->writeOfflineQuoteVersion($version, $payload);
+
             return $quote->fresh(['latestVersion.items']);
         }
 
@@ -770,7 +775,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['currency' => 'Offline quotes must use a supported business currency.']);
         }
 
-        $quote = \App\Models\Quote::create([
+        $quote = Quote::create([
             'event_id' => $event->id,
             'reference' => $this->nullableString($payload['reference'] ?? null, 100)
                 ?? 'QUO-OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
@@ -800,7 +805,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return $quote->fresh(['latestVersion.items']);
     }
 
-    private function writeOfflineQuoteVersion(\App\Models\QuoteVersion $version, array $payload): void
+    private function writeOfflineQuoteVersion(QuoteVersion $version, array $payload): void
     {
         if (array_key_exists('deposit_percent', $payload)) {
             $version->update([
@@ -898,7 +903,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $payload = $this->recordPayload($mutation);
-        $quote = $this->resolveIdentityRecord($mutation->business_id, 'quote', $payload['quote_local_id'] ?? null, \App\Models\Quote::class);
+        $quote = $this->resolveIdentityRecord($mutation->business_id, 'quote', $payload['quote_local_id'] ?? null, Quote::class);
 
         if (! $quote) {
             throw ValidationException::withMessages(['quote_local_id' => 'The offline acceptance references an unknown quote.']);
@@ -947,7 +952,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $payload = $this->recordPayload($mutation);
-        $quote = $this->resolveIdentityRecord($mutation->business_id, 'quote', $payload['quote_local_id'] ?? null, \App\Models\Quote::class);
+        $quote = $this->resolveIdentityRecord($mutation->business_id, 'quote', $payload['quote_local_id'] ?? null, Quote::class);
         if (! $quote || $quote->status !== 'accepted') {
             throw ValidationException::withMessages(['quote_local_id' => 'Offline invoices require an accepted quote.']);
         }
@@ -1277,6 +1282,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         if ($item instanceof InventoryItem) {
             $item->update($attributes);
+
             return $item->fresh();
         }
 
@@ -1350,7 +1356,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $unitCost = $this->nonNegativeMoney($payload['unit_cost'] ?? '0.00');
         $movementDate = $this->nullableDate($payload['movement_date'] ?? now()->toDateString()) ?? now()->toDateString();
 
-        \Illuminate\Support\Facades\DB::transaction(function () use (
+        DB::transaction(function () use (
             $mutation,
             $item,
             $event,
@@ -1363,7 +1369,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $payload,
             &$existing,
         ): void {
-            \App\Models\Business::query()->whereKey($mutation->business_id)->lockForUpdate()->firstOrFail();
+            Business::query()->whereKey($mutation->business_id)->lockForUpdate()->firstOrFail();
 
             $lockedItem = InventoryItem::query()
                 ->where('business_id', $mutation->business_id)
@@ -1481,6 +1487,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         if ($cost instanceof EventCost) {
             $cost->update($attributes);
+
             return $cost->fresh();
         }
 
@@ -1531,6 +1538,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         if ($asset instanceof Asset) {
             $asset->update($attributes);
+
             return $asset->fresh();
         }
 
@@ -1569,7 +1577,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 throw ValidationException::withMessages(['status' => 'Offline asset allocation updates may only return an existing allocation.']);
             }
 
-            \Illuminate\Support\Facades\DB::transaction(function () use ($mutation, $asset, $allocation, $status, $payload): void {
+            DB::transaction(function () use ($mutation, $asset, $allocation, $status, $payload): void {
                 $lockedAsset = Asset::query()->where('business_id', $mutation->business_id)->lockForUpdate()->findOrFail($asset->id);
                 $lockedAllocation = AssetAllocation::query()
                     ->where('business_id', $mutation->business_id)
@@ -1612,7 +1620,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['allocated_until' => 'Allocation dates are invalid.']);
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($mutation, $asset, $event, $payload, $from, $until, &$allocation): void {
+        DB::transaction(function () use ($mutation, $asset, $event, $payload, $from, $until, &$allocation): void {
             $lockedAsset = Asset::query()->where('business_id', $mutation->business_id)->lockForUpdate()->findOrFail($asset->id);
             abort_unless(in_array($lockedAsset->status, ['available', 'allocated'], true), 422, 'Only available assets can be allocated offline.');
 
@@ -1680,7 +1688,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $businessId)
             ->where('entity_type', $entityType)
-            ->where('record_type', (new $model())->getMorphClass())
+            ->where('record_type', (new $model)->getMorphClass())
             ->where('entity_uuid', Str::lower($uuid))
             ->first();
 
@@ -1777,7 +1785,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $businessId)
             ->where('entity_type', 'supplier')
-            ->where('record_type', (new Supplier())->getMorphClass())
+            ->where('record_type', (new Supplier)->getMorphClass())
             ->where('entity_uuid', Str::lower($supplierUuid))
             ->first();
 
@@ -1850,7 +1858,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $mutation->business_id)
             ->where('entity_type', 'purchase_order')
-            ->where('record_type', (new PurchaseOrder())->getMorphClass())
+            ->where('record_type', (new PurchaseOrder)->getMorphClass())
             ->where('entity_uuid', Str::lower($purchaseOrderUuid))
             ->first();
 
@@ -1906,7 +1914,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $lineIdentity = SyncEntityIdentity::query()
                 ->where('business_id', $businessId)
                 ->where('entity_type', 'purchase_order_item')
-                ->where('record_type', (new PurchaseOrderItem())->getMorphClass())
+                ->where('record_type', (new PurchaseOrderItem)->getMorphClass())
                 ->where('entity_uuid', Str::lower($lineIdentityOrId))
                 ->first();
 
@@ -1945,7 +1953,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $identity = SyncEntityIdentity::query()
             ->where('business_id', $businessId)
             ->where('entity_type', 'job')
-            ->where('record_type', (new Event())->getMorphClass())
+            ->where('record_type', (new Event)->getMorphClass())
             ->where('entity_uuid', Str::lower($eventUuid))
             ->first();
 
@@ -2099,6 +2107,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         if ($supplier instanceof Supplier) {
             $supplier->update($attributes);
+
             return $supplier->fresh();
         }
 
@@ -2138,6 +2147,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         if ($capability instanceof BusinessCapability) {
             $capability->update($attributes);
+
             return $capability->fresh();
         }
 
