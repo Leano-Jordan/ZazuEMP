@@ -1907,3 +1907,17 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Exact-head host-outage hardening commit `d35d2f95e6d510c2d7b8dd78c0ff3e0d4036d988`: all 9 GitHub checks passed. The new 1.8-second hanging-host fallback regression passed with the full application/quality/security/CodeQL suite.
 - Release checklist updated at `295141dc34a1ae91b350a842e8c63986c9c081da` to separate verified work from owner-operated restore, physical Android, commercial reconciliation, independent-backup encryption, and legal/brand gates.
 - Do not mark V1 ready. The next founder-operated action is restore the downloaded `.zazu` only into a separate empty/unpaired test business workspace. Never overwrite the populated live workspace.
+
+
+## Restore diagnostics and complete multi-focus guidance — 2026-11-23
+
+**Implemented directly on `main`:**
+- Business archive format detection now fails closed when the uploaded file cannot be opened; an inaccessible file is no longer silently classified as a legacy plaintext ZIP.
+- Restore failures now receive a correlation reference and structured warning log with the stage (`upload_access`, `encryption_detection`, `decryption`, or `archive_validation_and_restore`), business/user IDs, upload byte count and exception class. Passphrases, archive contents and exception messages are not logged.
+- The restore page returns the reference alongside the existing actionable error so the corresponding server log entry can be located.
+- Removed the three-focus truncation from Helper context. Every configured active focus area can now be represented for businesses with broad mixed service catalogues.
+- Added regression coverage for inaccessible archive paths and a four-focus business. These tests are committed but not yet executed in CI.
+
+**Verification boundary:** source was read back from `main`. GitHub commit-status lookup for the latest source commit returned no status records; no PHPUnit, migration, or exact-head CI pass is claimed. The first restore failure remains unresolved until its stage is captured. Do not retry the archive drill until the code is installed and the new checks have passed. Preserve the original archive and passphrase.
+
+**Latest related commits:** archive detection `d6f36c8`; restore diagnostics `f9c861a` / syntax correction `606352a`; archive regression `db79ca7`; full focus resolution `89ca4d3`; focus regression `07eb9de` / ordering correction `8ef9b6a`.
