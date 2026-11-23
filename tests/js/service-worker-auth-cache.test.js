@@ -1015,3 +1015,32 @@ test('offline forms and cached Work detail preserve their exact route while othe
     assert.match(await directoryResponse.text(), /Offline dashboard/);
     await directory.finished();
 });
+
+
+test('a hanging host with Wi-Fi still connected falls back quickly to the local dashboard shell', async () => {
+    const worker = bootWorker(async () => new Promise(() => {}), {}, true);
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/dashboard'],
+    });
+
+    const businessCache = await worker.caches.open('zazu-static-v61-user-41-business-17');
+    await businessCache.put('/customers', new MockResponse('<main>Stale customer snapshot</main>'));
+
+    const startedAt = Date.now();
+    const navigation = worker.dispatchFetch(new worker.Request('/customers', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }));
+
+    const response = await navigation.response;
+    const elapsed = Date.now() - startedAt;
+    assert.equal(response.ok, true);
+    assert.match(await response.text(), /data-zazu-user-id="41"/);
+    assert.doesNotMatch(await response.text(), /Stale customer snapshot/);
+    assert.ok(elapsed < 3000, 'the worker must not leave the installed app waiting on a dead host');
+    await navigation.finished();
+});
