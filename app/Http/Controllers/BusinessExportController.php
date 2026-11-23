@@ -9,6 +9,7 @@ use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use RuntimeException;
@@ -120,7 +121,7 @@ class BusinessExportController extends Controller
             ]);
 
             return back()->withErrors(['archive' => $exception->getMessage().' Reference: '.$incidentId]);
-        } catch (\\JsonException $exception) {
+        } catch (\JsonException $exception) {
             $incidentId = (string) Str::uuid();
             Log::warning('Business archive restore failed while decoding archive data.', [
                 'incident_id' => $incidentId,
