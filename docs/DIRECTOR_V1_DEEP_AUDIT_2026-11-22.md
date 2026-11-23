@@ -116,21 +116,15 @@ Observed:
 - Restore has staged database/private-storage rollback paths.
 - Empty private-storage restore and failed mid-restore cleanup have regression coverage.
 
-**High-priority finding — backups are not encrypted by the application.**
+**Historical finding — initial business and installation archives were unencrypted.**
 
-The current ZIP creation path adds files to a normal ZIP archive and does not configure ZIP encryption or encrypt the resulting archive. SHA-256 protects integrity; it does not provide confidentiality. A copied or stolen archive can expose the database and private customer/business files.
+Business archive confidentiality is now remediated for new exports: V2 .zazu exports use a passphrase-derived Argon2id key and authenticated Sodium secretstream encryption. Legacy plaintext V1 business archives remain importable for migration compatibility and should be re-exported.
 
-Required design before relying on off-device copies:
-1. Encrypt the archive with authenticated encryption.
-2. Define a recovery-key/passphrase mechanism that remains usable after loss of the original PC.
-3. Never store the only decryption key inside the same archive or only in the installation's `.env`.
-4. Test wrong-key, corrupted ciphertext, interrupted encryption, key rotation and restore to a clean installation.
-5. Preserve a documented migration path for existing unencrypted archives.
-6. Keep the existing archive integrity and rollback protections.
+Installation-wide scheduled backups intentionally remain unattended ZIP files so a recovery operation never depends on a human passphrase. Their off-disk copies must be stored on BitLocker-protected removable media or in an encrypted, access-controlled cloud vault. The scheduled runner verifies SHA-256 copy integrity only; it does not encrypt the secondary copy or verify destination encryption.
 
-Do not implement encryption by blindly deriving the only recovery key from the original APP_KEY: a full installation loss could then make the backup unrecoverable unless the original key is separately preserved.
+The original APP_KEY is not used as the business archive passphrase or encryption key. The business passphrase is supplied by the owner, is not persisted, and must be stored separately. A forgotten passphrase cannot be recovered by Zazu.
 
-The actual owner-PC scheduled backup, independent copy and controlled restore remain mandatory.
+The actual owner-PC scheduled backup, encrypted independent copy and controlled restore remain mandatory.
 
 ### E. Performance and resource use — measurement gap
 
