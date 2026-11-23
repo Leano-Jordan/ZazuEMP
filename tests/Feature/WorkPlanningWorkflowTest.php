@@ -176,6 +176,7 @@ class WorkPlanningWorkflowTest extends TestCase
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR', 'quantity' => [$requirement->id => '1.00'],
+            'confirm_single_quantity' => [$requirement->id => '1'],
             'unit_price' => [$requirement->id => '2500.00'],
         ])->assertRedirect();
 
@@ -213,6 +214,7 @@ class WorkPlanningWorkflowTest extends TestCase
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
             'quantity' => [$removed->id => '1.00', $remaining->id => '80.00'],
+            'confirm_single_quantity' => [$removed->id => '1'],
             'unit_price' => [$removed->id => '500.00', $remaining->id => '100.00'],
         ])->assertRedirect();
 
@@ -252,6 +254,7 @@ class WorkPlanningWorkflowTest extends TestCase
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
             'quantity' => [$requirement->id => '1.00'],
+            'confirm_single_quantity' => [$requirement->id => '1'],
             'unit_price' => [$requirement->id => '100.00'],
         ])->assertRedirect();
 
@@ -280,6 +283,7 @@ class WorkPlanningWorkflowTest extends TestCase
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
             'quantity' => [$requirement->id => '1.00'],
+            'confirm_single_quantity' => [$requirement->id => '1'],
             'unit_price' => [$requirement->id => '100.00'],
         ])->assertRedirect();
 
