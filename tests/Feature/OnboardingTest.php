@@ -480,11 +480,11 @@ class OnboardingTest extends TestCase
         $device = SyncDevice::create([
             'business_id' => $business->id,
             'approved_by_user_id' => $user->id,
-            'installation_id' => (string) \\Illuminate\\Support\\Str::uuid(),
+            'installation_id' => (string) \Illuminate\Support\Str::uuid(),
             'status' => 'active',
         ]);
 
-        $profile = app(\\App\\Support\\Offline\\SyncBootstrapPayloadBuilder::class)
+        $profile = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)
             ->build($device)['workspace_profile'];
 
         $this->assertContains('Catering & baking', $profile['focus_labels']);
