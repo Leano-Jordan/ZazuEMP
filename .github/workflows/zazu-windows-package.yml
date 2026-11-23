@@ -41,7 +41,7 @@ jobs:
           ref: ${{ github.sha }}
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         with:
           php-version: '8.4'
           extensions: curl, dom, fileinfo, mbstring, openssl, pdo_sqlite, tokenizer, xml, zip
@@ -160,7 +160,7 @@ jobs:
           ref: ${{ github.sha }}
 
       - name: Set up PHP 8.4 with SQLite
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         with:
           php-version: '8.4'
           extensions: curl, dom, fileinfo, mbstring, openssl, pdo_sqlite, tokenizer, xml, zip
