@@ -342,5 +342,4 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('.feature.mini:nth-of-type(4){grid-column:1 / span 6;grid-row:3}', $view);
         $this->assertStringContainsString('.feature.mini:nth-of-type(5){grid-column:7 / -1;grid-row:3}', $view);
     }
-
 }
