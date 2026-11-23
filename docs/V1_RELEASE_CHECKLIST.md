@@ -641,3 +641,10 @@ Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality, Director He
 - [x] Server-side validation rejects quantity one without confirmation on both actions.
 - [x] Regression tests cover rejection, explicit confirmation and revision-update behaviour.
 - [ ] Exact-head Laravel, PHPMD, Zazu Quality/Pint and browser acceptance for this implementation commit.
+
+
+### Quote single-unit browser coverage — 2026-11-23
+
+- [x] Added a desktop Playwright journey using the actual Job and Quote forms.
+- [x] Wired the journey into the per-push Laravel workflow.
+- [ ] Exact-head browser/Laravel CI passes on the current main commit.
