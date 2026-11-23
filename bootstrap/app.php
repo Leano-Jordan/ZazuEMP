@@ -38,6 +38,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Archive passphrases are secrets; never retain them in flashed validation input.
+        $exceptions->dontFlash(['archive_password', 'archive_password_confirmation']);
+
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
