@@ -9,7 +9,8 @@
             </div>
             <div class="zazu-eyebrow">First things first</div>
             <h2 class="zazu-onboarding-title">Add what you offer</h2>
-            <p class="zazu-onboarding-copy">Start with the things you regularly sell, provide or hire out. You can add pricing and other details now or later.</p>
+            <p class="zazu-onboarding-copy">Add the services, products, rentals and packages you actually provide. Your category suggestions are based on the business activities you selected, and you can add several offerings one after another.</p>
+            <p class="zazu-field-help mt-2">Business areas: {{ collect($selectedFocuses)->map(fn ($focus) => config('zazu.niches.'.$focus.'.label'))->filter()->unique()->implode(' · ') }}</p>
 
             <form method="POST" action="{{ route('onboarding.catalogue.store') }}" class="zazu-form-section">
                 @csrf
