@@ -68,7 +68,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $output = Join-Path $env:RUNNER_TEMP 'zazu-performance-smoke'
-          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ops/windows/Measure-ZazuResources.ps1' -DurationSeconds 3 -IntervalSeconds 1 -ProjectPath $PWD.Path -OutputDirectory $output
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ops/windows/Measure-ZazuResources.ps1' -DurationSeconds 3 -IntervalSeconds 1 -ProjectPath $PWD.Path -BuildCommitSha $env:GITHUB_SHA -OutputDirectory $output
           if ($LASTEXITCODE -ne 0) { throw 'The Zazu resource sampler exited unsuccessfully.' }
           $csv = Get-ChildItem -LiteralPath $output -Filter 'zazu-resource-samples-*.csv' -File | Select-Object -First 1
           $manifest = Get-ChildItem -LiteralPath $output -Filter 'zazu-resource-manifest-*.json' -File | Select-Object -First 1
