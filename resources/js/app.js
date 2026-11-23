@@ -2752,11 +2752,20 @@ function setupZazuOfflineDirectoryViews() {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
         if (!workspace?.isConnected) return lastOriginAvailable;
 
-        const hasPendingRecords = ['customers', 'jobs', 'quotes'].some(collection =>
-            (state?.[collection] || []).some(record =>
-                record?.local_id && !(record.server_id ?? record.id)
-            )
-        );
+        const offlineWorkspaceCollections = [
+            'customers', 'jobs', 'quotes', 'preparations',
+            ...Object.keys(offlineCollectionDefinitions),
+        ];
+        const hasPendingRecords = Boolean(state?.local_dirty)
+            || (state?.conflicts || []).some(conflict => conflict?.status === 'open')
+            || offlineWorkspaceCollections.some(collection =>
+                (state?.[collection] || []).some(record =>
+                    record?.local_id && (
+                        record.pending_sync === true
+                        || !(record.server_id ?? record.id)
+                    )
+                )
+            );
 
         workspace.hidden = !hasPendingRecords && lastOriginAvailable;
         applyOfflineRouteView();
