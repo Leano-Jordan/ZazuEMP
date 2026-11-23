@@ -1765,3 +1765,16 @@ No new preset/configuration table, permissions, authorization paths, navigation 
 - Added `OnboardingTest::test_setup_centre_summarises_active_and_hidden_owner_capabilities` covering active service, active rental and hidden service records.
 
 The Helper focus expansion is implemented in config, Helper presentation and `ZazuHelperContextTest`. Exact-head CI remains pending for the combined commits; do not call the new changes green until GitHub reports completion. Offline parity and physical device acceptance remain separate.
+
+
+## Dependency and workflow consolidation — 2026-11-23
+
+**Reviewed current locked dependencies and workflow action references on `main`:**
+- Confirmed all direct Composer and npm requirements have matching locked package entries; Laravel is locked at 13.43.0 and its Psalm compatibility shim checks the same version/reference.
+- Recalculated the licence inventory from current lockfiles: 77 Composer runtime packages, 34 Composer development packages and 147 npm package entries; all have declared licence metadata.
+- Refreshed `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md` and `THIRD_PARTY_NOTICES.md` with current counts and direct locked versions.
+- Pinned the remaining floating `actions/checkout@v7` references in quality, Director contract lint and landing-media workflows to the already-adopted v7.0.1 commit.
+- Updated PHPMD SARIF upload from CodeQL v3 to the repository's adopted pinned v4.39.3 action.
+- Removed the package-specific npm audit exception for GHSA-fc5q-39xc-vjpf / CVE-2026-112366. GitHub's advisory now marks it withdrawn on 2026-11-18 because it was determined not to be a security issue; the npm audit wrapper now enforces the normal high-severity threshold without an exception.
+
+**Not claimed:** local `npm ci`, `composer install`, audits or build were not run in this environment. Exact-head GitHub CI must verify the consolidation. Legal release approval remains separate.
