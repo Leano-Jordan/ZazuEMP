@@ -10,6 +10,7 @@ use App\Services\QuoteService;
 use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use App\Support\Audit;
+use App\Support\Money;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -93,7 +94,14 @@ class QuoteController extends Controller
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
             'quantity' => ['required', 'array', 'min:1'],
             'quantity.*' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
+            'confirm_single_quantity' => ['sometimes', 'array'],
+            'confirm_single_quantity.*' => ['accepted'],
         ]);
+
+        $this->validateSingleUnitQuantities(
+            $validated['quantity'],
+            $validated['confirm_single_quantity'] ?? []
+        );
 
         $taxRate = $this->resolveTaxRate($businessId, $validated['tax_rate_id'] ?? null);
 
@@ -375,7 +383,14 @@ class QuoteController extends Controller
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
             'quantity' => ['required', 'array', 'min:1'],
             'quantity.*' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
+            'confirm_single_quantity' => ['sometimes', 'array'],
+            'confirm_single_quantity.*' => ['accepted'],
         ]);
+
+        $this->validateSingleUnitQuantities(
+            $validated['quantity'],
+            $validated['confirm_single_quantity'] ?? []
+        );
 
         $requirementsById = $quote->event->requirements->keyBy('id');
         $submittedRequirementIds = array_map('intval', array_keys($validated['unit_price']));
@@ -411,6 +426,31 @@ class QuoteController extends Controller
         return redirect()
             ->route('quotes.show', $quote)
             ->with('success', 'Quote v' . $version->version . ' saved.');
+    }
+
+    /**
+     * A single unit is valid, but it must be an explicit commercial decision.
+     *
+     * @param array<int|string, string|int|float> $quantities
+     * @param array<int|string, mixed> $confirmations
+     */
+    private function validateSingleUnitQuantities(array $quantities, array $confirmations): void
+    {
+        $errors = [];
+
+        foreach ($quantities as $requirementId => $quantity) {
+            if (Money::toHundredths((string) $quantity) !== 100) {
+                continue;
+            }
+
+            if (($confirmations[$requirementId] ?? null) !== '1') {
+                $errors['quantity.'.$requirementId] = 'You entered a quantity of one. Confirm that one is genuinely the correct amount for this quote line.';
+            }
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     private function activeTaxRates(int $businessId)
