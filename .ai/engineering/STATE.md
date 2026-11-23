@@ -3,9 +3,9 @@
 
 - Added an Edit saved item flow to the offline inventory collection detail panel. It edits name, SKU, unit, reorder level and the linked catalogue product without requiring the inventory page to be online.
 - The edit form deliberately uses the durable sync queue even when the origin is reachable; it preserves the local identity/server ID, emits an `update` mutation, marks the local record pending, and uses the current aggregate revision for stale-write protection. Local-only IDs are not misinterpreted as numeric server IDs.
-- Added a Playwright acceptance test that edits an inventory item while disconnected and asserts local state, pending queue entry, operation type and expected revision.
+- Added a Playwright acceptance test that edits an inventory item while disconnected and asserts local state, pending queue entry, operation type and expected revision. Extended server-side operational-depth coverage to prove an inventory movement advances the item revision, a later offline update succeeds against that revision, and replay does not duplicate or double-advance it.
 - Updated the V1 operation matrix: inventory now has create/update UI; preparations, quote/draft versions, event costs and purchase orders remain create-only in the offline UI. Clarified that the generic dashboard list/detail renderer is not full route-specific CRUD parity.
-- **Verification pending:** exact-head lint, Laravel, desktop/mobile browser acceptance and Windows package checks must pass before this update path is considered closed.
+- **Verification pending:** exact-head PHPMD, Zazu Quality, Laravel, desktop/mobile browser acceptance and Windows package checks must pass before this update path is considered closed. Latest code head: `59590605`.
 
 ---
 
@@ -21,7 +21,7 @@
 
 ## Director incident response — Windows server readiness and accessibility regression — 2026-11-23
 
-**Implementation commits on `main`:** `45cec0f7`, `533d8a57`, `7f6fb9bf`, `7106a44f`, `1093ea50`, `dcfa9799`, `0aa1b4a6`, `402e5cf8`, `27f75650`, `3abd82cb`, `bfedf3b8`, `72855299`, `fc7de7a6`, `26641742`, `b61b8c97`, `86b960d8`, `fdfa692a`, `f825051c`, `e7123530`, `44e7acfe`, `803a3a78`, `132021fe`, `1262eb9d`, `53b5994b`, `2f465663`.
+**Implementation commits on `main`:** `45cec0f7`, `533d8a57`, `7f6fb9bf`, `7106a44f`, `1093ea50`, `dcfa9799`, `0aa1b4a6`, `402e5cf8`, `27f75650`, `3abd82cb`, `bfedf3b8`, `72855299`, `fc7de7a6`, `26641742`, `b61b8c97`, `86b960d8`, `fdfa692a`, `f825051c`, `e7123530`, `44e7acfe`, `803a3a78`, `132021fe`, `1262eb9d`, `53b5994b`, `2f465663`, `3254dd4d`, `814fa3ed`, `59590605`.
 
 - Investigated Laravel workflow run `45238129152` on prior head `b726e683`. Laravel/PHP tests, PostgreSQL migration/recovery, offline/session contract checks, Vite configuration and asset build passed. The browser job failed in authenticated-workspace accessibility acceptance before downstream browser/offline journeys could run.
 - Exact accessibility defects found across authenticated surfaces: footer navigation and brand copy inherited `#64748B` against `#DCE5ED` (3.73:1); dashboard health-card microcopy used the same muted token on pastel status surfaces (3.44–3.94:1); workspace-search exposed sidebar brand text at `#617B91` on `#D5E0E8` (3.29:1) and a page eyebrow at `#64748B` on `#DCE5ED` (3.73:1). Changes now use theme-aware `--zazu-ink-2` for footer copy, health-card supporting text and global eyebrow labels, deepen the light-theme sidebar label token to `#33465F`, and correct the shared light-theme muted and faint text tokens from `#64748B` / `#53677E` to `#475569`, with `--zazu-text-muted` / `--zazu-text-body` following the muted token. Dark-theme values remain theme-specific.
