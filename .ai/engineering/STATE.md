@@ -1975,3 +1975,12 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Added an onboarding feature regression covering a mixed DJ/catering/rental catalogue and excluding inactive photography from the offline profile.
 - Source commits: `74c7689a` (bootstrap), `348eb787` (offline client state), `01dd72dd` / `e848ee22` / `9e44ac4e` (regression).
 - **Verification pending:** exact-head CI/PHPUnit and mobile/desktop offline presentation acceptance. The profile is available locally but is not yet consumed by a dedicated offline UI surface.
+
+## Offline expense purchase-order integrity — 2026-11-23
+
+- Offline expense creation now applies the same purchase-order constraints as the online finance path.
+- Only ordered, received or cancelled purchase orders may be linked. A supplied event or supplier must match the purchase order's event and supplier.
+- When the mutation supplies only a purchase order, its business-owned event and supplier are resolved and inherited before the canonical finance transaction service records the expense.
+- Added focused regressions for inheritance, mismatched event, mismatched supplier and draft-order rejection. All four passed in the Laravel run for `3288833` (alongside the existing `OfflineExpenseReferenceIsolationTest` cases).
+- The first full-suite run exposed unrelated stale UI/service-worker assertions and a restore-reference visibility defect. The restore validation message now places its incident reference in the first visible archive error; affected regression expectations have been aligned with the current onboarding, export and host-outage UI.
+- Exact-head verification of the follow-up repairs is pending. Do not claim V1 acceptance from this engineering slice.
