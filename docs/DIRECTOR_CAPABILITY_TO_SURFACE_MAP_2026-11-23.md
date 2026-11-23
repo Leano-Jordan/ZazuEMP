@@ -74,3 +74,8 @@ The category match is guidance metadata. It is not a complete module-dependency 
 ## Current disposition
 
 **Mapped from source; implementation partial.** Onboarding, Helper, the read-only workspace profile and compact sidebar business-mix panel now use the existing focus/catalogue model. Dynamic module prioritisation and offline workspace profile parity remain open. The next code slice should focus on explicit offline contract parity and then carefully prioritise navigation without hiding shared tools.
+
+
+## Offline delivery
+
+The read-only workspace profile is now included as `workspace_profile` in the sync bootstrap and persisted by the phone client in its business-scoped local state. It is derived from the approving member's selected business focus plus active catalogue categories and counts. It is context for future offline presentation only; it does not affect route authorization, record selection, or sync visibility. The client tolerates older bootstrap payloads that omit the field. Dedicated offline UI consumption and exact-head CI/mobile/desktop acceptance remain open.
