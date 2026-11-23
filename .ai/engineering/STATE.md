@@ -1829,3 +1829,11 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - The scheduled Windows runner copies installation ZIPs byte-for-byte and verifies SHA-256; it does not encrypt the secondary copy or verify BitLocker/cloud-vault encryption.
 - Owner guidance and installer environment comments now require BitLocker-protected USB or an encrypted, access-controlled cloud vault for the secondary destination. The dashboard copy status means presence/integrity only, not encryption or completed cloud upload.
 - Exact owner-PC destination encryption and the full restore drill remain release gates.
+
+
+## Dependency/runtime consolidation — 2026-11-23
+
+- Rechecked Composer and npm manifest/lockfile roots. npm package.json development requirements match package-lock.json; Composer's locked platform remains PHP ^8.4 and no new Composer/npm package was introduced for encryption.
+- Added an explicit Composer manifest/lock validation gate (`composer validate --strict`) to Zazu Quality; `npm ci` continues to enforce npm lock consistency.
+- Added PHP Sodium to the installer prerequisite check and all PHP acceptance workflow extension lists so the encrypted archive feature cannot silently ship to a runtime that lacks Sodium.
+- Exact-head CI has not yet returned check results; Composer validation, Laravel/ZipArchive tests, PHPMD, Pint, security audit and Windows package acceptance remain pending.
