@@ -1023,7 +1023,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(weddingChoice.locator('input[name="event_type"]')).toBeChecked();
         await page.locator('input[name="event_date"]').fill('2026-11-15');
         await page.locator('input[name="event_address"]').fill('Pretoria');
-        const cateringChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"][value="Catering"])');
+        const cateringChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"][value="Buffet Catering"])');
         await cateringChoice.click();
         await expect(cateringChoice.locator('input[name="services[]"]')).toBeChecked();
         let normalWorkPostAttempted = false;
