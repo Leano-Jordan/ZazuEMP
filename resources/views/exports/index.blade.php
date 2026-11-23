@@ -45,7 +45,7 @@
             </div>
             <span class="zazu-chip zazu-chip-neutral">ZAZU ARCHIVE V2 · ENCRYPTED</span>
         </div>
-        <p class="zazu-panel-copy mt-3"><strong>Security:</strong> new business archives are encrypted with XChaCha20-Poly1305 and an Argon2id-derived key. Choose a strong, unique passphrase and keep it separately from the archive. Zazu cannot recover a forgotten passphrase. Older V1 archives remain importable but are unencrypted.</p>
+        <p class="zazu-panel-copy mt-3"><strong>Security:</strong> new business archives are encrypted with XChaCha20-Poly1305 and an Argon2id-derived key. Choose a strong, unique passphrase and keep it separately from the archive. Zazu cannot recover a forgotten passphrase. V2 .zazu files are Zazu-specific encrypted containers; restore them from this screen. Older V1 archives remain importable but are unencrypted.</p>
         <form method="POST" action="{{ route('exports.archive.download') }}" class="mt-4 grid gap-3 sm:grid-cols-2">
             @csrf
             <label class="zazu-field-label" for="archive-export-password">New archive passphrase
