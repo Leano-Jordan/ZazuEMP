@@ -32,7 +32,7 @@ final class PrivateStoragePermissions
             if (! $this->restrictDirectoryEntries($path)) {
                 return false;
             }
-        } catch (\\Throwable) {
+        } catch (\Throwable) {
             return false;
         }
 
