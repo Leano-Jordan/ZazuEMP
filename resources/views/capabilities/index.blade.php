@@ -97,7 +97,7 @@
                             <div class="font-mono text-sm font-semibold">{{ $capability->currency ?? 'ZAR' }} {{ $rate }} <span class="zazu-catalogue-unit">/ {{ str_replace('_', ' ', $capability->pricing_basis) }}</span></div>
                             <div class="zazu-catalogue-actions">
                                 @if($isOwner)<a href="{{ route('capabilities.edit', $capability) }}" class="zazu-btn zazu-btn-ghost zazu-btn-sm">Edit</a>@endif
-                                <a href="{{ route('assets.index') }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm">Allocate</a>
+                                @if($canViewAssets)<a href="{{ route('assets.index') }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm">Allocate</a>@endif
                             </div>
                         </article>
                     @endforeach
@@ -137,16 +137,12 @@
                                 <p class="zazu-catering-description">{{ $capability->description }}</p>
                             @endif
                             <div class="zazu-catering-meta">
+                                <span class="zazu-chip zazu-chip-info">{{ ucfirst($capability->capability_type) }}</span>
                                 <span class="font-mono">Pricing: {{ str_replace('_', ' ', $capability->pricing_basis) }}</span>
                                 <span class="{{ $capability->is_active ? 'zazu-status-active' : 'zazu-status-muted' }}">{{ $capability->is_active ? 'ACTIVE' : 'HIDDEN' }}</span>
                             </div>
-                            <div class="zazu-catering-meta">
-                                <span class="zazu-chip zazu-chip-info">{{ ucfirst($capability->capability_type) }}</span>
-                                <span class="zazu-field-help">Pricing: {{ str_replace('_', ' ', $capability->pricing_basis) }}</span>
-                                <span class="{{ $capability->is_active ? 'zazu-status-active' : 'zazu-status-muted' }}">{{ $capability->is_active ? 'ACTIVE' : 'HIDDEN' }}</span>
-                            </div>
                             <div class="zazu-catering-actions">
-                                @if($isOwner)<a href="{{ route('capabilities.edit', $capability) }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm" >Edit item</a>@endif
+                                @if($isOwner)<a href="{{ route('capabilities.edit', $capability) }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm">Edit item</a>@endif
                             </div>
                         </article>
                     @endforeach
