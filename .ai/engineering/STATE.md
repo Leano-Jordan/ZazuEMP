@@ -1,3 +1,16 @@
+## Helper current Job operational state — 2026-11-23
+
+**Implemented directly on main:**
+- Job detail Helper still presents the saved components of the current business-owned Event and current event-specific focus.
+- Added a compact current-state list backed by existing operational records: outstanding/open or blocked preparation items, planned costs, draft/sent/ordered purchase orders, and currently allocated assets.
+- Each row exposes the record's real label/reference and actual state, with a direct workspace link. It does not create tasks or infer missing work from empty relationships.
+- Every group is guarded by the corresponding existing permission (work.view, purchasing.view, assets.view) and constrained to the current Job/business. Asset allocation lookup additionally constrains both the allocation and related Asset to the active business.
+- Regression coverage includes the live preparation, purchasing, planned-cost and asset records, plus checks that a staff member without purchasing or asset permissions cannot see those records.
+
+**Verification boundary:** code and tests are committed to main. Exact-head Laravel, PostgreSQL, desktop/mobile offline browser, PHPMD and Zazu Quality are running against the newest test/UI changes; no pass is claimed here. The malformed Blade class-reference was corrected in afc892b; the follow-up PHPMD check on the test split passed at 30a5f0d. Re-check against the latest main head before declaring this Helper slice accepted.
+
+**Next:** only add another operational recommendation when an existing record and permission justify it. Keep the current Job's state as the single workflow authority; do not invent tasks or add a parallel AI workflow engine.
+
 ## Founder installation and business backup verification — 2026-11-23
 
 Founder reports the following live owner-PC checks while starting the Zazu server:
