@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\SyncDevice;
 use App\Support\Offline\SyncMutationApplier;
@@ -41,6 +42,15 @@ class OfflineWorkLifecycleTest extends TestCase
     {
         $business = $this->business();
         $device = $this->device($business);
+        $capability = BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Catering',
+            'category' => 'Food',
+            'capability_type' => 'service',
+            'pricing_basis' => 'per_person',
+            'default_unit' => 'portion',
+            'is_active' => true,
+        ]);
         $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-SERVICES-001',
@@ -89,6 +99,7 @@ class OfflineWorkLifecycleTest extends TestCase
             'unit' => 'guests',
             'notes' => 'Keep dietary notes',
             'status' => 'ready',
+            'capability_id' => $capability->id,
         ]);
         $this->assertDatabaseHas('event_requirements', [
             'event_id' => $event->id,
