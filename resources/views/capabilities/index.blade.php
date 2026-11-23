@@ -10,9 +10,9 @@
     <div class="zazu-catalogue-shell" data-zazu-catalogue>
         <section class="zazu-command-band zazu-catalogue-command">
             <div>
-                <div class="zazu-eyebrow">Rosco ICT &gt; Capability Catalogue</div>
+                <div class="zazu-eyebrow">Business catalogue</div>
                 <h2 class="zazu-command-title">Services &amp; Prices Catalogue</h2>
-                <p class="zazu-command-copy">A single commercial catalogue for hireable equipment, catering packages and reusable services. Catalogue prices flow into future requirements and quote revisions.</p>
+                <p class="zazu-command-copy">Manage what this business actually provides. Hire, services, products and packages retain their own pricing and flow into future job requirements and quotes.</p>
             </div>
             <div class="zazu-command-meta">
                 <div class="zazu-command-meta-label">Catalogue</div>
@@ -27,12 +27,12 @@
                         <span>Hire &amp; rental</span><span class="zazu-tab-count font-mono">{{ $equipment->count() }}</span>
                     </button>
                 @endif
-                @if($catering->isNotEmpty())
-                    <button type="button" class="zazu-catalogue-tab {{ $equipment->isEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-catering" data-catalogue-tab="catering">
-                        <span>Services &amp; products</span><span class="zazu-tab-count font-mono">{{ $catering->count() }}</span>
+                @if($services->isNotEmpty())
+                    <button type="button" class="zazu-catalogue-tab {{ $equipment->isEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-services" data-catalogue-tab="services">
+                        <span>Services &amp; products</span><span class="zazu-tab-count font-mono">{{ $services->count() }}</span>
                     </button>
                 @endif
-                @if($equipment->isEmpty() && $catering->isEmpty())
+                @if($equipment->isEmpty() && $services->isEmpty())
                     <span class="zazu-field-help">No catalogue items yet. Add the services or products this business actually provides.</span>
                 @endif
             </div>
@@ -62,11 +62,11 @@
         <section id="catalogue-panel-equipment" role="tabpanel" tabindex="0" data-catalogue-panel="equipment" class="zazu-catalogue-panel is-active">
             <div class="zazu-section-heading">
                 <div>
-                    <div class="zazu-eyebrow">Physical revenue stream</div>
-                    <h3>Equipment Hire</h3>
-                    <p>Reusable rental capabilities linked to the asset ledger where equipment records exist.</p>
+                    <div class="zazu-eyebrow">Hire and rental</div>
+                    <h3>Hire &amp; Rental</h3>
+                    <p>Track hire quantities, rates and availability against the assets this business owns or manages.</p>
                 </div>
-                @if($isOwner)<a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-secondary">Add equipment</a>@endif
+                @if($isOwner)<a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-secondary">Add hire item</a>@endif
             </div>
 
             @if($equipment->isNotEmpty())
@@ -111,26 +111,20 @@
         </section>
         @endif
 
-        @if($catering->isNotEmpty())
-        <section id="catalogue-panel-catering" role="tabpanel" tabindex="0" data-catalogue-panel="catering" class="zazu-catalogue-panel {{ $equipment->isEmpty() ? 'is-active' : '' }}" @if($equipment->isNotEmpty()) hidden @endif>
+        @if($services->isNotEmpty())
+        <section id="catalogue-panel-services" role="tabpanel" tabindex="0" data-catalogue-panel="services" class="zazu-catalogue-panel {{ $equipment->isEmpty() ? 'is-active' : '' }}" @if($equipment->isNotEmpty()) hidden @endif>
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Business capability stream</div>
                     <h3>Services &amp; Products</h3>
                     <p>Services, products and packages your business sells, with pricing flowing into quote lines.</p>
                 </div>
-                @if($isOwner)<a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-secondary">Add package</a>@endif
+                @if($isOwner)<a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-secondary">Add service or product</a>@endif
             </div>
 
-            @if($catering->isNotEmpty())
+            @if($services->isNotEmpty())
                 <div class="zazu-catering-grid">
-                    @foreach($catering as $capability)
-                        @php
-                            $tags = [];
-                            foreach (['halaal' => 'Halaal', 'vegan' => 'Vegan', 'gluten' => 'Gluten-Free', 'vegetarian' => 'Vegetarian'] as $needle => $label) {
-                                if (str_contains(strtolower((string) $capability->description), $needle)) $tags[] = $label;
-                            }
-                        @endphp
+                    @foreach($services as $capability)
                         <article class="zazu-catering-card">
                             <div class="zazu-catering-card-head">
                                 <div>
@@ -146,17 +140,13 @@
                                 <span class="font-mono">Pricing: {{ str_replace('_', ' ', $capability->pricing_basis) }}</span>
                                 <span class="{{ $capability->is_active ? 'zazu-status-active' : 'zazu-status-muted' }}">{{ $capability->is_active ? 'ACTIVE' : 'HIDDEN' }}</span>
                             </div>
-                            @if($tags)
-                                <div class="zazu-tag-row">
-                                    @foreach($tags as $tag)
-                                        <span class="zazu-dietary-tag zazu-dietary-{{ strtolower(str_replace('-', '', $tag)) }}">{{ $tag }}</span>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="zazu-field-help">Dietary profile not recorded.</div>
-                            @endif
+                            <div class="zazu-catering-meta">
+                                <span class="zazu-chip zazu-chip-info">{{ ucfirst($capability->capability_type) }}</span>
+                                <span class="zazu-field-help">Pricing: {{ str_replace('_', ' ', $capability->pricing_basis) }}</span>
+                                <span class="{{ $capability->is_active ? 'zazu-status-active' : 'zazu-status-muted' }}">{{ $capability->is_active ? 'ACTIVE' : 'HIDDEN' }}</span>
+                            </div>
                             <div class="zazu-catering-actions">
-                                @if($isOwner)<a href="{{ route('capabilities.edit', $capability) }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm">Edit package</a>@endif
+                                @if($isOwner)<a href="{{ route('capabilities.edit', $capability) }}" class="zazu-btn zazu-btn-secondary zazu-btn-sm" >Edit item</a>@endif
                             </div>
                         </article>
                     @endforeach
@@ -182,11 +172,11 @@
                         <p class="zazu-panel-copy">Use the full catalogue editor when you need to save a new capability. This drawer keeps the operational decision point close to the catalogue.</p>
                         <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary w-full">Open catalogue editor →</a>
                         <div class="zazu-catalogue-drawer-rule"></div>
-                        <div class="zazu-eyebrow">Pricing structure</div>
+                        <div class="zazu-eyebrow">Your current catalogue</div>
                         <div class="zazu-drawer-specs">
-                            <div><span>Hire</span><strong class="font-mono">Per day</strong></div>
-                            <div><span>Catering</span><strong class="font-mono">Per pax</strong></div>
-                            <div><span>Tax</span><strong class="font-mono">15% VAT</strong></div>
+                            <div><span>Hire &amp; rental</span><strong class="font-mono">{{ $equipment->count() }} items</strong></div>
+                            <div><span>Services &amp; products</span><strong class="font-mono">{{ $services->count() }} items</strong></div>
+                            <div><span>Pricing</span><strong class="font-mono">Business-defined</strong></div>
                         </div>
                     </div>
                 </div>
