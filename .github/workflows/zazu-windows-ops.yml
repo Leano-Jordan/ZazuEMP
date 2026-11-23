@@ -108,6 +108,23 @@ jobs:
           }
           Write-Host "PASS: Resource sampler produced $($samples.Count) local samples, complete host metrics and a hardware manifest."
 
+      - name: Summarize resource samples into a p50/p95 report
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $output = Join-Path $env:RUNNER_TEMP 'zazu-performance-smoke'
+          $csv = Get-ChildItem -LiteralPath $output -Filter 'zazu-resource-samples-*.csv' -File | Select-Object -First 1
+          $manifest = Get-ChildItem -LiteralPath $output -Filter 'zazu-resource-manifest-*.json' -File | Select-Object -First 1
+          $report = Join-Path $output 'zazu-performance-report.md'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ops/windows/Summarize-ZazuResources.ps1' -CsvPath $csv.FullName -ManifestPath $manifest.FullName -OutputPath $report
+          if ($LASTEXITCODE -ne 0) { throw 'The Zazu performance report generator exited unsuccessfully.' }
+          if (-not (Test-Path -LiteralPath $report -PathType Leaf)) { throw 'The performance report was not created.' }
+          $reportContent = Get-Content -LiteralPath $report -Raw
+          foreach ($required in @('Zazu device performance report', 'Host CPU', 'Host memory used', 'p50', 'p95', 'not zero usage')) {
+            if ($reportContent -notmatch [regex]::Escape($required)) { throw "The performance report is missing required evidence: $required" }
+          }
+          Write-Host 'PASS: Resource samples produce a privacy-safe p50/p95 comparison report.'
+
       - name: Verify LAN launchers use compiled frontend assets
         shell: pwsh
         run: |
