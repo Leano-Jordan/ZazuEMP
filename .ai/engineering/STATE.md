@@ -1921,3 +1921,6 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 **Verification boundary:** source was read back from `main`. GitHub commit-status lookup for the latest source commit returned no status records; no PHPUnit, migration, or exact-head CI pass is claimed. The first restore failure remains unresolved until its stage is captured. Do not retry the archive drill until the code is installed and the new checks have passed. Preserve the original archive and passphrase.
 
 **Latest related commits:** archive detection `d6f36c8`; restore diagnostics `f9c861a` / syntax correction `606352a`; archive regression `db79ca7`; full focus resolution `89ca4d3`; focus regression `07eb9de` / ordering correction `8ef9b6a`.
+
+
+**Follow-up hardening:** format detection now also fails closed if the file opens but its magic header cannot be read. The regression test formatting was normalized. Latest restore/onboarding follow-up commits: header read `fb2f072`; archive test `9f13147`. These remain pending exact-head CI.
