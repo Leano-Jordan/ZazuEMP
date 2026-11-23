@@ -1837,3 +1837,12 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Added an explicit Composer manifest/lock validation gate (`composer validate --strict`) to Zazu Quality; `npm ci` continues to enforce npm lock consistency.
 - Added PHP Sodium to the installer prerequisite check and all PHP acceptance workflow extension lists so the encrypted archive feature cannot silently ship to a runtime that lacks Sodium.
 - Exact-head CI has not yet returned check results; Composer validation, Laravel/ZipArchive tests, PHPMD, Pint, security audit and Windows package acceptance remain pending.
+
+
+## Business archive final implementation checks — 2026-11-23
+
+- Split the crypto stream reader/writer into bounded operations to keep PHPMD complexity under control; each stream requires authenticated MESSAGE chunks and exactly one FINAL tag with no trailing bytes.
+- Passphrase and confirmation fields are excluded from Laravel validation flash/session old input. Export and restore have separate owner-scoped 3-per-10-minute rate limiters.
+- Local PHP 8.4 syntax and multi-chunk (>2 MiB) round-trip, wrong-passphrase rejection and ciphertext-tamper rejection passed against the refactored Sodium service. The local environment lacks ZipArchive, so full business ZIP/controller tests still require CI.
+- Composer/npm lock review: npm manifest root matches lockfile; Composer lock platform matches PHP ^8.4. Zazu Quality now runs composer validate --strict before installing the locked PHP dependencies. No Composer/npm package was added for encryption.
+- Latest exact-head CI is not visible in repository status results yet; do not mark Laravel, PHPMD, Pint, Composer validation or Windows acceptance green until checks report for the final head.
