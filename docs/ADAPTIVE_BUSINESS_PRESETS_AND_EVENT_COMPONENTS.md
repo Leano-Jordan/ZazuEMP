@@ -231,3 +231,10 @@ Online creation validates the selected offering names against the active busines
 **Scope of this slice:** catalogue-driven Job intake and capability-linked starter requirements. It does not complete multi-capability onboarding, adaptive navigation/dashboard visibility, specialist operational workflows or physical offline parity.
 
 **Verification:** feature tests were added for active/disabled offering visibility, online capability linkage/default unit and the one-off custom-service path. Exact-head CI and physical PC/phone acceptance are pending; this checkpoint must not be treated as a passing release gate until those results are recorded.
+
+
+## Actionable linked-booking Helper context — 2026-11-23
+
+The Job-detail Helper's linked operational-record summary now provides direct, event-scoped destinations for the records it actually finds: preparation, purchase orders, asset allocations, recorded costs and travel costs. Purchase orders retain the current Job filter; the other links use their existing Job or asset workspaces. A link is rendered only when the corresponding record count was loaded under the member's existing workspace permission. Empty relationships still produce no recommendation, and this remains navigation to existing records—not a new workflow state or task generator.
+
+Regression coverage asserts that preparation and purchasing links appear for a booking with those records, and that a staff member without purchasing.view sees no purchasing record or Helper action while permitted preparation remains available. Exact-head CI and physical device acceptance are pending; no pass is claimed by this implementation checkpoint.
