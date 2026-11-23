@@ -198,6 +198,137 @@ class ZazuHelperContextTest extends TestCase
             ->assertDontSee('Keep menus, quantities, dietary details, purchasing, preparation and delivery connected to each booking.');
     }
 
+    public function test_helper_uses_saved_decor_photography_and_transport_job_components(): void
+    {
+        $business = $this->makeBusiness('Helper Specialist Job Mix');
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'primary_niche' => 'mixed',
+        ]);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'HELPER-SPECIALIST-'.Str::upper(Str::random(5)),
+            'name' => 'Creative production booking',
+            'status' => 'confirmed',
+        ]);
+
+        foreach ([
+            ['description' => 'Reception styling', 'category' => 'Decor'],
+            ['description' => 'Event photo coverage', 'category' => 'Photography & video'],
+            ['description' => 'Guest shuttle service', 'category' => 'Transport'],
+        ] as $index => $component) {
+            EventRequirement::create([
+                'event_id' => $event->id,
+                'description' => $component['description'],
+                'category' => $component['category'],
+                'quantity' => '1.00',
+                'unit' => 'service',
+                'status' => 'open',
+            ]);
+        }
+
+        $this->actingAs($user)
+            ->get(route('work.show', $event))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-focuses="decor,photography,transport"', false)
+            ->assertSee('Reception styling')
+            ->assertSee('Event photo coverage')
+            ->assertSee('Guest shuttle service')
+            ->assertSee('For this booking, review the styling brief, materials, setup timing, venue access and collection.')
+            ->assertSee('For this booking, review coverage, shot list, crew, equipment, venue timing and final delivery.')
+            ->assertSee('For this booking, review vehicle capacity, route, loading, delivery window and collection.')
+            ->assertDontSee('For this booking, review menu quantities, dietary details, purchasing, preparation and delivery.');
+    }
+
+    public function test_deactivating_a_capability_updates_catalogue_and_business_helper_but_preserves_saved_job_context(): void
+    {
+        $business = $this->makeBusiness('Helper Capability Deactivation');
+        $owner = User::factory()->create();
+        $business->users()->attach($owner->id, [
+            'role' => 'owner',
+            'primary_niche' => 'mixed',
+        ]);
+
+        $capability = BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Wedding styling',
+            'category' => 'Decor',
+            'capability_type' => 'service',
+            'pricing_basis' => 'custom',
+            'currency' => 'ZAR',
+            'is_active' => true,
+        ]);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'HELPER-DEACTIVATE-'.Str::upper(Str::random(5)),
+            'name' => 'Existing styling booking',
+            'status' => 'confirmed',
+        ]);
+
+        EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => 'Wedding styling',
+            'category' => 'Decor',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
+
+        $this->actingAs($owner)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-focuses="decor"', false)
+            ->assertSee('Keep styling scope, materials, setup plans, venue coordination and collection connected to each booking.');
+
+        $this->actingAs($owner)
+            ->put(route('capabilities.update', $capability), [
+                'name' => 'Wedding styling',
+                'category' => 'Decor',
+                'capability_type' => 'service',
+                'pricing_basis' => 'custom',
+                'currency' => 'ZAR',
+                'is_active' => '0',
+            ])
+            ->assertRedirect(route('capabilities.index'));
+
+        $this->actingAs($owner)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-focuses="mixed"', false)
+            ->assertDontSee('Keep styling scope, materials, setup plans, venue coordination and collection connected to each booking.');
+
+        $this->actingAs($owner)
+            ->get(route('capabilities.index'))
+            ->assertOk()
+            ->assertSee('Wedding styling')
+            ->assertSee('HIDDEN');
+
+        config(['zazu.permissions.roles.staff' => ['dashboard.view', 'capabilities.view']]);
+        $staff = User::factory()->create();
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+
+        $this->actingAs($staff)
+            ->get(route('capabilities.index'))
+            ->assertOk()
+            ->assertDontSee('Wedding styling');
+
+        $this->actingAs($owner)
+            ->get(route('work.show', $event))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-focuses="decor"', false)
+            ->assertSee('Wedding styling')
+            ->assertSee('For this booking, review the styling brief, materials, setup timing, venue access and collection.');
+
+        $this->assertDatabaseHas('event_requirements', [
+            'event_id' => $event->id,
+            'description' => 'Wedding styling',
+            'category' => 'Decor',
+        ]);
+    }
+
     public function test_helper_shows_only_the_current_jobs_saved_components(): void
     {
         $business = $this->makeBusiness('Helper Event Scope');
