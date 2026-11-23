@@ -67,12 +67,16 @@ class OnboardingController extends Controller
         ));
     }
 
-    public function catalogue(Request $request): View|RedirectResponse
+    public function catalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): View|RedirectResponse
     {
         $business = $this->currentBusiness($request);
 
-        if ($business->catalogue_setup_completed_at) {
+        if (!$levels->selected($request->user(), $business) || !$niches->selected($request->user(), $business)) {
             return redirect()->route('onboarding.experience');
+        }
+
+        if ($business->catalogue_setup_completed_at || $business->catalogue_setup_skipped_at) {
+            return redirect()->route('onboarding.business');
         }
 
         return view('onboarding.catalogue', [
@@ -129,8 +133,8 @@ class OnboardingController extends Controller
         ]);
 
         return redirect()
-            ->route('onboarding.experience')
-            ->with('success', 'Services saved. Choose how much of Zazu you want surfaced, then continue setup.');
+            ->route('onboarding.business')
+            ->with('success', 'Your offerings are saved. Add your business details to finish setup.');
     }
 
     public function finishCatalogue(Request $request): RedirectResponse
@@ -144,8 +148,8 @@ class OnboardingController extends Controller
         Audit::record('onboarding.catalogue.completed', $business, ['capability_count' => $business->capabilities()->count()], $business->id);
 
         return redirect()
-            ->route('onboarding.experience')
-            ->with('success', 'Services setup saved. Choose your workspace experience level.');
+            ->route('onboarding.business')
+            ->with('success', 'Your offerings setup is saved. Add your business details to finish setup.');
     }
 
     public function skipCatalogue(Request $request): RedirectResponse
@@ -157,7 +161,7 @@ class OnboardingController extends Controller
         ]);
 
         return redirect()
-            ->route('onboarding.experience')
+            ->route('onboarding.business')
             ->with('info', 'Services setup was deferred. You can resume it from Setup Centre or Services & prices.');
     }
 
@@ -171,7 +175,11 @@ class OnboardingController extends Controller
         $maximumLevel = $levels->maximumFor($business, null, $request->user());
 
         if ($experienceLevel && $primaryNiche) {
-            return redirect()->route('onboarding.business');
+            return redirect()->route(
+                $business->catalogue_setup_completed_at || $business->catalogue_setup_skipped_at
+                    ? 'onboarding.business'
+                    : 'onboarding.catalogue'
+            );
         }
 
         return view('onboarding.experience', [
@@ -185,6 +193,7 @@ class OnboardingController extends Controller
             'trialEndsAt' => $levels->trialEndsAt($business),
             'nicheOptions' => $niches->options(),
             'selectedNiche' => $primaryNiche,
+            'selectedFocuses' => $niches->selectedMany($request->user(), $business),
             'selectedLevel' => $experienceLevel,
         ]);
     }
@@ -195,6 +204,8 @@ class OnboardingController extends Controller
         $validated = $request->validate([
             'experience_level' => ['required', 'in:basic,intermediate,advanced'],
             'primary_niche' => ['nullable', 'string', 'in:'.implode(',', array_keys(config('zazu.niches', [])))],
+            'business_focuses' => ['nullable', 'array', 'max:10'],
+            'business_focuses.*' => ['string', 'distinct', 'in:'.implode(',', array_keys(config('zazu.niches', [])))],
         ]);
 
         if (! $levels->canSelect($business, $validated['experience_level'], null, $request->user())) {
@@ -205,23 +216,30 @@ class OnboardingController extends Controller
             ])->withInput();
         }
 
+        $focuses = $validated['business_focuses'] ?? $niches->selectedMany($request->user(), $business);
         $primaryNiche = $validated['primary_niche']
             ?? $niches->selected($request->user(), $business)
-            ?? NicheFocus::DEFAULT;
+            ?? ($focuses[0] ?? NicheFocus::DEFAULT);
+        if (!in_array($primaryNiche, $focuses, true)) {
+            array_unshift($focuses, $primaryNiche);
+        }
+        $focuses = array_values(array_unique($focuses));
 
         $request->user()->businesses()->updateExistingPivot($business->id, [
             'experience_level' => $validated['experience_level'],
             'primary_niche' => $primaryNiche,
+            'business_focuses' => json_encode($focuses, JSON_THROW_ON_ERROR),
         ]);
 
         Audit::record('onboarding.experience_level_selected', $business, [
             'experience_level' => $validated['experience_level'],
             'primary_niche' => $primaryNiche,
+            'business_focuses' => $focuses,
         ], $business->id);
 
         return redirect()
-            ->route('onboarding.business')
-            ->with('success', 'Experience level saved. Now add your business details.');
+            ->route('onboarding.catalogue')
+            ->with('success', 'Business focus saved. Now add the services, products and rentals you offer.');
     }
 
     public function business(Request $request, ExperienceLevel $levels): View|RedirectResponse
@@ -230,6 +248,10 @@ class OnboardingController extends Controller
 
         if (!$levels->selected($request->user(), $business)) {
             return redirect()->route('onboarding.experience');
+        }
+
+        if (!$business->catalogue_setup_completed_at && !$business->catalogue_setup_skipped_at) {
+            return redirect()->route('onboarding.catalogue');
         }
 
         if ($business->business_setup_completed_at) {
