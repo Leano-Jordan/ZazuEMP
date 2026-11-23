@@ -3,9 +3,9 @@
     <x-slot:heading>Workspace focus</x-slot:heading>
     <section class="zazu-page-intro">
         <div>
-            <span class="zazu-eyebrow">Setup · Workspace tier and preference</span>
-            <h2>What do you mainly provide?</h2>
-            <p>Choose your main business focus and the level of detail you want to see. Your workspace tier controls the maximum experience; roles and permissions still control actions and records.</p>
+            <span class="zazu-eyebrow">Step 1 · Understand your business</span>
+            <h2>What kind of business do you run?</h2>
+            <p>Select every activity that describes your business. Zazu uses this foundation to make the next setup steps relevant; you can combine event services, rentals, products and other work.</p>
             @if($isFounder)
                 <p class="zazu-field-help mt-3" role="status">Founder access: all experience levels are available to this configured account. This does not change the business licence or customer entitlements.</p>
             @elseif($isTrial)
@@ -18,9 +18,34 @@
     <form method="POST" action="{{ route('onboarding.experience.store') }}" class="zazu-form">
         @csrf
         <fieldset class="zazu-fieldset">
-            <legend class="zazu-fieldset-legend">Primary business focus</legend>
-            <p class="zazu-fieldset-help">Pick the closest fit. You can change it later without losing data.</p>
-            @include('components.niche-focus-options', ['options' => $nicheOptions, 'selected' => $selectedNiche, 'name' => 'primary_niche', 'required' => true])
+            <legend class="zazu-fieldset-legend">Your business activities</legend>
+            <p class="zazu-fieldset-help">Choose as many as apply. A business can provide DJ and sound, catering, photography, decor, rentals and more.</p>
+            @php($chosenFocuses = old('business_focuses', $selectedFocuses))
+            <div class="zazu-niche-grid">
+                @foreach($nicheOptions as $key => $option)
+                    @continue($key === 'mixed')
+                    <label class="zazu-niche-card {{ in_array($key, $chosenFocuses, true) ? 'is-selected' : '' }}">
+                        <span class="zazu-niche-card-main">
+                            <input type="checkbox" name="business_focuses[]" value="{{ $key }}" @checked(in_array($key, $chosenFocuses, true))>
+                            <span class="zazu-niche-card-copy">
+                                <strong>{{ $option['label'] }}</strong>
+                                <small>{{ $option['description'] }}</small>
+                            </span>
+                        </span>
+                    </label>
+                @endforeach
+            </div>
+            <label class="zazu-field mt-4">
+                <span class="zazu-label">Which activity should Zazu prioritise?</span>
+                <select name="primary_niche" class="zazu-select">
+                    <option value="mixed" @selected(old('primary_niche', $selectedNiche ?? 'mixed') === 'mixed')>Balanced view across my business</option>
+                    @foreach($nicheOptions as $key => $option)
+                        @continue($key === 'mixed')
+                        <option value="{{ $key }}" @selected(old('primary_niche', $selectedNiche) === $key)>{{ $option['label'] }}</option>
+                    @endforeach
+                </select>
+                <span class="zazu-field-help">This affects guidance and starting suggestions, not what you are allowed to sell or manage.</span>
+            </label>
         </fieldset>
         <details class="zazu-disclosure" {{ $selectedLevel ? '' : 'open' }}>
             <summary>
