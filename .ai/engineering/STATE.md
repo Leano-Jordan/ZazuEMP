@@ -1690,3 +1690,8 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Implemented directly on main:** new quote creation and draft quote revision now require an explicit per-line confirmation when the entered quantity is exactly 1. The checkbox appears beside the affected line, becomes required when the quantity is 1, and disappears/clears when the quantity changes. The live summary excludes an unconfirmed single-unit line from its subtotal and explains that confirmation is outstanding. The same rule is enforced server-side in both create and revision-update actions; a browser-only bypass is not sufficient.
 
 **Regression coverage:** new feature tests prove an unconfirmed quantity-one line is rejected without creating a quote, the explicit confirmation is accepted, and the revision path also rejects an unconfirmed single-unit change while preserving the existing quote line. Exact-head Laravel, PHPMD, formatting, quality and browser CI are pending for this commit. No pass is claimed yet.
+
+
+## Quote single-unit browser acceptance — 2026-11-23
+
+Added `e2e/quote-single-quantity-confirmation.spec.js` and wired it into the per-push Laravel workflow. The browser journey creates a fresh Job through the actual New Job form, opens the quote editor, proves a quantity of one requires confirmation and is excluded from the live subtotal, changes it to two to prove the confirmation clears and totals recalculate, then returns it to one and completes quote creation after explicit confirmation. It uses the same visible choice cards an operator uses. The browser test and workflow are committed directly to main. Exact-head Laravel/browser and Zazu Quality runs on the current head are queued; this checkpoint does not claim a pass.
