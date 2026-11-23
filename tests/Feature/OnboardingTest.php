@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
