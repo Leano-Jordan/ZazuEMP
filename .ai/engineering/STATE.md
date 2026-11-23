@@ -1822,3 +1822,10 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Installation-wide scheduled backups remain unattended ZIP files by design; they do not depend on a human passphrase. Off-disk copies must be encrypted and access-controlled.
 - Added Sodium to the Windows installer prerequisite check and the Laravel/Windows package CI PHP extension lists. Added multi-chunk round-trip, wrong-passphrase, tamper, legacy detection and controller flow regression tests.
 - Local PHP 8.4/Sodium algorithm smoke test passed for a 2 MiB+ multi-chunk payload and wrong-password rejection. Full Laravel/ZipArchive CI and installed Windows acceptance remain pending.
+
+
+## Installation backup off-disk encryption boundary — 2026-11-23
+
+- The scheduled Windows runner copies installation ZIPs byte-for-byte and verifies SHA-256; it does not encrypt the secondary copy or verify BitLocker/cloud-vault encryption.
+- Owner guidance and installer environment comments now require BitLocker-protected USB or an encrypted, access-controlled cloud vault for the secondary destination. The dashboard copy status means presence/integrity only, not encryption or completed cloud upload.
+- Exact owner-PC destination encryption and the full restore drill remain release gates.
