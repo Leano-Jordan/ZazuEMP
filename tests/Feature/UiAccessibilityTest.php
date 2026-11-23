@@ -271,5 +271,4 @@ class UiAccessibilityTest extends TestCase
         $this->assertStringContainsString('--zazu-font-size-label: 12px;', $appCss);
         $this->assertStringNotContainsString(':root {', $visualCss);
     }
-
 }
