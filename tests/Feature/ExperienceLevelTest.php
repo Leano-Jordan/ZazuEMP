@@ -118,7 +118,7 @@ class ExperienceLevelTest extends TestCase
         $this->post(route('onboarding.experience.store'), [
             'experience_level' => 'advanced',
             'primary_niche' => NicheFocus::SOUND_DJ,
-        ])->assertRedirect(route('onboarding.business'));
+        ])->assertRedirect(route('onboarding.catalogue'));
 
         $membership = $user->businesses()->whereKey($business->id)->first()->pivot;
 
