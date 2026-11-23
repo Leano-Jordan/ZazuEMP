@@ -8,11 +8,11 @@
 
     @php
         $exportGroups = [
-            'People &amp; work' => ['customers', 'customer_contacts', 'events'],
-            'Catalogue &amp; assets' => ['business_capabilities', 'assets', 'asset_allocations'],
+            'People & work' => ['customers', 'customer_contacts', 'events'],
+            'Catalogue & assets' => ['business_capabilities', 'assets', 'asset_allocations'],
             'Event delivery' => ['event_requirements', 'event_preparation'],
-            'Money &amp; tax' => ['quotes', 'quote_items', 'invoices', 'invoice_items', 'payments', 'expenses', 'event_costs', 'travel_costs', 'tax_rates'],
-            'Purchasing &amp; stock' => ['suppliers', 'purchase_orders', 'purchase_order_items', 'purchase_order_receipts', 'inventory_items', 'inventory_movements'],
+            'Money & tax' => ['quotes', 'quote_items', 'invoices', 'invoice_items', 'payments', 'expenses', 'event_costs', 'travel_costs', 'tax_rates'],
+            'Purchasing & stock' => ['suppliers', 'purchase_orders', 'purchase_order_items', 'purchase_order_receipts', 'inventory_items', 'inventory_movements'],
         ];
         $groupedExports = collect($exportGroups)->map(fn ($resources) => collect($exports)->filter(fn ($export) => in_array($export['resource'], $resources, true))->values());
     @endphp
