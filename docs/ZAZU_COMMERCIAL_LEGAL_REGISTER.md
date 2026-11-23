@@ -237,7 +237,7 @@ Remaining manual release evidence:
 
 Status: dependency metadata audit complete; final licence compliance clearance remains open.
 
-Last updated: 2026-10-04
+Last updated: 2026-11-23
 
 
 ## 13. Director POPIA operational-closure audit — 2026-10-04
