@@ -284,3 +284,14 @@ Added focused feature coverage for the active-catalogue → business Helper → 
 This is intentional: active catalogue state governs future discoverability and business-wide guidance; saved Job requirements remain the authority for the scope of work already recorded. Deactivation does not rewrite or erase historical/active Job requirements. The test also exercises the existing owner update route rather than mutating the database directly.
 
 **Verification:** source and regression tests are committed on `main`; exact-head Laravel, PHPMD, formatting and browser checks must pass before this slice is marked green. Offline PC/phone parity and physical acceptance remain separate.
+
+
+## Server-enforced onboarding sequence — 2026-11-23
+
+The first-run order is now enforced on mutation endpoints, not only by page redirects:
+- Catalogue add, finish and skip actions require a saved experience tier and business focus.
+- Business-profile save and defer actions require the focus step and a completed or explicitly deferred catalogue step.
+- Direct POST requests cannot bypass the intended business-first sequence or mutate the profile early.
+- This remains a setup-order safeguard, not a permission boundary; existing owner middleware and business scoping remain authoritative.
+
+A regression test exercises direct business-profile POST attempts both before focus selection and before catalogue completion. This protects the intended flow even when requests are crafted outside the visible UI. Exact-head checks for this latest change are pending.
