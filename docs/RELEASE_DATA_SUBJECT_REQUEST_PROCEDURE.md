@@ -91,6 +91,9 @@ Where a request cannot be fully fulfilled, record:
 
 ## Evidence
 
+Use the blank [Privacy Operations Register Template](RELEASE_PRIVACY_OPERATIONS_REGISTER_TEMPLATE.md) for the minimum request metadata. Keep the populated working register and all supporting personal information in an access-restricted location outside GitHub.
+
+
 For every completed request, retain a minimal evidence record showing:
 
 - request identifier;
