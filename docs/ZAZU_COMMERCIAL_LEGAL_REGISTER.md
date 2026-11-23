@@ -354,7 +354,7 @@ The release document set has been refreshed against the Information Regulator's 
 ### Official references
 
 - 2025 amended POPIA Regulations: https://www.justice.gov.za/legislation/notices/2025/20250417-gg52523gon6126-POPIA-Regulations-Amendment.pdf
-- 2026 health-information Regulations: https://www.justice.gov.za/legislation/notices/2026/20260306-gg54268gon7198-Paia-Regulations-Amended.pdf
+- 2026 health/sex-life information Regulations: https://www.justice.gov.za/legislation/notices/2026/20260306-gg54268gon7198-Paia-Regulations-Amended.pdf
 - Information Regulator security-compromise fact sheet: https://inforegulator.org.za/2025/08/19/fact-sheet-handling-of-security-compromises/
 - Information Regulator eServices: https://eservices.inforegulator.org.za/services.aspx
 
