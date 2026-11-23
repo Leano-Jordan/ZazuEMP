@@ -1,3 +1,33 @@
+## Director acceptance ledger — 2026-11-23
+
+**Audit:** [Widespread engineering audit and formal scorecard](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md)  
+**Current source head at audit:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`.
+
+### Owner checks already completed — do not repeat
+
+- [x] Installed PC normal connected operation.
+- [x] Linked phone normal connected operation.
+- [x] PC and phone use the same workspace.
+- [x] Fictional customer, quote, invoice, supplier, purchase-order and inventory records are populated; Founder reports these modules function as intended.
+- [x] Installed database startup check reports no pending migrations.
+- [x] Installation backup exists and was independently verified.
+- [x] Business archive was downloaded and independently verified.
+- [x] Onboarding was exercised and feedback captured; business-focus-first, multi-focus onboarding changes are implemented with feature coverage.
+- [x] Encrypted business archive restore was attempted in a disposable empty workspace. **Outcome: FAIL** — archive failed to load; subsequent SYS-002/429. This records a completed test attempt, not a passed restore gate. Preserve the original archive, passphrase and disposable target; do not retry against the live business.
+
+### Release acceptance still open
+
+- [ ] Successful encrypted business archive restore on the intended installed environment.
+- [ ] Full installation restore on the intended PC, including database, configuration/key handling, private media and post-restore workspace verification.
+- [ ] Physical Android disconnected cold launch, supported offline writes/attachments, force-close/restart and reconnect acceptance. Connected phone use is already PASS; do not repeat it.
+- [ ] Transaction-level reconciliation using the existing populated workspace: accepted quote → invoice → payments → actual costs → profit, with actual values recorded.
+- [ ] POPIA operational sign-off.
+- [ ] ZAZU name clearance.
+
+**Evidence rule:** the Founder has been actively testing Zazu. The ledger above strikes off the outcomes explicitly recorded. Do not mark disconnected/offline or financial reconciliation gates passed without their actual observed result; do not send the Founder back through setup or backup checks already completed.
+
+---
+
 ## Director consolidation checkpoint — 2026-11-23
 
 **Repository:** `Leano-Jordan/ZazuEMP` · canonical branch: `main`  
