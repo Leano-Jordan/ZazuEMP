@@ -1,0 +1,318 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'artisan'
+      - '.env.example'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'phpunit.xml'
+      - 'playwright.config.js'
+      - 'vite.config.*'
+      - '.github/workflows/laravel.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'artisan'
+      - '.env.example'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'phpunit.xml'
+      - 'playwright.config.js'
+      - 'vite.config.*'
+      - '.github/workflows/laravel.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+      with:
+        php-version: '8.4'
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Set up Node
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: '22'
+        cache: npm
+    - name: Install frontend dependencies
+      run: npm ci
+    - name: Build frontend assets
+      run: npm run build
+    - name: Test service-worker offline cache and session contracts
+      run: npm run test:service-worker
+    - name: Verify LAN Vite asset-origin configuration
+      run: npm run test:vite-config
+    - name: Generate key
+      run: php artisan key:generate
+    - name: Compile Blade views
+      run: php artisan view:cache
+    - name: Verify built asset manifest
+      run: |
+        php -r '$manifest = json_decode(file_get_contents("public/build/manifest.json"), true, 512, JSON_THROW_ON_ERROR); foreach ($manifest as $entry) { if (isset($entry["file"]) && !is_file("public/build/".$entry["file"])) { fwrite(STDERR, "Missing built asset: ".$entry["file"].PHP_EOL); exit(1); } } echo "Asset manifest verified.".PHP_EOL;'
+    - name: Validate application configuration
+      run: |
+        php artisan config:cache
+        php artisan config:clear
+    - name: Create Database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+        php artisan migrate --force
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+    - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: php artisan test
+
+
+  postgres-migration-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: zazu_test
+          POSTGRES_USER: zazu
+          POSTGRES_PASSWORD: zazu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U zazu -d zazu_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, mbstring, xml, zip
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install PostgreSQL 16 backup and restore client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl gnupg
+          sudo install -d /usr/share/keyrings
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /usr/share/keyrings/postgresql.gpg
+          echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] https://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo "$VERSION_CODENAME")-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-16
+          echo "/usr/lib/postgresql/16/bin" >> "$GITHUB_PATH"
+          export PATH="/usr/lib/postgresql/16/bin:$PATH"
+          pg_dump --version
+          pg_restore --version
+          pg_dump --version | grep -Eq 'PostgreSQL\) 16\.'
+          pg_restore --version | grep -Eq 'PostgreSQL\) 16\.'
+      - name: Install PHP dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Build frontend assets
+        run: npm run build
+      - name: Prepare environment
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Generate application key
+        run: php artisan key:generate
+      - name: Run complete migration set on PostgreSQL
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: zazu_test
+          DB_USERNAME: zazu
+          DB_PASSWORD: zazu
+        run: php artisan migrate --force
+      - name: Verify PostgreSQL migration rollback and reapplication
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: zazu_test
+          DB_USERNAME: zazu
+          DB_PASSWORD: zazu
+        run: |
+          php artisan migrate:rollback --step=1 --force
+          php artisan migrate --force
+          php artisan migrate:status
+      - name: Exercise real account and workspace registration on PostgreSQL
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: zazu_test
+          DB_USERNAME: zazu
+          DB_PASSWORD: zazu
+        run: php artisan test --filter=test_registration_creates_user_business_owner_membership_and_session
+      - name: Exercise PostgreSQL backup, restore and private-file recovery
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: zazu_test
+          DB_USERNAME: zazu
+          DB_PASSWORD: zazu
+        run: php artisan test --filter=test_postgres_backup_and_restore_round_trip_real_database_and_private_files
+
+  offline-browser-acceptance:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: local
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      # Isolate rate-limit state between E2E requests; auth throttling is covered by feature tests.
+      CACHE_STORE: array
+      ZAZU_SEED_DEMO: 'true'
+      ZAZU_DEMO_EMAIL: demo@zazu.local
+      ZAZU_DEMO_PASSWORD: password
+      ZAZU_DEMO_OPERATIONS_PASSWORD: password
+      ZAZU_DEMO_FINANCE_PASSWORD: password
+
+    steps:
+    - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+      with:
+        php-version: '8.4'
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Install PHP dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Set up Node
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: '22'
+        cache: npm
+    - name: Install frontend dependencies
+      run: npm ci
+    - name: Build frontend assets
+      run: npm run build
+    - name: Generate application key
+      run: php artisan key:generate
+    - name: Prepare demo database
+      run: |
+        mkdir -p database storage/logs
+        touch database/database.sqlite
+        php artisan migrate:fresh --seed --force
+    - name: Prepare second business for workspace-switch acceptance
+      run: php artisan db:seed --class='Database\Seeders\DemoBusinessSwitchSeeder' --force
+    - name: Install pinned axe accessibility scanner for browser acceptance
+      run: npm install --no-save --package-lock=false @axe-core/playwright@4.10.2
+    - name: Install Chromium for Playwright
+      run: npx playwright install --with-deps chromium
+    - name: Run public and authentication accessibility acceptance
+      run: npm run test:e2e -- --project=chromium e2e/accessibility-smoke.spec.js
+    - name: Verify desktop navigation click-through
+      run: npm run test:e2e -- --project=chromium e2e/ui-theme.spec.ts --grep "opens and follows links"
+    - name: Verify mobile navigation click-through
+      run: npm run test:e2e -- --project=chromium-mobile e2e/ui-theme.spec.ts --grep "opens and follows links"
+    - name: Run offline browser acceptance suite
+      run: npm run test:e2e -- --project=chromium e2e/pwa-offline.spec.js e2e/offline-session-transition.spec.js e2e/offline-conflict-resolution.spec.js e2e/offline-attachment-sync.spec.js e2e/offline-work-creation.spec.js e2e/zazu-visual-foundation.spec.js
+    - name: Run offline customer and Work acceptance on mobile viewport
+      run: npm run test:e2e -- --project=chromium-mobile e2e/offline-work-creation.spec.js e2e/zazu-visual-foundation.spec.js
+    - name: Run host-outage monitor acceptance on mobile viewport
+      run: npm run test:e2e -- --project=chromium-mobile e2e/pwa-offline.spec.js --grep "detects a stopped Zazu host"
+    - name: Run phone-local attachment journey on mobile viewport
+      run: npm run test:e2e -- --project=chromium-mobile e2e/offline-attachment-sync.spec.js --grep "operator creates an offline Work job, attaches a file from its directory row, then syncs it"
+
+  coverage-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up PHP with PCOV coverage driver
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: '8.4'
+          coverage: pcov
+
+      - name: Install PHP dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Prepare test database
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          php artisan key:generate
+          mkdir -p database build/coverage
+          touch database/database.sqlite
+          php artisan migrate --force
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+
+      - name: Run full test suite and collect application coverage
+        run: php artisan test --coverage-clover=build/coverage/clover.xml --coverage-text
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+
+      - name: Publish coverage report in workflow summary
+        if: always() && hashFiles('build/coverage/clover.xml') != ''
+        run: |
+          echo "## Zazu application test coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "The attached Clover report records which application lines were exercised by the full automated test suite. This is a visibility report, not a release gate or a claim that untested code is defective." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Clover coverage report
+        if: always() && hashFiles('build/coverage/clover.xml') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: zazu-application-coverage
+          path: build/coverage/clover.xml
+          if-no-files-found: error
+          retention-days: 14
+
