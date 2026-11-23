@@ -476,17 +476,29 @@ class ZazuBackupCommand extends Command
 
     private function createArchive(string $work, string $temporaryArchive): bool
     {
-        $zip = new ZipArchive();
+        $previousUmask = umask(0077);
+        try {
+            $handle = @fopen($temporaryArchive, 'x+b');
+        } finally {
+            umask($previousUmask);
+        }
 
-        if ($zip->open($temporaryArchive, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            $this->error('Could not create backup archive.');
+        if ($handle === false) {
+            $this->error('Could not create a private temporary backup archive.');
+            return false;
+        }
+        fclose($handle);
+
+        if (! app(PrivateStoragePermissions::class)->restrictFile($temporaryArchive)) {
+            File::delete($temporaryArchive);
+            $this->error('Could not restrict backup archive permissions; no archive was published.');
             return false;
         }
 
-        if (! app(PrivateStoragePermissions::class)->restrictFile($temporaryArchive)) {
-            $zip->close();
+        $zip = new ZipArchive();
+        if ($zip->open($temporaryArchive, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             File::delete($temporaryArchive);
-            $this->error('Could not restrict backup archive permissions; no archive was published.');
+            $this->error('Could not open the private temporary backup archive.');
             return false;
         }
 
