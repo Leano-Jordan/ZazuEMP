@@ -14,7 +14,7 @@
             <strong id="zazu-backup-warning-title">Backup protection needs attention</strong>
             <span>{{ $backupStatus['message'] }}</span>
             @if ($backupStatus['latest_at'])
-                <span>Latest on-PC archive: {{ $backupStatus['age_hours'] }} hours old ({{ $backupStatus['latest_at'] }}).</span>
+                <span>Latest on-PC archive: {{ $backupStatus['age_hours'] }} hours old ({{ \\Illuminate\\Support\\Carbon::parse($backupStatus['latest_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') }}).</span>
             @endif
             <span>{{ $backupStatus['secondary_message'] }}</span>
             <small>These archives cover the entire installation. Restoring one affects every business on this PC and remains an installation-operator task.</small>
