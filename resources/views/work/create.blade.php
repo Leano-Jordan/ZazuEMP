@@ -103,27 +103,39 @@
                             <div class="zazu-selection-summary" id="service-selection-summary" aria-live="polite">No services selected yet</div>
                         </div>
 
-                        <div class="zazu-service-groups">
-                            @foreach ($serviceCategories as $group => $services)
-                                <fieldset class="zazu-service-group">
-                                    <legend>{{ $group }}</legend>
-                                    <div class="zazu-choice-grid">
-                                        @foreach ($services as $service)
-                                            <label class="zazu-choice-card zazu-service-choice" data-service-choice>
-                                                <input type="checkbox" name="services[]" value="{{ $service }}" @checked(in_array($service, old('services', []), true))>
-                                                <span>{{ $service }}</span>
-                                            </label>
-                                        @endforeach
-                                        @if ($group === 'Other')
-                                            <label class="zazu-choice-card zazu-service-choice">
-                                                <input type="checkbox" id="other-service-toggle" value="1">
-                                                <span>Something else</span>
-                                            </label>
-                                        @endif
-                                    </div>
-                                </fieldset>
-                            @endforeach
-                        </div>
+                        @if ($serviceCategories->isEmpty())
+                            <div class="zazu-empty-state">
+                                <strong>Your catalogue is empty</strong>
+                                <p>Add the services, products or hire items your business actually offers. They will appear here when active.</p>
+                                <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-secondary">Add a catalogue offering</a>
+                            </div>
+                        @else
+                            <div class="zazu-service-groups">
+                                @foreach ($serviceCategories as $group => $offerings)
+                                    <fieldset class="zazu-service-group">
+                                        <legend>{{ $group }}</legend>
+                                        <div class="zazu-choice-grid">
+                                            @foreach ($offerings as $offering)
+                                                <label class="zazu-choice-card zazu-service-choice" data-service-choice>
+                                                    <input type="checkbox" name="services[]" value="{{ $offering->name }}" @checked(in_array($offering->name, old('services', []), true))>
+                                                    <span>{{ $offering->name }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </fieldset>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <fieldset class="zazu-service-group mt-4">
+                            <legend>Not in your catalogue?</legend>
+                            <div class="zazu-choice-grid">
+                                <label class="zazu-choice-card zazu-service-choice">
+                                    <input type="checkbox" id="other-service-toggle" value="1">
+                                    <span>Add a one-off service</span>
+                                </label>
+                            </div>
+                        </fieldset>
 
                         <div id="other-service-wrap" class="zazu-field mt-5" hidden>
                             <label for="other_service" class="zazu-label">What else are you providing?</label>
