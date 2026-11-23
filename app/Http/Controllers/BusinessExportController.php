@@ -141,25 +141,19 @@ class BusinessExportController extends Controller
         BusinessArchiveService $archives,
         BusinessArchiveEncryptionService $encryption,
     ): RedirectResponse {
-        $uploadedPath = $validated['archive']->getRealPath();
-        $restorePath = is_string($uploadedPath) ? $uploadedPath : '';
         $decryptedPath = null;
         $restoreStage = 'upload_access';
 
         try {
-            if ($restorePath === '' || ! is_file($restorePath) || ! is_readable($restorePath)) {
-                throw new RuntimeException('The uploaded business archive could not be accessed by the server.');
-            }
+            $restorePath = $this->resolveRestoreArchivePath(
+                $validated,
+                $encryption,
+                $restoreStage,
+                $decryptedPath,
+            );
 
-            $restoreStage = 'encryption_detection';
-            if ($encryption->isEncrypted($restorePath)) {
-                if (! filled($validated['archive_password'] ?? null)) {
-                    return back()->withErrors(['archive_password' => 'Enter the passphrase used when this business archive was created.']);
-                }
-
-                $restoreStage = 'decryption';
-                $decryptedPath = $encryption->decryptFile($restorePath, $validated['archive_password']);
-                $restorePath = $decryptedPath;
+            if ($restorePath === null) {
+                return back()->withErrors(['archive_password' => 'Enter the passphrase used when this business archive was created.']);
             }
 
             $restoreStage = 'archive_validation_and_restore';
@@ -197,6 +191,37 @@ class BusinessExportController extends Controller
             'success',
             sprintf('Business archive restored: %d records and %d files.', $result['records'], $result['files'])
         );
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    private function resolveRestoreArchivePath(
+        array $validated,
+        BusinessArchiveEncryptionService $encryption,
+        string &$restoreStage,
+        ?string &$decryptedPath,
+    ): ?string {
+        $uploadedPath = $validated['archive']->getRealPath();
+        $restorePath = is_string($uploadedPath) ? $uploadedPath : '';
+
+        if ($restorePath === '' || ! is_file($restorePath) || ! is_readable($restorePath)) {
+            throw new RuntimeException('The uploaded business archive could not be accessed by the server.');
+        }
+
+        $restoreStage = 'encryption_detection';
+        if (! $encryption->isEncrypted($restorePath)) {
+            return $restorePath;
+        }
+
+        if (! filled($validated['archive_password'] ?? null)) {
+            return null;
+        }
+
+        $restoreStage = 'decryption';
+        $decryptedPath = $encryption->decryptFile($restorePath, $validated['archive_password']);
+
+        return $decryptedPath;
     }
 
     private function restoreRuntimeFailure(
