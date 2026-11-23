@@ -75,21 +75,7 @@ class ZazuBackupRestoreTest extends TestCase
                 '--force' => true,
             ])->assertExitCode(0);
 
-            DB::purge('sqlite');
-
-            $this->assertNoSqliteRollbackArtifacts();
-
-            $this->assertSame(
-                'before backup',
-                DB::connection('sqlite')->table('backup_probe')->value('value')
-            );
-            $this->assertFileExists($privateProbe);
-            $this->assertSame('private media before backup', File::get($privateProbe));
-            if (PHP_OS_FAMILY !== 'Windows') {
-                $this->assertSame(0700, fileperms(storage_path('app/private')) & 0777);
-                $this->assertSame(0700, fileperms(dirname($privateProbe)) & 0777);
-                $this->assertSame(0600, fileperms($privateProbe) & 0777);
-            }
+            $this->assertRestoredSqliteProbe($privateProbe);
 
             DB::table('backup_probe')->update(['value' => 'changed before legacy restore']);
             File::delete($privateProbe);
@@ -99,12 +85,7 @@ class ZazuBackupRestoreTest extends TestCase
                 '--force' => true,
             ])->assertExitCode(0);
 
-            DB::purge('sqlite');
-            $this->assertSame(
-                'before backup',
-                DB::connection('sqlite')->table('backup_probe')->value('value')
-            );
-            $this->assertSame('private media before backup', File::get($privateProbe));
+            $this->assertRestoredSqliteProbe($privateProbe);
         } finally {
             DB::purge('sqlite');
             $this->cleanupSqliteArtifacts($database);
@@ -722,6 +703,25 @@ class ZazuBackupRestoreTest extends TestCase
         DB::purge('sqlite');
         File::put($database.'-wal', 'pre-restore WAL sidecar');
         File::put($database.'-shm', 'pre-restore shared-memory sidecar');
+    }
+
+    private function assertRestoredSqliteProbe(string $privateProbe): void
+    {
+        DB::purge('sqlite');
+        $this->assertNoSqliteRollbackArtifacts();
+
+        $this->assertSame(
+            'before backup',
+            DB::connection('sqlite')->table('backup_probe')->value('value')
+        );
+        $this->assertFileExists($privateProbe);
+        $this->assertSame('private media before backup', File::get($privateProbe));
+
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $this->assertSame(0700, fileperms(storage_path('app/private')) & 0777);
+            $this->assertSame(0700, fileperms(dirname($privateProbe)) & 0777);
+            $this->assertSame(0600, fileperms($privateProbe) & 0777);
+        }
     }
 
     private function assertNoSqliteRollbackArtifacts(): void
