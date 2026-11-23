@@ -42,30 +42,69 @@ class NicheFocus
         $user ??= auth()->user();
         $business ??= app(CurrentBusiness::class)->resolve($user);
 
-        if (!$user || !$business) {
+        if (! $user || ! $business) {
             return [];
         }
 
-        $membership = $user->businesses()->whereKey($business->id)->first();
-        $ownerMembership = $business->users()->wherePivot('role', 'owner')->first();
-        $raw = $membership?->pivot?->business_focuses;
-        if (!is_array($raw) && (!is_string($raw) || trim($raw) === '')) {
-            $raw = $ownerMembership?->pivot?->business_focuses;
-        }
-        $focuses = is_array($raw) ? $raw : (is_string($raw) ? json_decode($raw, true) : []);
-        $focuses = is_array($focuses) ? $focuses : [];
-        $focuses = array_values(array_unique(array_filter(
-            $focuses,
-            static fn ($focus) => is_string($focus) && array_key_exists($focus, config('zazu.niches', []))
-        )));
+        [$membership, $ownerMembership] = $this->focusMemberships($user, $business);
+        $focuses = $this->normaliseSavedFocuses(
+            $membership?->pivot?->business_focuses,
+            $ownerMembership?->pivot?->business_focuses,
+        );
+        $primary = $this->primaryFocusWithOwnerFallback($user, $business, $ownerMembership);
 
-        $primary = $this->selected($user, $business)
-            ?? (is_string($ownerMembership?->pivot?->primary_niche) ? $ownerMembership->pivot->primary_niche : null);
-        if ($primary && !in_array($primary, $focuses, true)) {
+        if ($primary && ! in_array($primary, $focuses, true)) {
             array_unshift($focuses, $primary);
         }
 
         return $focuses ?: [self::DEFAULT];
+    }
+
+    /**
+     * @return array{0: mixed, 1: mixed}
+     */
+    private function focusMemberships(User $user, Business $business): array
+    {
+        return [
+            $user->businesses()->whereKey($business->id)->first(),
+            $business->users()->wherePivot('role', 'owner')->first(),
+        ];
+    }
+
+    /**
+     * @param array<int, string>|string|null $saved
+     * @param array<int, string>|string|null $ownerSaved
+     * @return array<int, string>
+     */
+    private function normaliseSavedFocuses(mixed $saved, mixed $ownerSaved): array
+    {
+        if (! is_array($saved) && (! is_string($saved) || trim($saved) === '')) {
+            $saved = $ownerSaved;
+        }
+
+        $decoded = is_array($saved) ? $saved : (is_string($saved) ? json_decode($saved, true) : []);
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(
+            $decoded,
+            static fn ($focus) => is_string($focus) && array_key_exists($focus, config('zazu.niches', []))
+        )));
+    }
+
+    private function primaryFocusWithOwnerFallback(User $user, Business $business, mixed $ownerMembership): ?string
+    {
+        $primary = $this->selected($user, $business);
+        if ($primary) {
+            return $primary;
+        }
+
+        $ownerPrimary = $ownerMembership?->pivot?->primary_niche;
+
+        return is_string($ownerPrimary) && array_key_exists($ownerPrimary, config('zazu.niches', []))
+            ? $ownerPrimary
+            : null;
     }
 
     public function for(?User $user = null, ?Business $business = null): string
