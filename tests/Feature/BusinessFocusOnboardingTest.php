@@ -187,8 +187,8 @@ class BusinessFocusOnboardingTest extends TestCase
             ->assertSee('Catering & baking')
             ->assertSee('Sound & DJ')
             ->assertSee('Catering')
-            ->assertSee('Sound &amp; entertainment')
-            ->assertDontSee('Photography &amp; video', false)
+            ->assertSee('Sound & entertainment')
+            ->assertDontSee('Photography & video')
             ->assertSee('Jobs')
             ->assertSee('Quotes')
             ->assertSee('Finance');
