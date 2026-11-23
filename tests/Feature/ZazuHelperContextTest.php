@@ -218,7 +218,7 @@ class ZazuHelperContextTest extends TestCase
             ['description' => 'Reception styling', 'category' => 'Decor'],
             ['description' => 'Event photo coverage', 'category' => 'Photography & video'],
             ['description' => 'Guest shuttle service', 'category' => 'Transport'],
-        ] as $index => $component) {
+        ] as $component) {
             EventRequirement::create([
                 'event_id' => $event->id,
                 'description' => $component['description'],
