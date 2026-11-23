@@ -1683,3 +1683,10 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Why:** exact GitHub PHPMD output identified WorkController::store() at 101 lines/complexity 10, offlineJobRequirementDefinitions() at complexity 11/NPath 243, and WorkWorkflowTest above the configured public-method limit. The quality run also identified a single class_attributes_separation formatting failure. These were code-quality gate failures, not waived.
 
 **Verification:** Laravel tests passed on the earlier test commit, and PostgreSQL migration/recovery passed. The offline-browser job was still running at the last check. The corrective refactor commits are newer and require fresh exact-head Laravel, PHPMD, Zazu Quality, browser/offline and Director Health runs. Do not mark this corrective batch green until those runs finish.
+
+
+## Quote single-unit confirmation — 2026-11-23
+
+**Implemented directly on main:** new quote creation and draft quote revision now require an explicit per-line confirmation when the entered quantity is exactly 1. The checkbox appears beside the affected line, becomes required when the quantity is 1, and disappears/clears when the quantity changes. The live summary excludes an unconfirmed single-unit line from its subtotal and explains that confirmation is outstanding. The same rule is enforced server-side in both create and revision-update actions; a browser-only bypass is not sufficient.
+
+**Regression coverage:** new feature tests prove an unconfirmed quantity-one line is rejected without creating a quote, the explicit confirmation is accepted, and the revision path also rejects an unconfirmed single-unit change while preserving the existing quote line. Exact-head Laravel, PHPMD, formatting, quality and browser CI are pending for this commit. No pass is claimed yet.
