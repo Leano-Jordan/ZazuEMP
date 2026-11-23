@@ -1024,9 +1024,10 @@ test.describe('Zazu installed PWA offline shell', () => {
             buffer: Buffer.from('offline-photo-fixture'),
         });
 
-        const dialog = page.waitForEvent('dialog');
-        await page.getByRole('button', { name: 'Save customer' }).click();
-        const alert = await dialog;
+        const [alert] = await Promise.all([
+            page.waitForEvent('dialog'),
+            page.getByRole('button', { name: 'Save customer' }).click(),
+        ]);
         expect(alert.message()).toContain('Customer profile photo changes need a connection');
         await alert.accept();
 
