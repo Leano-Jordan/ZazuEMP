@@ -109,9 +109,12 @@ class OnboardingController extends Controller
         ]);
     }
 
-    public function storeCatalogue(Request $request): RedirectResponse
+    public function storeCatalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
         $business = $this->currentBusiness($request);
+        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
+            return $redirect;
+        }
 
         $categories = array_keys(config('zazu.service_categories'));
 
@@ -158,9 +161,12 @@ class OnboardingController extends Controller
             ->with('success', 'Your offerings are saved. Add your business details to finish setup.');
     }
 
-    public function finishCatalogue(Request $request): RedirectResponse
+    public function finishCatalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
         $business = $this->currentBusiness($request);
+        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
+            return $redirect;
+        }
         $business->update([
             'catalogue_setup_completed_at' => now(),
             'catalogue_setup_skipped_at' => null,
@@ -173,9 +179,12 @@ class OnboardingController extends Controller
             ->with('success', 'Your offerings setup is saved. Add your business details to finish setup.');
     }
 
-    public function skipCatalogue(Request $request): RedirectResponse
+    public function skipCatalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
         $business = $this->currentBusiness($request);
+        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
+            return $redirect;
+        }
         $business->update([
             'catalogue_setup_completed_at' => null,
             'catalogue_setup_skipped_at' => now(),
@@ -291,9 +300,12 @@ class OnboardingController extends Controller
         ]);
     }
 
-    public function storeBusiness(Request $request): RedirectResponse
+    public function storeBusiness(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
         $business = $this->currentBusiness($request);
+        if ($redirect = $this->businessDetailsPrerequisiteRedirect($request, $business, $levels, $niches)) {
+            return $redirect;
+        }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -321,9 +333,12 @@ class OnboardingController extends Controller
             ->with('success', 'Business profile saved. Your Zazu workspace is ready.');
     }
 
-    public function skipBusiness(Request $request): RedirectResponse
+    public function skipBusiness(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
         $business = $this->currentBusiness($request);
+        if ($redirect = $this->businessDetailsPrerequisiteRedirect($request, $business, $levels, $niches)) {
+            return $redirect;
+        }
         $business->update([
             'business_setup_completed_at' => null,
             'business_setup_skipped_at' => now(),
@@ -332,6 +347,36 @@ class OnboardingController extends Controller
         return redirect()
             ->route('dashboard')
             ->with('info', 'Business details were deferred. You can resume setup from Setup Centre or Settings.');
+    }
+
+    private function focusPrerequisiteRedirect(
+        Request $request,
+        Business $business,
+        ExperienceLevel $levels,
+        NicheFocus $niches,
+    ): ?RedirectResponse {
+        if (! $levels->selected($request->user(), $business) || ! $niches->selected($request->user(), $business)) {
+            return redirect()->route('onboarding.experience');
+        }
+
+        return null;
+    }
+
+    private function businessDetailsPrerequisiteRedirect(
+        Request $request,
+        Business $business,
+        ExperienceLevel $levels,
+        NicheFocus $niches,
+    ): ?RedirectResponse {
+        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
+            return $redirect;
+        }
+
+        if (! $business->catalogue_setup_completed_at && ! $business->catalogue_setup_skipped_at) {
+            return redirect()->route('onboarding.catalogue');
+        }
+
+        return null;
     }
 
     private function setupStatus($completedAt, $skippedAt, bool $hasData): string
