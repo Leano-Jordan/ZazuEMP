@@ -731,3 +731,22 @@ Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality, Director He
 - [x] Added a desktop Playwright journey using the actual Job and Quote forms.
 - [x] Wired the journey into the per-push Laravel workflow.
 - [ ] Exact-head browser/Laravel CI passes on the current main commit.
+
+
+---
+
+## Director checkpoint — export acceptance and Android host-outage hardening — 2026-11-23
+
+**Current source head:** [d35d2f9](https://github.com/Leano-Jordan/ZazuEMP/commit/d35d2f95e6d510c2d7b8dd78c0ff3e0d4036d988) on `main`.
+
+- [x] Founder downloaded the encrypted business `.zazu` archive from the installed Windows Zazu and independently confirmed the file checks out. This closes the installed-PC **export** leg only.
+- [x] Export/recovery page redesigned into distinct encrypted archive create/restore actions and five collapsible CSV groups; exact-head UI checks passed on the preceding UI commit.
+- [x] Android host-outage service-worker change verified by exact-head CI: navigation timeout reduced from 4 seconds to 1.8 seconds; regression keeps browser `navigator.onLine` true while the host fetch hangs and asserts fallback to the authenticated local dashboard shell.
+- [x] Exact-head CI for `d35d2f95e6d510c2d7b8dd78c0ff3e0d4036d988`: all 9 checks passed — application, formatting, Composer security audit, secret scan, Director contract lint, health report, and three CodeQL analyses.
+- [ ] Founder-operated encrypted business archive restore on the installed PC, using a separate empty/unpaired test workspace. Do not restore into the populated live workspace.
+- [ ] Physical Android cold launch, host stop, force-close/restart and reconnection acceptance. CI/browser emulation is not physical-device evidence.
+- [ ] Populated live-business quote → invoice/payment → expenses/event costs → actual profit reconciliation. Use existing populated records; do not ask Founder to recreate them.
+- [ ] Verify that the independent off-device installation-backup destination is encrypted (BitLocker-protected removable storage or encrypted/access-controlled vault); SHA-256 copy verification alone does not prove encryption.
+- [ ] POPIA operational sign-off and ZAZU name clearance remain separate legal/operational gates.
+
+**Disposition:** These engineering changes and the installed-PC archive export are verified. V1 remains **NOT READY** until the owner-operated restore, physical Android and commercial reconciliation gates above are evidenced, along with remaining legal/brand and installation-backup controls.
