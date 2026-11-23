@@ -26,7 +26,10 @@
 - [x] Existing plaintext V1 business archives remain importable for compatibility; owners are warned to re-export or securely protect old copies.
 - [x] Installation-wide scheduled backups remain unattended plain ZIP files; off-disk copies require encrypted removable media or an encrypted, access-controlled vault.
 - [ ] Verify the configured secondary destination is BitLocker-protected USB or an encrypted, access-controlled cloud vault. The runner verifies SHA-256 only; it does not enforce or attest destination encryption.
-- [ ] Exact-head CI and real Windows installed-PC encrypted export/restore acceptance.
+- [x] Windows automated archive acceptance passed on test head `93c6e2a50b755a9aeb44715a120df1ff2cf2df21`, run [45149443876](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45149443876): **7 passed / 31 assertions**. Covers multi-chunk Sodium encryption/decryption, wrong-passphrase rejection, ciphertext tamper rejection, owner export, encrypted restore and legacy plaintext V1 restore.
+- [ ] Run the encrypted export/restore drill on the Founder’s actual installed Windows PC; CI is not a substitute for the installed environment and the live business workspace.
+- [ ] Confirm the configured secondary installation-backup destination is BitLocker-protected USB or an encrypted, access-controlled cloud vault.
+- [ ] Confirm all exact-head CI checks for the final documentation/source head are green.
 
 ### Capability-to-Job integration coverage
 
