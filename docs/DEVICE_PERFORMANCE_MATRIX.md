@@ -1,6 +1,6 @@
 # Zazu EMP — Device performance and resource acceptance
 
-**Status:** measurement protocol and local Windows sampler introduced; hardware baselines are not yet established.
+**Status:** local Windows sampler and repeatable acceptance protocol are in place; real-device baselines are not yet established.
 
 ## Objective
 
@@ -19,7 +19,7 @@ The Windows sampler is local-only. It writes CSV samples and a JSON hardware/run
 
 ## Supported Windows hardware cohorts
 
-Do not assume one developer PC represents the market. Record actual devices into these cohorts by measured specifications; cohort labels are descriptive, not minimum requirements until the baseline is established.
+Do not assume one developer PC represents the market. The sampler assigns a provisional cohort from installed RAM and logical processor count: Entry (8 GB RAM or less, or 4 logical processors or fewer), High-performance (at least 16 GB RAM and 8 logical processors), otherwise Mainstream. This is a comparison aid, not a supported-device promise or a minimum requirement. Record actual CPU model, core counts, RAM, storage model/interface/type and free space alongside the assigned cohort.
 
 - **Entry / constrained:** older dual- or quad-core CPU, 4–8 GB RAM, HDD or low-end SATA/eMMC storage, integrated graphics.
 - **Mainstream:** modern 4–8 core CPU, 8–16 GB RAM, SATA SSD or NVMe.
@@ -42,7 +42,7 @@ Capture host CPU, host memory, Zazu process CPU and private/working-set memory, 
 
 ## Acceptance and reporting rules
 
-- Every report must include the exact source commit SHA and package SHA-256. A result without both is not release evidence.
+- Every release acceptance report must include the exact source commit SHA and package SHA-256. The sampler discovers the Git commit automatically in a source checkout; pass -BuildCommitSha when testing an installed build. Pass -PackagePath to hash the exact installer/package. A run without both identifiers is diagnostic-only, not release evidence.
 - Record p50 and p95 for cold start, warm navigation, search, save, and sync; report CPU/memory/disk/network alongside them.
 - Compare entry, mainstream and high-performance cohorts. Do not average away a failure on the entry cohort.
 - No arbitrary resource thresholds are release blockers until a repeatable baseline exists. First collect three runs per device; then set budgets from observed headroom and product requirements.
@@ -65,11 +65,11 @@ A short smoke capture can be used to validate the sampler:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\ops\windows\Measure-ZazuResources.ps1 -DurationSeconds 5 -IntervalSeconds 1
 ```
 
-The sampler looks for the PHP process listening on the configured Zazu ports and its child processes, plus matching local database/proxy processes. If it cannot identify the Zazu process, it marks `ZazuProcessMatched=false`; do not interpret missing process metrics as zero usage. Network adapter and host disk metrics remain system-wide. PHP process I/O is labelled process I/O because Windows process I/O counters include more than disk activity.
+The sampler looks for the PHP process listening on the configured Zazu ports and its child processes, plus matching local database/proxy processes. It records the provisional hardware cohort, source commit and optional installer SHA-256. The first Zazu CPU sample is intentionally blank because a real CPU delta requires two observations. If it cannot identify the Zazu process, it marks `ZazuProcessMatched=false` and leaves process CPU/memory/I/O values blank; missing data is never reported as zero usage. Network adapter and host disk metrics remain system-wide. PHP process I/O is labelled process I/O because Windows process I/O counters include more than disk activity. This is a local test instrument, not an always-on product telemetry service.
 
 ## Evidence still required
 
-- [ ] Run the sampler on the actual owner PC during a repeatable Zazu workload.
+- [ ] Run the sampler on the actual owner PC during a repeatable Zazu workload, with the exact release commit and package hash.
 - [ ] Run the same release and dataset on at least one entry-level and one mainstream PC.
 - [ ] Capture physical Android client/browser performance separately; browser-only CPU/memory estimates are not sufficient.
 - [ ] Establish p50/p95 and resource budgets from at least three runs per cohort.
