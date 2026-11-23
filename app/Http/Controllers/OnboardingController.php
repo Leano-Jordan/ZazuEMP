@@ -240,6 +240,10 @@ class OnboardingController extends Controller
         $focuses = $request->boolean('business_focuses_present')
             ? ($validated['business_focuses'] ?? [])
             : ($validated['business_focuses'] ?? $niches->selectedMany($request->user(), $business));
+        $focuses = array_values(array_filter(
+            $focuses,
+            static fn (string $focus) => $focus !== NicheFocus::MIXED
+        ));
         $primaryNiche = $validated['primary_niche']
             ?? $niches->selected($request->user(), $business)
             ?? ($focuses[0] ?? NicheFocus::DEFAULT);
