@@ -78,6 +78,7 @@ jobs:
           $metadata = Get-Content -LiteralPath $manifest.FullName -Raw | ConvertFrom-Json
           if (-not $metadata.cpuModel -or -not $metadata.logicalProcessors -or -not $metadata.installedMemoryGB) { throw 'The resource manifest is missing hardware identification fields.' }
           if ($metadata.deviceTier -notin @('Entry', 'Mainstream', 'High-performance')) { throw 'The resource manifest is missing its hardware cohort classification.' }
+          if (-not $metadata.projectStorageType) { throw 'The resource manifest is missing the storage type hosting the Zazu project.' }
           if (-not $metadata.buildCommitSha) { throw 'The resource manifest must identify the source commit.' }
           if ($metadata.privacy -notmatch 'No telemetry is uploaded') { throw 'The sampler privacy declaration is missing.' }
 
