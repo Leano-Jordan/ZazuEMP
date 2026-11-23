@@ -1,3 +1,12 @@
+## Windows business archive acceptance — 2026-11-23
+
+- Added a dedicated Windows V1 Package job for encrypted and legacy business archive acceptance.
+- Test head: `93c6e2a50b755a9aeb44715a120df1ff2cf2df21`; Windows run [45149443876](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45149443876): **7 passed / 31 assertions**, no warnings.
+- Covered multi-chunk Sodium encryption/decryption, wrong-passphrase rejection, ciphertext tamper rejection, owner export, encrypted restore and legacy plaintext V1 restore.
+- Added a regression proving legacy plaintext ZIP archives remain restorable, not merely detectable.
+- The first Windows run exposed missing disposable `.env` setup and emitted PHPUnit warnings; the workflow now creates `.env` from `.env.example` before Composer/test execution. The rerun passed cleanly.
+- **Still OPEN:** actual Founder-installed Windows export/restore acceptance, off-device installation-backup destination encryption verification, and the remaining physical Android/offline, commercial and POPIA/brand release gates. Windows CI does not substitute for the owner-PC drill.
+
 ## POPIA documentation and data-minimisation checkpoint — 2026-11-23
 
 **Documentation refreshed on main:**
