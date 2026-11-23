@@ -2,7 +2,8 @@
 
 ## Director visual communication correction — 2026-11-23
 
-- [x] Dashboard image visibility corrected in both themes; existing business-upload/fallback image selection retained.
+- [x] Dashboard hero image visibility corrected in both themes; existing business-upload/fallback image selection retained.
+- [x] Business wallpaper now applies to Dashboard as well as other authenticated pages, with light/dark overlays and mobile-safe background attachment.
 - [x] Business mix moved below primary navigation without changing permissions or data.
 - [x] Dashboard and Founder Control Centre backup timestamps now use local human-readable dates.
 - [x] Tabler Icons (MIT) selected as the future local icon standard; licence retention and offline delivery are documented.

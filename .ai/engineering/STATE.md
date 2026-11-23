@@ -2098,3 +2098,11 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Migrated primary navigation groups, Dashboard metric icons and Dashboard quick actions to the shared component. Existing visible labels remain; icons are decorative and do not become the only action cue.
 - Added regression coverage for the shared component, local-only delivery and licence notice.
 - Remaining visual work: migrate status/form icons, audit controls and page hierarchy, and verify actual browser rendering across light/dark and mobile layouts.
+
+
+## Dashboard business wallpaper visibility — 2026-11-23
+
+- Root cause confirmed: the previous wallpaper visibility selector explicitly excluded `.zazu-dashboard-page`; the dashboard therefore kept its own opaque gradient instead of the selected business wallpaper.
+- Added a dashboard-specific wallpaper rule using the existing authenticated `--zazu-wallpaper` variable, with light/dark readability overlays, transparent shell/content surfaces and scroll attachment on small screens.
+- This is separate from the dashboard hero image. Both business image settings are now handled independently.
+- Added regression coverage for dashboard wallpaper visibility and both themes. Physical visual acceptance remains pending.

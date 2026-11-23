@@ -1970,3 +1970,32 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
 .zazu-nav-area-title { display: inline-flex; align-items: center; gap: 9px; }
 .zazu-nav-icon { flex: 0 0 18px; width: 18px; height: 18px; opacity: .92; }
 .zazu-icon { display: block; flex: 0 0 auto; width: 1.25em; height: 1.25em; }
+
+
+/* Dashboard wallpaper: do not exclude the dashboard from the business branding image. */
+body.zazu-dashboard-page.zazu-has-wallpaper {
+    background-color: var(--zazu-page) !important;
+    background-image:
+        linear-gradient(rgba(230, 240, 248, .48), rgba(230, 240, 248, .48)),
+        var(--zazu-wallpaper) !important;
+    background-size: cover, cover !important;
+    background-position: center, center !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-attachment: fixed, fixed !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page.zazu-has-wallpaper {
+    background-color: #0D1D2E !important;
+    background-image:
+        linear-gradient(rgba(9, 24, 38, .62), rgba(9, 24, 38, .62)),
+        var(--zazu-wallpaper) !important;
+}
+body.zazu-dashboard-page.zazu-has-wallpaper .zazu-shell,
+body.zazu-dashboard-page.zazu-has-wallpaper .zazu-main,
+body.zazu-dashboard-page.zazu-has-wallpaper .zazu-content {
+    background: transparent !important;
+}
+@media (max-width: 760px) {
+    body.zazu-dashboard-page.zazu-has-wallpaper {
+        background-attachment: scroll, scroll !important;
+    }
+}

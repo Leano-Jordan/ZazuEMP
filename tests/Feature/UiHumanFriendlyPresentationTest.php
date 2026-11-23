@@ -69,4 +69,16 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('MIT License', $notices);
         $this->assertStringNotContainsString('https://cdn.', $component);
     }
+
+    public function test_business_wallpaper_is_visible_on_dashboard_pages(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('body.zazu-dashboard-page.zazu-has-wallpaper {', $css);
+        $this->assertStringContainsString('var(--zazu-wallpaper) !important;', $css);
+        $this->assertStringContainsString('body.zazu-dashboard-page.zazu-has-wallpaper .zazu-content', $css);
+        $this->assertStringContainsString('background-attachment: scroll, scroll !important;', $css);
+        $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page.zazu-has-wallpaper', $css);
+    }
 }
