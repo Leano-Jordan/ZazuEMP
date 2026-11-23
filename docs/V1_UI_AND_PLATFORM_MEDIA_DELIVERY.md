@@ -71,9 +71,19 @@ Tab panels now update both the native `hidden` state and `aria-hidden`, retain l
 
 The Helper now visibly identifies active business services as compact chips. On a Job, saved requirement components appear as chips instead of a generic bullet dump. The recommended next action has a clearer visual hierarchy, a reason label and a distinct action link. This is still driven by existing authoritative Job state and permission-filtered attention, not speculative AI recommendations.
 
-## Quality gate correction
+## Quality gate correction — 2026-11-23
 
-The earlier PHPMD workflow did not remain queued: GitHub completed it with **failure** on the previous code batch. The Laravel and Zazu quality workflows were still queued at the time of the follow-up inspection, and the Director Health workflow completed successfully. PHPMD's job log was not available through the repository connector, so its exact finding has not been attributed to a particular changed file. This is an open quality gate; do not treat the batch as green until the PHPMD output is retrieved and addressed, and the new commits receive fresh test runs.
+The failure logs were retrieved and the root causes were addressed rather than suppressing the gates:
+
+- Laravel suite: stale test expectations used the retired inspector labels “Services & preparation” and “Financial Ledger”; the landing-media test counted attribute text in the inline script instead of counting rendered preview elements; RouteIntegrity misclassified `request()->route('event')` as a named-route helper; Helper context tests expected relation counts that the view had not loaded.
+- Helper: permitted event relationship counts are now explicitly loaded, business-scoped and permission-filtered before rendering.
+- Browser E2E: both populated-runtime and offline-attachment suites now select the current “Commercial position” tab label.
+- PHP syntax/formatting: the DemoScenarioSeeder test class closure and unused import were corrected.
+- PHPMD: `LandingMediaService::library()` complexity was decomposed into smaller library methods; test classes exceeding the public-method threshold were split into focused classes.
+
+**Evidence:** PHPMD completed successfully on implementation/test refactor head `f64d143c1f137261c356fe3258901dbbdcbc89c6`. Further catalogue controller/test changes followed and triggered fresh exact-head PHPMD, Laravel and Zazu Quality runs; those latest runs must be read against the current `main` head before declaring the batch green. SonarCloud remains skipped and is not counted as a pass.
+
+Physical PC/phone visual review, real installation offline acceptance and restart/reconnect acceptance remain separate founder-operated release checks.
 
 
 ## Founder-requested media correction — 2026-11-23
@@ -87,3 +97,12 @@ The earlier PHPMD workflow did not remain queued: GitHub completed it with **fai
 - Added feature assertions for direct-pick controls, crop-preview hooks and removal of the SVG illustration fallbacks from the rendered media library.
 
 **Verification boundary:** code and tests are committed to main; this record does not claim tests or visual acceptance have passed. Check exact-head GitHub Actions, then visually inspect the six public crops, settings wallpaper and dashboard picture on PC and phone.
+
+## Regression repair and adaptive catalogue hardening — 2026-11-23
+
+- Fixed the failing Laravel assertions and route-helper integrity false positive without weakening the checks.
+- Corrected Helper event-record loading to fetch only permitted relation counts, constrained to the active business.
+- Updated stale browser selectors to the current neutral inspector tab label.
+- Added a dedicated catalogue regression suite for mixed service/rental businesses, service-only businesses and staff without asset-allocation permission.
+- Split high-method-count test classes and decomposed the landing-media library builder after PHPMD findings.
+- Disabled catalogue entries remain visible to owners with a HIDDEN status so they can be restored; operational staff see active offerings only. No capability or historical event record is deleted.
