@@ -129,6 +129,7 @@ final class BusinessArchiveEncryptionService
         }
 
         $key = null;
+        $state = null;
         try {
             $prefix = $this->readExact($source, strlen(self::MAGIC) + SODIUM_CRYPTO_PWHASH_SALTBYTES
                 + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
@@ -182,6 +183,9 @@ final class BusinessArchiveEncryptionService
                 ? $exception
                 : new RuntimeException('The archive password is incorrect or the encrypted archive is damaged.', 0, $exception);
         } finally {
+            if (is_string($state)) {
+                sodium_memzero($state);
+            }
             if (is_string($key)) {
                 sodium_memzero($key);
             }
