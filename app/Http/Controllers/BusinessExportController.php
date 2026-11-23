@@ -172,7 +172,7 @@ class BusinessExportController extends Controller
                 $restoreStage,
                 $exception,
             );
-        } catch (\\JsonException $exception) {
+        } catch (\JsonException $exception) {
             return $this->restoreJsonFailure(
                 $request,
                 $business,
@@ -224,7 +224,7 @@ class BusinessExportController extends Controller
         Business $business,
         int $uploadBytes,
         string $restoreStage,
-        \\JsonException $exception,
+        \JsonException $exception,
     ): RedirectResponse {
         $incidentId = (string) Str::uuid();
         Log::warning('Business archive restore failed while decoding archive data.', [
