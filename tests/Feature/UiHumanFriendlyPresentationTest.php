@@ -70,6 +70,24 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringNotContainsString('https://cdn.', $component);
     }
 
+    public function test_export_and_recovery_actions_use_local_semantic_tabler_icons(): void
+    {
+        $exports = file_get_contents(resource_path('views/exports/index.blade.php'));
+        $component = file_get_contents(resource_path('views/components/icon.blade.php'));
+
+        $this->assertIsString($exports);
+        $this->assertIsString($component);
+        $this->assertStringContainsString('<x-icon name="download"', $exports);
+        $this->assertStringContainsString('<x-icon name="upload"', $exports);
+        $this->assertStringContainsString('<x-icon name="lock"', $exports);
+        $this->assertStringContainsString('<x-icon name="shield-check"', $exports);
+        $this->assertStringContainsString("'download' =>", $component);
+        $this->assertStringContainsString("'upload' =>", $component);
+        $this->assertStringContainsString("'shield-check' =>", $component);
+        $this->assertStringNotContainsString('>↓</div>', $exports);
+        $this->assertStringNotContainsString('>↥</div>', $exports);
+    }
+
     public function test_business_wallpaper_is_visible_on_dashboard_pages(): void
     {
         $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
