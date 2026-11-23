@@ -1051,7 +1051,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(jobMutation.payload.record.event_type).toBe('Wedding');
         expect(jobMutation.payload.record.event_date).toBe('2026-11-15');
         expect(jobMutation.payload.record.event_address).toBe('Pretoria');
-        expect(jobMutation.payload.record.services).toEqual(['Catering']);
+        expect(jobMutation.payload.record.services).toEqual(['Buffet Catering']);
     });
 
     test('migrates legacy offline data only into its matching business workspace', async ({ page }) => {
