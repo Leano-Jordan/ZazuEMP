@@ -264,6 +264,74 @@ test('offline supplier edits update local contact details and queue a revision-c
     });
 });
 
+test('editing a locally created supplier preserves the queued create-before-update dependency', async ({ page }) => {
+    const localId = randomUUID();
+
+    await login(page);
+    await page.context().setOffline(true);
+    await page.evaluate(async localId => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.customers = [];
+        state.jobs = [];
+        state.quotes = [];
+        state.suppliers = [{
+            id: null,
+            server_id: null,
+            local_id: localId,
+            name: 'Locally created supplier',
+            contact_name: 'First Contact',
+            email: 'first@example.test',
+            phone: null,
+            notes: null,
+            pending_sync: true,
+        }];
+        state.local_dirty = false;
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+        await window.ZazuOffline.queueMutation('supplier', 'create', {
+            local_id: localId,
+            server_id: null,
+            name: 'Locally created supplier',
+            contact_name: 'First Contact',
+            email: 'first@example.test',
+            phone: null,
+            notes: null,
+        }, state);
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    }, localId);
+
+    const suppliers = page.locator('[data-zazu-offline-workspace] [data-zazu-offline-collection="suppliers"]');
+    await suppliers.getByRole('button', { name: 'View saved details' }).click();
+    await suppliers.getByRole('button', { name: 'Edit saved supplier' }).click();
+    await suppliers.getByLabel('Supplier name').fill('Locally created supplier updated');
+    await suppliers.getByLabel('Contact person').fill('Second Contact');
+    await suppliers.getByRole('button', { name: 'Save supplier' }).click();
+
+    await expect.poll(async () => page.evaluate(async localId => {
+        const state = window.ZazuOffline.getState();
+        const record = state.suppliers.find(item => item.local_id === localId);
+        const mutations = (await window.ZazuOffline.pending()).filter(item => item.entity_type === 'supplier');
+
+        return {
+            name: record?.name,
+            contact: record?.contact_name,
+            operations: mutations.map(item => item.operation),
+            predecessor: mutations[1]?.payload?.predecessor_mutation_id,
+            createId: mutations[0]?.id,
+            count: mutations.length,
+        };
+    }, localId)).toMatchObject({
+        name: 'Locally created supplier updated',
+        contact: 'Second Contact',
+        operations: ['create', 'update'],
+        count: 2,
+    });
+    await expect.poll(async () => page.evaluate(async () => {
+        const mutations = (await window.ZazuOffline.pending()).filter(item => item.entity_type === 'supplier');
+        return mutations[1]?.payload?.predecessor_mutation_id === mutations[0]?.id;
+    })).toBe(true);
+});
+
 test('offline workspace exposes locally stored quotes with their sync state', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const jobLocalId = randomUUID();
