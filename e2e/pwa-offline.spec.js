@@ -39,6 +39,52 @@ async function trustCurrentDevice(page) {
 }
 
 test.describe('Zazu installed PWA offline shell', () => {
+    test('refreshes the business-mix panel from the matching local profile while disconnected', async ({ page, context }, testInfo) => {
+        test.skip(testInfo.project.name !== 'chromium', 'Local workspace profile presentation contract runs once.');
+
+        await login(page);
+        const businessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
+        const panel = page.locator('[data-zazu-workspace-profile]');
+        await expect(panel).toBeVisible();
+
+        await context.setOffline(true);
+        await page.evaluate(async (id) => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.business = { ...(state.business || {}), id };
+            state.workspace_profile = {
+                focus_labels: ['Sound & DJ'],
+                catalogue_categories: ['Sound & entertainment', 'Audio & entertainment'],
+                active_offerings: 3,
+                active_rentals: 2,
+            };
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, businessId);
+
+        await expect(panel.locator('[data-zazu-workspace-profile-count]')).toHaveText('3 active offerings');
+        await expect(panel.locator('[data-zazu-workspace-profile-focuses]')).toHaveText('Sound & DJ');
+        await expect(panel.locator('[data-zazu-workspace-profile-categories]')).toHaveText('Sound & entertainment · Audio & entertainment');
+
+        // A profile belonging to another business must never replace this panel.
+        await page.evaluate(async (id) => {
+            const state = window.ZazuOffline.getState();
+            state.business.id = id + 1;
+            state.workspace_profile = {
+                focus_labels: ['Foreign business profile'],
+                catalogue_categories: ['Foreign category'],
+                active_offerings: 99,
+                active_rentals: 0,
+            };
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, businessId);
+
+        await expect(panel.locator('[data-zazu-workspace-profile-count]')).toHaveText('3 active offerings');
+        await expect(panel.locator('[data-zazu-workspace-profile-focuses]')).toHaveText('Sound & DJ');
+        await expect(panel.locator('[data-zazu-workspace-profile-categories]')).toHaveText('Sound & entertainment · Audio & entertainment');
+    });
+
     test('local client becomes ready before an unresponsive initial sync', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Network-stall startup contract runs once; responsive viewports are covered separately.');
