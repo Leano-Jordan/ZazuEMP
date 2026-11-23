@@ -41,7 +41,8 @@ class PlatformAdminTest extends TestCase
             $response->assertSee($image['url'], false);
         }
 
-        $this->assertSame(6, substr_count($response->getContent(), 'data-zazu-landing-preview'));
+        preg_match_all('/<img\\b[^>]*\\bdata-zazu-landing-preview\\b/i', $response->getContent(), $previewImages);
+        $this->assertCount(6, $previewImages[0], 'Each of the six landing positions must render exactly one preview image.');
 
         $this->actingAs($admin)
             ->put(route('admin.landing.settings.update'), [
