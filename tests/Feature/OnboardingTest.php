@@ -185,6 +185,7 @@ class OnboardingTest extends TestCase
             'slug' => 'business-setup-skip',
             'status' => 'active',
             'currency' => 'ZAR',
+            'catalogue_setup_skipped_at' => now(),
         ]);
 
         $user = $this->signInAsOwner($business);
