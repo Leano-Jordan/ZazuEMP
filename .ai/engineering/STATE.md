@@ -1618,3 +1618,27 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Architecture map:** membership primary_niche remains a single presentation focus; active catalogue categories supplement Helper focus through NicheFocus. Onboarding persists one focus. Navigation is still role/permission-driven and static. Dashboard tool visibility remains tier/permission-driven. EventRequirement remains the per-job component source. Capability records already participate in aggregate revision/sync, but the future multi-capability workspace configuration still needs offline parity tests. Full mapping is in docs/ADAPTIVE_BUSINESS_PRESETS_AND_EVENT_COMPONENTS.md.
 
 **Next:** extend the owner-facing capability selection/review using existing BusinessCapability records, then test add/deactivate effects on catalogue and Helper. Do not introduce a parallel preset store or retroactively rewrite historical event/quote scope.
+
+
+## CI regression repair and catalogue visibility hardening — 2026-11-23
+
+**Failure causes traced from GitHub job logs:**
+- Laravel tests had stale inspector label expectations, a brittle landing-preview substring count, a route-integrity false positive for `request()->route('event')`, and Helper tests expecting event relationship counts that were never loaded.
+- Offline and populated browser tests still selected the retired “Financial Ledger” tab.
+- PHPMD identified `LandingMediaService::library()` cyclomatic complexity 11, `PlatformAdminTest` and `ZazuHelperTest` above the public-method limit, and an invalid DemoScenarioSeeder test file ending.
+- Zazu Quality found the unused Route import / class spacing issue in that demo test.
+
+**Corrections committed on main:**
+- Helper now loads only permitted event record counts, scoped to the active business.
+- Updated test assertions to verify the actual neutral UI labels and count six preview image elements, not matching text in scripts.
+- RouteIntegrity ignores `->route('parameter')` access while still checking `route('name')`.
+- Updated both browser suites to use “Commercial position”.
+- Repaired the demo test class and removed the unused import.
+- Refactored the landing-media library into smaller methods and split high-public-method test classes.
+- PHPMD passed on implementation/refactor head `f64d143c1f137261c356fe3258901dbbdcbc89c6`.
+
+**Catalogue refinement:** controller now separates rental items from service/package/product/other items. Owners retain visibility of hidden capabilities for recovery; staff/manager catalogue views are filtered to active entries. Asset allocation links are permission-gated. Regression tests cover mixed-provider, single-specialist and staff-permission cases.
+
+**Current verification boundary:** later catalogue filtering changes triggered new exact-head Laravel, PHPMD, Zazu Quality, Psalm and Director Health runs. Do not attribute the earlier PHPMD pass to the latest head until those newer results complete. PC/phone visual and physical offline acceptance are still not verified.
+
+**Next execution target:** connect active business-owned catalogue offerings to New Job service requirements through the existing `services[]` contract used by offline creation. Update online and offline paths together; preserve requirement quantity/unit correction, historical quote snapshots and capability/business isolation. No parallel configuration store.
