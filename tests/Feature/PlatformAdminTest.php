@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Business;
+use App\Models\User;
+use App\Services\LandingMediaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
@@ -16,7 +19,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_platform_admin_can_manage_landing_media(): void
     {
-        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $response = $this->actingAs($admin)->get(route('admin.landing.settings'));
@@ -37,7 +40,7 @@ class PlatformAdminTest extends TestCase
             ->assertSee('Upload image experiments')
             ->assertSee('data-zazu-upload-previews', false);
 
-        foreach (app(\App\Services\LandingMediaService::class)->library() as $image) {
+        foreach (app(LandingMediaService::class)->library() as $image) {
             $response->assertSee($image['url'], false);
         }
 
@@ -64,10 +67,9 @@ class PlatformAdminTest extends TestCase
         $this->assertSame(config('zazu.landing_image_library.luxury_banquet.url'), $row->decor_image_path);
     }
 
-
     public function test_platform_admin_can_upload_preview_and_reuse_landing_media(): void
     {
-        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $directory = storage_path('framework/testing/landing-uploads-'.Str::uuid());
@@ -114,7 +116,7 @@ class PlatformAdminTest extends TestCase
             $media->path,
             DB::table('platform_landing_settings')->value('hero_image_path')
         );
-        $this->assertSame($media->path, app(\App\Services\LandingMediaService::class)->images()['hero']);
+        $this->assertSame($media->path, app(LandingMediaService::class)->images()['hero']);
 
         File::deleteDirectory($directory);
     }
@@ -122,7 +124,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_platform_admin_upload_rejects_svg_and_untrusted_media_types(): void
     {
-        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($admin)
@@ -170,7 +172,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_non_platform_admin_cannot_manage_landing_media(): void
     {
-        $user = \App\Models\User::factory()->create(['email' => 'owner@zazu.test']);
+        $user = User::factory()->create(['email' => 'owner@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($user)
@@ -212,14 +214,14 @@ class PlatformAdminTest extends TestCase
     {
         $this->get(route('admin.sentinel'))->assertRedirect(route('login'));
 
-        $user = \App\Models\User::factory()->create(['email' => 'owner@zazu.test']);
+        $user = User::factory()->create(['email' => 'owner@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($user)
             ->get(route('admin.sentinel'))
             ->assertForbidden();
 
-        $founder = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
+        $founder = User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($founder)
@@ -232,8 +234,8 @@ class PlatformAdminTest extends TestCase
 
     public function test_founder_control_centre_has_a_return_path_when_the_founder_has_a_business_workspace(): void
     {
-        $founder = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
-        $business = \App\Models\Business::create([
+        $founder = User::factory()->create(['email' => 'admin@zazu.test']);
+        $business = Business::create([
             'name' => 'Founder Workspace',
             'slug' => 'founder-workspace',
             'status' => 'active',
@@ -266,7 +268,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_legacy_admin_list_does_not_grant_founder_access(): void
     {
-        $user = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
+        $user = User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', '');
         Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
 
@@ -277,7 +279,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_platform_admin_can_search_sentinel_and_open_safe_timeline(): void
     {
-        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $directory = storage_path('app/private/zazu-diagnostics');
