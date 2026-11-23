@@ -80,12 +80,35 @@ class BusinessExportController extends Controller
         BusinessArchiveEncryptionService $encryption,
         CurrentBusiness $currentBusiness,
     ): RedirectResponse {
-        $validated = $request->validate([
-            'archive' => ['required', 'file', 'max:102400'],
-            'archive_password' => ['nullable', 'string', 'min:12', 'max:128'],
-        ]);
-
         $business = $currentBusiness->model($request->user());
+
+        try {
+            $validated = $request->validate([
+                'archive' => ['required', 'file', 'max:102400'],
+                'archive_password' => ['nullable', 'string', 'min:12', 'max:128'],
+            ]);
+        } catch (ValidationException $exception) {
+            $incidentId = (string) Str::uuid();
+            $uploadedFile = $request->file('archive');
+
+            Log::warning('Business archive restore request rejected before processing.', [
+                'incident_id' => $incidentId,
+                'stage' => 'request_validation',
+                'business_id' => (int) $business->id,
+                'user_id' => (int) $request->user()->getAuthIdentifier(),
+                'content_length' => (int) $request->server('CONTENT_LENGTH', 0),
+                'upload_error' => $uploadedFile?->getError(),
+                'upload_bytes' => $uploadedFile?->getSize(),
+                'upload_max_filesize' => (string) ini_get('upload_max_filesize'),
+                'post_max_size' => (string) ini_get('post_max_size'),
+                'error_fields' => array_keys($exception->errors()),
+            ]);
+
+            $errors = $exception->errors();
+            $errors['archive'][] = 'Restore request reference: '.$incidentId;
+
+            return back()->withErrors($errors);
+        }
         $uploadedPath = $validated['archive']->getRealPath();
         $restorePath = is_string($uploadedPath) ? $uploadedPath : '';
         $decryptedPath = null;
