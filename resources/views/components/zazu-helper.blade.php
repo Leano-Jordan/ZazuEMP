@@ -214,10 +214,10 @@
     $eventOperationalDetails = collect();
 
     if ($routeName === 'work.show'
-        && $event instanceof \\App\\Models\\Event
+        && $event instanceof \App\Models\Event
         && $business
         && (int) $event->business_id === (int) $business->id) {
-        $permissions = app(\\App\\Support\\PermissionService::class);
+        $permissions = app(\App\Support\PermissionService::class);
 
         if ($permissions->allows('work.view', auth()->user(), $business)) {
             foreach ($event->preparationItems
