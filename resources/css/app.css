@@ -125,7 +125,7 @@
     --zazu-sidebar: #D5E0E8;
     --zazu-sidebar-ink: #23394D;
     --zazu-sidebar-muted: #536B7F;
-    --zazu-sidebar-label: #617B91;
+    --zazu-sidebar-label: #33465F;
     --zazu-sidebar-hover: #C2D2DE;
     --zazu-sidebar-active: #B4C8D7;
     --zazu-sidebar-surface: #E6EDF2;
@@ -533,7 +533,7 @@ body {
 }
 
 .zazu-eyebrow {
-    color: var(--zazu-muted);
+    color: var(--zazu-ink-2);
     font-size: 12px;
     font-weight: 700;
     line-height: 1.35;
