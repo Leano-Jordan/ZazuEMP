@@ -19,7 +19,7 @@ The Windows sampler is local-only. It writes CSV samples and a JSON hardware/run
 
 ## Supported Windows hardware cohorts
 
-Do not assume one developer PC represents the market. The sampler assigns a provisional cohort from installed RAM and logical processor count: Entry (8 GB RAM or less, or 4 logical processors or fewer), High-performance (at least 16 GB RAM and 8 logical processors), otherwise Mainstream. This is a comparison aid, not a supported-device promise or a minimum requirement. Record actual CPU model, core counts, RAM, storage model/interface/type and free space alongside the assigned cohort.
+Do not assume one developer PC represents the market. The sampler assigns a provisional cohort from installed RAM, logical processor count and the storage type hosting the Zazu project: Entry (8 GB RAM or less, 4 logical processors or fewer, or HDD), High-performance (at least 16 GB RAM, 8 logical processors and SSD/NVMe), otherwise Mainstream. Unknown storage is not treated as SSD. This is a comparison aid, not a supported-device promise or a minimum requirement. Record actual CPU model, core counts, RAM, storage model/interface/type and free space alongside the assigned cohort.
 
 - **Entry / constrained:** older dual- or quad-core CPU, 4–8 GB RAM, HDD or low-end SATA/eMMC storage, integrated graphics.
 - **Mainstream:** modern 4–8 core CPU, 8–16 GB RAM, SATA SSD or NVMe.
