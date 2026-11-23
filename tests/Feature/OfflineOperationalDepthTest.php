@@ -473,6 +473,7 @@ class OfflineOperationalDepthTest extends TestCase
             $this->assertSame('OFF-ASSET-OTHER', $otherAsset->fresh()->asset_tag);
         }
     }
+
     public function test_recorder_rechecks_durable_device_state_after_middleware_snapshot(): void
     {
         $business = $this->business();
