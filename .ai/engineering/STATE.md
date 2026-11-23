@@ -1,3 +1,27 @@
+## Business-first multi-focus onboarding — implementation in progress — 2026-11-23
+
+**Implemented directly on `main`:**
+- Reordered the first-run path so business focus is captured before the catalogue; business details follow the offerings step.
+- Added nullable JSON `business_user.business_focuses` while retaining `primary_niche` as the presentation/guidance priority. Existing memberships continue to resolve from their legacy primary niche.
+- Owners can select multiple business activities; the primary focus remains separate from the set of things the business offers.
+- The selected business activities are shared with workspace members through the owner membership and exposed through the existing membership relationships.
+- Catalogue category suggestions now follow the selected business activities, so a DJ-only business is not presented with catering/baking categories by default; mixed businesses receive combined relevant categories.
+- Added onboarding regression coverage for ordering, multiple focus persistence, staff visibility, DJ-only category relevance and the business-details gate.
+
+**Source commits:** migration `9d028276`; resolver `542f3a17` / `14c1cbfd` / `9d1670ea`; controller `7aa334b2` / `7f40b735` / `afdbba0f`; onboarding view `c0c1baef` / `3d32546b` / `791281ea` / `d2ec9d26`; tests `cd7309d7` / `104974a1` / `d25fc133` / `ef6f32b8`; membership relations `8d7ef75d` / `94b3dc53`.
+
+**Verification disposition:** source and test files were re-read from `main`. Exact-head CI/PHPUnit, migration execution, rendered mobile/desktop onboarding and downstream workspace adaptation are **NOT YET VERIFIED**. Do not mark the foundation complete until these pass. This slice captures business identity/focus and adapts the next catalogue step; it does not yet implement the full capability-driven navigation/module matrix or event-specific downstream workflow adaptation.
+
+## Business archive restore incident — 2026-11-23
+
+- Founder reports the uploaded encrypted `.zazu` archive failed to load repeatedly despite using the saved passphrase; subsequent response was `SYS-002`.
+- Confirmed in `ZazuErrorCatalog::forStatus()` and `codeFor()`: `SYS-002` maps to HTTP 429. `AppServiceProvider` configures the owner restore route for 3 requests per 10 minutes per authenticated user.
+- The existing global form submission guard already prevents repeated submission of the same form instance. Do not add a duplicate guard or weaken the limiter as a symptom patch.
+- The 429 explains the terminal rate-limit response only. It does **not** identify the first archive-load failure. Initial upload, PHP request limits, encryption detection/decryption, temporary-file staging and ZIP validation remain under investigation.
+- Restore gate remains **BLOCKED**. Founder must not retry until the first failing stage is identified. Preserve the original archive/passphrase and disposable target workspace. No live-business restore.
+
+---
+
 ## Windows business archive acceptance — 2026-11-23
 
 - Added a dedicated Windows V1 Package job for encrypted and legacy business archive acceptance.
