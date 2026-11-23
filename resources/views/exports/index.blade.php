@@ -45,6 +45,7 @@
             </div>
             <span class="zazu-chip zazu-chip-neutral">ZAZU ARCHIVE V1</span>
         </div>
+        <p class="zazu-panel-copy mt-3"><strong>Security:</strong> this archive is not password-encrypted. It contains sensitive business records and uploaded files. Store it only in a protected location; do not email it or place it in public file-sharing.</p>
         <div class="flex flex-wrap gap-3 mt-4">
             <a href="{{ route('exports.archive.download') }}" class="zazu-btn zazu-btn-primary">Download business archive</a>
         </div>
