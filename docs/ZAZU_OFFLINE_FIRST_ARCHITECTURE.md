@@ -461,3 +461,13 @@ The exact source/test head `36a2f605481e3985b647dda710ead7bef157b70f` passed 60 
 
 **Evidence boundary:** the browser sync response is deterministic and mocked. This verifies the offline client's mutation ordering and acknowledgement reconciliation, not an independent live-server invoice persistence transaction. The complete sync matrix and live-business commercial reconciliation remain open. Physical Android acceptance is not inferred from browser emulation.
 
+### Offline expense / purchase-order parity — 2026-11-23
+
+Offline expense mutations now enforce the online finance relationship rules before recording:
+
+- A linked purchase order must be in `ordered`, `received` or `cancelled` state.
+- If the purchase order has an event, an explicitly selected event must match it. When the client supplies only the purchase-order identity, the business-scoped event is resolved and inherited.
+- An explicitly selected supplier must match the purchase-order supplier. When omitted, the business-scoped supplier is inherited from the purchase order.
+- The resolved relationships are passed to the canonical finance transaction service, which retains its locking, ownership and financial-state checks.
+
+Regression coverage verifies successful inheritance and rejection of event mismatch, supplier mismatch and draft purchase orders. This is server-side sync validation; it does not expand the list of operations accepted while disconnected or close physical Android acceptance.
