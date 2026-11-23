@@ -1945,3 +1945,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 **New commits after the founder-confirmed green head:** archive validation diagnostics `3f365a2`; archive validation regression `6128bb2`; server-side onboarding prerequisites `f41d3f0`; onboarding test helper placement `6d798cf`; import correction `b8fe1be`; resume assertion correction `ae74189`.
 
 **Current verification disposition:** latest changes are committed directly to `main`; they require a fresh exact-head CI run. Do not treat the founder-confirmed green result for `60dbcc3` as verification of these later commits. Do not retry the physical archive restore until the latest build is installed and checks pass.
+
+
+## Capability-to-surface source map — 2026-11-23
+
+- Added [Director Capability-to-Surface Map](../../docs/DIRECTOR_CAPABILITY_TO_SURFACE_MAP_2026-11-23.md), grounded in the current navigation layout, onboarding focus storage, catalogue model/controller, event requirements, dashboard, Helper and offline bootstrap source.
+- Confirmed that selected business focus, active catalogue capabilities and event-specific requirements are distinct sources and must remain distinct.
+- Onboarding and Helper already have partial focus-aware behaviour. Main navigation remains fixed apart from permission checks; offline bootstrap includes catalogue/operational records but does not expose a complete derived capability profile in its business envelope.
+- The map recommends a read-only profile derived from existing sources, permission-preserving progressive disclosure in navigation, then a versioned offline contract. It explicitly rejects capability-based authorization and parallel workflow state.
+- Source-map commit: `ce06d534ffd2d5cab79d3f0a6c77bd4db88be586`.
+- Exact-head CI for this documentation-only commit is pending. No capability-driven navigation or offline parity is claimed as implemented.
