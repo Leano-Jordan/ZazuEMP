@@ -1,3 +1,10 @@
+## Windows installation candidate verification — 2026-11-23
+
+- Runtime/source head: `6933f41621fd8ac2e3ff7b311d3eb81123594511` (includes the Helper current-state implementation, including rental asset allocations).
+- GitHub Actions Windows V1 Package run `45133569162`: **Build Windows installation candidate — PASS**; **Verify fresh install on Windows PowerShell — PASS**.
+- The optional GitHub prerelease publication job was **SKIPPED**; no prerelease publication is claimed.
+- This verifies package construction and a clean PowerShell installation workflow in CI. It does not substitute for restoring the Founder’s intended installed PC from the independently verified backup or for physical Android offline acceptance.
+
 ## Helper current Job operational state — 2026-11-23
 
 **Implemented directly on main:**
