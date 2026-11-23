@@ -3,14 +3,14 @@
 
 - Source review found refreshOfflineWorkspaceVisibility() only considered unsynced customer, job and quote records. A pending inventory, supplier, purchase-order, invoice, expense, asset, catalogue or preparation mutation could therefore be queued while the origin was online again and the dashboard offline workspace would be hidden.
 - Updated the shared visibility decision to retain the workspace when the durable mutation queue is dirty, an open conflict exists, or any supported local collection contains an unsynced/pending record. This includes all collections already rendered by the offline workspace plus preparations.
-- Added a targeted Playwright regression: queue an inventory-item update while disconnected, restore origin reachability, and verify the offline workspace and inventory record remain visible while the mutation is still pending.
+- Added a targeted Playwright regression: queue an inventory-item update while disconnected, restore origin reachability, and verify the offline workspace and inventory record remain visible while the mutation is still pending. The shared light-theme sidebar-muted token was also corrected from `#536B7F` to `#475569` after confirming its contrast was 4.14:1 on the sidebar surface.
 - **Verification pending:** exact-head Laravel/browser acceptance and quality checks must pass before this correction is considered closed.
 
 ---
 
 ## Director incident response — Windows server readiness and accessibility regression — 2026-11-23
 
-**Implementation commits on `main`:** `45cec0f7`, `533d8a57`, `7f6fb9bf`, `7106a44f`, `1093ea50`, `dcfa9799`, `0aa1b4a6`, `402e5cf8`, `27f75650`, `3abd82cb`, `bfedf3b8`, `72855299`, `fc7de7a6`, `26641742`, `b61b8c97`, `86b960d8`, `fdfa692a`.
+**Implementation commits on `main`:** `45cec0f7`, `533d8a57`, `7f6fb9bf`, `7106a44f`, `1093ea50`, `dcfa9799`, `0aa1b4a6`, `402e5cf8`, `27f75650`, `3abd82cb`, `bfedf3b8`, `72855299`, `fc7de7a6`, `26641742`, `b61b8c97`, `86b960d8`, `fdfa692a`, `f825051c`, `e7123530`.
 
 - Investigated Laravel workflow run `45238129152` on prior head `b726e683`. Laravel/PHP tests, PostgreSQL migration/recovery, offline/session contract checks, Vite configuration and asset build passed. The browser job failed in authenticated-workspace accessibility acceptance before downstream browser/offline journeys could run.
 - Exact accessibility defects found across authenticated surfaces: footer navigation and brand copy inherited `#64748B` against `#DCE5ED` (3.73:1); dashboard health-card microcopy used the same muted token on pastel status surfaces (3.44–3.94:1); workspace-search exposed sidebar brand text at `#617B91` on `#D5E0E8` (3.29:1) and a page eyebrow at `#64748B` on `#DCE5ED` (3.73:1). Changes now use theme-aware `--zazu-ink-2` for footer copy, health-card supporting text and global eyebrow labels, deepen the light-theme sidebar label token to `#33465F`, and correct the shared light-theme muted and faint text tokens from `#64748B` / `#53677E` to `#475569`, with `--zazu-text-muted` / `--zazu-text-body` following the muted token. Dark-theme values remain theme-specific.
