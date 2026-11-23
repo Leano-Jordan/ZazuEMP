@@ -44,7 +44,7 @@ class ZazuRestoreCommand extends Command
             return self::SUCCESS;
         }
 
-        $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid()));
+        $work = storage_path('app/zazu-backups/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid()));
         if (! app(PrivateStoragePermissions::class)->createDirectory($work)) {
             File::deleteDirectory($work);
             $this->error('Could not create a private restore staging directory.');
@@ -331,7 +331,7 @@ class ZazuRestoreCommand extends Command
                 // file target so the real restore path can still be exercised without
                 // weakening the production file-replacement safeguards.
                 if ($target === ':memory:') {
-                    $target = storage_path('app/.zazu-test-restore-'.Str::ulid().'.sqlite');
+                    $target = storage_path('app/zazu-backups/.zazu-test-restore-'.Str::ulid().'.sqlite');
                     config(['database.connections.sqlite.database' => $target]);
                     $temporaryMemoryTarget = true;
                     $temporaryMemoryDatabasePath = $target;
@@ -388,7 +388,7 @@ class ZazuRestoreCommand extends Command
             // Stage private storage only after every required database rollback point exists.
             // Every mutation after this point either completes or throws so catch can recover.
             if ($hasPrivateStorage) {
-                $privateRollback = storage_path('app/.zazu-private-rollback-'.Str::ulid());
+                $privateRollback = storage_path('app/zazu-backups/.zazu-private-rollback-'.Str::ulid());
 
                 if (is_dir($privateTarget) && !rename($privateTarget, $privateRollback)) {
                     throw new \RuntimeException('Could not stage the current private storage for safe replacement.');
@@ -422,7 +422,7 @@ class ZazuRestoreCommand extends Command
                 DB::purge('sqlite');
                 gc_collect_cycles();
 
-                $databaseStage = storage_path('app/.zazu-database-restore-'.Str::ulid().'.sqlite');
+                $databaseStage = storage_path('app/zazu-backups/.zazu-database-restore-'.Str::ulid().'.sqlite');
                 if (!copy($source, $databaseStage)
                     || ! app(PrivateStoragePermissions::class)->restrictFile($databaseStage)) {
                     File::delete($databaseStage);
@@ -430,7 +430,7 @@ class ZazuRestoreCommand extends Command
                 }
 
                 $sqliteTarget = $target;
-                $databaseRollback = storage_path('app/.zazu-database-rollback-'.Str::ulid().'.sqlite');
+                $databaseRollback = storage_path('app/zazu-backups/.zazu-database-rollback-'.Str::ulid().'.sqlite');
                 $wal = $target.'-wal';
                 $shm = $target.'-shm';
                 $rollbackWal = $databaseRollback.'-wal';
