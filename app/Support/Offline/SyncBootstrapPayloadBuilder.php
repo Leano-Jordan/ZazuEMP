@@ -18,6 +18,7 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncDevice;
 use App\Models\SyncEntityIdentity;
+use App\Support\WorkspaceProfile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -63,6 +64,9 @@ class SyncBootstrapPayloadBuilder
                     'website' => $business->website,
                     'tax_number' => $business->tax_number,
                 ],
+                'workspace_profile' => $device->approvedBy
+                    ? app(WorkspaceProfile::class)->for($device->approvedBy, $business)
+                    : null,
                 'catalogue' => $this->bootstrapCatalogue($business, $registry),
                 'suppliers' => $this->bootstrapSuppliers($business, $registry, $deliveryTargets['supplier'] ?? []),
                 'purchase_orders' => $this->bootstrapPurchaseOrders($business, $registry, $deliveryTargets['purchase_order'] ?? []),
