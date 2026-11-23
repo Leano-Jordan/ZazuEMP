@@ -46,6 +46,7 @@ class ZazuRestoreCommand extends Command
 
         $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid()));
         if (! app(PrivateStoragePermissions::class)->createDirectory($work)) {
+            File::deleteDirectory($work);
             $this->error('Could not create a private restore staging directory.');
             return self::FAILURE;
         }
