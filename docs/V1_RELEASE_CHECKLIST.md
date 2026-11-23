@@ -1,5 +1,15 @@
 ## Director acceptance ledger — 2026-11-23
 
+## Director visual communication correction — 2026-11-23
+
+- [x] Dashboard image visibility corrected in both themes; existing business-upload/fallback image selection retained.
+- [x] Business mix moved below primary navigation without changing permissions or data.
+- [x] Dashboard and Founder Control Centre backup timestamps now use local human-readable dates.
+- [x] Tabler Icons (MIT) selected as the future local icon standard; licence retention and offline delivery are documented.
+- [ ] Exact-head Laravel, Zazu Quality and browser acceptance for these changes.
+- [ ] Complete the local icon subset/component and product-wide visual communication rollout. See [Director visual communication audit](DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md).
+
+
 **Audit:** [Widespread engineering audit and formal scorecard](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md)  
 **Latest code/test head:** `ff73fbec` (offline supplier editing UI and create-before-update regression added; exact-head acceptance pending).
 
