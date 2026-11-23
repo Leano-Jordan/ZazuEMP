@@ -29,6 +29,14 @@ class PrivateStoragePermissionsTest extends TestCase
             $this->assertSame(0700, fileperms($root) & 0777);
             $this->assertSame(0700, fileperms($nested) & 0777);
             $this->assertSame(0600, fileperms($secret) & 0777);
+
+            $outside = $root.'-outside';
+            $link = $root.'/linked-secret';
+            $this->assertNotFalse(file_put_contents($outside, 'outside sensitive data'));
+            $this->assertTrue(symlink($outside, $link));
+            $this->assertFalse($permissions->restrictDirectoryTree($root));
+            unlink($link);
+            unlink($outside);
         } finally {
             File::deleteDirectory($root);
         }
