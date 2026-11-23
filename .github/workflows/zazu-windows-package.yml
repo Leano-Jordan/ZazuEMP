@@ -500,6 +500,9 @@ jobs:
       - name: Install test dependencies
         shell: powershell
         run: |
+          if (-not (Test-Path '.env' -PathType Leaf)) {
+            Copy-Item '.env.example' '.env'
+          }
           composer install --prefer-dist --no-interaction --no-progress
           if ($LASTEXITCODE -ne 0) { throw 'Composer test dependency installation failed.' }
 
