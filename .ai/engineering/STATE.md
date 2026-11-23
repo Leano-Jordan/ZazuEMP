@@ -1778,3 +1778,13 @@ The Helper focus expansion is implemented in config, Helper presentation and `Za
 - Removed the package-specific npm audit exception for GHSA-fc5q-39xc-vjpf / CVE-2026-112366. GitHub's advisory now marks it withdrawn on 2026-11-18 because it was determined not to be a security issue; the npm audit wrapper now enforces the normal high-severity threshold without an exception.
 
 **Not claimed:** local `npm ci`, `composer install`, audits or build were not run in this environment. Exact-head GitHub CI must verify the consolidation. Legal release approval remains separate.
+
+
+## Capability-to-Job context validation — 2026-11-23
+
+Added feature regressions for the next adaptive-business vertical slice:
+- A mixed Decor, Photography & video and Transport Job receives all three matching Job-specific Helper guidance areas from its saved requirement categories.
+- Deactivating an owner-managed Decor capability removes it from business-wide Helper focus and staff catalogue visibility while keeping the owner's hidden record available.
+- Existing Job requirement description/category and Job-specific Decor guidance survive capability deactivation; saved Job scope is not rewritten.
+
+The test uses the actual owner update route and verifies owner/staff catalogue presentation. No new configuration store, permission or offline contract was introduced. Exact-head CI is required before marking the change green.
