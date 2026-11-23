@@ -69,7 +69,7 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(equipmentPanel).toBeVisible();
         await expect(equipmentPanel).toContainText('6m x 12m stretch tent');
 
-        await inspector.getByRole('tab', { name: 'Financial Ledger' }).click();
+        await inspector.getByRole('tab', { name: 'Commercial position' }).click();
         const financePanel = inspector.locator('[data-zazu-tab-panel="finance"]');
         await expect(financePanel).toBeVisible();
         await expect(financePanel).toContainText('11,500.00');
