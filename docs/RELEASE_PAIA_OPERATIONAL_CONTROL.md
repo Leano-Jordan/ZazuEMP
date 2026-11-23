@@ -3,7 +3,7 @@
 **Status:** OPERATIONAL DRAFT — APPLICABILITY AND DETAILS REQUIRE REVIEW  
 **Current responsible-party owner:** Isaac Junior Lehlogonolo Maluleka  
 ****Operating address:** [Operating address — see private records]
-**Records/contact channel:** `[PUBLISHED REQUEST CHANNEL TO BE SUPPLIED]`
+**Provisional records/contact channel:** rosscorelabs@outlook.com (owner-approved for current Zazu support/privacy requests; publication and mailbox monitoring must be tested).
 
 ## Purpose
 
@@ -21,6 +21,14 @@ The responsible party must determine:
 - what exclusions or refusal grounds may apply.
 
 This repository does not make that legal determination.
+
+## Intake and separation from POPIA requests
+
+Use the applicable PAIA process for requests to access records held by the relevant private body. Do not treat a normal Zazu login, an ordinary business export or the POPIA correction/deletion Form 2 as a PAIA access response.
+
+The provisional Zazu contact channel is rosscorelabs@outlook.com. Where a request concerns records held by a Zazu customer about that customer's clients, route it to the customer/responsible party unless the Zazu provider is itself responsible for the requested records or is expressly authorised to assist. Verify identity and authority, protect third-party information, record the decision and use the applicable statutory forms, response periods, fees and review/appeal route after legal confirmation.
+
+The Information Regulator's eServices portal provides PAIA manual upload and related services: https://eservices.inforegulator.org.za/paiamanuals/default.aspx. A PAIA manual and public request channel must not be claimed as published until the responsible party, applicability, content and contact details have been confirmed.
 
 ## Record inventory
 
