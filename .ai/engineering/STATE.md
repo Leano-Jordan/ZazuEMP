@@ -1803,3 +1803,11 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 **Open confidentiality decision:** installation and business archives remain plain ZIP files. Checksums/allowlist validation do not encrypt or authenticate the archive. POSIX staging permissions and Windows NTFS ACLs reduce local exposure but do not protect copied archives. Off-disk storage must be encrypted and access-controlled. Decide whether application-level passphrase encryption is mandatory for V1 before making any confidentiality claim.
 
 **Verification boundary:** source and test changes are committed/read back from `main`; exact-head Laravel, Windows PowerShell, PHPMD, formatting and quality checks are pending. No new CI pass is claimed.
+
+
+## Verification boundary for recovery permission changes — 2026-11-23
+
+- Latest recovery implementation commit: `00085664acff8971e90dfec249ac3f7ac3a7790d`.
+- A local PHP 8.4.24 check of `PrivateStoragePermissions` passed: owner-only 0700/0600 modes were applied and symlink-containing trees were rejected.
+- The local container does not have PHP ZipArchive installed, so ZipArchive creation/restore and the Laravel backup/restore feature suite were not executed locally.
+- GitHub commit-status/workflow-run lookups returned no check records for the latest commit. Exact-head Laravel, PHPMD, formatting, Windows package/ACL and Zazu Quality results remain unconfirmed; do not claim green.
