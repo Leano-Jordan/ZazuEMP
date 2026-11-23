@@ -1855,3 +1855,12 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Local PHP 8.4 syntax and multi-chunk (>2 MiB) round-trip, wrong-passphrase rejection and ciphertext-tamper rejection passed against the refactored Sodium service. The local environment lacks ZipArchive, so full business ZIP/controller tests still require CI.
 - Composer/npm lock review: npm manifest root matches lockfile; Composer lock platform matches PHP ^8.4. Zazu Quality now runs composer validate --strict before installing the locked PHP dependencies. No Composer/npm package was added for encryption.
 - Latest exact-head CI is not visible in repository status results yet; do not mark Laravel, PHPMD, Pint, Composer validation or Windows acceptance green until checks report for the final head.
+
+
+## Business export and recovery UI refinement — 2026-11-23
+
+- Founder confirmed the installed-PC encrypted business archive download completed and independently checked out. Record this as installed-PC export acceptance PASS; do not infer restore acceptance from the download.
+- Reworked `resources/views/exports/index.blade.php` from a long repeated-card catalogue into a task-led recovery workspace: paired create/restore actions, visible restore safety boundary, and five native collapsible CSV dataset groups.
+- Added responsive export-specific styling in `resources/css/app.css`; CSV rows are compact and actions remain keyboard-accessible through native `details/summary`.
+- Updated `BusinessSpreadsheetExportTest` to assert the grouped directory and archive actions. Exact-head CI is pending for commit `163fc6095ff129856dde8e6dbc8c398b6964a024`.
+- Remaining owner-operated gate: restore the downloaded archive only into a separate empty/unpaired test business workspace. Never restore into the populated live workspace.
