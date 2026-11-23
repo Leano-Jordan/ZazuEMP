@@ -1755,3 +1755,13 @@ Added `e2e/quote-single-quantity-confirmation.spec.js` and wired it into the per
 No new preset/configuration table, permissions, authorization paths, navigation gates, historical record mutations or offline contract changes were introduced. Exact-head CI is pending for commits `66a50d2`, `6ee5375` and `af78655`; do not mark this slice green until the checks complete.
 
 **Next:** validate contextual guidance against real Decor, Photography and Transport Job records; then consider progressive disclosure only where the active catalogue and existing permissions support it. Offline and physical PC/phone acceptance remain separate gates.
+
+
+## Owner capability summary in Setup Centre — 2026-11-23
+
+**Implemented on `main`:**
+- Setup Centre now shows active and hidden capability totals plus the active mix by capability type, sourced directly from the current business's `BusinessCapability` records.
+- The summary is read-only and supplements existing owner catalogue create/edit/deactivate controls; it introduces no parallel configuration store.
+- Added `OnboardingTest::test_setup_centre_summarises_active_and_hidden_owner_capabilities` covering active service, active rental and hidden service records.
+
+The Helper focus expansion is implemented in config, Helper presentation and `ZazuHelperContextTest`. Exact-head CI remains pending for the combined commits; do not call the new changes green until GitHub reports completion. Offline parity and physical device acceptance remain separate.
