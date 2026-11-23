@@ -14,18 +14,22 @@ use Illuminate\View\View;
 
 class OnboardingController extends Controller
 {
+    public function __construct(private readonly OnboardingProgressService $progress)
+    {
+    }
+
     public function index(Request $request, ExperienceLevel $levels, NicheFocus $niches): View
     {
-        $business = $this->currentBusiness($request);
+        $business = $this->progress->currentBusiness($request);
         $business->loadMissing('taxProfile');
 
-        $catalogueStatus = $this->setupStatus(
+        $catalogueStatus = $this->progress->setupStatus(
             $business->catalogue_setup_completed_at,
             $business->catalogue_setup_skipped_at,
             $business->capabilities()->exists()
         );
 
-        $businessStatus = $this->setupStatus(
+        $businessStatus = $this->progress->setupStatus(
             $business->business_setup_completed_at,
             $business->business_setup_skipped_at,
             filled($business->email) || filled($business->phone) || filled($business->address)
@@ -69,7 +73,7 @@ class OnboardingController extends Controller
 
     public function catalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): View|RedirectResponse
     {
-        $business = $this->currentBusiness($request);
+        $business = $this->progress->currentBusiness($request);
 
         if (!$levels->selected($request->user(), $business) || !$niches->selected($request->user(), $business)) {
             return redirect()->route('onboarding.experience');
@@ -111,8 +115,8 @@ class OnboardingController extends Controller
 
     public function storeCatalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
-        $business = $this->currentBusiness($request);
-        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
+        $business = $this->progress->currentBusiness($request);
+        if ($redirect = $this->progress->focusPrerequisiteRedirect($request, $business)) {
             return $redirect;
         }
 
@@ -163,8 +167,8 @@ class OnboardingController extends Controller
 
     public function finishCatalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
-        $business = $this->currentBusiness($request);
-        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
+        $business = $this->progress->currentBusiness($request);
+        if ($redirect = $this->progress->focusPrerequisiteRedirect($request, $business)) {
             return $redirect;
         }
         $business->update([
@@ -181,8 +185,8 @@ class OnboardingController extends Controller
 
     public function skipCatalogue(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
-        $business = $this->currentBusiness($request);
-        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
+        $business = $this->progress->currentBusiness($request);
+        if ($redirect = $this->progress->focusPrerequisiteRedirect($request, $business)) {
             return $redirect;
         }
         $business->update([
@@ -197,7 +201,7 @@ class OnboardingController extends Controller
 
     public function experience(Request $request, ExperienceLevel $levels, NicheFocus $niches): View|RedirectResponse
     {
-        $business = $this->currentBusiness($request);
+        $business = $this->progress->currentBusiness($request);
         $storedExperienceLevel = $levels->selected($request->user(), $business);
         $experienceLevel = $storedExperienceLevel ? $levels->for($request->user(), $business) : null;
         $primaryNiche = $niches->selected($request->user(), $business);
@@ -230,7 +234,7 @@ class OnboardingController extends Controller
 
     public function storeExperience(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
-        $business = $this->currentBusiness($request);
+        $business = $this->progress->currentBusiness($request);
         $validated = $request->validate([
             'experience_level' => ['required', 'in:basic,intermediate,advanced'],
             'primary_niche' => ['nullable', 'string', 'in:'.implode(',', array_keys(config('zazu.niches', [])))],
@@ -280,7 +284,7 @@ class OnboardingController extends Controller
 
     public function business(Request $request, ExperienceLevel $levels): View|RedirectResponse
     {
-        $business = $this->currentBusiness($request);
+        $business = $this->progress->currentBusiness($request);
 
         if (!$levels->selected($request->user(), $business)) {
             return redirect()->route('onboarding.experience');
@@ -302,8 +306,8 @@ class OnboardingController extends Controller
 
     public function storeBusiness(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
-        $business = $this->currentBusiness($request);
-        if ($redirect = $this->businessDetailsPrerequisiteRedirect($request, $business, $levels, $niches)) {
+        $business = $this->progress->currentBusiness($request);
+        if ($redirect = $this->progress->businessDetailsPrerequisiteRedirect($request, $business)) {
             return $redirect;
         }
 
@@ -335,8 +339,8 @@ class OnboardingController extends Controller
 
     public function skipBusiness(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
-        $business = $this->currentBusiness($request);
-        if ($redirect = $this->businessDetailsPrerequisiteRedirect($request, $business, $levels, $niches)) {
+        $business = $this->progress->currentBusiness($request);
+        if ($redirect = $this->progress->businessDetailsPrerequisiteRedirect($request, $business)) {
             return $redirect;
         }
         $business->update([
@@ -349,51 +353,4 @@ class OnboardingController extends Controller
             ->with('info', 'Business details were deferred. You can resume setup from Setup Centre or Settings.');
     }
 
-    private function focusPrerequisiteRedirect(
-        Request $request,
-        Business $business,
-        ExperienceLevel $levels,
-        NicheFocus $niches,
-    ): ?RedirectResponse {
-        if (! $levels->selected($request->user(), $business) || ! $niches->selected($request->user(), $business)) {
-            return redirect()->route('onboarding.experience');
-        }
-
-        return null;
-    }
-
-    private function businessDetailsPrerequisiteRedirect(
-        Request $request,
-        Business $business,
-        ExperienceLevel $levels,
-        NicheFocus $niches,
-    ): ?RedirectResponse {
-        if ($redirect = $this->focusPrerequisiteRedirect($request, $business, $levels, $niches)) {
-            return $redirect;
-        }
-
-        if (! $business->catalogue_setup_completed_at && ! $business->catalogue_setup_skipped_at) {
-            return redirect()->route('onboarding.catalogue');
-        }
-
-        return null;
-    }
-
-    private function setupStatus($completedAt, $skippedAt, bool $hasData): string
-    {
-        if ($completedAt) {
-            return 'completed';
-        }
-
-        if ($skippedAt) {
-            return 'deferred';
-        }
-
-        return $hasData ? 'in_progress' : 'not_started';
-    }
-
-    private function currentBusiness(Request $request): Business
-    {
-        return app(CurrentBusiness::class)->model($request->user());
-    }
 }
