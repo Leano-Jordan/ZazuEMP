@@ -194,7 +194,7 @@ class ZazuHelperContextTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('data-zazu-helper-focuses="sound_dj,chairs_tents,catering_baking,decor"', false);
+            ->assertSee('data-zazu-helper-focuses="chairs_tents,catering_baking,sound_dj,decor"', false);
     }
 
     public function test_helper_derives_decor_and_photography_guidance_from_active_capabilities_only(): void
