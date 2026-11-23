@@ -478,47 +478,37 @@ class ZazuBackupCommand extends Command
     private function createArchive(string $work, string $temporaryArchive): bool
     {
         $previousUmask = umask(0077);
+
         try {
-            $handle = @fopen($temporaryArchive, 'x+b');
+            $zip = new ZipArchive();
+
+            if ($zip->open($temporaryArchive, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                $this->error('Could not create a private temporary backup archive.');
+                return false;
+            }
+
+            foreach (File::allFiles($work) as $file) {
+                $entryName = str_replace('\\', '/', $file->getRelativePathname());
+
+                if (!$zip->addFile($file->getPathname(), $entryName)) {
+                    $zip->close();
+                    $this->error('Could not add a file to the backup archive.');
+                    return false;
+                }
+            }
+
+            if (!$zip->close() || !is_file($temporaryArchive) || filesize($temporaryArchive) === 0) {
+                $this->error('Could not finalize the backup archive.');
+                return false;
+            }
         } finally {
             umask($previousUmask);
         }
 
-        if ($handle === false) {
-            $this->error('Could not create a private temporary backup archive.');
-            return false;
-        }
-        fclose($handle);
-
         if (! app(PrivateStoragePermissions::class)->restrictFile($temporaryArchive)) {
-            File::delete($temporaryArchive);
             $this->error('Could not restrict backup archive permissions; no archive was published.');
             return false;
         }
 
-        $zip = new ZipArchive();
-        if ($zip->open($temporaryArchive, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            File::delete($temporaryArchive);
-            $this->error('Could not open the private temporary backup archive.');
-            return false;
-        }
-
-        foreach (File::allFiles($work) as $file) {
-            $entryName = str_replace('\\', '/', $file->getRelativePathname());
-
-            if (!$zip->addFile($file->getPathname(), $entryName)) {
-                $zip->close();
-                $this->error('Could not add a file to the backup archive.');
-                return false;
-            }
-        }
-
-        if (!$zip->close() || !is_file($temporaryArchive) || filesize($temporaryArchive) === 0
-            || ! app(PrivateStoragePermissions::class)->restrictFile($temporaryArchive)) {
-            $this->error('Could not finalize a private backup archive.');
-            return false;
-        }
-
         return true;
-    }
-}
+    }}
