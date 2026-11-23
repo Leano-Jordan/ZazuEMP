@@ -216,7 +216,9 @@ class OnboardingController extends Controller
             ])->withInput();
         }
 
-        $focuses = $validated['business_focuses'] ?? $niches->selectedMany($request->user(), $business);
+        $focuses = $request->boolean('business_focuses_present')
+            ? ($validated['business_focuses'] ?? [])
+            : ($validated['business_focuses'] ?? $niches->selectedMany($request->user(), $business));
         $primaryNiche = $validated['primary_niche']
             ?? $niches->selected($request->user(), $business)
             ?? ($focuses[0] ?? NicheFocus::DEFAULT);
