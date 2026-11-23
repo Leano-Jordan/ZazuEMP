@@ -8,6 +8,7 @@ use App\Services\BusinessArchiveEncryptionService;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -131,6 +132,67 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
                 'name' => 'Encrypted Archive Customer',
             ]);
         } finally {
+            @unlink($plain);
+            @unlink($encrypted);
+        }
+    }
+
+    public function test_restore_audit_failure_rolls_back_imported_records_and_private_files(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+
+        $source = Business::create([
+            'name' => 'Audit Failure Archive Source',
+            'slug' => 'audit-failure-archive-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourcePath = 'profile-photos/customers/audit-failure-source.jpg';
+        Storage::disk('private')->put($sourcePath, 'private source image');
+        Customer::create([
+            'business_id' => $source->id,
+            'name' => 'Must Roll Back',
+            'profile_photo_path' => $sourcePath,
+        ]);
+
+        $target = Business::create([
+            'name' => 'Audit Failure Restore Target',
+            'slug' => 'audit-failure-restore-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($target);
+
+        $plain = app(BusinessArchiveService::class)->download($source);
+        $encrypted = app(BusinessArchiveEncryptionService::class)->encryptFile(
+            $plain,
+            'correct horse battery staple'
+        );
+        $trigger = 'fail_business_archive_restore_audit';
+
+        DB::unprepared("CREATE TRIGGER {$trigger} BEFORE INSERT ON audit_logs
+            WHEN NEW.action = 'business.archive_restored'
+            BEGIN SELECT RAISE(ABORT, 'simulated audit write failure'); END;");
+
+        try {
+            $response = $this->post(route('exports.archive.restore'), [
+                'archive' => UploadedFile::fake()->createWithContent(
+                    'business.zazu',
+                    (string) file_get_contents($encrypted)
+                ),
+                'archive_password' => 'correct horse battery staple',
+            ]);
+
+            $response->assertRedirect();
+            $response->assertSessionHasErrors('archive');
+            $this->assertDatabaseMissing('customers', [
+                'business_id' => $target->id,
+                'name' => 'Must Roll Back',
+            ]);
+            $this->assertSame([$sourcePath], Storage::disk('private')->allFiles());
+        } finally {
+            DB::unprepared("DROP TRIGGER IF EXISTS {$trigger}");
             @unlink($plain);
             @unlink($encrypted);
         }
