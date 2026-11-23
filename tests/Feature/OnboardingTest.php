@@ -14,10 +14,6 @@ class OnboardingTest extends TestCase
 {
     use RefreshDatabase;
 
-
-
-
-
     public function test_business_details_wait_until_business_focus_and_offerings_are_handled(): void
     {
         $business = Business::create([
@@ -223,7 +219,6 @@ class OnboardingTest extends TestCase
         $this->assertDatabaseCount('business_capabilities', 0);
     }
 
-
     public function test_business_post_cannot_bypass_business_focus_or_offerings_setup(): void
     {
         $business = Business::create([
@@ -276,8 +271,5 @@ class OnboardingTest extends TestCase
             ->assertSee('Quick actions')
             ->assertSee('Open finance');
     }
-
-
-
 
 }
