@@ -130,7 +130,13 @@ class NicheFocus
             ->pluck('category')
             ->all();
 
-        $focuses = $primaryNiche !== self::MIXED ? [$primaryNiche] : [];
+        $focuses = array_values(array_filter(
+            $this->selectedMany(auth()->user(), $business),
+            static fn (string $focus) => $focus !== self::MIXED
+        ));
+        if ($primaryNiche !== self::MIXED && !in_array($primaryNiche, $focuses, true)) {
+            array_unshift($focuses, $primaryNiche);
+        }
         foreach ($this->matchingCategories($categories) as $matched) {
             if (!in_array($matched, $focuses, true)) {
                 $focuses[] = $matched;
