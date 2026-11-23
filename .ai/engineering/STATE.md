@@ -1924,3 +1924,24 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 
 
 **Follow-up hardening:** format detection now also fails closed if the file opens but its magic header cannot be read. The regression test formatting was normalized. Latest restore/onboarding follow-up commits: header read `fb2f072`; archive test `9f13147`. These remain pending exact-head CI.
+
+
+## Follow-up execution after founder-confirmed green checks — 2026-11-23
+
+Founder confirmed the previously pending checks passed after commit `60dbcc3`. That confirmation closes the earlier exact-head verification hold for that commit; it does not automatically verify subsequent commits listed below.
+
+**Archive diagnostics expanded:**
+- Restore request validation now receives a correlation reference and a structured warning log before returning validation errors.
+- Diagnostic fields include content length, PHP upload error code, upload size, configured PHP upload/post limits and validation field names. No passphrase, archive content or exception message is logged.
+- Added a feature regression asserting the reference is returned and the passphrase is not flashed back to the session.
+- The existing global `ZazuIncidentRecorder` remains the fallback for framework-level exceptions occurring before the controller, including middleware-level request rejection.
+
+**Onboarding sequence hardening:**
+- Catalogue add/finish/defer POST actions now require saved experience tier and business focus.
+- Business-profile save/defer POST actions now require business focus plus catalogue completion or explicit deferral.
+- Added direct-POST regression coverage so crafted requests cannot bypass the intended first-run sequence.
+- Existing owner middleware and business scoping remain the authorization boundary.
+
+**New commits after the founder-confirmed green head:** archive validation diagnostics `3f365a2`; archive validation regression `6128bb2`; server-side onboarding prerequisites `f41d3f0`; onboarding test helper placement `6d798cf`; import correction `b8fe1be`; resume assertion correction `ae74189`.
+
+**Current verification disposition:** latest changes are committed directly to `main`; they require a fresh exact-head CI run. Do not treat the founder-confirmed green result for `60dbcc3` as verification of these later commits. Do not retry the physical archive restore until the latest build is installed and checks pass.
