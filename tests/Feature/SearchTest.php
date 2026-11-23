@@ -296,5 +296,4 @@ class SearchTest extends TestCase
             ->assertSee('0 records')
             ->assertViewHas('results', static fn (array $results): bool => $results === []);
     }
-
 }
