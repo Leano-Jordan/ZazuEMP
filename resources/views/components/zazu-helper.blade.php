@@ -146,11 +146,36 @@
         && (int) $event->business_id === (int) $business->id) {
         $permissions = app(\App\Support\PermissionService::class);
         $recordDefinitions = [
-            'preparationItems' => ['label' => 'preparation item', 'permission' => 'work.view'],
-            'purchaseOrders' => ['label' => 'purchase order', 'permission' => 'purchasing.view'],
-            'assetAllocations' => ['label' => 'asset allocation', 'permission' => 'assets.view'],
-            'costs' => ['label' => 'recorded cost', 'permission' => 'work.view'],
-            'travelCosts' => ['label' => 'travel cost', 'permission' => 'work.view'],
+            'preparationItems' => [
+                'label' => 'preparation item',
+                'permission' => 'work.view',
+                'href' => route('work.preparation.index', $event),
+                'action' => 'Review preparation',
+            ],
+            'purchaseOrders' => [
+                'label' => 'purchase order',
+                'permission' => 'purchasing.view',
+                'href' => route('purchasing.index', ['event_id' => $event->id]),
+                'action' => 'Review purchasing',
+            ],
+            'assetAllocations' => [
+                'label' => 'asset allocation',
+                'permission' => 'assets.view',
+                'href' => route('assets.index'),
+                'action' => 'Review assets',
+            ],
+            'costs' => [
+                'label' => 'recorded cost',
+                'permission' => 'work.view',
+                'href' => route('work.costs.index', $event),
+                'action' => 'Review costs',
+            ],
+            'travelCosts' => [
+                'label' => 'travel cost',
+                'permission' => 'work.view',
+                'href' => route('work.costs.index', $event),
+                'action' => 'Review travel costs',
+            ],
         ];
         $eventCountRelations = [];
 
@@ -177,7 +202,11 @@
 
             if ($count > 0) {
                 $label = $definition['label'];
-                $eventOperationalRecords->push($count.' '.$label.($count === 1 ? '' : 's'));
+                $eventOperationalRecords->push([
+                    'label' => $count.' '.$label.($count === 1 ? '' : 's'),
+                    'href' => $definition['href'],
+                    'action' => $definition['action'],
+                ]);
             }
         }
     }
@@ -240,7 +269,11 @@
                     <div class="zazu-helper-step-label">Work linked to this booking</div>
                     <ul class="list-disc pl-5" data-zazu-helper-event-record-list>
                         @foreach ($eventOperationalRecords as $record)
-                            <li>{{ $record }}</li>
+                            <li>
+                                <span>{{ $record['label'] }}</span>
+                                <span aria-hidden="true"> · </span>
+                                <a href="{{ $record['href'] }}" class="zazu-helper-link" data-zazu-helper-event-record-link>{{ $record['action'] }}</a>
+                            </li>
                         @endforeach
                     </ul>
                 </div>
