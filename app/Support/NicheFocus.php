@@ -148,7 +148,7 @@ class NicheFocus
             }
         }
 
-        return array_slice($focuses ?: [self::MIXED], 0, 3);
+        return $focuses ?: [self::MIXED];
     }
 
     /**
