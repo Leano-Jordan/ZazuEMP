@@ -44,6 +44,7 @@ class ZazuBackupCommand extends Command
         $temporaryArchive = $archive.'.tmp';
 
         if (! app(PrivateStoragePermissions::class)->createDirectory($work)) {
+            File::deleteDirectory($work);
             $this->error('Could not create a private backup staging directory.');
             return self::FAILURE;
         }
