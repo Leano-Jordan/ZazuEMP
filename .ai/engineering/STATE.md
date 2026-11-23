@@ -1,3 +1,20 @@
+## Director widespread audit and consolidation — 2026-11-23
+
+**Current main source head:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`.  
+**Audit report:** `docs/DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md`.
+
+- Repository inventory: 849 tracked files; 198 application PHP files, 46 controllers, 41 services, 79 migrations, 146 PHP tests, 10 E2E specs and 84 Blade views.
+- Owner evidence already recorded: connected PC normal use PASS; linked phone normal use PASS; shared workspace PASS; populated fictional customer/quote/invoice/supplier/PO/inventory modules reported functional; DB startup/migration check PASS; installation and business backups independently verified.
+- Encrypted business archive restore was attempted on a disposable empty workspace and FAILED; preserve the archive/passphrase/target and do not use the live business.
+- Fixed archive restore audit atomicity: audit now runs inside the restore transaction; an audit write failure rolls back imported rows and cleans newly written private files. Regression uses a deliberate SQLite audit-write failure.
+- Fixed Windows PHP host upload/runtime configuration: 100M upload, 110M POST and 300-second execution/input limits, with Windows Ops contract coverage. This is a runtime-contract fix, not proof of the original installed restore failure's root cause.
+- Refactored PHPMD complexity hotspots: extracted `OnboardingProgressService`, separated business-profile onboarding actions into `OnboardingBusinessController`, extracted `BusinessArchiveEncryptionStream`, and removed obsolete stream helpers. PHPMD passed on `2d7b1146`; final route wiring is `620ab99b`.
+- Windows Ops on `9b95591` and Windows package/archive acceptance on `6d8bd53` passed. Director Health passed on `620ab99b`. Laravel and Zazu Quality for `620ab99b` were queued at this checkpoint; do not infer their result.
+- Formal score: 71/100 (46/65 across 13 domains), reaffirmed; no uplift from code changes/queued CI. V1 remains NOT READY.
+- Do not repeat connected PC/mobile checks, create new populated records, or repeat already-verified backups. The disconnected Android acceptance, successful installed business restore, full installation recovery, transaction-level populated quote-to-profit reconciliation, POPIA operations and ZAZU clearance remain distinct.
+
+---
+
 ## Business-first multi-focus onboarding — implementation in progress — 2026-11-23
 
 **Implemented directly on `main`:**
