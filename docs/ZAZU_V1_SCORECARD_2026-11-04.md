@@ -2,7 +2,7 @@
 
 **Formal 13-domain evidence-maturity score: 71/100 (46/65 = 3.54/5).** Reaffirmed, not increased. The 77/100 figure in `ZAZU_2027_HARDENING_SCORECARD.md` was not independently recalculated under the canonical 13-domain method and is superseded for formal V1 reporting.
 
-New code fixes (restore/audit atomicity, explicit Windows PHP upload limits and maintainability refactors) do not justify an uplift until exact-head automated verification passes. Recovery remains 4/5 for its automated archive/installation evidence, but the Founder's installed encrypted-archive restore attempt failed and V1 acceptance remains blocked pending a successful controlled restore. Offline continuity remains 3/5 pending actual disconnected Android cold-start/restart/reconnect evidence. See [the 2026-11-23 Director audit](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md).
+The restore/audit atomicity fix, explicit Windows PHP upload limits and maintainability refactors now pass exact-head Laravel/Quality/PHPMD/Psalm/Windows verification. No numerical uplift is awarded: Recovery already sits at 4/5 for automated archive/installation evidence, while the Founder's installed encrypted-archive restore attempt failed and operational acceptance still requires a successful controlled restore. Offline continuity remains 3/5 pending actual disconnected Android cold-start/restart/reconnect evidence. See [the 2026-11-23 Director audit](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md).
 
 **V1 remains NOT READY.**
 
