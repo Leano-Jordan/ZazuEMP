@@ -1,3 +1,14 @@
+## Director recovery integrity review — 2026-11-23
+
+- Identified that installation backup/restore staging had been created directly under `storage/app`, where default POSIX modes and inherited Windows permissions could expose temporary database dumps and private files.
+- Moved backup, restore, private-storage rollback and SQLite staging artifacts under `storage/app/zazu-backups/`. The Windows installer already applies a restricted ACL to this directory; POSIX staging is explicitly restricted to 0700 directories and 0600 files.
+- Added permission regression coverage and an owner-facing warning that business `.zazu` archives are not password-encrypted.
+- Restore still validates archive structure/checksums before mutation and retains database/private-media rollback paths. Existing verified backup files were not touched.
+- **Open risk:** installation and business archives remain plain ZIP files. Application-level encryption is not implemented; off-disk copies must be stored in encrypted, access-controlled locations.
+- **Verification:** latest source/test changes are committed and read back from main. Exact-head CI is not yet confirmed. No pass is claimed.
+
+---
+
 ## Director execution checkpoint — 2026-11-23 — dependency and capability consolidation
 
 **Repository:** `Leano-Jordan/ZazuEMP` · canonical branch: `main`  
