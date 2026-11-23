@@ -82,7 +82,7 @@ final class BusinessArchiveEncryptionService
 
     public function decryptFile(string $sourcePath, #[\SensitiveParameter] string $passphrase): string
     {
-        $this->assertAvailable();
+        $this->stream->assertAvailable();
         $this->assertPassphrase($passphrase);
 
         $source = @fopen($sourcePath, 'rb');
@@ -148,36 +148,4 @@ final class BusinessArchiveEncryptionService
         return $path;
     }
 
-    /** @param resource $stream */
-    private function readExact($stream, int $length): string
-    {
-        $contents = '';
-        while (strlen($contents) < $length && ! feof($stream)) {
-            $chunk = fread($stream, $length - strlen($contents));
-            if ($chunk === false || $chunk === '') {
-                break;
-            }
-            $contents .= $chunk;
-        }
-
-        if (strlen($contents) !== $length) {
-            throw new RuntimeException('The encrypted business archive is truncated.');
-        }
-
-        return $contents;
-    }
-
-    /** @param resource $stream */
-    private function writeAll($stream, string $contents): void
-    {
-        $offset = 0;
-        $length = strlen($contents);
-        while ($offset < $length) {
-            $written = fwrite($stream, substr($contents, $offset));
-            if ($written === false || $written === 0) {
-                throw new RuntimeException('The encrypted business archive could not be written.');
-            }
-            $offset += $written;
-        }
-    }
 }
