@@ -89,36 +89,58 @@ class BusinessExportController extends Controller
                 'archive_password' => ['nullable', 'string', 'min:12', 'max:128'],
             ]);
         } catch (ValidationException $exception) {
-            $incidentId = (string) Str::uuid();
-            $uploadedFile = $request->file('archive');
-
-            Log::warning('Business archive restore request rejected before processing.', [
-                'incident_id' => $incidentId,
-                'stage' => 'request_validation',
-                'business_id' => (int) $business->id,
-                'user_id' => (int) $request->user()->getAuthIdentifier(),
-                'content_length' => (int) $request->server('CONTENT_LENGTH', 0),
-                'upload_error' => $uploadedFile?->getError(),
-                'upload_bytes' => $uploadedFile?->getSize(),
-                'upload_max_filesize' => (string) ini_get('upload_max_filesize'),
-                'post_max_size' => (string) ini_get('post_max_size'),
-                'error_fields' => array_keys($exception->errors()),
-            ]);
-
-            $errors = $exception->errors();
-            $archiveErrors = $errors['archive'] ?? [];
-            $reference = 'Restore request reference: '.$incidentId;
-
-            if ($archiveErrors === []) {
-                $archiveErrors[] = $reference;
-            } else {
-                $archiveErrors[0] = rtrim($archiveErrors[0]).' '.$reference;
-            }
-
-            $errors['archive'] = $archiveErrors;
-
-            return back()->withErrors($errors);
+            return $this->rejectRestoreRequest($request, $business, $exception);
         }
+
+        return $this->restoreValidatedArchive($request, $business, $validated, $archives, $encryption);
+    }
+
+    private function rejectRestoreRequest(
+        Request $request,
+        Business $business,
+        ValidationException $exception,
+    ): RedirectResponse {
+        $incidentId = (string) Str::uuid();
+        $uploadedFile = $request->file('archive');
+
+        Log::warning('Business archive restore request rejected before processing.', [
+            'incident_id' => $incidentId,
+            'stage' => 'request_validation',
+            'business_id' => (int) $business->id,
+            'user_id' => (int) $request->user()->getAuthIdentifier(),
+            'content_length' => (int) $request->server('CONTENT_LENGTH', 0),
+            'upload_error' => $uploadedFile?->getError(),
+            'upload_bytes' => $uploadedFile?->getSize(),
+            'upload_max_filesize' => (string) ini_get('upload_max_filesize'),
+            'post_max_size' => (string) ini_get('post_max_size'),
+            'error_fields' => array_keys($exception->errors()),
+        ]);
+
+        $errors = $exception->errors();
+        $archiveErrors = $errors['archive'] ?? [];
+        $reference = 'Restore request reference: '.$incidentId;
+
+        if ($archiveErrors === []) {
+            $archiveErrors[] = $reference;
+        } else {
+            $archiveErrors[0] = rtrim($archiveErrors[0]).' '.$reference;
+        }
+
+        $errors['archive'] = $archiveErrors;
+
+        return back()->withErrors($errors);
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    private function restoreValidatedArchive(
+        Request $request,
+        Business $business,
+        array $validated,
+        BusinessArchiveService $archives,
+        BusinessArchiveEncryptionService $encryption,
+    ): RedirectResponse {
         $uploadedPath = $validated['archive']->getRealPath();
         $restorePath = is_string($uploadedPath) ? $uploadedPath : '';
         $decryptedPath = null;
@@ -143,29 +165,21 @@ class BusinessExportController extends Controller
             $restoreStage = 'archive_validation_and_restore';
             $result = $archives->restore($restorePath, $business);
         } catch (RuntimeException $exception) {
-            $incidentId = (string) Str::uuid();
-            Log::warning('Business archive restore failed.', [
-                'incident_id' => $incidentId,
-                'stage' => $restoreStage,
-                'business_id' => (int) $business->id,
-                'user_id' => (int) $request->user()->getAuthIdentifier(),
-                'upload_bytes' => $validated['archive']->getSize(),
-                'exception_class' => $exception::class,
-            ]);
-
-            return back()->withErrors(['archive' => $exception->getMessage().' Reference: '.$incidentId]);
-        } catch (\JsonException $exception) {
-            $incidentId = (string) Str::uuid();
-            Log::warning('Business archive restore failed while decoding archive data.', [
-                'incident_id' => $incidentId,
-                'stage' => $restoreStage,
-                'business_id' => (int) $business->id,
-                'user_id' => (int) $request->user()->getAuthIdentifier(),
-                'upload_bytes' => $validated['archive']->getSize(),
-                'exception_class' => $exception::class,
-            ]);
-
-            return back()->withErrors(['archive' => 'The uploaded archive is damaged or contains invalid data. Reference: '.$incidentId]);
+            return $this->restoreRuntimeFailure(
+                $request,
+                $business,
+                $validated['archive']->getSize(),
+                $restoreStage,
+                $exception,
+            );
+        } catch (\\JsonException $exception) {
+            return $this->restoreJsonFailure(
+                $request,
+                $business,
+                $validated['archive']->getSize(),
+                $restoreStage,
+                $exception,
+            );
         } finally {
             if (is_string($decryptedPath)) {
                 @unlink($decryptedPath);
@@ -183,6 +197,48 @@ class BusinessExportController extends Controller
             'success',
             sprintf('Business archive restored: %d records and %d files.', $result['records'], $result['files'])
         );
+    }
+
+    private function restoreRuntimeFailure(
+        Request $request,
+        Business $business,
+        int $uploadBytes,
+        string $restoreStage,
+        RuntimeException $exception,
+    ): RedirectResponse {
+        $incidentId = (string) Str::uuid();
+        Log::warning('Business archive restore failed.', [
+            'incident_id' => $incidentId,
+            'stage' => $restoreStage,
+            'business_id' => (int) $business->id,
+            'user_id' => (int) $request->user()->getAuthIdentifier(),
+            'upload_bytes' => $uploadBytes,
+            'exception_class' => $exception::class,
+        ]);
+
+        return back()->withErrors(['archive' => $exception->getMessage().' Reference: '.$incidentId]);
+    }
+
+    private function restoreJsonFailure(
+        Request $request,
+        Business $business,
+        int $uploadBytes,
+        string $restoreStage,
+        \\JsonException $exception,
+    ): RedirectResponse {
+        $incidentId = (string) Str::uuid();
+        Log::warning('Business archive restore failed while decoding archive data.', [
+            'incident_id' => $incidentId,
+            'stage' => $restoreStage,
+            'business_id' => (int) $business->id,
+            'user_id' => (int) $request->user()->getAuthIdentifier(),
+            'upload_bytes' => $uploadBytes,
+            'exception_class' => $exception::class,
+        ]);
+
+        return back()->withErrors([
+            'archive' => 'The uploaded archive is damaged or contains invalid data. Reference: '.$incidentId,
+        ]);
     }
 
     public function download(
