@@ -487,7 +487,8 @@ class OnboardingTest extends TestCase
         $profile = app(\\App\\Support\\Offline\\SyncBootstrapPayloadBuilder::class)
             ->build($device)['workspace_profile'];
 
-        $this->assertSame(['Catering & baking'], $profile['focus_labels']);
+        $this->assertContains('Catering & baking', $profile['focus_labels']);
+        $this->assertContains('Sound & DJ', $profile['focus_labels']);
         $this->assertSame(['Catering', 'Equipment rental', 'Sound & entertainment'], $profile['catalogue_categories']);
         $this->assertSame(3, $profile['active_offerings']);
         $this->assertSame(1, $profile['active_rentals']);
