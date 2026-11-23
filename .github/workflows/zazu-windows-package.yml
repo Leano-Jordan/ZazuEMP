@@ -487,7 +487,7 @@ jobs:
             if ([string]::IsNullOrWhiteSpace($setCookie)) {
               throw 'The local login page did not issue a session cookie.'
             }
-            if ($setCookie -match '(?i)(^|;)\\s*Secure(\\s*;|$)') {
+            if ($setCookie -match '(?i)(^|;)\s*Secure(\s*;|$)') {
               throw 'The loopback HTTP session cookie is marked Secure and may not persist on the default local HTTP origin.'
             }
           } finally {
