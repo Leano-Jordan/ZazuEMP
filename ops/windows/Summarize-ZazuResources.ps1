@@ -76,6 +76,14 @@ $lines.Add(('- Device cohort: {0}' -f $manifest.deviceTier))
 $lines.Add(('- CPU: {0}' -f $manifest.cpuModel))
 $lines.Add(('- Logical processors: {0}; physical cores: {1}' -f $manifest.logicalProcessors, $manifest.physicalCores))
 $lines.Add(('- Installed RAM: {0} GB' -f $manifest.installedMemoryGB))
+$storageSummary = @($manifest.diskDevices | ForEach-Object {
+    '{0} ({1} GB; {2})' -f $_.Model, $_.SizeGB, $_.InterfaceType
+}) -join '; '
+$lines.Add(('- Storage devices: {0}' -f $(if ($storageSummary) { $storageSummary } else { 'not detected' })))
+$startDataMB = if ($null -ne $manifest.projectDataBytesAtStart) { [math]::Round(([double]$manifest.projectDataBytesAtStart / 1MB), 2) } else { $null }
+$endDataMB = if ($null -ne $manifest.projectDataBytesAtEnd) { [math]::Round(([double]$manifest.projectDataBytesAtEnd / 1MB), 2) } else { $null }
+$dataDeltaMB = if ($null -ne $startDataMB -and $null -ne $endDataMB) { [math]::Round(($endDataMB - $startDataMB), 2) } else { $null }
+$lines.Add(('- Zazu data footprint: {0} MB at start; {1} MB at end; {2} MB change' -f $startDataMB, $endDataMB, $dataDeltaMB))
 $lines.Add(('- OS: {0} ({1})' -f $manifest.osCaption, $manifest.osVersion))
 $lines.Add(('- Source commit: {0}' -f $(if ($manifest.buildCommitSha) { $manifest.buildCommitSha } else { 'not supplied' })))
 $lines.Add(('- Package SHA-256: {0}' -f $(if ($manifest.packageSha256) { $manifest.packageSha256 } else { 'not supplied' })))
