@@ -2,7 +2,7 @@
 
 **Status:** CONTRACT TEMPLATE — USE ONLY WHERE APPLICABLE  
 **Current owner:** Isaac Junior Lehlogonolo Maluleka  
-****Operating address:** [Operating address — see private records]
+**Operating address:** [Operating address — see private records]
 
 ## Purpose
 
