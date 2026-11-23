@@ -187,6 +187,12 @@ final class BusinessArchiveEncryptionService
                 }
 
                 [$plaintext, $tag] = $opened;
+                if (! in_array($tag, [
+                    SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE,
+                    SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL,
+                ], true)) {
+                    throw new RuntimeException('The encrypted business archive contains an unsupported stream tag.');
+                }
                 $this->writeAll($target, $plaintext);
                 $finalSeen = $tag === SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
             }
