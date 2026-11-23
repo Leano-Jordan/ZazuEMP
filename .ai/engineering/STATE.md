@@ -1659,3 +1659,14 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Verification boundary:** implementation and test files were read back from `main`. Exact-head Laravel, PHPMD, Zazu Quality, Psalm, Director Health, browser/offline, PostgreSQL and Windows workflows have not yet been confirmed for this implementation head. No test pass or physical offline acceptance is claimed. The latest GitHub combined-status response contained no status entries.
 
 **Next execution:** inspect/run exact-head CI and repair only failures introduced or exposed by this slice. Add explicit offline regression coverage for capability linkage, business isolation, legacy queued payloads and custom one-off services. Do not expand into a new preset store or navigation rewrite.
+
+
+## Helper linked-operation actions — 2026-11-23
+
+**Implemented directly on main:** the Job-detail Helper's linked operational-record summary now includes direct destinations for existing preparation, purchasing, asset, cost and travel-cost workspaces. Links are emitted only alongside a record count loaded after the existing permission check and constrained to the current business-owned Event. Purchasing remains filtered to the current event. No empty relation is interpreted as missing work; no new task state or workflow authority was introduced.
+
+**Regression coverage added:** current-event preparation and purchasing destinations are asserted, and the staff permission test verifies that preparation remains actionable while purchasing content/actions stay hidden without purchasing.view.
+
+**Verification boundary:** implementation and test commits are on main; exact-head Laravel/PHPMD/Quality/Psalm/Director Health/browser and physical acceptance have not yet been verified. Do not mark this slice green until exact-head checks complete.
+
+**Next:** continue with one component-specific operational cue only where existing requirements and linked records establish a concrete next action; reuse the Job's authoritative next-action source and never infer missing tasks from empty relations.
