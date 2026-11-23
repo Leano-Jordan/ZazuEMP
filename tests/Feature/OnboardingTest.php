@@ -59,9 +59,17 @@ class OnboardingTest extends TestCase
             'business_focuses' => '["sound_dj","catering_baking","photography"]',
         ]);
 
+        $niches = app(\App\Support\NicheFocus::class);
         $this->assertSame(
             ['sound_dj', 'catering_baking', 'photography'],
-            app(\App\Support\NicheFocus::class)->selectedMany($user, $business)
+            $niches->selectedMany($user, $business)
+        );
+
+        $staff = User::factory()->create();
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+        $this->assertSame(
+            ['sound_dj', 'catering_baking', 'photography'],
+            $niches->selectedMany($staff, $business)
         );
     }
 
