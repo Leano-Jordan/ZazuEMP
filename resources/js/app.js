@@ -3296,6 +3296,7 @@ function setupZazuOfflineForms() {
                     unit: get('unit') || 'unit',
                     reorder_level: get('reorder_level') || '0',
                     capability_local_id: capability?.local_id || null,
+                    capability_id: capability?.server_id ?? capability?.id ?? null,
                     pending_sync: true,
                 };
                 payload.__operation = existing?.local_id ? 'update' : 'create';
