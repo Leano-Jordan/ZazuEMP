@@ -84,7 +84,7 @@ The installation backup's SHA-256 manifest detects payload changes; it does not 
 - Treat every archive as sensitive personal and commercial information.
 - Keep off-disk copies on an encrypted removable drive or in a properly encrypted, access-controlled storage vault. Full-disk encryption helps protect a powered-off device but does not protect a copied archive once it leaves that device.
 - Do not email archives, attach them to support tickets, or place them in public/shared folders.
-- POSIX backup/restore staging is now restricted to owner-only directories/files (0700/0600). On Windows, protection depends on inherited NTFS ACLs for the installation and selected output destination; verify those ACLs before copying archives.
+- POSIX backup/restore staging is now restricted to owner-only directories/files (0700/0600). Temporary backup, restore and rollback artifacts are kept under `storage/app/zazu-backups/`, outside the private-media tree. On Windows, `Install-Zazu.ps1` already restricts `storage/app/zazu-backups` to the installation owner, SYSTEM and local Administrators; verify that ACL remains intact before copying archives.
 - Application-level archive encryption remains an open hardening item. Do not describe ZIP checksums or local file permissions as encryption.
 
 The allowlist includes `invoice_number_sequences`, so the per-business invoice counter moves with the invoice records. Existing format-v1 archives created before this dataset was added remain restorable; the importer supplies an empty sequence dataset, and the invoice generator reconciles the next number against invoices already restored. Keep the sequence table in archive coverage tests whenever invoice issuance or archive datasets change.
