@@ -1,3 +1,16 @@
+## POPIA documentation and data-minimisation checkpoint — 2026-11-23
+
+**Documentation refreshed on main:**
+- Updated the data-subject procedure to distinguish objections (Form 1), correction/deletion (Form 2), record access through PAIA/POPIA, and customer-managed records where Zazu is an operator. It uses the owner-approved provisional contact channel but does not claim a self-service portal.
+- Updated the privacy notice draft with hosted/local role distinctions, a provisional contact disclosure, the lack of self-service deletion, and minimal handling of allergy/dietary information.
+- Updated the incident runbook to remove the obsolete regulator-channel placeholder and retain the current eServices process, immediate operator escalation and no-low-risk-threshold handling.
+- Updated PAIA and operator-control drafts so requests are routed by responsible-party role and operator templates are not represented as executed contracts.
+- Added `docs/RELEASE_PRIVACY_OPERATIONS_REGISTER_TEMPLATE.md` for data-subject request, security-compromise and provider inventories. The working register must be stored outside GitHub; no personal information or completed register entries belong in the repository.
+- Updated the privacy engineering baseline and legal register against the 2025 amended POPIA Regulations and the scoped 2026 health-information Regulations.
+- Added minimal data-entry guidance on Job notes and requirement Special details: record only the operational instruction needed for the event; avoid diagnoses and medical history. `PrivacyDataMinimisationCopyTest` covers both surfaces.
+
+**Release disposition:** these changes improve documentation and user guidance; they do not provide a DSAR/export/deletion portal, automated retention/deletion scheduler, executed operator agreements, registered Information Officer evidence or legal sign-off. The operational POPIA gate remains OPEN. Do not claim compliance certification.
+
 ## Windows installation candidate verification — 2026-11-23
 
 - Runtime/source head: `6933f41621fd8ac2e3ff7b311d3eb81123594511` (includes the Helper current-state implementation, including rental asset allocations).
