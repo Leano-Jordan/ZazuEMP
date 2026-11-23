@@ -1,3 +1,34 @@
+## Director consolidation checkpoint — 2026-11-23
+
+**Repository:** `Leano-Jordan/ZazuEMP` · canonical branch: `main`  
+**Capability regression source/test commit:** `3ca0b72e4a370f94b3e9c12f42fb8840ce20d12d`  
+**Engineering state checkpoint:** `053182a1b5c37529a170af994d88210cb4674f81`
+
+### Dependency and CI consolidation
+
+- [x] Confirmed direct Composer requirements match the locked Composer packages and declared constraints.
+- [x] Confirmed direct npm development/optional dependencies match the locked npm packages and declared ranges.
+- [x] Recalculated licence metadata from the lockfiles: 77 Composer runtime packages, 34 Composer development packages and 147 npm package entries; every entry has declared licence metadata.
+- [x] Refreshed `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md` and `THIRD_PARTY_NOTICES.md` with current lockfile counts and direct dependency versions.
+- [x] Pinned the remaining floating checkout actions and aligned PHPMD SARIF upload to pinned CodeQL v4.39.3.
+- [x] Removed the obsolete GHSA-fc5q-39xc-vjpf / CVE-2026-112366 npm audit exception. GitHub marks the advisory withdrawn on 2026-11-18; the audit wrapper now applies the normal high-severity threshold without a package-specific bypass.
+- [ ] Exact-head CI for the consolidation commits: not yet confirmed. Do not infer a pass from earlier green runs.
+
+### Capability-to-Job integration coverage
+
+- [x] Added a mixed Job fixture proving saved Decor, Photography & video and Transport requirements drive the matching Job-specific Helper guidance.
+- [x] Added a deactivation regression through the real owner update route: the offering leaves business-wide active focus and staff catalogue visibility.
+- [x] Verified the owner retains the hidden catalogue item and the existing Job requirement/category and Job-specific guidance remain intact.
+- [ ] Exact-head Laravel, PHPMD, formatting and browser acceptance for the new regression tests.
+
+### Current release disposition
+
+V1 remains **NOT READY**. Automated coverage and the dependency refresh do not close the owner-operated physical Android offline/restart/reconnect test, controlled restore on the intended Windows installation, populated live-business quote-to-payment-to-cost/profit reconciliation, or POPIA operational and Zazu name-clearance gates. Do not ask the Founder to recreate populated records or repeat backup checks already confirmed.
+
+Historical dependency notes later in this checklist that describe GHSA-fc5q-39xc-vjpf as active/unpatched are superseded by this checkpoint and the 2026-11-18 GitHub advisory withdrawal.
+
+---
+
 ## POPIA operational documentation update — 2026-11-23
 
 - [x] Refresh the manual data-subject request procedure for objection, correction/deletion, access and role routing; self-service remains unavailable.
