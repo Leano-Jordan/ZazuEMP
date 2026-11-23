@@ -52,6 +52,10 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertCount(1, $archives);
 
             $archive = $archives[0];
+            if (PHP_OS_FAMILY !== 'Windows') {
+                $this->assertSame(0600, fileperms($archive) & 0777, 'Published installation backups must be owner-readable only.');
+            }
+
             $zip = new ZipArchive();
             $this->assertSame(true, $zip->open($archive));
             $this->assertVersionTwoArchive($zip);
@@ -81,6 +85,11 @@ class ZazuBackupRestoreTest extends TestCase
             );
             $this->assertFileExists($privateProbe);
             $this->assertSame('private media before backup', File::get($privateProbe));
+            if (PHP_OS_FAMILY !== 'Windows') {
+                $this->assertSame(0700, fileperms(storage_path('app/private')) & 0777);
+                $this->assertSame(0700, fileperms(dirname($privateProbe)) & 0777);
+                $this->assertSame(0600, fileperms($privateProbe) & 0777);
+            }
 
             DB::table('backup_probe')->update(['value' => 'changed before legacy restore']);
             File::delete($privateProbe);
