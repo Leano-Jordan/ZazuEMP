@@ -34,7 +34,7 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     await eventTypeChoice.click();
     await expect(eventTypeChoice.locator('input[name="event_type"]')).toBeChecked();
 
-    const serviceChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"])').first();
+    const serviceChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"][value="Buffet Catering"])');
     await expect(serviceChoice).toBeVisible();
     await serviceChoice.click();
     await expect(serviceChoice.locator('input[name="services[]"]')).toBeChecked();
