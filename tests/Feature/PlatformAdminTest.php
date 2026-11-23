@@ -335,6 +335,4 @@ class PlatformAdminTest extends TestCase
             File::deleteDirectory($directory);
         }
     }
-
-
 }
