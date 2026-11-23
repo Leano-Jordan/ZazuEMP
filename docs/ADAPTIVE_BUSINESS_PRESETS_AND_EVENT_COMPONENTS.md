@@ -201,3 +201,21 @@ This is an incremental catalogue correction, not completion of adaptive workspac
 ### Next vertical slice
 
 Use the existing active `BusinessCapability` catalogue as the read model for an owner-facing capability summary in business settings/onboarding, then test the effect of adding/deactivating a capability on catalogue discoverability and Helper guidance. Do not add a parallel preset table or mutate historical EventRequirement/quote snapshots. After that, derive only low-risk navigation and dashboard progressive disclosure from the same active capability set, preserving permission middleware and cross-business essentials.
+
+
+## Catalogue visibility and role refinement — 2026-11-23
+
+The business catalogue now treats the existing `BusinessCapability` records as the authoritative set of offerings:
+
+- Rental capabilities render in a dedicated hire/rental stream.
+- Active non-rental capabilities of type service, package, product or other render in the business-neutral services/products stream.
+- Empty streams are omitted; this prevents an empty catering or rental section from being presented as required work.
+- Owners see inactive catalogue entries marked HIDDEN so they can edit/reactivate them.
+- Staff and managers see active offerings only. The controller filters inactive entries and their categories before constructing the page.
+- Asset allocation actions are rendered only when the member has `assets.view`; the Assets route remains independently protected by its permission middleware.
+
+Regression tests cover a mixed DJ/sound/rental/product provider, a DJ-only business, owner visibility of hidden entries, staff suppression of hidden entries and missing asset permission. This is a catalogue/workspace-discoverability slice, not proof of complete adaptive navigation, dashboard or offline intake.
+
+## Next vertical slice — active catalogue to online/offline Job intake
+
+The current New Job form still renders `config('zazu.service_categories')` and submits the legacy `services[]` field. Offline job creation and synchronization also reconcile this existing service list. The next implementation must derive choices from the active business-owned `BusinessCapability` catalogue while preserving one shared online/offline contract, business isolation, requirement quantities/units and accepted quote history. Do not replace the online form field with an unrelated IDs-only contract or leave phone-local creation using the old generic list.
