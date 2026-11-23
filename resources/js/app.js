@@ -645,7 +645,13 @@ const setupZazuHierarchicalNavigation = () => {
     });
 
     document.addEventListener('click', (event) => {
-        if (!areas.some((area) => area.contains(event.target))) {
+        const target = event.target;
+        if (target instanceof Element
+            && (target.closest('[data-mobile-sidebar]') || target.closest('[data-mobile-sidebar-toggle]'))) {
+            return;
+        }
+
+        if (!areas.some((area) => area.contains(target))) {
             closeOthers(null);
         }
     });
