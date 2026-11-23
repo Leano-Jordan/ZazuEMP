@@ -123,6 +123,16 @@ The requirement is not complete merely because a preset selector exists.
 - [ ] PC, phone, offline, restart and reconnect behaviour is consistent and covered by automated plus physical acceptance.
 - [ ] Regression tests cover business isolation, staff permissions, configuration changes, historical records, multi-capability combinations and offline synchronization.
 
+## Current implementation evidence — business-first multi-focus onboarding — 2026-11-23
+
+The first-run onboarding path now asks owners to identify all applicable business activities before configuring the catalogue. The existing membership `primary_niche` remains the guidance priority; a new nullable `business_focuses` JSON field stores the full selected set without replacing or rewriting legacy primary-focus values. Owner selections are readable through authorised workspace memberships.
+
+The subsequent catalogue step filters category suggestions to the selected activities, with an explicit Other path. A DJ-only selection therefore starts with Sound & entertainment and Other rather than catering/baking categories; a mixed selection combines the relevant categories. The owner can still add multiple offerings and use the existing catalogue model.
+
+This is the first onboarding foundation slice, not completion of the broader capability contract. It does not yet configure navigation, dashboard modules, event intake, event components, specialist operations or offline synchronization from the full selection. Exact-head CI, migration execution, rendered desktop/mobile acceptance and regression verification remain pending. Do not claim full workspace adaptation or V1 acceptance from this slice.
+
+---
+
 ## Current implementation evidence — 2026-11-23
 
 The first Helper adaptation slice now reads the existing saved primary business focus and changes guidance on Dashboard, Jobs and Job detail for chairs/tents, sound/DJ and catering/baking. Automated feature coverage has been added for those three focus values.
