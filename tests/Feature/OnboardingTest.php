@@ -73,6 +73,30 @@ class OnboardingTest extends TestCase
         );
     }
 
+    public function test_legacy_single_focus_submission_remains_compatible(): void
+    {
+        $business = Business::create([
+            'name' => 'Legacy Focus Business',
+            'slug' => 'legacy-focus-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = $this->signInAsOwner($business);
+
+        $this->post(route('onboarding.experience.store'), [
+            'experience_level' => 'basic',
+            'primary_niche' => 'sound_dj',
+        ])->assertRedirect(route('onboarding.catalogue'));
+
+        $this->assertDatabaseHas('business_user', [
+            'business_id' => $business->id,
+            'user_id' => $user->id,
+            'primary_niche' => 'sound_dj',
+            'business_focuses' => '["sound_dj"]',
+        ]);
+    }
+
     public function test_dj_only_business_gets_relevant_catalogue_categories_without_catering_clutter(): void
     {
         $business = Business::create([
