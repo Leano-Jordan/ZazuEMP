@@ -263,3 +263,30 @@ A customer create/update form may include supported text/contact metadata alongs
 **Regression:** offline browser coverage selects a profile photo, submits the customer, verifies local state and pending mutation metadata, asserts no photo fields are queued, and checks the partial-save notice.
 
 **Status:** CLOSED — exact-head Laravel (744 passed / 1 skipped / 5,230 assertions), desktop offline browser (64), mobile viewport (7), host-outage, phone-local attachment, PostgreSQL migration/recovery and Zazu Quality passed on `c57bbd72`. See CASE-ZAZU-0045 / ENG-JS-002. Customer photo upload/removal itself remains online-only.
+
+## REG-029 — Offline service image must not discard service metadata
+
+Selecting a catalogue image while offline must not discard supported service name, category, type, currency or pricing metadata.
+
+**Control:** defer only the image operation; queue the supported service record without image bytes and show an explicit partial-save notice.
+
+**Regression:** offline browser acceptance selects a local image and verifies queued/local service metadata, image omission and the notice.
+
+**Status:** CLOSED — 65 desktop browser tests plus mobile, quote, host-outage and phone-local attachment journeys passed on run 45235238220. See CASE-ZAZU-0046 / ENG-JS-003.
+
+## REG-030 — Playwright must not depend on obstructed pointer paths for native form state
+
+Sticky navigation/action chrome can intercept pointer events when Playwright scrolls a styled form control into view, even though the native input itself is visible and enabled.
+
+**Control:** when the test's contract is native form state rather than pointer hit-testing, resolve and force-check the native input. Keep the real submission and behavioural assertions intact; do not change production UI to satisfy a test-only pointer obstruction.
+
+**Status:** CLOSED — exact-head browser acceptance passed on run 45235238220. See CASE-ZAZU-0047 / ENG-CONTRACT-008.
+
+## REG-031 — Customer search must include active linked contacts without crossing business boundaries
+
+Operators may search using the details they remember about a contact rather than the customer's registered name. Contact data is stored separately and soft-deleted contacts must not appear in active lookup.
+
+**Control:** customer search includes related active contact name, phone, email and label through the business-scoped customer relationship. Preserve soft-delete scope and never query contacts globally without the parent customer/business predicate.
+
+**Status:** CLOSED — exact-head Laravel (745 passed / 1 skipped / 5,244 assertions), Zazu Quality, PHPMD and PostgreSQL migration/recovery passed on 6226b510. See CASE-ZAZU-0048 / ENG-SEARCH-001.
+

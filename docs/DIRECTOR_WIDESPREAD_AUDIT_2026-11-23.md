@@ -166,3 +166,29 @@ The canonical 13-domain method remains the formal scoring basis. Each domain is 
 4. Close the remaining owner acceptance gates: Android offline/restart/reconnect, populated commercial reconciliation, full installation restore, POPIA operations and ZAZU name clearance.
 
 All changes in this audit were committed directly to `main`. No branch was created. No live business data, database or production environment was changed by this audit.
+
+## 8. Current-main engineering update — 2026-11-23
+
+**Code/test head:** `6226b5108ed3b125a795f739df68e55b010b5687`.
+
+### Offline service image boundary
+
+A service catalogue image selected while offline previously aborted the entire service mutation. The handler now queues supported service metadata, omits image bytes and displays an explicit deferred-image notice. CASE-ZAZU-0046 / ENG-JS-003 / REG-029.
+
+The first browser regression run exposed a separate test-contract issue: the styled category radio's pointer path was blocked by sticky navigation/action chrome. The test now force-checks the native input while retaining the real submission and queue assertions. No production UI change was made for this test-only failure. CASE-ZAZU-0047 / ENG-CONTRACT-008 / REG-030.
+
+Exact browser run [45235238220](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45235238220): **65 desktop tests**, quote single-unit journey, **7 mobile viewport tests**, host-outage and phone-local attachment journeys passed.
+
+### Customer contact search
+
+Customer search previously matched the customer's identity/legal fields but not its linked contact records. It now searches active contact name, phone, email and label through the customer relationship. The query remains constrained by the active business; soft-deleted contacts are excluded. Regression coverage includes all four fields, deleted-contact exclusion and cross-business isolation. CASE-ZAZU-0048 / ENG-SEARCH-001 / REG-031.
+
+Exact current-head Laravel [run 45236025738](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45236025738): **745 passed / 1 skipped / 5,244 assertions**. PostgreSQL migration/recovery, Zazu Quality, PHPMD and Director Health passed. SonarCloud skipped. Current-head offline-browser and Windows package checks were still running at the time of this addendum.
+
+### Score and release disposition
+
+Formal 13-domain score remains **71/100 (46/65)**. No numerical uplift is awarded from these two engineering corrections. Search/reporting/Helper remains 3/5 pending broader V1 search and operational usability acceptance. Offline continuity remains 3/5 pending physical Android disconnected cold-start/restart/reconnect proof. Recovery remains 4/5 pending successful installed restore. Commercial workflow remains 4/5 pending the Founder’s populated live-record reconciliation. Legal/privacy remains 1/5 pending operational sign-off.
+
+**V1 remains NOT READY.** The failed installed archive restore remains preserved; no restore retry or live-business operation was performed.
+
+

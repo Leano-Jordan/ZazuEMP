@@ -1,3 +1,18 @@
+## Director execution — offline service boundary and customer contact search — 2026-11-23
+
+**Current main code/test head:** `6226b5108ed3b125a795f739df68e55b010b5687`.
+
+- Closed the offline service image boundary defect: service metadata is queued when an image is selected offline; image bytes are excluded and the user receives a clear deferred-image notice. CASE-ZAZU-0046 / ENG-JS-003 / REG-029.
+- The first regression run exposed a test-only pointer interception: the styled category card and sticky top/action bars blocked Playwright's radio click. Corrected the native radio check without changing production UI. CASE-ZAZU-0047 / ENG-CONTRACT-008 / REG-030.
+- Exact browser run `45235238220` passed **65 desktop tests**, the quote single-unit journey, **7 mobile viewport tests**, host-outage and phone-local attachment journeys.
+- Fixed a real V1 search gap: customer lookup now searches active linked contact name, phone, email and label while preserving business isolation and excluding soft-deleted contacts. CASE-ZAZU-0048 / ENG-SEARCH-001 / REG-031.
+- Exact current-head Laravel run `45236025738`: **745 passed / 1 skipped / 5,244 assertions**. PostgreSQL migration/recovery, Zazu Quality, PHPMD and Director Health passed. SonarCloud skipped.
+- At this checkpoint, current-head offline-browser acceptance and Windows package checks were still running. Do not claim those jobs passed until their run concludes.
+- Formal 13-domain score remains **71/100**. The search correction is a concrete usability improvement, but the broader Search/Reporting/Helper domain remains 3/5 pending wider V1 acceptance. Offline continuity, recovery and owner-operated gates are unchanged.
+- V1 remains **NOT READY**. Preserve the failed installed archive restore evidence; do not retry it or touch the live business as part of this engineering work.
+
+---
+
 ## Director continuation — offline customer photo boundary defect closed — 2026-11-23
 
 **Verified main head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`.

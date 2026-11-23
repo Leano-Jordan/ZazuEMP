@@ -23,6 +23,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0040 | Stale device snapshot writes sync state after credential replacement | Mutation apply or conflict recording can proceed after a device is re-paired if the later transaction checks only active status | CLOSED — exact-head Laravel/PHPMD/Psalm/browser/quality PASS on 04db872 | Mutation recorder checked token hash, but separate apply/conflict writes did not consistently revalidate the authenticated snapshot | Apply and conflict writes now use the same business-first/device-row credential guard; regressions prove stale snapshots return 401 without apply/delivery/conflict |
 | CASE-ZAZU-0041 | Unsupported offline mutation operation | Customer, job and service handlers could interpret an unsupported operation as create/update rather than rejecting it | CLOSED — exact-head Laravel + PHPMD + PostgreSQL PASS | Three handlers lacked the explicit operation allowlists already used by other entity handlers | Regression sends delete operations for all three entities and proves rejection before domain writes |
 | CASE-ZAZU-0042 | Draft invoices counted as invoiced revenue | Finance dashboard summed draft invoices into the invoiced total | CLOSED — exact-head Laravel/quality/PHPMD PASS | Aggregate query included every invoice status | Restrict invoiced totals to issued and paid; regression covers draft, issued and paid records |
+| CASE-ZAZU-0046 | Offline service image boundary | Selecting a service image aborts the whole offline mutation and loses supported service metadata | CLOSED — exact-head browser PASS | Image bytes are unsupported offline, but service metadata must still be queued | Queue metadata, omit image bytes, and disclose deferred image update |
+| CASE-ZAZU-0047 | Service image browser regression selector | Playwright radio check times out because the styled category card and sticky chrome intercept pointer events | CLOSED — exact-head browser PASS | Test must set the native radio state without relying on a pointer path blocked by sticky UI | Force-check the resolved radio input; retain all downstream behavioural assertions |
+| CASE-ZAZU-0048 | Customer contact search coverage | Search matches customer identity fields but misses active linked contact names, phone numbers, emails and labels | CLOSED — exact-head Laravel/Quality/PHPMD/PostgreSQL PASS | Customer contact details live in the related customer_contacts table, not on customers | Search active contacts through the business-scoped customer relationship; exclude soft-deleted contacts |
 
 | Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
 |---|---|---|---|---|---|
@@ -859,3 +862,60 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Exact-head verification:** Laravel **744 passed / 1 skipped / 5,230 assertions**; offline browser **64 desktop + quote single-unit + 7 mobile viewport + host-outage + phone-local attachment passed**; PostgreSQL migration/recovery PASS on [run 45229069891](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229069891). Zazu Quality PASS on [run 45229070049](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229070049). SonarCloud skipped.
 
 **Scope:** Offline customer metadata is supported. Customer photo upload/removal remains online-only. This case does not imply offline image upload support.
+
+### CASE-ZAZU-0046
+
+**Status:** CLOSED — exact-head offline browser acceptance passed on test head `155cd4cf` (run `45235238220`).
+
+**Engineering code:** ENG-JS-003  
+**Class:** F1 — application defect  
+**Target:** `resources/js/app.js`, offline service catalogue form submission.
+
+**Failure fingerprint:** An offline service create/update form includes valid service metadata and a selected image. The UI defers image upload, but the form handler returns before queuing the supported service record.
+
+**Root cause:** The image guard treated the unsupported image operation as a reason to abort the entire service mutation.
+
+**Correction:** The handler now queues supported service metadata, omits image bytes from the offline mutation, and tells the operator that the service details were saved while the image must be added when online.
+
+**Regression:** The browser test selects a local image while offline, submits the service, verifies the partial-save notice, checks the pending service mutation and confirms no image bytes are present.
+
+**Verification:** The corrected browser suite passed **65 desktop tests**, plus the separate quote single-unit, **7 mobile viewport**, host-outage and phone-local attachment journeys on run `45235238220`. The test-only selector correction is commit `155cd4cf`; application code is `bafe8622`.
+
+**Scope:** Service metadata is supported offline. Catalogue image upload remains online-only.
+
+### CASE-ZAZU-0047
+
+**Status:** CLOSED — exact-head browser acceptance passed on `155cd4cf`, run `45235238220`.
+
+**Engineering code:** ENG-CONTRACT-008  
+**Class:** F2 — verification/test contract defect  
+**Target:** `e2e/pwa-offline.spec.js`, service image regression setup.
+
+**Failure fingerprint:** Playwright's `locator.check()` on `input[name="category"]` timed out after the input resolved and was visible. The category-card span and sticky top/action bars intercepted pointer events.
+
+**Root cause:** The test used a pointer-interaction path that was obstructed by the current sticky layout, even though the assertion only needed the radio input to be selected before exercising the service-save workflow.
+
+**Correction:** The test now uses `check({ force: true })` on the resolved native radio input. The subsequent form submission, offline queue, local-state and partial-save assertions remain unchanged.
+
+**Verification:** The exact browser run passed **65 desktop tests** and all separate mobile/quote/host-outage/attachment journeys. No application UI code was changed for this failure.
+
+### CASE-ZAZU-0048
+
+**Status:** CLOSED — exact-head Laravel, Zazu Quality, PHPMD and PostgreSQL migration/recovery checks passed on `6226b510`.
+
+**Engineering code:** ENG-SEARCH-001  
+**Class:** F1 — application search-coverage defect  
+**Target:** `WorkspaceSearchService` customer handler path, specifically `CustomerSearchHandler`.
+
+**Failure fingerprint:** A user searches by a real customer's contact name, phone number, email address or contact label, selects the Customer record type, and receives no matching customer even though the active contact is linked to that customer.
+
+**Root cause:** Customer search queried the `customers` table's identity/legal fields only. Contact details are stored in the related `customer_contacts` table.
+
+**Correction:** Customer search now groups customer identity fields with an `orWhereHas('contacts')` query covering active contact name, phone, email and label. The customer query remains scoped to the active business; the relationship's soft-delete scope excludes removed contacts.
+
+**Regression:** Feature coverage searches by all four contact fields, confirms a soft-deleted contact is not returned, and confirms a contact belonging to another business cannot reveal that business's customer.
+
+**Verification:** Exact-head Laravel run `45236025738`: **745 passed / 1 skipped / 5,244 assertions**. PostgreSQL migration/recovery, Zazu Quality, PHPMD and Director Health passed. Offline-browser acceptance and Windows package checks were still running at the time of this record; SonarCloud was skipped.
+
+**Scope:** This closes linked-contact lookup coverage. It does not claim that every search/report/Helper V1 usability acceptance item is complete.
+

@@ -1,3 +1,15 @@
+## Current Director engineering checkpoint — 2026-11-23
+
+**Latest code/test head:** `6226b5108ed3b125a795f739df68e55b010b5687`.
+
+- Offline service metadata now saves while image upload is deferred; exact browser run [45235238220](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45235238220) passed 65 desktop tests plus quote single-unit, 7 mobile viewport, host-outage and phone-local attachment journeys.
+- Customer search now matches active linked contact name, phone, email and label. Deleted-contact exclusion and cross-business isolation are covered.
+- Exact-head Laravel [45236025738](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45236025738): **745 passed / 1 skipped / 5,244 assertions**. PostgreSQL migration/recovery, Zazu Quality, PHPMD and Director Health passed. SonarCloud skipped. Current-head offline-browser and Windows package checks were still running at this checkpoint.
+- **Formal score remains 71/100 (46/65).** No uplift is awarded yet: the search/reporting/Helper domain remains 3/5 pending broader V1 usability acceptance; offline continuity, recovery, commercial, UX and legal/operational evidence boundaries remain unchanged.
+- **V1 remains NOT READY.**
+
+---
+
 ## Current Director re-score reconciliation — 2026-11-23
 
 **Formal 13-domain evidence-maturity score: 71/100 (46/65 = 3.54/5).** Reaffirmed, not increased. The 77/100 figure in `ZAZU_2027_HARDENING_SCORECARD.md` was not independently recalculated under the canonical 13-domain method and is superseded for formal V1 reporting.

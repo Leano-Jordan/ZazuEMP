@@ -40,6 +40,7 @@ Codes are permanent once assigned. Never recycle a code.
 | UI | Interaction/layout/visual state defect | hit-test, clipping, overlap, responsive state |
 | DATA | Data/invariant corruption or unsafe mutation | duplicate mutation, ownership, partial write |
 | RECOVERY | Backup/restore/update safety failure | restore path, rollback, incomplete recovery |
+| SEARCH | Search coverage or result-isolation failure | missing searchable business fields, contact lookup, cross-business search leakage |
 | FLAKE | Non-deterministic or load-sensitive outcome | timeout, race, concurrency, worker sensitivity |
 
 ## Current named failures
@@ -65,6 +66,9 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-RECOVERY-002 | CASE-ZAZU-0043 | Business archive restore committed before its success audit entry | F1 | CLOSED — exact-head Laravel PASS |
 | ENG-RUNTIME-003 | CASE-ZAZU-0044 | Windows PHP host upload limits inherited from machine php.ini | F4 | CLOSED AT LAUNCHER/CI LEVEL — installed restore still open |
 | ENG-JS-002 | CASE-ZAZU-0045 | Offline customer photo guard discarded valid customer metadata | F1 | CLOSED — exact-head Laravel/browser acceptance passed on c57bbd72 |
+| ENG-JS-003 | CASE-ZAZU-0046 | Offline service image guard discards supported service metadata | F1 | CLOSED — exact-head browser PASS |
+| ENG-CONTRACT-008 | CASE-ZAZU-0047 | Service image E2E radio selection intercepted by sticky chrome | F2 | CLOSED — exact-head browser PASS |
+| ENG-SEARCH-001 | CASE-ZAZU-0048 | Customer search omits linked contact details | F1 | CLOSED — exact-head Laravel/Quality/PHPMD/PostgreSQL PASS |
 | ENG-AUTH-001 | CASE-ZAZU-0035 | Bootstrap trusts a stale authenticated device snapshot after revocation or credential replacement | F1/F7 | CLOSED — exact-head CI verified on 559e66b |
 | ENG-UI-003 | CASE-ZAZU-0018 | Calendar agenda hidden on desktop/tablet | F1/F2 | VERIFIED — current browser suite green |
 | ENG-CSS-002 | CASE-ZAZU-0019 | Horizontal overflow at 1280px | F1/F2 | VERIFIED — current browser suite green |

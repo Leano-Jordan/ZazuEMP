@@ -1,7 +1,16 @@
 ## Director acceptance ledger — 2026-11-23
 
 **Audit:** [Widespread engineering audit and formal scorecard](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md)  
-**Latest verified source/test head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`.
+**Latest code/test head:** `6226b5108ed3b125a795f739df68e55b010b5687` (Laravel, Zazu Quality, PHPMD, PostgreSQL migration/recovery and Director Health passed; current-head offline-browser and Windows package checks were still running at checkpoint).
+
+### Director engineering closures — 2026-11-23
+
+- [x] Offline service metadata is preserved when a service image is selected offline; image bytes are excluded and the partial-save notice is explicit. CASE-ZAZU-0046 / REG-029.
+- [x] Exact browser acceptance on [run 45235238220](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45235238220): 65 desktop tests, quote single-unit journey, 7 mobile viewport tests, host-outage and phone-local attachment journeys passed.
+- [x] Corrected the test-only category radio pointer interception with a native forced check; no production UI change. CASE-ZAZU-0047 / REG-030.
+- [x] Customer search now includes active linked contact name, phone, email and label, excludes soft-deleted contacts and preserves business isolation. CASE-ZAZU-0048 / REG-031.
+- [x] Exact-head Laravel [run 45236025738](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45236025738): 745 passed / 1 skipped / 5,244 assertions. PostgreSQL migration/recovery, Zazu Quality [run 45236025686](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45236025686), PHPMD [run 45236025951](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45236025951) and Director Health [run 45236025957](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45236025957) passed. SonarCloud skipped.
+- [ ] Current-head offline-browser acceptance and Windows package/fresh-install checks were still running at the time of this checkpoint.
 
 ### Owner checks already completed — do not repeat
 

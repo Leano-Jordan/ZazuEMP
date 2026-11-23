@@ -1,3 +1,13 @@
+## Latest Director engineering evidence — 2026-11-23
+
+- CASE-ZAZU-0046 / ENG-JS-003 CLOSED: offline service metadata survives deferred image upload; image bytes are not queued.
+- CASE-ZAZU-0047 / ENG-CONTRACT-008 CLOSED: Playwright service category selection no longer fails behind sticky chrome; production UI was not changed for the test failure.
+- CASE-ZAZU-0048 / ENG-SEARCH-001 CLOSED: customer search includes active linked contact name, phone, email and label; deleted and cross-business contact regressions pass.
+- Exact current-head Laravel: **745 passed / 1 skipped / 5,244 assertions**. Zazu Quality, PHPMD, PostgreSQL migration/recovery and Director Health PASS. Browser acceptance and Windows package checks pending at this checkpoint; SonarCloud skipped.
+- Formal score remains **71/100**; no score uplift. V1 remains NOT READY.
+
+---
+
 ## Latest Director verification — offline customer metadata/photo boundary — 2026-11-23
 
 **Verified main head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`.
