@@ -3,7 +3,7 @@
 **Date:** 2026-11-23  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Canonical branch:** `main` (no branches created)  
-**Current source head:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`  
+**Current source head:** `223009302b5b529aa5b50eba6b4aaf70968d5fa0`  
 **Disposition:** V1 remains **NOT READY**. The product foundation is substantial; recovery acceptance, offline physical proof, populated commercial reconciliation and legal/brand closure remain release gates.
 
 ## 1. Scope and method
