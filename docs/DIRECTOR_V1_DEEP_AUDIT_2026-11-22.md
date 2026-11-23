@@ -332,3 +332,16 @@ Do not expand V1 scope to imitate every competitor. Close the identified reliabi
 - [Tripleseat customer reviews](https://www.capterra.com/p/118047/Tripleseat/reviews/)
 - [HoneyBook vs Tripleseat comparison](https://www.honeybook.com/blog/honeybook-vs-tripleseat)
 - [Planning Pod customer reviews](https://www.capterra.com/p/125947/Planning-Pod/reviews/)
+
+
+## Backup confidentiality follow-up — 2026-11-23
+
+The earlier audit finding remains valid: installation and business archives are plain ZIP files, not password-encrypted. SHA-256 integrity checks and business-archive allowlist validation do not provide confidentiality.
+
+**Implemented on main:**
+- Added owner-only POSIX permissions for installation backup staging and published backup archives (0700 directories / 0600 files).
+- Restore staging, extracted private media, preserved private-storage rollback, SQLite staging and rollback files, and SQL rollback snapshots now receive restrictive POSIX permissions before use.
+- Added regression coverage for private staging-tree permissions and the backup/restore round-trip's archive and restored private-media modes.
+- The business export screen now warns owners that .zazu archives are unencrypted and must not be emailed or placed in public file-sharing.
+
+**Remaining risk:** Windows relies on inherited NTFS ACLs, and neither archive format has application-level encryption. Off-disk copies must use encrypted removable media or an encrypted, access-controlled vault. Decide whether V1 requires passphrase-based archive encryption or whether documented encrypted-storage controls are sufficient; do not imply that the current format is encrypted.
