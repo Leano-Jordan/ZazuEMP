@@ -28,7 +28,7 @@ class BusinessCapabilityCatalogueTest extends TestCase
             ->get(route('capabilities.index'))
             ->assertOk()
             ->assertSee('Hire &amp; rental', false)
-            ->assertSee('Services &amp; products')
+            ->assertSee('Services & products')
             ->assertSee('Speaker and sound hire')
             ->assertSee('DJ performance')
             ->assertSee('LED dance floor')
@@ -50,7 +50,7 @@ class BusinessCapabilityCatalogueTest extends TestCase
         $response = $this->actingAs($owner)->get(route('capabilities.index'));
 
         $response->assertOk()
-            ->assertSee('Services &amp; products')
+            ->assertSee('Services & products')
             ->assertSee('DJ performance')
             ->assertSee('Lighting package')
             ->assertDontSee('catalogue-panel-equipment', false)
