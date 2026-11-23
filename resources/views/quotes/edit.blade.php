@@ -72,7 +72,7 @@
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Products and services</div>
                         <div class="zazu-form-section-copy">Confirm the quantity, unit and price for every product and service. Line totals and the quote summary update as you type.</div>
-                        <div class="zazu-quote-quantity-instruction" role="note"><strong>Every line needs your attention.</strong> Enter the real quantity for each product or service, then check its unit price. A quantity of 1 is not assumed.</div>
+                        <div class="zazu-quote-quantity-instruction" role="note"><strong>Every line needs your attention.</strong> Enter the real quantity for each product or service, then check its unit price. A quantity of 1 is not assumed. When a line is exactly 1, confirm that single-unit quantity before saving.</div>
                     </div>
                     <div class="zazu-card zazu-list zazu-quote-line-editor">
                         @foreach ($quote->event->requirements as $requirement)
@@ -117,6 +117,13 @@
                                             <span class="zazu-field-help"><strong>Required:</strong> enter the total {{ $requirement->unit ?: 'amount' }} you will supply. Do not leave this at one unless one is genuinely correct.</span>
                                             @error('quantity.'.$requirement->id)<span class="zazu-field-error">{{ $message }}</span>@enderror
                                         </label>
+                                        <div class="zazu-quote-single-confirm-wrap" data-quote-single-confirm-wrap>
+                                            <label class="zazu-quote-single-confirm">
+                                                <input type="checkbox" name="confirm_single_quantity[{{ $requirement->id }}]" value="1"
+                                                    data-quote-single-confirm @checked(old('confirm_single_quantity.'.$requirement->id))>
+                                                <span>Confirm that exactly one {{ $requirement->unit ?: 'unit' }} is the correct quantity for this line.</span>
+                                            </label>
+                                        </div>
                                         <label class="zazu-field">
                                             <span class="zazu-label">Unit price ({{ $quote->currency }}) <span class="zazu-required">*</span></span>
                                             <input type="number" min="0" step="0.01" inputmode="decimal"
@@ -183,15 +190,28 @@
 
             let subtotal = 0;
             let incompleteLines = 0;
+            let unconfirmedSingleLines = 0;
             editPriceInputs.forEach((input) => {
                 const line = input.closest('[data-quote-line]');
                 const quantity = Number.parseFloat(line?.querySelector('[data-quote-quantity]')?.value || '');
                 const price = Number.parseFloat(input.value || '');
                 const lineTotal = Number.isFinite(quantity) && quantity > 0 && Number.isFinite(price) && price >= 0 ? quantity * price : null;
-                if (lineTotal !== null) subtotal += lineTotal;
-                else incompleteLines += 1;
+                const confirmation = line?.querySelector('[data-quote-single-confirm]');
+                const singleQuantityUnconfirmed = Number.isFinite(quantity)
+                    && Math.round(quantity * 100) === 100
+                    && confirmation
+                    && !confirmation.checked;
+
+                if (lineTotal !== null && !singleQuantityUnconfirmed) subtotal += lineTotal;
+                if (lineTotal === null) incompleteLines += 1;
+                if (singleQuantityUnconfirmed) unconfirmedSingleLines += 1;
+
                 const output = line?.querySelector('[data-quote-line-total]');
-                if (output) output.textContent = lineTotal === null ? 'Enter quantity and price' : (editCurrency + ' ' + editMoney.format(lineTotal));
+                if (output) {
+                    output.textContent = lineTotal === null
+                        ? 'Enter quantity and price'
+                        : (singleQuantityUnconfirmed ? 'Confirm quantity of 1' : editCurrency + ' ' + editMoney.format(lineTotal));
+                }
             });
 
             const option = editTaxSelect?.selectedOptions[0];
@@ -205,15 +225,43 @@
             const format = (value) => editCurrency + ' ' + editMoney.format(value);
 
             const reviewStatus = editSummary.querySelector('[data-quote-review-status]');
-            if (reviewStatus) reviewStatus.textContent = incompleteLines ? incompleteLines + ' line(s) still need a valid quantity and price.' : 'All line quantities and prices are entered.';
+            if (reviewStatus) {
+                reviewStatus.textContent = incompleteLines
+                    ? incompleteLines + ' line(s) still need a valid quantity and price.'
+                    : (unconfirmedSingleLines
+                        ? unconfirmedSingleLines + ' single-unit line(s) need explicit confirmation.'
+                        : 'All line quantities and prices are entered.');
+            }
             editSummary.querySelector('[data-quote-subtotal]').textContent = format(subtotal);
             editSummary.querySelector('[data-quote-tax]').textContent = format(tax);
             editSummary.querySelector('[data-quote-total]').textContent = format(total);
             editSummary.querySelector('[data-quote-deposit]').textContent = format(deposit);
         }
 
+        function updateEditSingleQuantityConfirmation(input) {
+            const line = input.closest('[data-quote-line]');
+            const wrapper = line?.querySelector('[data-quote-single-confirm-wrap]');
+            const checkbox = wrapper?.querySelector('[data-quote-single-confirm]');
+            if (!wrapper || !checkbox) return;
+
+            const quantity = Number.parseFloat(input.value || '');
+            const isExactlyOne = Number.isFinite(quantity) && Math.round(quantity * 100) === 100;
+            wrapper.hidden = !isExactlyOne;
+            checkbox.required = isExactlyOne;
+            if (!isExactlyOne) checkbox.checked = false;
+        }
+
         editPriceInputs.forEach((input) => input.addEventListener('input', refreshEditQuoteSummary));
-        editQuantityInputs.forEach((input) => input.addEventListener('input', refreshEditQuoteSummary));
+        editQuantityInputs.forEach((input) => {
+            updateEditSingleQuantityConfirmation(input);
+            input.addEventListener('input', () => {
+                updateEditSingleQuantityConfirmation(input);
+                refreshEditQuoteSummary();
+            });
+        });
+        document.querySelectorAll('[data-quote-single-confirm]').forEach((input) => {
+            input.addEventListener('change', refreshEditQuoteSummary);
+        });
         editDepositInput?.addEventListener('input', refreshEditQuoteSummary);
         editTaxSelect?.addEventListener('change', refreshEditQuoteSummary);
         refreshEditQuoteSummary();
