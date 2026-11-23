@@ -31,6 +31,38 @@ class NicheFocus
             : null;
     }
 
+    /**
+     * Return every saved business focus, retaining the legacy primary focus
+     * for memberships created before multi-focus onboarding was introduced.
+     *
+     * @return array<int, string>
+     */
+    public function selectedMany(?User $user = null, ?Business $business = null): array
+    {
+        $user ??= auth()->user();
+        $business ??= app(CurrentBusiness::class)->resolve($user);
+
+        if (!$user || !$business) {
+            return [];
+        }
+
+        $membership = $user->businesses()->whereKey($business->id)->first();
+        $raw = $membership?->pivot?->business_focuses;
+        $focuses = is_array($raw) ? $raw : (is_string($raw) ? json_decode($raw, true) : []);
+        $focuses = is_array($focuses) ? $focuses : [];
+        $focuses = array_values(array_unique(array_filter(
+            $focuses,
+            static fn ($focus) => is_string($focus) && array_key_exists($focus, config('zazu.niches', []))
+        )));
+
+        $primary = $this->selected($user, $business);
+        if ($primary && !in_array($primary, $focuses, true)) {
+            array_unshift($focuses, $primary);
+        }
+
+        return $focuses ?: [self::DEFAULT];
+    }
+
     public function for(?User $user = null, ?Business $business = null): string
     {
         return $this->selected($user, $business) ?? self::DEFAULT;
