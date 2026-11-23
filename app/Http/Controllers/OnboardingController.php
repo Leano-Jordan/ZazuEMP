@@ -40,6 +40,16 @@ class OnboardingController extends Controller
         $nicheFocus = $niches->selected($request->user(), $business);
         $nicheStatus = $nicheFocus ? 'completed' : 'not_started';
         $nicheDefinition = $niches->definition($nicheFocus ?? NicheFocus::DEFAULT);
+        $activeCapabilities = $business->capabilities()->where('is_active', true)->count();
+        $hiddenCapabilities = $business->capabilities()->where('is_active', false)->count();
+        $activeCapabilityTypes = $business->capabilities()
+            ->where('is_active', true)
+            ->selectRaw('capability_type, COUNT(*) as total')
+            ->groupBy('capability_type')
+            ->pluck('total', 'capability_type');
+        $capabilityTypeSummary = $activeCapabilityTypes
+            ->map(fn ($count, $type) => ucfirst($type).': '.$count)
+            ->implode(' · ');
 
         return view('onboarding.index', compact(
             'business',
@@ -50,7 +60,10 @@ class OnboardingController extends Controller
             'experienceStatus',
             'nicheFocus',
             'nicheStatus',
-            'nicheDefinition'
+            'nicheDefinition',
+            'activeCapabilities',
+            'hiddenCapabilities',
+            'capabilityTypeSummary'
         ));
     }
 
