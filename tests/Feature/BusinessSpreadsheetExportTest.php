@@ -88,7 +88,8 @@ class BusinessSpreadsheetExportTest extends TestCase
 
         $this->get(route('exports.index'))
             ->assertOk()
-            ->assertSee('Export business data')
+            ->assertSee('Data export &amp; recovery', false)
+            ->assertSee('Your records. Ready when you need them.')
             ->assertSee('Customers')
             ->assertSee('Events and jobs')
             ->assertSee('Customer contacts')
