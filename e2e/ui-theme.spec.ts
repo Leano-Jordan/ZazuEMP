@@ -231,6 +231,7 @@ test.describe('Zazu UI theme and navigation', () => {
         const monthGrid = mobile.locator('.zazu-calendar-grid-scroll > .zazu-calendar-grid');
         await expect(monthGrid).toBeVisible();
         await expect(monthGrid.locator('.zazu-calendar-label')).toHaveCount(7);
+        expect(await monthGrid.locator('.zazu-calendar-cell').count()).toBeGreaterThanOrEqual(28);
         const dimensions = await mobile.locator('.zazu-calendar-grid-scroll').evaluate((element) => ({
             clientWidth: element.clientWidth,
             scrollWidth: element.scrollWidth,
