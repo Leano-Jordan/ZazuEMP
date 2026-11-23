@@ -1,3 +1,10 @@
+## Windows installation candidate verification — 2026-11-23
+
+- Runtime/source head: `6933f41621fd8ac2e3ff7b311d3eb81123594511` (includes the Helper current-state implementation, including rental asset allocations).
+- GitHub Actions Windows V1 Package run `45133569162`: **Build Windows installation candidate — PASS**; **Verify fresh install on Windows PowerShell — PASS**.
+- The optional GitHub prerelease publication job was **SKIPPED**; no prerelease publication is claimed.
+- This verifies package construction and a clean PowerShell installation workflow in CI. It does not substitute for restoring the Founder’s intended installed PC from the independently verified backup or for physical Android offline acceptance.
+
 # Owner-verified physical operation and populated workspace — 2026-11-22
 
 **Founder evidence update; current repository baseline:** [`cd7762a`](https://github.com/Leano-Jordan/ZazuEMP/commit/cd7762a18976eeae7cef6d2c4fb132f69b32b0f5).
