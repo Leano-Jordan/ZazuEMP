@@ -1965,3 +1965,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Added a feature regression for a mixed DJ/catering catalogue, ensuring inactive photography offerings are excluded while shared Jobs, Quotes and Finance remain visible.
 - Code/test commits: `afaab2e` (resolver), `35d1f4f` (layout), `52109a0` (styles), `2929945` (feature test). Exact-head CI is required before treating this slice as accepted.
 - Remaining: richer capability-to-module prioritisation and explicit offline profile contract; neither is claimed complete.
+
+
+## Offline workspace profile contract — 2026-11-23
+
+- The offline bootstrap now includes a nullable `workspace_profile` derived from the device's approving member and the business's existing selected focus and active catalogue.
+- The profile contains focus labels, active catalogue categories, active offering count and active rental count. It is presentation context only; it does not alter authorization, record selection, sync identity, or business data visibility.
+- The offline client persists the profile in its business-scoped IndexedDB state. Older bootstrap payloads remain compatible: absence of the field preserves the existing local value; an explicit null clears it.
+- Added an onboarding feature regression covering a mixed DJ/catering/rental catalogue and excluding inactive photography from the offline profile.
+- Source commits: `74c7689a` (bootstrap), `348eb787` (offline client state), `01dd72dd` / `e848ee22` / `9e44ac4e` (regression).
+- **Verification pending:** exact-head CI/PHPUnit and mobile/desktop offline presentation acceptance. The profile is available locally but is not yet consumed by a dedicated offline UI surface.
