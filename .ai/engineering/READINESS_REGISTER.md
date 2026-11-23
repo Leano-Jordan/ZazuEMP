@@ -7,7 +7,7 @@
 - Owner-tested but failed: encrypted business archive restore against disposable empty workspace. The initial failure stage is not conclusively identified; later SYS-002/429 is rate limiting, not the root cause.
 - Corrected on main: Windows PHP host now explicitly sets 100M upload / 110M POST and 300-second execution/input limits; restore audit writes are now inside the restore transaction with rollback/file cleanup on audit failure.
 - Maintainability: onboarding flow and archive encryption stream responsibilities split into focused classes; obsolete encryption helpers removed. PHPMD passed on `2d7b1146`; final route wiring is on `620ab99b`.
-- Exact-head Laravel and Quality for `620ab99b` were queued at this checkpoint. Do not report them as passed until their runs complete.
+- Exact-head Laravel passed (744 passed, 1 skipped, 5,230 assertions); PostgreSQL migration/recovery, Zazu Quality, Psalm, Windows package/fresh install/archive, populated upgrade/rollback, Director Health and Push-on-main passed on `22300930`. Offline browser acceptance was still running at this checkpoint; SonarCloud skipped.
 - Formal 13-domain evidence-maturity score remains **71/100 (46/65)**; 77/100 in older hardening notes is not the canonical recalculated score. V1 remains **NOT READY**.
 
 Do not repeat connected startup, populated-record creation, or backup verification. Keep offline physical acceptance, successful business restore, full installation recovery, populated quote-to-profit reconciliation, POPIA and ZAZU clearance separate.
