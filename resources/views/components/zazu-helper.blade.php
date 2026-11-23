@@ -120,6 +120,21 @@
             'work.index' => 'Watch menu confirmation, dietary details, purchasing, preparation deadlines and delivery across upcoming bookings.',
             'work.show' => 'For this booking, review menu quantities, dietary details, purchasing, preparation and delivery.',
         ],
+        'decor' => [
+            'dashboard' => 'Keep styling scope, materials, setup plans, venue coordination and collection connected to each booking.',
+            'work.index' => 'Watch decor materials, setup timing, venue access and collection plans across upcoming bookings.',
+            'work.show' => 'For this booking, review the styling brief, materials, setup timing, venue access and collection.',
+        ],
+        'photography' => [
+            'dashboard' => 'Keep coverage, shot lists, crew, equipment, venue timing and final delivery connected to each booking.',
+            'work.index' => 'Watch coverage confirmation, shot lists, crew/equipment availability and delivery deadlines across upcoming bookings.',
+            'work.show' => 'For this booking, review coverage, shot list, crew, equipment, venue timing and final delivery.',
+        ],
+        'transport' => [
+            'dashboard' => 'Keep vehicle capacity, routes, loading, delivery windows and collection connected to each booking.',
+            'work.index' => 'Watch vehicle availability, route planning, loading and delivery/collection windows across upcoming bookings.',
+            'work.show' => 'For this booking, review vehicle capacity, route, loading, delivery window and collection.',
+        ],
     ];
 
     // Business-wide guidance reflects the active catalogue mix. On Job detail,
