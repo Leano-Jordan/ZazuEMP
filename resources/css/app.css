@@ -7782,6 +7782,7 @@ body.zazu-inspector-open { overflow:hidden; }
 
     .zazu-nav-area.is-open > .zazu-nav-flyout {
         display: block;
+        pointer-events: auto;
     }
 
     .zazu-nav-area-trigger {
