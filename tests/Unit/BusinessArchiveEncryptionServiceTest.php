@@ -87,6 +87,7 @@ class BusinessArchiveEncryptionServiceTest extends TestCase
             @unlink($legacy);
         }
     }
+
     public function test_unreadable_archive_path_fails_closed_during_format_detection(): void
     {
         $service = app(BusinessArchiveEncryptionService::class);
