@@ -2829,6 +2829,90 @@ function setupZazuOfflineDirectoryViews() {
                         panel.append(editButton);
                     }
 
+                    if (collection === 'suppliers' && current.local_id) {
+                        const editButton = document.createElement('button');
+                        editButton.type = 'button';
+                        editButton.className = 'zazu-btn zazu-btn-ghost mt-3';
+                        editButton.textContent = 'Edit saved supplier';
+                        editButton.setAttribute('aria-expanded', 'false');
+                        editButton.addEventListener('click', () => {
+                            let form = panel.querySelector('[data-zazu-offline-supplier-edit]');
+                            if (form) {
+                                form.hidden = !form.hidden;
+                                editButton.setAttribute('aria-expanded', form.hidden ? 'false' : 'true');
+                                if (!form.hidden) form.querySelector('input[name="name"]')?.focus();
+                                return;
+                            }
+
+                            form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = window.location.pathname;
+                            form.className = 'zazu-form mt-3';
+                            form.dataset.zazuOfflineEntity = 'supplier';
+                            form.dataset.zazuOfflineLocalId = current.local_id;
+                            const serverIdCandidate = current.server_id ?? current.id;
+                            const serverId = Number.isFinite(Number(serverIdCandidate)) && Number(serverIdCandidate) > 0
+                                ? Number(serverIdCandidate)
+                                : null;
+                            if (serverId) form.dataset.zazuOfflineServerId = String(serverId);
+                            form.dataset.zazuOfflineForceQueue = '1';
+                            form.dataset.zazuOfflineSupplierEdit = '1';
+                            form.setAttribute('aria-label', 'Edit '+definition.title(current));
+
+                            const grid = document.createElement('div');
+                            grid.className = 'zazu-form-grid';
+                            const addField = (labelText, name, value, type = 'text', required = false) => {
+                                const label = document.createElement('label');
+                                label.className = 'zazu-field';
+                                label.append(text('span', '', labelText));
+                                const input = document.createElement('input');
+                                input.type = type;
+                                input.name = name;
+                                input.value = value == null ? '' : String(value);
+                                input.required = required;
+                                label.append(input);
+                                grid.append(label);
+                            };
+
+                            addField('Supplier name', 'name', current.name, 'text', true);
+                            addField('Contact person', 'contact_name', current.contact_name || '');
+                            addField('Email', 'email', current.email || '','email');
+                            addField('Phone', 'phone', current.phone || '','tel');
+                            const notesLabel = document.createElement('label');
+                            notesLabel.className = 'zazu-field';
+                            notesLabel.append(text('span', '', 'Notes'));
+                            const notes = document.createElement('textarea');
+                            notes.name = 'notes';
+                            notes.rows = 3;
+                            notes.value = current.notes || '';
+                            notesLabel.append(notes);
+                            grid.append(notesLabel);
+
+                            const hint = text('p', 'zazu-panel-copy', 'Edits are saved on this device and queued for sync.');
+                            const actions = document.createElement('div');
+                            actions.className = 'zazu-actionbar mt-3';
+                            const save = document.createElement('button');
+                            save.type = 'submit';
+                            save.className = 'zazu-btn zazu-btn-primary';
+                            save.textContent = 'Save supplier';
+                            const cancel = document.createElement('button');
+                            cancel.type = 'button';
+                            cancel.className = 'zazu-btn zazu-btn-ghost';
+                            cancel.textContent = 'Cancel';
+                            cancel.addEventListener('click', () => {
+                                form.hidden = true;
+                                editButton.setAttribute('aria-expanded', 'false');
+                            });
+                            actions.append(save, cancel);
+                            form.append(grid, hint, actions);
+                            panel.append(form);
+                            editButton.setAttribute('aria-expanded', 'true');
+                            setupZazuOfflineForms();
+                            form.querySelector('input[name="name"]')?.focus();
+                        });
+                        panel.append(editButton);
+                    }
+
                     panel.append(text('p', 'zazu-panel-copy mt-3', 'This is the last synchronised and locally saved version on this device. Reconnect to refresh it.'));
                 });
                 actions.append(detailButton);
@@ -3268,10 +3352,12 @@ function setupZazuOfflineForms() {
                 };
             } else if (entity === 'supplier') {
                 const state = window.ZazuOffline.getState();
+                const localRecordId = form.dataset.zazuOfflineLocalId;
                 const serverId = form.dataset.zazuOfflineServerId;
-                const existing = serverId
-                    ? state?.suppliers?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
-                    : null;
+                const existing = state?.suppliers?.find(item =>
+                    (localRecordId && item.local_id === localRecordId)
+                    || (serverId && Number(item.id ?? item.server_id) === Number(serverId))
+                );
                 payload = {
                     local_id: existing?.local_id || localId,
                     server_id: existing?.server_id ?? (serverId ? Number(serverId) : null),
