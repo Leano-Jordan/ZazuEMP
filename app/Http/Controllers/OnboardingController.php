@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Support\Audit;
-use App\Support\CurrentBusiness;
+use App\Services\OnboardingProgressService;
 use App\Support\ExperienceLevel;
 use App\Support\NicheFocus;
 use Illuminate\Http\RedirectResponse;
