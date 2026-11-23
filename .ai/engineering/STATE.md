@@ -1741,3 +1741,17 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 ## Quote single-unit browser acceptance — 2026-11-23
 
 Added `e2e/quote-single-quantity-confirmation.spec.js` and wired it into the per-push Laravel workflow. The browser journey creates a fresh Job through the actual New Job form, opens the quote editor, proves a quantity of one requires confirmation and is excluded from the live subtotal, changes it to two to prove the confirmation clears and totals recalculate, then returns it to one and completes quote creation after explicit confirmation. It uses the same visible choice cards an operator uses. The browser test and workflow are committed directly to main. Exact-head Laravel/browser and Zazu Quality runs on the current head are queued; this checkpoint does not claim a pass.
+
+
+## Capability-derived Helper focus expansion — 2026-11-23
+
+**Implemented on `main`:**
+- Added Decor & styling, Photography & video, and Transport & delivery focus definitions, mapped to the exact existing catalogue categories.
+- Added corresponding Helper guidance for Dashboard, Jobs list and current Job.
+- Added the three focus choices to the existing setup options automatically through the shared `config('zazu.niches')` source.
+- Active `BusinessCapability` records infer additional Helper focus areas; inactive offerings remain excluded. Current Job saved requirement categories continue to take precedence.
+- Added regression coverage for all explicit focus choices and mixed Decor/Photography capability-derived guidance, including inactive-category exclusion.
+
+No new preset/configuration table, permissions, authorization paths, navigation gates, historical record mutations or offline contract changes were introduced. Exact-head CI is pending for commits `66a50d2`, `6ee5375` and `af78655`; do not mark this slice green until the checks complete.
+
+**Next:** validate contextual guidance against real Decor, Photography and Transport Job records; then consider progressive disclosure only where the active catalogue and existing permissions support it. Offline and physical PC/phone acceptance remain separate gates.
