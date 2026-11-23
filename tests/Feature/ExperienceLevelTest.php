@@ -88,12 +88,12 @@ class ExperienceLevelTest extends TestCase
 
         $this->get(route('onboarding.experience'))
             ->assertOk()
-            ->assertSee('What do you mainly provide?')
+            ->assertSee('Your business activities')
             ->assertSee('Sound &amp; DJ', false);
 
         $this->post(route('onboarding.experience.store'), [
             'experience_level' => 'advanced',
-        ])->assertRedirect(route('onboarding.business'));
+        ])->assertRedirect(route('onboarding.catalogue'));
 
         $this->assertSame(
             'advanced',
