@@ -39,7 +39,7 @@ class ZazuBackupCommand extends Command
     private function runBackup(string $directory): int
     {
         $stamp = now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid());
-        $work = storage_path('app/.zazu-backup-'.$stamp);
+        $work = storage_path('app/zazu-backups/.zazu-backup-'.$stamp);
         $archive = $directory.DIRECTORY_SEPARATOR.'zazu-backup-'.$stamp.'.zip';
         $temporaryArchive = $archive.'.tmp';
 
