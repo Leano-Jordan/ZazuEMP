@@ -807,7 +807,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0043
 
-**Status:** IMPLEMENTED — exact-head Laravel regression pending at the 2026-11-23 audit checkpoint.
+**Status:** CLOSED — exact-head Laravel PASS (744 passed, 1 skipped, 5,230 assertions; run 45205116099).
 
 **Engineering code:** ENG-RECOVERY-002  
 **Class:** F1 — application defect  
@@ -819,7 +819,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Correction on main:** the service now accepts an after-restore callback and executes it inside the same database transaction. An audit exception rolls back database changes and enters the existing cleanup path for newly written private files.
 
-**Regression:** encrypted restore flow deliberately creates a SQLite trigger that rejects `business.archive_restored`. It asserts that the target customer is absent and the only private file remaining is the original source file.
+**Regression:** encrypted restore flow deliberately creates a SQLite trigger that rejects `business.archive_restored`. It asserts that the target customer is absent and the only private file remaining is the original source file. The full BusinessArchiveEncryptionFlowTest passed on application head 620ab99b in Laravel run 45205116099.
 
 **Scope note:** this is a confirmed source-level consistency defect found during the widespread audit. It is not asserted to be the root cause of the Founder's earlier archive-upload failure.
 
