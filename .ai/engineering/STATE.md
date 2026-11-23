@@ -14,7 +14,7 @@
 - Every group is guarded by the corresponding existing permission (work.view, purchasing.view, assets.view) and constrained to the current Job/business. Asset allocation lookup additionally constrains both the allocation and related Asset to the active business.
 - Regression coverage includes the live preparation, purchasing, planned-cost and asset records, plus checks that a staff member without purchasing or asset permissions cannot see those records.
 
-**Verification boundary:** code and tests are committed to main. Exact-head Laravel, PostgreSQL, desktop/mobile offline browser, PHPMD and Zazu Quality are running against the newest test/UI changes; no pass is claimed here. The malformed Blade class-reference was corrected in afc892b; the follow-up PHPMD check on the test split passed at 30a5f0d. Re-check against the latest main head before declaring this Helper slice accepted.
+**Exact source/test verification — `d0d1881f7eaf190e502fe2a69ca6a7253927973c`:** Laravel **715 passed / 1 skipped / 5,039 assertions** (run `45133960714`); PostgreSQL migration/recovery **PASS**; coverage report **PASS**; PHPMD **PASS** (run `45133960741`); Zazu Quality **PASS** (run `45133960715`); Director Health **PASS** (run `45133960609`); Push-on-main **PASS** (run `45133960268`). SonarCloud was **SKIPPED**. The desktop/mobile offline-browser acceptance job was still running at the time of this checkpoint; do not call the complete acceptance batch green until it finishes.
 
 **Next:** only add another operational recommendation when an existing record and permission justify it. Keep the current Job's state as the single workflow authority; do not invent tasks or add a parallel AI workflow engine.
 
