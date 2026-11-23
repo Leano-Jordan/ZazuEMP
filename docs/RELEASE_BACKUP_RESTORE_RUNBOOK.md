@@ -77,15 +77,18 @@ Business-level export/restore is implemented separately through the owner-only E
 
 ## Confidentiality and storage protection
 
-**Both archive formats are currently unencrypted ZIP files.** The installation archive contains the entire installation database and private storage; the business archive contains the selected business's allowlisted records and referenced files. Neither is password-protected.
+**The two archive classes now have deliberately different protection models.** Installation-wide scheduled backups remain unattended ZIP files because startup/scheduled recovery must not depend on a human passphrase. Store their off-disk copies only on encrypted removable media or in an encrypted, access-controlled vault. New business `.zazu` exports are encrypted with XChaCha20-Poly1305 using a key derived from the owner-supplied passphrase with Argon2id; each chunk is authenticated and the archive is streamed so large workspaces are not loaded into memory.
 
-The installation backup's SHA-256 manifest detects payload changes; it does not encrypt the data or authenticate who created the archive. Business-archive validation enforces its structure and allowlists; it does not provide cryptographic confidentiality or creator authentication.
+The installation backup's SHA-256 manifest detects payload changes; it does not encrypt the data or authenticate who created the archive. Business V2 exports provide confidentiality and authenticated integrity through Sodium secretstream. The business archive's existing schema allowlists and tenant checks remain in force after decryption.
 
 - Treat every archive as sensitive personal and commercial information.
 - Keep off-disk copies on an encrypted removable drive or in a properly encrypted, access-controlled storage vault. Full-disk encryption helps protect a powered-off device but does not protect a copied archive once it leaves that device.
 - Do not email archives, attach them to support tickets, or place them in public/shared folders.
 - POSIX backup/restore staging is now restricted to owner-only directories/files (0700/0600). Temporary backup, restore and rollback artifacts are kept under `storage/app/zazu-backups/`, outside the private-media tree. On Windows, `Install-Zazu.ps1` already restricts `storage/app/zazu-backups` to the installation owner, SYSTEM and local Administrators; verify that ACL remains intact before copying archives.
-- Application-level archive encryption remains an open hardening item. Do not describe ZIP checksums or local file permissions as encryption.
+- Business V2 exports require a 12–128 character passphrase at export and the same passphrase at restore. Use a unique passphrase of at least 16 characters or several random words; keep it separately from the `.zazu` file. Zazu cannot recover a forgotten passphrase.
+- Business V2 uses PHP Sodium secretstream XChaCha20-Poly1305 with Argon2id key derivation and authenticated final-chunk verification. Decryption completes into a private temporary file before the existing ZIP schema/tenant validation and restore process starts.
+- Existing plaintext V1 `.zazu` exports remain importable for migration compatibility. They are not retroactively encrypted; protect or re-export them immediately.
+- Installation-wide backups remain plain ZIP by design so unattended recovery works without a passphrase. Local staging is permission-restricted; off-disk copies must be stored encrypted and access-controlled. Do not describe checksums or local file permissions as encryption.
 
 The allowlist includes `invoice_number_sequences`, so the per-business invoice counter moves with the invoice records. Existing format-v1 archives created before this dataset was added remain restorable; the importer supplies an empty sequence dataset, and the invoice generator reconciles the next number against invoices already restored. Keep the sequence table in archive coverage tests whenever invoice issuance or archive datasets change.
 
