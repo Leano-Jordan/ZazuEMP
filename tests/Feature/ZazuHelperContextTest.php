@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Asset;
+use App\Models\AssetAllocation;
 use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Models\Event;
+use App\Models\EventCost;
 use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Models\PurchaseOrder;
@@ -45,6 +48,23 @@ class ZazuHelperContextTest extends TestCase
             'business_id' => $business->id,
             'name' => 'Restricted supplier',
         ]);
+        $restrictedAsset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'HELPER-STAFF-ASSET',
+            'name' => 'Restricted asset',
+            'status' => 'allocated',
+            'condition' => 'good',
+            'purchase_cost' => '500.00',
+            'currency' => 'ZAR',
+        ]);
+        AssetAllocation::create([
+            'business_id' => $business->id,
+            'asset_id' => $restrictedAsset->id,
+            'event_id' => $event->id,
+            'allocated_from' => now()->toDateString(),
+            'allocated_until' => now()->addDay()->toDateString(),
+            'status' => 'allocated',
+        ]);
         PurchaseOrder::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
@@ -62,7 +82,9 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('1 preparation item')
             ->assertSee('Review preparation')
             ->assertDontSee('purchase order')
-            ->assertDontSee('Review purchasing');
+            ->assertDontSee('Review purchasing')
+            ->assertDontSee('HELPER-STAFF-ASSET')
+            ->assertDontSee('Restricted asset');
     }
 
     public function test_helper_guidance_adapts_to_the_saved_business_focus(): void
@@ -188,17 +210,21 @@ class ZazuHelperContextTest extends TestCase
             'category' => 'Equipment',
             'quantity' => '2.00',
             'unit' => 'set',
-            'status' => 'open',
+            'status' => 'blocked',
         ]);
+        $this->createPlannedHelperCost($business, $event);
+        $assetTag = $this->createAllocatedHelperAsset($business, $event);
+
         $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Event component supplier',
         ]);
+        $purchaseOrderReference = 'HELPER-EVENT-PO-'.Str::upper(Str::random(5));
         PurchaseOrder::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
             'supplier_id' => $supplier->id,
-            'reference' => 'HELPER-EVENT-PO-'.Str::upper(Str::random(5)),
+            'reference' => $purchaseOrderReference,
             'status' => 'sent',
             'currency' => 'ZAR',
             'total_amount' => '250.00',
@@ -214,7 +240,7 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('data-zazu-helper-focuses="chairs_tents"', false)
             ->assertSee('For this booking, review hire quantities, asset availability, delivery, setup, collection and condition.')
             ->assertDontSee('For this booking, review menu quantities, dietary details, purchasing, preparation and delivery.')
-            ->assertSee('data-zazu-helper-event-records="2"', false)
+            ->assertSee('data-zazu-helper-event-records="4"', false)
             ->assertSee('1 preparation item')
             ->assertSee('1 purchase order')
             ->assertSee('href="'.route('work.preparation.index', $event).'"', false)
@@ -222,8 +248,57 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('href="'.route('purchasing.index', ['event_id' => $event->id]).'"', false)
             ->assertSee('Review purchasing')
             ->assertSee('data-zazu-helper-event-record-link', false)
+            ->assertSee('data-zazu-helper-event-operational-details="4"', false)
+            ->assertSee('Current operational state')
+            ->assertSee('Prepare tent hardware')
+            ->assertSee('Blocked')
+            ->assertSee($purchaseOrderReference)
+            ->assertSee('Sent')
+            ->assertSee('Confirm equipment supplier cost')
+            ->assertSee('Planned')
+            ->assertSee($assetTag)
+            ->assertSee('Allocated')
             ->assertDontSee('Catering preparation')
             ->assertDontSee('Camera editing');
+    }
+
+    private function createAllocatedHelperAsset(Business $business, Event $event): string
+    {
+        $assetTag = 'HELPER-ASSET-'.Str::upper(Str::random(5));
+        $asset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => $assetTag,
+            'name' => 'Stretch tent asset',
+            'status' => 'allocated',
+            'condition' => 'good',
+            'purchase_cost' => '1500.00',
+            'currency' => 'ZAR',
+        ]);
+
+        AssetAllocation::create([
+            'business_id' => $business->id,
+            'asset_id' => $asset->id,
+            'event_id' => $event->id,
+            'allocated_from' => now()->toDateString(),
+            'allocated_until' => now()->addDay()->toDateString(),
+            'status' => 'allocated',
+        ]);
+
+        return $assetTag;
+    }
+
+    private function createPlannedHelperCost(Business $business, Event $event): EventCost
+    {
+        return EventCost::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'category' => 'Equipment',
+            'description' => 'Confirm equipment supplier cost',
+            'currency' => 'ZAR',
+            'projected_amount' => '250.00',
+            'actual_amount' => null,
+            'status' => 'planned',
+        ]);
     }
 
     private function makeBusiness(string $name): Business

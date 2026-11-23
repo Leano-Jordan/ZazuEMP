@@ -2,11 +2,13 @@
 
 **Status:** CONTRACT TEMPLATE — USE ONLY WHERE APPLICABLE  
 **Current owner:** Isaac Junior Lehlogonolo Maluleka  
-****Operating address:** [Operating address — see private records]
+**Operating address:** [Operating address — see private records]
 
 ## Purpose
 
 Provide a checklist for situations where another person or organisation processes personal information on behalf of the responsible party.
+
+**Control rule:** do not sign or publish this template as an executed operator agreement. Complete it only for a real deployment/provider relationship. The hosting shortlist or framework integration capability is not evidence that a provider has been engaged. The solo operator must separately determine whether it is acting as an operator or as a responsible party for each processing purpose.
 
 ## Before processing begins
 

@@ -103,6 +103,7 @@
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Special details</span>
                             <textarea name="notes" rows="4" class="zazu-textarea">{{ old('notes', $requirement?->notes) }}</textarea>
+                            <span class="zazu-field-help">Record only details needed to deliver this item. For allergies or dietary needs, use the practical instruction only; avoid diagnoses or medical history.</span>
                             <span class="zazu-field-help">Colour, size, menu, timing, quantity details or anything else the team needs to know.</span>
                         </label>
                     </div>

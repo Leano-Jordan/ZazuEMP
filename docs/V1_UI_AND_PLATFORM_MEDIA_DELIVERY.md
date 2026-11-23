@@ -111,3 +111,10 @@ Physical PC/phone visual review, real installation offline acceptance and restar
 ## Quote line quantity-one safeguard — 2026-11-23
 
 The quote builder already requires explicit quantity and unit-price inputs for every line. It now adds a second guard for the highest-risk default: when an operator enters exactly one, a per-line confirmation appears and becomes mandatory. The live summary flags that line and excludes it from the displayed subtotal until confirmed. New quote creation and draft revision updates apply the same server-side rule; no client-side-only validation is trusted.
+
+
+## Job Helper operational state — 2026-11-23
+
+The Job detail Helper now complements the saved event components and business focus with actual, permission-filtered operational records. It shows up to two outstanding preparation items, planned costs, live purchase orders and allocated serialized assets. Each record carries its own current status/reference and a direct link to the existing workspace. The lookup stays within the current Event and business; the Asset lookup also verifies the related Asset's business ownership. No work item is generated or inferred where there is no underlying record.
+
+Regression coverage asserts the four record types and the staff permission fence for purchasing and assets. Exact-source Laravel (715 passed / 1 skipped / 5,039 assertions), PostgreSQL migration/recovery, coverage, PHPMD and Zazu Quality passed on `d0d1881`; desktop/mobile offline-browser acceptance remained in progress at this checkpoint.

@@ -34,6 +34,16 @@ Depending on the deployment and features used:
 
 Zazu should not be described as collecting information that the actual deployed feature set does not collect.
 
+## 3A. Dietary, allergy and other health-related details
+
+Zazu is an event/business-management tool, not a medical-record or healthcare service. Event notes or service requirements may nevertheless contain dietary, allergy or other health-related details entered by a customer. Treat these details as potentially sensitive personal information.
+
+Customers should record only the minimum instruction needed to safely plan and deliver the event (for example, an allergen to avoid or a required meal adjustment). Do not enter diagnoses, medical histories, identity-document numbers or unrelated health information into general event notes. Restrict access to staff who need the information for the event, do not reuse it for unrelated purposes, and remove it when it is no longer needed and no lawful retention reason applies.
+
+The POPIA regulations published in Government Gazette 54268, Government Notice 7198 (6 March 2026) address health-information processing by specified categories of responsible parties, including insurers, medical schemes/administrators, managed healthcare organisations, administrative bodies, pension funds, employers and institutions working for those bodies. They are not a blanket new rule for every Zazu user or every business. The actual responsible-party role, data category and deployment must be assessed where health information is processed. Customers in those categories must obtain specific legal advice before using Zazu to process health information in those capacities.
+
+Official source: [Government Notice 7198, GG 54268 (6 March 2026)](https://www.justice.gov.za/legislation/notices/2026/20260306-gg54268gon7198-Paia-Regulations-Amended.pdf).
+
 ## 4. Purposes
 
 Information may be used to provide event and business-management functionality; maintain account, workspace and role-based access; connect customer and job records to business operations; generate invoices, reports and operational records; secure the service, diagnose faults and investigate incidents; provide requested support; maintain backup and recovery capability; and meet applicable legal, regulatory and contractual obligations.
@@ -84,13 +94,13 @@ Subscription expiry alone does not delete customer data. Under the intended comm
 
 ## 10. Requests and complaints
 
-The final responsible-party process must explain how a person can request applicable access, correction, deletion or objection handling and how to complain to the Information Regulator where applicable.
+A person may submit a privacy/data-subject request through **rosscorelabs@outlook.com**, the owner-approved provisional Zazu contact channel. This address must be monitored, access-controlled and tested before the notice is published; it is not a dedicated Zazu mailbox. The request will be routed to the responsible party for the relevant records. Access requests follow the applicable PAIA/POPIA route; objections and correction/deletion requests follow the applicable POPIA procedures. Form 1/2 procedures under the amended POPIA Regulations must be made reasonably accessible and free of charge where applicable.
 
-The internal process is recorded in RELEASE_DATA_SUBJECT_REQUEST_PROCEDURE.md. The actual contact channel must be inserted and tested before publication.
+The internal procedure is recorded in RELEASE_DATA_SUBJECT_REQUEST_PROCEDURE.md. Deletion is not absolute where the responsible party remains authorised or required to retain information, and the service has no general self-service deletion/export portal at this time.
 
 ## 11. Security compromises
 
-The incident process must address containment, investigation, escalation and any notification required by POPIA. The operating procedure is recorded in RELEASE_SECURITY_INCIDENT_RESPONSE.md.
+The incident process must address containment, investigation, escalation and any notification required by POPIA. Where a responsible party has reasonable grounds to believe personal information was accessed or acquired by an unauthorised person, the Information Regulator's guidance says notification must be made as soon as reasonably possible; the investigation need not be complete first. Operators must immediately notify the responsible party. The current reporting route is the Regulator's [eServices security-compromise portal](https://eservices.inforegulator.org.za/compromises/default.aspx). The operating procedure is recorded in RELEASE_SECURITY_INCIDENT_RESPONSE.md.
 
 ## 12. Operators and third parties
 

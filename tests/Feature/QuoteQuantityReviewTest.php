@@ -151,6 +151,9 @@ class QuoteQuantityReviewTest extends TestCase
                 $serviceRequirement->id => '8.00',
                 $starterServiceRequirement->id => '1.00',
             ],
+            'confirm_single_quantity' => [
+                $starterServiceRequirement->id => '1',
+            ],
             'unit_price' => [
                 $productRequirement->id => '45.00',
                 $serviceRequirement->id => '120.00',

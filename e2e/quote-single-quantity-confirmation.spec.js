@@ -34,10 +34,11 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     await eventTypeChoice.click();
     await expect(eventTypeChoice.locator('input[name="event_type"]')).toBeChecked();
 
-    const serviceChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"])').first();
+    const serviceChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"][value="Buffet Catering"])');
     await expect(serviceChoice).toBeVisible();
     await serviceChoice.click();
     await expect(serviceChoice.locator('input[name="services[]"]')).toBeChecked();
+    const selectedService = (await serviceChoice.innerText()).trim();
 
     await form.locator('input[name="name"]').fill('Quantity confirmation acceptance ' + runId);
     const eventDate = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -86,5 +87,12 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
 
     await page.getByRole('button', { name: 'Save quote v1' }).click();
     await expect(page).toHaveURL(/\/quotes\/\d+$/);
-    await expect(page.getByText('Draft quote created.', { exact: true })).toBeVisible();
+
+    const quoteHeading = page.getByRole('heading', { name: /^QUO-/ });
+    await expect(quoteHeading).toBeVisible();
+    const savedLines = page.locator('.zazu-quote-lines');
+    await expect(savedLines).toContainText(selectedService);
+    await expect(savedLines).toContainText('2.00 guest');
+    await expect(savedLines).toContainText('ZAR 123.45');
+    await expect(page.locator('.zazu-total-row')).toContainText('ZAR 123.45');
 });

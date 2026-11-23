@@ -1,3 +1,49 @@
+## POPIA documentation and data-minimisation checkpoint — 2026-11-23
+
+**Documentation refreshed on main:**
+- Updated the data-subject procedure to distinguish objections (Form 1), correction/deletion (Form 2), record access through PAIA/POPIA, and customer-managed records where Zazu is an operator. It uses the owner-approved provisional contact channel but does not claim a self-service portal.
+- Updated the privacy notice draft with hosted/local role distinctions, a provisional contact disclosure, the lack of self-service deletion, and minimal handling of allergy/dietary information.
+- Updated the incident runbook to remove the obsolete regulator-channel placeholder and retain the current eServices process, immediate operator escalation and no-low-risk-threshold handling.
+- Updated PAIA and operator-control drafts so requests are routed by responsible-party role and operator templates are not represented as executed contracts.
+- Added `docs/RELEASE_PRIVACY_OPERATIONS_REGISTER_TEMPLATE.md` for data-subject request, security-compromise and provider inventories. The working register must be stored outside GitHub; no personal information or completed register entries belong in the repository.
+- Updated the privacy engineering baseline and legal register against the 2025 amended POPIA Regulations and the scoped 2026 health/sex-life information Regulations.
+- Added minimal data-entry guidance on Job notes and requirement Special details: record only the operational instruction needed for the event; avoid diagnoses and medical history. `PrivacyDataMinimisationCopyTest` covers both surfaces.
+
+**Release disposition:** these changes improve documentation and user guidance; they do not provide a DSAR/export/deletion portal, automated retention/deletion scheduler, executed operator agreements, registered Information Officer evidence or legal sign-off. The operational POPIA gate remains OPEN. Do not claim compliance certification.
+
+## Windows installation candidate verification — 2026-11-23
+
+- Runtime/source head: `6933f41621fd8ac2e3ff7b311d3eb81123594511` (includes the Helper current-state implementation, including rental asset allocations).
+- GitHub Actions Windows V1 Package run `45133569162`: **Build Windows installation candidate — PASS**; **Verify fresh install on Windows PowerShell — PASS**.
+- The optional GitHub prerelease publication job was **SKIPPED**; no prerelease publication is claimed.
+- This verifies package construction and a clean PowerShell installation workflow in CI. It does not substitute for restoring the Founder’s intended installed PC from the independently verified backup or for physical Android offline acceptance.
+
+## Helper current Job operational state — 2026-11-23
+
+**Implemented directly on main:**
+- Job detail Helper still presents the saved components of the current business-owned Event and current event-specific focus.
+- Added a compact current-state list backed by existing operational records: outstanding/open or blocked preparation items, planned costs, draft/sent/ordered purchase orders, and currently allocated assets.
+- Each row exposes the record's real label/reference and actual state, with a direct workspace link. It does not create tasks or infer missing work from empty relationships.
+- Every group is guarded by the corresponding existing permission (work.view, purchasing.view, assets.view) and constrained to the current Job/business. Asset allocation lookup additionally constrains both the allocation and related Asset to the active business.
+- Regression coverage includes the live preparation, purchasing, planned-cost and asset records, plus checks that a staff member without purchasing or asset permissions cannot see those records.
+
+**Exact source/test verification — `d0d1881f7eaf190e502fe2a69ca6a7253927973c`:** Laravel **715 passed / 1 skipped / 5,039 assertions** (run `45133960714`); PostgreSQL migration/recovery **PASS**; coverage report **PASS**; PHPMD **PASS** (run `45133960741`); Zazu Quality **PASS** (run `45133960715`); Director Health **PASS** (run `45133960609`); Push-on-main **PASS** (run `45133960268`). SonarCloud was **SKIPPED**. The desktop/mobile offline-browser acceptance job was still running at the time of this checkpoint; do not call the complete acceptance batch green until it finishes.
+
+**Next:** only add another operational recommendation when an existing record and permission justify it. Keep the current Job's state as the single workflow authority; do not invent tasks or add a parallel AI workflow engine.
+
+## Founder installation and business backup verification — 2026-11-23
+
+Founder reports the following live owner-PC checks while starting the Zazu server:
+
+- Startup database check displayed: “The Zazu database is up to date.” Record this as **OWNER-VERIFIED database migration check PASS** for the installed environment at this observation.
+- The latest installation-backup file is visible on the PC; the Zazu backup UI shows it as approximately **7 hours old** at the time of the observation.
+- A business-level backup was downloaded.
+- Founder independently verified the installation and business backup files.
+
+**Recorded status:** installation backup present and independently verified — OWNER-VERIFIED PASS; business archive downloaded and independently verified — OWNER-VERIFIED PASS; installed database reports no pending migrations — OWNER-VERIFIED PASS.
+
+**Still separate / NOT CLOSED:** a file existing and being independently verified does not prove that the intended installation can be fully restored. The controlled owner-PC restore drill, including database, configuration/key handling, private media and post-restore startup/workspace verification, remains OPEN until a restore is actually performed and checked. Preserve the existing installation and backup files; do not ask the Founder to repeat checks already completed.
+
 ## Helper event-component context slice — 2026-11-23
 
 **Implemented directly on `main`:**

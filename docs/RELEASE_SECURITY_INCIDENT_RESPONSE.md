@@ -6,11 +6,13 @@
 **Operating address:** [Operating address — see private records]
 **Information Officer:** Isaac Junior Lehlogonolo Maluleka — formal registration/appointment status to be confirmed before publication  
 **Deputy / escalation:** Not applicable to the current solo-operator model; external legal/regulatory support to be engaged when required  
-**Regulatory contact process:** `[APPROVED CHANNEL TO BE CONFIRMED BEFORE PUBLICATION]`
+**Regulatory contact process:** Information Regulator eServices Security Compromise portal — https://eservices.inforegulator.org.za/compromises/default.aspx
 
 ## Purpose
 
 Control suspected or confirmed unauthorised access, disclosure, loss, corruption, malicious modification, credential compromise or private-media exposure.
+
+**Role boundary:** do not describe the named solo operator as a formally registered Information Officer until the appointment and registration status have been verified. The internal incident owner is not, by itself, proof of regulatory registration. The current provisional customer-reporting email is rosscorelabs@outlook.com; it must be monitored and tested. It is not the Regulator reporting channel.
 
 ## Severity
 
@@ -72,6 +74,9 @@ Queued changes that exist only on the missing phone will not be uploaded after r
 If the phone is recovered, preserve its browser storage until the owner decides whether locally queued work must be reconciled. Do not clear site data or uninstall the PWA before that decision. Re-pair only after the device is back under business control and the owner has authorised its return to service.
 
 ## Investigation
+
+Use the blank [Privacy Operations Register Template](RELEASE_PRIVACY_OPERATIONS_REGISTER_TEMPLATE.md) to record incident metadata and protected evidence references. Keep completed incident records and all supporting personal information in a restricted location outside GitHub.
+
 
 Determine:
 

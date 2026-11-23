@@ -1,3 +1,25 @@
+## POPIA operational documentation update — 2026-11-23
+
+- [x] Refresh the manual data-subject request procedure for objection, correction/deletion, access and role routing; self-service remains unavailable.
+- [x] Refresh privacy notice draft for hosted/local processing roles, provisional contact, dietary/allergy data minimisation and incident escalation.
+- [x] Correct regulator eServices reporting reference in the security incident runbook.
+- [x] Clarify PAIA routing and the operator agreement template boundary.
+- [x] Add privacy request, incident and provider inventory template. Working records must be kept outside GitHub.
+- [x] Add data-minimisation guidance to Job notes and requirement special details, with feature coverage.
+- [ ] Complete Information Officer appointment/registration and PAIA applicability/manual obligations for the actual responsible party.
+- [ ] Test/monitor the approved provisional support/privacy mailbox and confirm final public provider/contact details.
+- [ ] Inventory actual sub-operators and execute written operator terms where required.
+- [ ] Approve the retention/disposal policy, verify private-media disposal and backup expiry, and complete legal review/tabletop exercise.
+
+**Disposition:** documentation/UI refinement is implemented. POPIA operational sign-off remains OPEN; these edits are not legal approval or a compliance claim.
+
+## Windows installation candidate verification — 2026-11-23
+
+- Runtime/source head: `6933f41621fd8ac2e3ff7b311d3eb81123594511` (includes the Helper current-state implementation, including rental asset allocations).
+- GitHub Actions Windows V1 Package run `45133569162`: **Build Windows installation candidate — PASS**; **Verify fresh install on Windows PowerShell — PASS**.
+- The optional GitHub prerelease publication job was **SKIPPED**; no prerelease publication is claimed.
+- This verifies package construction and a clean PowerShell installation workflow in CI. It does not substitute for restoring the Founder’s intended installed PC from the independently verified backup or for physical Android offline acceptance.
+
 # Owner-verified physical operation and populated workspace — 2026-11-22
 
 **Founder evidence update; current repository baseline:** [`cd7762a`](https://github.com/Leano-Jordan/ZazuEMP/commit/cd7762a18976eeae7cef6d2c4fb132f69b32b0f5).
@@ -12,6 +34,19 @@ The Founder confirms physical operation of Zazu EMP on the PC and linked mobile 
 - **Data classification:** Founder confirms all test/business records supplied for this exercise are fictional.
 
 Do not ask the Founder to recreate records or repeat basic connected PC/mobile startup checks. Do not infer that connected operation proves disconnected cold-start, offline write/restart/reconnect, attachment sync, full installation restore, or transaction-level quote-to-profit reconciliation. Keep those distinct evidence gates open until directly demonstrated. The owner-PC off-disk backup/restore and POPIA/name-clearance gates are also unaffected.
+## Founder installation and business backup verification — 2026-11-23
+
+Founder reports the following live owner-PC checks while starting the Zazu server:
+
+- Startup database check displayed: “The Zazu database is up to date.” Record this as **OWNER-VERIFIED database migration check PASS** for the installed environment at this observation.
+- The latest installation-backup file is visible on the PC; the Zazu backup UI shows it as approximately **7 hours old** at the time of the observation.
+- A business-level backup was downloaded.
+- Founder independently verified the installation and business backup files.
+
+**Recorded status:** installation backup present and independently verified — OWNER-VERIFIED PASS; business archive downloaded and independently verified — OWNER-VERIFIED PASS; installed database reports no pending migrations — OWNER-VERIFIED PASS.
+
+**Still separate / NOT CLOSED:** a file existing and being independently verified does not prove that the intended installation can be fully restored. The controlled owner-PC restore drill, including database, configuration/key handling, private media and post-restore startup/workspace verification, remains OPEN until a restore is actually performed and checked. Preserve the existing installation and backup files; do not ask the Founder to repeat checks already completed.
+
 ## Physical Android acceptance — REQUIRED / PENDING
 
 **Acceptance status: NOT YET PERFORMED.** The Founder-confirmed fictional workspace already contains customers, quotes, invoices, suppliers, purchase orders and inventory. The PC and linked Android phone already use that same workspace. Do not create duplicate setup records, reseed the workspace or re-pair devices. The physical acceptance run itself is still required.
