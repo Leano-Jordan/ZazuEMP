@@ -891,6 +891,59 @@ function setupZazuHelper() {
 }
 
 
+function setupZazuOfflineWorkspaceProfile() {
+    const panel = document.querySelector('[data-zazu-workspace-profile]');
+    const businessId = Number(document.body?.dataset.zazuBusinessId || 0);
+    if (!panel || !Number.isSafeInteger(businessId) || businessId < 1) return;
+
+    const render = () => {
+        const state = window.ZazuOffline?.getState?.();
+        if (!state || Number(state.business?.id || 0) !== businessId) return;
+
+        const profile = state.workspace_profile;
+        if (!profile || typeof profile !== 'object') return;
+
+        const count = Number(profile.active_offerings);
+        const countElement = panel.querySelector('[data-zazu-workspace-profile-count]');
+        if (countElement && Number.isFinite(count) && count >= 0) {
+            countElement.textContent = count + ' active ' + (count === 1 ? 'offering' : 'offerings');
+        }
+
+        const focusList = panel.querySelector('[data-zazu-workspace-profile-focuses]');
+        if (focusList && Array.isArray(profile.focus_labels)) {
+            const labels = profile.focus_labels.filter(label => typeof label === 'string' && label.trim() !== '');
+            const items = labels.length ? labels : ['No business focus selected'];
+            focusList.replaceChildren(...items.map(label => {
+                const item = document.createElement('span');
+                item.textContent = label;
+                return item;
+            }));
+        }
+
+        const categoriesElement = panel.querySelector('[data-zazu-workspace-profile-categories]');
+        if (categoriesElement && Array.isArray(profile.catalogue_categories)) {
+            const categories = profile.catalogue_categories
+                .filter(category => typeof category === 'string' && category.trim() !== '');
+            categoriesElement.textContent = categories.length
+                ? categories.join(' · ')
+                : 'Your service catalogue is ready to be configured.';
+        }
+    };
+
+    const bind = () => {
+        const offline = window.ZazuOffline;
+        if (offline?.ready && typeof offline.ready.then === 'function') {
+            offline.ready.then(render).catch(() => {});
+        }
+        render();
+    };
+
+    window.addEventListener('zazu:offline-ready', bind, { once: true });
+    window.addEventListener('zazu:offline-state-updated', render);
+    bind();
+}
+
+
 const initializeZazuUi = () => {
     setupZazuAuthExperience();
     setupZazuMobileNavigation();
@@ -900,6 +953,7 @@ const initializeZazuUi = () => {
     setupZazuCatalogue();
     setupZazuUserMenus();
     setupZazuBusinessSwitcher();
+    setupZazuOfflineWorkspaceProfile();
     setupZazuToasts();
     setupBrandingUploads();
     setupZazuHelper();
