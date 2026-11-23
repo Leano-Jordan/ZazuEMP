@@ -1,3 +1,21 @@
+## Windows business-archive acceptance — automated PASS — 2026-11-23
+
+**Test head:** `93c6e2a50b755a9aeb44715a120df1ff2cf2df21`.  
+**Windows V1 Package run:** [45149443876](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45149443876).
+
+The dedicated `windows-business-archive-acceptance` job ran the Laravel unit and feature tests on `windows-latest` with PHP 8.4, Sodium and ZipArchive:
+
+- **7 passed / 31 assertions**, with no test warnings on the final run.
+- Multi-chunk authenticated encryption/decryption passed.
+- Wrong passphrase and modified ciphertext were rejected.
+- Owner export produced the encrypted business archive.
+- Correct-passphrase restore imported the business records.
+- Legacy plaintext V1 business archive restore remained functional.
+
+This is automated Windows runtime evidence. It does **not** close the Founder’s installed-PC acceptance: repeat export and restore on the actual installed environment and confirm the live workspace remains intact. It also does not verify that the installation-wide secondary backup destination is encrypted; the scheduled runner only verifies the copied archive’s SHA-256.
+
+---
+
 ## Secondary-copy presence verification — 2026-11-22
 
 **Implementation:** [c992b98](https://github.com/Leano-Jordan/ZazuEMP/commit/c992b986497ca1c233437212d55b3e93ad29c455).
