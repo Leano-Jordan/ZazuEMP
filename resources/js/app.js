@@ -2989,6 +2989,7 @@ function setupZazuOfflineForms() {
 
             let payload;
             let scheduleConflictNames = [];
+            let customerPhotoChangeDeferred = false;
             if (entity === 'customer') {
                 const offlineState = window.ZazuOffline.getState();
                 const serverId = form.dataset.zazuOfflineServerId;
@@ -3003,11 +3004,8 @@ function setupZazuOfflineForms() {
                 }
 
                 const profilePhoto = formData.get('profile_photo');
-                if ((profilePhoto instanceof File && profilePhoto.size > 0) || get('remove_profile_photo') === '1') {
-                    releaseSubmitLock();
-                    window.alert('Customer profile photo changes need a connection. Save the customer details first, then update the photo when Zazu is online.');
-                    return;
-                }
+                customerPhotoChangeDeferred = (profilePhoto instanceof File && profilePhoto.size > 0)
+                    || get('remove_profile_photo') === '1';
 
                 for (const period of ['day', 'night']) {
                     const contactName = get(period + '_contact_name');
@@ -3803,6 +3801,9 @@ function setupZazuOfflineForms() {
             notice.textContent = scheduleConflictNames.length
                 ? 'Saved on this device. Schedule overlap with: ' + scheduleConflictNames.join(', ') + '. Review the calendar before confirming this job. It will sync when Zazu reconnects.'
                 : 'Saved on this device. It will sync automatically when Zazu reconnects.';
+            if (customerPhotoChangeDeferred) {
+                notice.textContent += ' Customer details were saved, but the profile photo change was not saved. Update the photo when Zazu is online.';
+            }
             } catch (error) {
                 // IndexedDB quota, blocked upgrades, and transaction failures
                 // must not leave the submit button stuck or silently lose the user's work.
