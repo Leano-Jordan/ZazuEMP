@@ -1,3 +1,18 @@
+## POPIA operational documentation update — 2026-11-23
+
+- [x] Refresh the manual data-subject request procedure for objection, correction/deletion, access and role routing; self-service remains unavailable.
+- [x] Refresh privacy notice draft for hosted/local processing roles, provisional contact, dietary/allergy data minimisation and incident escalation.
+- [x] Correct regulator eServices reporting reference in the security incident runbook.
+- [x] Clarify PAIA routing and the operator agreement template boundary.
+- [x] Add privacy request, incident and provider inventory template. Working records must be kept outside GitHub.
+- [x] Add data-minimisation guidance to Job notes and requirement special details, with feature coverage.
+- [ ] Complete Information Officer appointment/registration and PAIA applicability/manual obligations for the actual responsible party.
+- [ ] Test/monitor the approved provisional support/privacy mailbox and confirm final public provider/contact details.
+- [ ] Inventory actual sub-operators and execute written operator terms where required.
+- [ ] Approve the retention/disposal policy, verify private-media disposal and backup expiry, and complete legal review/tabletop exercise.
+
+**Disposition:** documentation/UI refinement is implemented. POPIA operational sign-off remains OPEN; these edits are not legal approval or a compliance claim.
+
 ## Windows installation candidate verification — 2026-11-23
 
 - Runtime/source head: `6933f41621fd8ac2e3ff7b311d3eb81123594511` (includes the Helper current-state implementation, including rental asset allocations).
