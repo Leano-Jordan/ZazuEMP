@@ -131,10 +131,27 @@ $physicalDisks = Get-CimSafe -ClassName 'Win32_DiskDrive' | ForEach-Object {
 $installedMemoryGB = if ($computer.TotalPhysicalMemory) { [math]::Round(([double]$computer.TotalPhysicalMemory / 1GB), 1) } else { $null }
 $logicalProcessorCount = [Environment]::ProcessorCount
 $physicalCoreCount = ($processors | Measure-Object -Property NumberOfCores -Sum).Sum
+$projectStorageType = 'Unknown'
+try {
+    $driveLetter = $projectDrive.TrimEnd('\').TrimEnd(':')
+    $projectPartition = Get-Partition -DriveLetter $driveLetter -ErrorAction Stop | Select-Object -First 1
+    $projectDisk = Get-Disk -Number $projectPartition.DiskNumber -ErrorAction Stop
+    if ($projectDisk.BusType.ToString() -eq 'NVMe') {
+        $projectStorageType = 'SSD'
+    }
+    $physicalDisk = Get-PhysicalDisk -ErrorAction Stop |
+        Where-Object { $_.UniqueId -eq $projectDisk.UniqueId -or $_.FriendlyName -eq $projectDisk.FriendlyName } |
+        Select-Object -First 1
+    if ($physicalDisk -and $physicalDisk.MediaType.ToString() -in @('HDD', 'SSD', 'SCM')) {
+        $projectStorageType = $physicalDisk.MediaType.ToString()
+    }
+} catch {
+    $projectStorageType = 'Unknown'
+}
 $deviceTier = 'Mainstream'
-if (($null -ne $installedMemoryGB -and $installedMemoryGB -le 8) -or $logicalProcessorCount -le 4) {
+if (($null -ne $installedMemoryGB -and $installedMemoryGB -le 8) -or $logicalProcessorCount -le 4 -or $projectStorageType -eq 'HDD') {
     $deviceTier = 'Entry'
-} elseif ($installedMemoryGB -ge 16 -and $logicalProcessorCount -ge 8) {
+} elseif ($installedMemoryGB -ge 16 -and $logicalProcessorCount -ge 8 -and $projectStorageType -in @('SSD', 'SCM')) {
     $deviceTier = 'High-performance'
 }
 
@@ -165,6 +182,7 @@ $manifest = [ordered]@{
     logicalProcessors = $logicalProcessorCount
     physicalCores = $physicalCoreCount
     installedMemoryGB = $installedMemoryGB
+    projectStorageType = $projectStorageType
     deviceTier = $deviceTier
     buildCommitSha = $BuildCommitSha
     packageSha256 = $packageSha256
