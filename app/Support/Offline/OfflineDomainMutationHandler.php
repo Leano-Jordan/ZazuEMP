@@ -529,7 +529,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $names = array_values(array_unique(array_map(
-            fn (mixed $service): string => $this->requiredString($service, 'services', 100),
+            fn (mixed $service): string => $this->requiredString($service, 'services', 255),
             $services
         )));
         $catalogue = BusinessCapability::query()
