@@ -1873,3 +1873,11 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Reduced the service-worker navigation timeout to 1.8 seconds and added an abort-aware regression test that keeps browser network status online, stalls the host request, and verifies the worker serves the authenticated local dashboard shell rather than stale route HTML.
 - Implementation: `public/sw.js`; regression: `tests/js/service-worker-auth-cache.test.js`. Exact-head CI pending at `8d72e959acc9de580705072a4f741a788144aa53`.
 - This is a targeted responsiveness hardening, not proof that the physical Android issue is resolved. Confirm HTTPS origin, controlling service worker, primed cache and actual cold-launch behaviour on the phone before closing the gate.
+
+
+## Release gate evidence refresh — 2026-11-23
+
+- Founder confirms the encrypted business archive was downloaded from the installed Windows Zazu and independently checked. Installed-PC archive export is PASS; restore is not implied.
+- Exact-head host-outage hardening commit `d35d2f95e6d510c2d7b8dd78c0ff3e0d4036d988`: all 9 GitHub checks passed. The new 1.8-second hanging-host fallback regression passed with the full application/quality/security/CodeQL suite.
+- Release checklist updated at `295141dc34a1ae91b350a842e8c63986c9c081da` to separate verified work from owner-operated restore, physical Android, commercial reconciliation, independent-backup encryption, and legal/brand gates.
+- Do not mark V1 ready. The next founder-operated action is restore the downloaded `.zazu` only into a separate empty/unpaired test business workspace. Never overwrite the populated live workspace.
