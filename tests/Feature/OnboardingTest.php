@@ -272,4 +272,13 @@ class OnboardingTest extends TestCase
             ->assertSee('Open finance');
     }
 
+    private function selectBusinessFocus(User $user, Business $business): void
+    {
+        $user->businesses()->updateExistingPivot($business->id, [
+            'experience_level' => 'basic',
+            'primary_niche' => 'catering_baking',
+            'business_focuses' => json_encode(['catering_baking']),
+        ]);
+    }
+
 }
