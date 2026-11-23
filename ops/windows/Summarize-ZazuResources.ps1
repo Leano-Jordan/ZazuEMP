@@ -45,7 +45,7 @@ function Get-ResourcePercentile {
 }
 
 function Format-ResourceValue {
-    param([AllowNull()][double]$Value)
+    param([AllowNull()][object]$Value)
     if ($null -eq $Value) { return 'n/a' }
     return $Value.ToString('0.00', $culture)
 }
@@ -73,7 +73,6 @@ $lines.Add('# Zazu device performance report')
 $lines.Add('')
 $lines.Add(('- Captured: {0}' -f $manifest.capturedAtUtc))
 $lines.Add(('- Device cohort: {0}' -f $manifest.deviceTier))
-$lines.Add(('- Device: {0}' -f $env:COMPUTERNAME))
 $lines.Add(('- CPU: {0}' -f $manifest.cpuModel))
 $lines.Add(('- Logical processors: {0}; physical cores: {1}' -f $manifest.logicalProcessors, $manifest.physicalCores))
 $lines.Add(('- Installed RAM: {0} GB' -f $manifest.installedMemoryGB))
