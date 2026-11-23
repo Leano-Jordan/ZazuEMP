@@ -1,3 +1,18 @@
+## Offline supplier edit parity — implementation in progress — 2026-11-23
+
+**Implemented directly on `main`:**
+- Added an Edit saved supplier flow to the offline supplier collection detail panel. Name, contact person, email, phone and notes can be edited from the locally stored record.
+- Updated the shared supplier form handler to resolve an existing record by local identity as well as server ID. This supports both already-synchronised suppliers and suppliers created locally but not yet acknowledged by the server.
+- The edit is queued as an `update` mutation. When a local supplier's `create` is still pending, the durable queue preserves create-before-update dependency ordering rather than creating a duplicate supplier.
+- Added desktop Playwright regressions for a revision-checked update to a synchronised supplier and an edit to a locally created supplier with a queued create predecessor.
+- Added server-side operational-depth coverage for supplier create → update → duplicate replay, asserting one supplier row and identity revision advancement from 1 to 2.
+
+**Source commits:** UI/form handler `1b2ce8c3`; synced-supplier browser test `2da6e39b`; server replay/revision test `2258929a`; local-create dependency regression `ff73fbec`.
+
+**Verification pending:** exact-head Laravel, offline browser, PHP formatting/quality, PostgreSQL migration/recovery and Windows V1 package checks. No completion or release-readiness claim until these pass.
+
+---
+
 
 ## Offline inventory-item update parity — 2026-11-23
 
