@@ -82,15 +82,15 @@
                 <section class="zazu-workspace-profile" aria-label="Business mix" data-zazu-workspace-profile>
                     <div class="zazu-workspace-profile-heading">
                         <span>YOUR BUSINESS MIX</span>
-                        <strong>{{ $workspaceProfile['active_offerings'] }} active {{ \Illuminate\Support\Str::plural('offering', $workspaceProfile['active_offerings']) }}</strong>
+                        <strong data-zazu-workspace-profile-count>{{ $workspaceProfile['active_offerings'] }} active {{ \Illuminate\Support\Str::plural('offering', $workspaceProfile['active_offerings']) }}</strong>
                     </div>
-                    <div class="zazu-workspace-profile-focuses">
+                    <div class="zazu-workspace-profile-focuses" data-zazu-workspace-profile-focuses>
                         @foreach($workspaceProfile['focus_labels'] as $focusLabel)
                             <span>{{ $focusLabel }}</span>
                         @endforeach
                     </div>
                     @if($workspaceProfile['catalogue_categories'])
-                        <p>{{ implode(' · ', $workspaceProfile['catalogue_categories']) }}</p>
+                        <p data-zazu-workspace-profile-categories>{{ implode(' · ', $workspaceProfile['catalogue_categories']) }}</p>
                     @else
                         <p>Your service catalogue is ready to be configured.</p>
                     @endif
