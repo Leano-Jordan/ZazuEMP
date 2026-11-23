@@ -158,7 +158,19 @@ class BusinessExportController extends Controller
             }
 
             $restoreStage = 'archive_validation_and_restore';
-            $result = $archives->restore($restorePath, $business);
+            $encrypted = is_string($decryptedPath);
+            $result = $archives->restore(
+                $restorePath,
+                $business,
+                static function (array $result) use ($business, $encrypted): void {
+                    Audit::record('business.archive_restored', null, [
+                        'tables' => $result['tables'],
+                        'records' => $result['records'],
+                        'files' => $result['files'],
+                        'encrypted' => $encrypted,
+                    ], (int) $business->id);
+                }
+            );
         } catch (RuntimeException $exception) {
             return $this->restoreRuntimeFailure(
                 $request,
@@ -180,13 +192,6 @@ class BusinessExportController extends Controller
                 @unlink($decryptedPath);
             }
         }
-
-        Audit::record('business.archive_restored', null, [
-            'tables' => $result['tables'],
-            'records' => $result['records'],
-            'files' => $result['files'],
-            'encrypted' => is_string($decryptedPath),
-        ], (int) $business->id);
 
         return redirect()->route('exports.index')->with(
             'success',
