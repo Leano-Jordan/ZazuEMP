@@ -67,7 +67,7 @@ Before real customer or staff personal information is processed in production, Z
 - WCAG 2.2: https://www.w3.org/TR/wcag/
 - WCAG 3.3.1 Error Identification: https://www.w3.org/WAI/WCAG22/Understanding/error-identification
 
-The 2025 amended POPIA Regulations and the specific-scope 2026 health-information Regulations are summarised above; re-check current primary sources against the actual deployment and processing activity before production release.
+The 2025 amended POPIA Regulations and the specific-scope 2026 health/sex-life information Regulations are summarised above; re-check current primary sources against the actual deployment and processing activity before production release.
 
 
 ## Other South African legal lenses considered
