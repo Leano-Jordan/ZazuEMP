@@ -52,6 +52,8 @@ jobs:
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2.40.0
         with:
           php-version: '8.4'
+      - name: Validate Composer manifest and lockfile
+        run: composer validate --strict --no-interaction
       - name: Install locked PHP dependencies without application scripts
         run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
       - name: Enforce PHP formatting on changed PHP files
