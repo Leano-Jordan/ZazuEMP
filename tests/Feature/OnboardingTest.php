@@ -32,7 +32,16 @@ class OnboardingTest extends TestCase
             ->assertSee('What kind of business do you run?')
             ->assertSee('name="business_focuses[]"', false)
             ->assertSee('name="primary_niche"', false);
+        private function selectBusinessFocus(User $user, Business $business): void
+    {
+        $user->businesses()->updateExistingPivot($business->id, [
+            'experience_level' => 'basic',
+            'primary_niche' => 'catering_baking',
+            'business_focuses' => json_encode(['catering_baking']),
+        ]);
     }
+
+}
 
     public function test_owner_can_save_multiple_business_focuses_and_a_primary_focus(): void
     {
@@ -151,7 +160,8 @@ class OnboardingTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $this->signInAsOwner($business);
+        $user = $this->signInAsOwner($business);
+        $this->selectBusinessFocus($user, $business);
 
         $response = $this->post(route('onboarding.catalogue.store'), [
             'name' => 'Wedding catering',
@@ -179,7 +189,8 @@ class OnboardingTest extends TestCase
             'currency' => 'USD',
         ]);
 
-        $this->signInAsOwner($business);
+        $user = $this->signInAsOwner($business);
+        $this->selectBusinessFocus($user, $business);
 
         $response = $this->post(route('onboarding.catalogue.store'), [
             'name' => 'Full Service Catering',
@@ -212,7 +223,8 @@ class OnboardingTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $this->signInAsOwner($business);
+        $user = $this->signInAsOwner($business);
+        $this->selectBusinessFocus($user, $business);
 
         $this->post(route('onboarding.catalogue.skip'))
             ->assertRedirect(route('onboarding.business'))
@@ -243,7 +255,12 @@ class OnboardingTest extends TestCase
         ]);
 
         $user = $this->signInAsOwner($business);
-        $user->businesses()->updateExistingPivot($business->id, ['experience_level' => 'intermediate']);
+        $user->businesses()->updateExistingPivot($business->id, [
+            'experience_level' => 'intermediate',
+            'primary_niche' => 'mixed',
+            'business_focuses' => json_encode([]),
+        ]);
+        $business->update(['catalogue_setup_skipped_at' => now()]);
 
         $this->post(route('onboarding.business'), [
             'name' => 'Lean Business',
@@ -266,7 +283,11 @@ class OnboardingTest extends TestCase
         ]);
 
         $user = $this->signInAsOwner($business);
-        $user->businesses()->updateExistingPivot($business->id, ['experience_level' => 'intermediate']);
+        $user->businesses()->updateExistingPivot($business->id, [
+            'experience_level' => 'intermediate',
+            'primary_niche' => 'mixed',
+            'business_focuses' => json_encode([]),
+        ]);
 
         $this->post(route('onboarding.business.skip'))
             ->assertRedirect(route('dashboard'))
@@ -345,6 +366,32 @@ class OnboardingTest extends TestCase
             ->assertSee('data-zazu-capability-summary', false)
             ->assertSee('2 active · 1 hidden')
             ->assertSee('Service: 1 · Rental: 1');
+    }
+
+    public function test_business_post_cannot_bypass_business_focus_or_offerings_setup(): void
+    {
+        $business = Business::create([
+            'name' => 'Protected Onboarding Sequence',
+            'slug' => 'protected-onboarding-sequence',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($business);
+
+        $this->post(route('onboarding.business'), ['name' => 'Changed Name'])
+            ->assertRedirect(route('onboarding.experience'));
+
+        $this->assertSame('Protected Onboarding Sequence', $business->fresh()->name);
+        $this->assertNull($business->fresh()->business_setup_completed_at);
+
+        $user = auth()->user();
+        $this->selectBusinessFocus($user, $business);
+
+        $this->post(route('onboarding.business'), ['name' => 'Changed Name'])
+            ->assertRedirect(route('onboarding.catalogue'));
+
+        $this->assertSame('Protected Onboarding Sequence', $business->fresh()->name);
+        $this->assertNull($business->fresh()->business_setup_completed_at);
     }
 
     public function test_dashboard_exposes_the_current_operational_command_surface(): void
