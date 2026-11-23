@@ -93,6 +93,9 @@ class ZazuHelperContextTest extends TestCase
             'chairs_tents' => 'Keep hire quantities, availability, delivery, setup, collection and asset condition connected to each booking.',
             'sound_dj' => 'Keep sound equipment, crew, setup/breakdown, programme timing and transport connected to each booking.',
             'catering_baking' => 'Keep menus, quantities, dietary details, purchasing, preparation and delivery connected to each booking.',
+            'decor' => 'Keep styling scope, materials, setup plans, venue coordination and collection connected to each booking.',
+            'photography' => 'Keep coverage, shot lists, crew, equipment, venue timing and final delivery connected to each booking.',
+            'transport' => 'Keep vehicle capacity, routes, loading, delivery windows and collection connected to each booking.',
         ];
 
         foreach ($cases as $focus => $expectedGuidance) {
@@ -162,6 +165,37 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('Keep menus, quantities, dietary details, purchasing, preparation and delivery connected to each booking.')
             ->assertDontSee('Archived cake service')
             ->assertDontSee('Camera editing');
+    }
+
+    public function test_helper_derives_decor_and_photography_guidance_from_active_capabilities_only(): void
+    {
+        $business = $this->makeBusiness('Helper Creative Services');
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'primary_niche' => 'mixed',
+        ]);
+
+        foreach ([
+            ['name' => 'Wedding styling', 'category' => 'Decor', 'capability_type' => 'service', 'is_active' => true],
+            ['name' => 'Event photography', 'category' => 'Photography & video', 'capability_type' => 'service', 'is_active' => true],
+            ['name' => 'Archived catering', 'category' => 'Catering', 'capability_type' => 'service', 'is_active' => false],
+        ] as $offering) {
+            BusinessCapability::create($offering + [
+                'business_id' => $business->id,
+                'pricing_basis' => 'custom',
+                'currency' => 'ZAR',
+            ]);
+        }
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-focus="mixed"', false)
+            ->assertSee('data-zazu-helper-focuses="decor,photography"', false)
+            ->assertSee('Keep styling scope, materials, setup plans, venue coordination and collection connected to each booking.')
+            ->assertSee('Keep coverage, shot lists, crew, equipment, venue timing and final delivery connected to each booking.')
+            ->assertDontSee('Keep menus, quantities, dietary details, purchasing, preparation and delivery connected to each booking.');
     }
 
     public function test_helper_shows_only_the_current_jobs_saved_components(): void
