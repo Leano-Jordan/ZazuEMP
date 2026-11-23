@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\BusinessSpreadsheetExportService;
 use App\Services\BusinessArchiveService;
+use App\Services\BusinessArchiveEncryptionService;
 use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
@@ -33,12 +34,28 @@ class BusinessExportController extends Controller
     public function downloadArchive(
         Request $request,
         BusinessArchiveService $archives,
+        BusinessArchiveEncryptionService $encryption,
         CurrentBusiness $currentBusiness,
-    ): BinaryFileResponse {
+    ): BinaryFileResponse|RedirectResponse {
+        $validated = $request->validate([
+            'archive_password' => ['required', 'string', 'min:12', 'max:128', 'confirmed'],
+        ]);
         $business = $currentBusiness->model($request->user());
-        $path = $archives->download($business);
+        $plainPath = $archives->download($business);
 
-        Audit::record('business.archive_exported', null, ['format' => 'zazu-business-archive-v1'], (int) $business->id);
+        try {
+            $path = $encryption->encryptFile($plainPath, $validated['archive_password']);
+        } catch (RuntimeException $exception) {
+            return back()->withErrors(['archive_password' => $exception->getMessage()]);
+        } finally {
+            @unlink($plainPath);
+        }
+
+        Audit::record('business.archive_exported', null, [
+            'format' => 'zazu-business-archive-v2',
+            'encryption' => 'xchacha20-poly1305',
+            'kdf' => 'argon2id',
+        ], (int) $business->id);
 
         return response()->download(
             $path,
@@ -55,26 +72,45 @@ class BusinessExportController extends Controller
     public function restoreArchive(
         Request $request,
         BusinessArchiveService $archives,
+        BusinessArchiveEncryptionService $encryption,
         CurrentBusiness $currentBusiness,
     ): RedirectResponse {
         $validated = $request->validate([
             'archive' => ['required', 'file', 'max:102400'],
+            'archive_password' => ['nullable', 'string', 'min:12', 'max:128'],
         ]);
 
         $business = $currentBusiness->model($request->user());
+        $uploadedPath = $validated['archive']->getRealPath();
+        $restorePath = $uploadedPath;
+        $decryptedPath = null;
 
         try {
-            $result = $archives->restore($validated['archive']->getRealPath(), $business);
+            if ($encryption->isEncrypted($uploadedPath)) {
+                if (! filled($validated['archive_password'] ?? null)) {
+                    return back()->withErrors(['archive_password' => 'Enter the passphrase used when this business archive was created.']);
+                }
+
+                $decryptedPath = $encryption->decryptFile($uploadedPath, $validated['archive_password']);
+                $restorePath = $decryptedPath;
+            }
+
+            $result = $archives->restore($restorePath, $business);
         } catch (RuntimeException $exception) {
             return back()->withErrors(['archive' => $exception->getMessage()]);
         } catch (\JsonException) {
             return back()->withErrors(['archive' => 'The uploaded archive is damaged or contains invalid data.']);
+        } finally {
+            if (is_string($decryptedPath)) {
+                @unlink($decryptedPath);
+            }
         }
 
         Audit::record('business.archive_restored', null, [
             'tables' => $result['tables'],
             'records' => $result['records'],
             'files' => $result['files'],
+            'encrypted' => is_string($decryptedPath),
         ], (int) $business->id);
 
         return redirect()->route('exports.index')->with(
