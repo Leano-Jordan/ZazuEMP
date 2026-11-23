@@ -43,7 +43,7 @@ class BusinessCapabilityController extends Controller
 
         // Keep the catalogue useful for every business type: non-rental capabilities
         // include DJ, decor, photography, catering, products and packaged services.
-        $catering = (clone $base)
+        $services = (clone $base)
             ->whereIn('capability_type', ['package', 'service', 'product', 'other'])
             ->orderByDesc('is_active')
             ->orderBy('category')
@@ -59,8 +59,9 @@ class BusinessCapabilityController extends Controller
             ->pluck('category');
 
         $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
+        $canViewAssets = app(PermissionService::class)->allows('assets.view', $request->user(), $business);
 
-        return view('capabilities.index', compact('capabilities', 'categories', 'isOwner', 'equipment', 'catering'));
+        return view('capabilities.index', compact('capabilities', 'categories', 'isOwner', 'equipment', 'services', 'canViewAssets'));
     }
 
     public function create(Request $request): View
