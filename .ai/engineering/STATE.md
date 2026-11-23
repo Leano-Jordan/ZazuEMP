@@ -1670,3 +1670,16 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 **Verification boundary:** implementation and test commits are on main; exact-head Laravel/PHPMD/Quality/Psalm/Director Health/browser and physical acceptance have not yet been verified. Do not mark this slice green until exact-head checks complete.
 
 **Next:** continue with one component-specific operational cue only where existing requirements and linked records establish a concrete next action; reuse the Job's authoritative next-action source and never infer missing tasks from empty relations.
+
+
+## Director execution — release quality-gate refactor — 2026-11-23
+
+**Implemented directly on main:**
+- Split online Job creation into selected-service normalization, locked catalogue resolution, customer/contact validation, Job persistence and starter-requirement creation. The business lock, capability locks, same-business checks, contact validation and EventRequirement linkage remain inside the same database transaction.
+- Decomposed offline Job requirement reconciliation into service-list validation, legacy category mapping, same-business catalogue lookup, ambiguity rejection, definition building and one-off service handling. The existing services[] contract, legacy queued payload fallback, duplicate protection and capability linkage are preserved.
+- Moved the three catalogue-driven Job-intake feature tests out of WorkWorkflowTest into CatalogueJobIntakeTest, keeping test coverage while reducing class size.
+- Corrected the Helper-context test's Pint formatting issue.
+
+**Why:** exact GitHub PHPMD output identified WorkController::store() at 101 lines/complexity 10, offlineJobRequirementDefinitions() at complexity 11/NPath 243, and WorkWorkflowTest above the configured public-method limit. The quality run also identified a single class_attributes_separation formatting failure. These were code-quality gate failures, not waived.
+
+**Verification:** Laravel tests passed on the earlier test commit, and PostgreSQL migration/recovery passed. The offline-browser job was still running at the last check. The corrective refactor commits are newer and require fresh exact-head Laravel, PHPMD, Zazu Quality, browser/offline and Director Health runs. Do not mark this corrective batch green until those runs finish.
