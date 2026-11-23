@@ -8,7 +8,9 @@
 - [x] Dashboard and Founder Control Centre backup timestamps now use local human-readable dates.
 - [x] Owner health and Local Recovery timestamps now use local human-readable dates; human-facing display timezone is configurable through `ZAZU_DISPLAY_TIMEZONE` and defaults to Africa/Johannesburg; internal timezone remains UTC.
 - [x] Tabler Icons (MIT) selected as the future local icon standard; licence retention and offline delivery are documented.
-- [ ] Exact-head Laravel, Zazu Quality and browser acceptance for these changes.
+- [x] Exact-head Laravel tests, PostgreSQL migration smoke, Zazu Quality, security checks, SonarCloud and Windows first-install/launcher readiness passed.
+- [ ] Offline browser acceptance suite still running (offline operations, mobile Work, host-outage and phone-local attachments).
+- [ ] Physical visual acceptance on the user's device.
 - [x] Local Tabler icon subset, shared Blade component and licence notice added; primary navigation and Dashboard icons migrated.
 - [x] Dashboard KPI colours now follow metric meaning/state rather than nth-child position.\n- [ ] Complete remaining status/form icon migration and product-wide visual communication rollout. See [Director visual communication audit](DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md).
 

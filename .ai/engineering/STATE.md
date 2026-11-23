@@ -2136,3 +2136,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Replaced positional KPI colour meaning with explicit classes for work, quotes, invoices, customers, revenue and calendar metrics.
 - Metric cards now use a consistent neutral surface; icon accents use semantic blue, amber and green states. Zero outstanding quotes/invoices switch to a clear/success accent.
 - Added regression coverage so optional module visibility cannot silently remap metric colours by card order.
+
+
+## Visual correction verification snapshot — 2026-11-23
+
+- Source/test implementation head: `312e76b7e6a613e9e7b22c6a7a6f24a6aa8c7288` on `main`.
+- Zazu Quality run `45268313904`: application checks, formatting, secret scan and Composer security audit passed.
+- Laravel run `45268313094`: Laravel tests, PostgreSQL migration smoke and coverage report passed. Offline browser acceptance remains in progress.
+- Windows V1 Package run `45268313088`: candidate build, encrypted/legacy archive recovery, first-install script and local launcher HTTP-readiness checks passed.
+- SonarCloud run `45268315558`: all configured analyses passed.
+- Visual appearance on the user's physical device remains unverified; no claim of physical acceptance is made.
