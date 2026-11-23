@@ -34,10 +34,9 @@ class BusinessArchiveMalformedUploadTest extends TestCase
 
             $response->assertRedirect();
             $response->assertSessionHasErrors('archive');
-            $this->assertSame(
-                'The uploaded archive is damaged or contains invalid data.',
-                session('errors')->first('archive')
-            );
+            $error = session('errors')->first('archive');
+            $this->assertStringStartsWith('The uploaded archive is damaged or contains invalid data.', $error);
+            $this->assertStringContainsString('Reference: ', $error);
         } finally {
             @unlink($archivePath);
         }
