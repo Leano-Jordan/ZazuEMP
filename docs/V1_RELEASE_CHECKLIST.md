@@ -819,3 +819,10 @@ Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality, Director He
 - [ ] POPIA operational sign-off and ZAZU name clearance remain separate legal/operational gates.
 
 **Disposition:** These engineering changes and the installed-PC archive export are verified. V1 remains **NOT READY** until the owner-operated restore, physical Android and commercial reconciliation gates above are evidenced, along with remaining legal/brand and installation-backup controls.
+
+
+## Device performance acceptance
+
+- [ ] Establish repeatable CPU, memory, disk and network baselines across entry-level, mainstream and high-performance Windows PCs using [DEVICE_PERFORMANCE_MATRIX.md](DEVICE_PERFORMANCE_MATRIX.md).
+- [ ] Capture exact release/source and package hashes, representative dataset, p50/p95 timings and resource samples on each cohort; CI emulation is not physical hardware acceptance.
+- [ ] Capture Android client performance separately; do not infer phone CPU/RAM from browser hints or PC-host measurements.
