@@ -24,6 +24,7 @@
 - [x] Export requires a confirmed 12–128 character passphrase; restore requires the matching passphrase for V2 archives.
 - [x] Existing plaintext V1 business archives remain importable for compatibility; owners are warned to re-export or securely protect old copies.
 - [x] Installation-wide scheduled backups remain unattended plain ZIP files; off-disk copies require encrypted removable media or an encrypted, access-controlled vault.
+- [ ] Verify the configured secondary destination is BitLocker-protected USB or an encrypted, access-controlled cloud vault. The runner verifies SHA-256 only; it does not enforce or attest destination encryption.
 - [ ] Exact-head CI and real Windows installed-PC encrypted export/restore acceptance.
 
 ### Capability-to-Job integration coverage
