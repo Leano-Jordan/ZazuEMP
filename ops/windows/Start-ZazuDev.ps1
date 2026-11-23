@@ -505,6 +505,47 @@ function Test-ZazuTcpEndpoint {
     }
 }
 
+function Test-ZazuHttpEndpoint {
+    # A listening TCP socket is not enough: Laravel can still fail during
+    # bootstrap and return HTTP 500. Confirm the application serves its root
+    # route before reporting a successful start.
+    $uri = ([System.UriBuilder]::new('http', $BindAddress, $Port, '/')).Uri
+    $request = [System.Net.HttpWebRequest]::Create($uri)
+    $request.Method = 'GET'
+    $request.Timeout = 3000
+    $request.ReadWriteTimeout = 3000
+    $request.AllowAutoRedirect = $true
+    $request.Proxy = $null
+    $request.KeepAlive = $false
+
+    try {
+        $response = $request.GetResponse()
+        try {
+            $statusCode = [int]$response.StatusCode
+            $script:ZazuHttpStartupStatus = "HTTP $statusCode"
+            return ($statusCode -ge 200 -and $statusCode -lt 400)
+        } finally {
+            $response.Close()
+        }
+    } catch [System.Net.WebException] {
+        $response = $_.Exception.Response
+        if ($response) {
+            try {
+                $statusCode = [int]$response.StatusCode
+                $script:ZazuHttpStartupStatus = "HTTP $statusCode"
+                return ($statusCode -ge 200 -and $statusCode -lt 400)
+            } finally {
+                $response.Close()
+            }
+        }
+
+        $script:ZazuHttpStartupStatus = $_.Exception.Message
+        return $false
+    } finally {
+        $request.Abort()
+    }
+}
+
 function Get-ZazuStartupLogTail {
     $sections = @()
     foreach ($log in @(@{ Label = 'STDERR'; Path = $stderr }, @{ Label = 'STDOUT'; Path = $stdout })) {
@@ -523,23 +564,31 @@ function Get-ZazuStartupLogTail {
 }
 
 $ready = $false
+$tcpReady = $false
+$script:ZazuHttpStartupStatus = 'No HTTP response received yet.'
 # Allow a bounded cold boot on the owner's local HDD rather than timing out after 15 seconds.
 for ($attempt = 0; $attempt -lt 45; $attempt++) {
     Start-Sleep -Seconds 1
     if ($process.HasExited) {
         $details = Get-ZazuStartupLogTail
-        throw ("Zazu server exited during startup. Startup output:`n{0}" -f $details)
+        throw ("Zazu server exited during startup. Startup output:{0}{1}" -f [Environment]::NewLine, $details)
     }
     if (Test-ZazuTcpEndpoint) {
-        $ready = $true
-        break
+        $tcpReady = $true
+        if (Test-ZazuHttpEndpoint) {
+            $ready = $true
+            break
+        }
     }
 }
 
 if (-not $ready) {
     $details = Get-ZazuStartupLogTail
     Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
-    throw ("Zazu did not open port $Port within 45 seconds. Startup output:`n{0}" -f $details)
+    if ($tcpReady) {
+        throw ("Zazu opened port $Port but did not return a healthy HTTP response within 45 seconds. HTTP probe: $script:ZazuHttpStartupStatus. Startup output:{0}{1}" -f [Environment]::NewLine, $details)
+    }
+    throw ("Zazu did not open port $Port within 45 seconds. Startup output:{0}{1}" -f [Environment]::NewLine, $details)
 }
 
 Write-Host "Zazu development server is running independently of VS Code."
