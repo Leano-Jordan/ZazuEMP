@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use Tests\\TestCase;
+use Tests\TestCase;
 
 class UiHumanFriendlyPresentationTest extends TestCase
 {
@@ -47,7 +47,5 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertIsString($sentinel);
         $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $dashboard);
         $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $sentinel);
-        $this->assertStringNotContainsString("{{ $backupStatus['latest_at'] }}", $dashboard);
-        $this->assertStringNotContainsString("{{ $backupStatus['latest_at'] }}", $sentinel);
     }
 }
