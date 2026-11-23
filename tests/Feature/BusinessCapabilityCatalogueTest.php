@@ -22,6 +22,7 @@ class BusinessCapabilityCatalogueTest extends TestCase
         $this->createCapability($business, 'Speaker and sound hire', 'Audio & entertainment', 'rental');
         $this->createCapability($business, 'DJ performance', 'Sound & entertainment', 'service');
         $this->createCapability($business, 'LED dance floor', 'Event production', 'product');
+        $this->createCapability($business, 'Archived camera hire', 'Photography', 'rental', false);
 
         $this->actingAs($owner)
             ->get(route('capabilities.index'))
@@ -31,6 +32,8 @@ class BusinessCapabilityCatalogueTest extends TestCase
             ->assertSee('Speaker and sound hire')
             ->assertSee('DJ performance')
             ->assertSee('LED dance floor')
+            ->assertSee('Archived camera hire')
+            ->assertSee('HIDDEN')
             ->assertDontSee('Catering &amp; Food Packages', false)
             ->assertDontSee('Dietary profile not recorded');
     }
@@ -63,11 +66,14 @@ class BusinessCapabilityCatalogueTest extends TestCase
         $business->users()->attach($staff->id, ['role' => 'staff']);
 
         $this->createCapability($business, 'Banquet chairs', 'Furniture & equipment', 'rental');
+        $this->createCapability($business, 'Archived camera hire', 'Photography', 'rental', false);
 
         $response = $this->actingAs($staff)->get(route('capabilities.index'));
 
         $response->assertOk()
             ->assertSee('Banquet chairs')
+            ->assertDontSee('Archived camera hire')
+            ->assertDontSee('Photography')
             ->assertDontSee('Allocate');
     }
 
@@ -81,7 +87,7 @@ class BusinessCapabilityCatalogueTest extends TestCase
         ]);
     }
 
-    private function createCapability(Business $business, string $name, string $category, string $type): BusinessCapability
+    private function createCapability(Business $business, string $name, string $category, string $type, bool $active = true): BusinessCapability
     {
         return BusinessCapability::create([
             'business_id' => $business->id,
@@ -92,7 +98,7 @@ class BusinessCapabilityCatalogueTest extends TestCase
             'default_price' => '250.00',
             'currency' => 'ZAR',
             'default_unit' => 'unit',
-            'is_active' => true,
+            'is_active' => $active,
         ]);
     }
 }
