@@ -452,7 +452,7 @@ if (-not $latestDailyBackup) {
     $backupAge = (Get-Date).ToUniversalTime() - $latestDailyBackup.LastWriteTimeUtc
     Write-Host ("Latest installation backup: {0} ({1} hours ago)" -f $latestDailyBackup.Name, [math]::Floor($backupAge.TotalHours))
     if ($backupAge.TotalHours -gt 26) {
-        Write-Warning 'The latest installation backup is overdue. Check the Zazu EMP Daily Backup task and copy a current archive to separate USB/cloud storage.'
+        Write-Warning 'The latest installation backup is overdue. Check the Zazu EMP Daily Backup task and copy a current archive to BitLocker-protected USB or an encrypted, access-controlled cloud vault.'
     }
 }
 
