@@ -212,8 +212,9 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(responses).toEqual([]);
     });
 
-    test('keeps sidebar navigation expanded without hover flyout overlap and preserves the full mobile month grid', async ({ browser }) => {
-        const desktop = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+    test('keeps sidebar navigation expanded without hover flyout overlap and preserves the full mobile month grid', async ({ page, browser }) => {
+        const desktop = page;
+        await desktop.setViewportSize({ width: 1365, height: 900 });
         await login(desktop);
         const workArea = desktop.locator('[data-zazu-nav-area]').filter({ has: desktop.getByRole('button', { name: 'Work', exact: true }) });
         await expect(workArea).toHaveClass(/is-open/);
@@ -223,9 +224,13 @@ test.describe('Zazu UI theme and navigation', () => {
         await desktop.getByRole('button', { name: 'Sales' }).hover();
         await expect(workArea.locator('.zazu-nav-flyout')).toBeVisible();
         await expect(desktop.locator('[data-zazu-nav-area].is-open')).toHaveCount(1);
-        await desktop.close();
-
-        const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+        const mobileContext = await browser.newContext({
+            baseURL: process.env.ZAZU_BASE_URL || 'http://127.0.0.1:8000',
+            viewport: { width: 390, height: 844 },
+            isMobile: true,
+            hasTouch: true,
+        });
+        const mobile = await mobileContext.newPage();
         await login(mobile);
         await mobile.goto('/calendar');
         const monthGrid = mobile.locator('.zazu-calendar-grid-scroll > .zazu-calendar-grid');
@@ -240,6 +245,6 @@ test.describe('Zazu UI theme and navigation', () => {
         expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
         expect(dimensions.gridWidth).toBeGreaterThanOrEqual(700);
         await expectNoViewportOverflow(mobile);
-        await mobile.close();
+        await mobileContext.close();
     });
 });
