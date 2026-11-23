@@ -40,7 +40,7 @@ class BusinessArchiveEncryptionServiceTest extends TestCase
         }
     }
 
-    public function test_wrong_passphrase_and_tampered_ciphertext_are_rejected_without_leaving_plaintext(): void
+    public function test_wrong_passphrase_and_tampered_ciphertext_are_rejected(): void
     {
         $service = app(BusinessArchiveEncryptionService::class);
         $source = tempnam(sys_get_temp_dir(), 'zazu-encryption-source-');
