@@ -173,7 +173,7 @@
                 continue;
             }
 
-            $count = (int) $event->getAttribute($relation.'_count');
+            $count = (int) $event->getAttribute(\Illuminate\Support\Str::snake($relation).'_count');
 
             if ($count > 0) {
                 $label = $definition['label'];
