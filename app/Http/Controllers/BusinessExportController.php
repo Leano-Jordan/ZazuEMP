@@ -50,11 +50,16 @@ class BusinessExportController extends Controller
             @unlink($plainPath);
         }
 
-        Audit::record('business.archive_exported', null, [
-            'format' => 'zazu-business-archive-v2',
-            'encryption' => 'xchacha20-poly1305',
-            'kdf' => 'argon2id',
-        ], (int) $business->id);
+        try {
+            Audit::record('business.archive_exported', null, [
+                'format' => 'zazu-business-archive-v2',
+                'encryption' => 'xchacha20-poly1305',
+                'kdf' => 'argon2id',
+            ], (int) $business->id);
+        } catch (\Throwable $exception) {
+            @unlink($path);
+            throw $exception;
+        }
 
         return response()->download(
             $path,
