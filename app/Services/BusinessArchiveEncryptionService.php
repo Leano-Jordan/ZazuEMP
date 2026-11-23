@@ -72,7 +72,7 @@ final class BusinessArchiveEncryptionService
                 }
 
                 $isFinal = $next === '';
-                [$state, $ciphertext] = sodium_crypto_secretstream_xchacha20poly1305_push(
+                $ciphertext = sodium_crypto_secretstream_xchacha20poly1305_push(
                     $state,
                     $buffer,
                     '',
