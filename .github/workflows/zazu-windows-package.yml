@@ -469,40 +469,32 @@ jobs:
           php artisan route:list --path=login --no-ansi
           if ($LASTEXITCODE -ne 0) { throw 'Application route boot failed after installation.' }
 
-          $stdout = Join-Path $env:RUNNER_TEMP 'zazu-http-smoke.out.log'
-          $stderr = Join-Path $env:RUNNER_TEMP 'zazu-http-smoke.err.log'
-          $server = Start-Process -FilePath 'php' -ArgumentList @('artisan', 'serve', '--host=127.0.0.1', '--port=8787') -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+          $project = (Get-Location).Path
+          $launcher = (Resolve-Path 'ops/windows/Start-ZazuDev.ps1').Path
+          $php = (Get-Command php.exe -ErrorAction Stop).Source
 
           try {
-            $response = $null
-            for ($attempt = 0; $attempt -lt 20; $attempt++) {
-              if ($server.HasExited) { throw 'Laravel HTTP smoke server exited before becoming ready.' }
-              try {
-                $response = Invoke-WebRequest -Uri 'http://127.0.0.1:8787/login' -UseBasicParsing -TimeoutSec 3
-                break
-              } catch {
-                Start-Sleep -Seconds 1
-              }
-            }
+            # Exercise the real owner-PC launcher, not a parallel hand-built
+            # php artisan serve command. Its own startup gate must verify HTTP.
+            & $launcher -ProjectPath $project -PhpPath $php -Port 8787 -BuiltAssetsOnly
 
-            if (-not $response -or $response.StatusCode -ne 200) {
-              throw 'The local login page did not return HTTP 200 after installation.'
+            $response = Invoke-WebRequest -Uri 'http://127.0.0.1:8787/login' -UseBasicParsing -TimeoutSec 10
+            if ($response.StatusCode -ne 200) {
+              throw 'The launcher started, but the local login page did not return HTTP 200.'
             }
 
             $setCookie = [string]$response.Headers['Set-Cookie']
             if ([string]::IsNullOrWhiteSpace($setCookie)) {
               throw 'The local login page did not issue a session cookie.'
             }
-            if ($setCookie -match '(?i)(^|;)\s*Secure(\s*;|$)') {
+            if ($setCookie -match '(?i)(^|;)\\s*Secure(\\s*;|$)') {
               throw 'The loopback HTTP session cookie is marked Secure and may not persist on the default local HTTP origin.'
             }
           } finally {
-            if ($server -and -not $server.HasExited) {
-              Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
-            }
+            & $launcher -ProjectPath $project -Port 8787 -Stop
           }
 
-          Write-Host 'PASS: Windows PowerShell fresh install generated a private environment and app key, migrated SQLite, booted routes, and returned a usable loopback HTTP session cookie.'
+          Write-Host 'PASS: the real Windows Zazu launcher passed its HTTP readiness gate, served the login page and issued a usable loopback session cookie.'
 
 
   windows-business-archive-acceptance:
