@@ -1,59 +1,83 @@
 # Zazu EMP — Release Dependency Licence Audit
 
-**Audit date:** 2026-10-19  
+**Audit date:** 2026-11-23  
 **Basis:** current `composer.lock` and `package-lock.json` on `main`  
 **Scope:** locked Composer packages and npm packages, including development/build dependencies
 
 ## Result
 
-All 153 npm package entries and all 109 Composer lock packages expose declared licence metadata. Counts below are derived from the current lockfiles, not carried forward from the October 7 snapshot.
+All **147 npm package entries** and all **111 Composer lock packages** expose declared licence metadata. Counts below were recalculated from the current lockfiles after the 2026-11-23 dependency refresh.
 
 ### Composer runtime
 
-**Packages:** 76
+**Packages:** 77
 
 | Licence | Locked packages |
 |---|---:|
-| MIT | 68 |
+| MIT | 69 |
 | BSD-3-Clause | 5 |
 | BSD-3-Clause / GPL-2.0-only / GPL-3.0-only | 2 |
 | Apache-2.0 | 1 |
 
 ### Composer development
 
-**Packages:** 33
+**Packages:** 34
 
 | Licence | Locked packages |
 |---|---:|
 | MIT | 9 |
-| BSD-3-Clause | 24 |
+| BSD-3-Clause | 25 |
 
-The two dual/multi-licensed packages are `nette/schema` v1.3.6 and `nette/utils` v4.1.5. Their metadata permits selection among the listed licensing options; release distribution must preserve applicable upstream notices.
+The two dual/multi-licensed packages are `nette/schema` v1.4.0 and `nette/utils` v4.1.6. Their metadata permits selection among the listed licensing options; release distribution must preserve applicable upstream notices.
 
 ### npm
 
-**Package entries with licence metadata:** 153
+**Package entries with licence metadata:** 147
 
 | Licence | Locked package entries |
 |---|---:|
-| MIT | 113 |
-| MPL-2.0 | 24 |
-| ISC | 7 |
+| MIT | 119 |
+| MPL-2.0 | 12 |
+| ISC | 6 |
 | Apache-2.0 | 5 |
 | BSD-3-Clause | 1 |
 | 0BSD | 2 |
+| BlueOak-1.0.0 | 1 |
 | MIT OR CC0-1.0 | 1 |
 
-The MPL-2.0 entries are the `lightningcss` package and its platform builds, including nested Vite copies. These are build-tool dependencies, not application source code. Distribution of generated assets must still retain applicable third-party notices.
+The MPL-2.0 entries are `lightningcss` v1.33.0 and its platform builds, including nested Vite copies. These are build-tool dependencies, not application source code. Distribution of generated assets must still retain applicable third-party notices.
 
-The unused `@fontsource/anton` package (OFL-1.1) was removed after checking the application JS, Vite configuration, and active authored CSS files: no import or font-family reference used it. The display stack in `resources/css/app.css` uses Space Grotesk/Manrope font faces already declared by that stylesheet. No OFL-1.1 npm package remains in the current lockfile.
+The `BlueOak-1.0.0` entry is `graceful-fs` v4.2.12. The `MIT OR CC0-1.0` entry is `type-fest` v5.10.0. Retain their upstream licence metadata and notices in the release inventory.
+
+The unused `@fontsource/anton` package (OFL-1.1) remains removed: active application JS/CSS/Vite source did not import or reference it. The display stack in `resources/css/app.css` uses Space Grotesk/Manrope font faces declared by that stylesheet. No OFL-1.1 npm package remains in the current lockfile.
+
+### Direct dependency snapshot
+
+| Ecosystem | Package | Locked version |
+|---|---|---:|
+| Composer | laravel/framework | 13.43.0 |
+| Composer | laravel/tinker | 3.2.0 |
+| Composer (dev) | phpunit/phpunit | 13.4.8 |
+| Composer (dev) | laravel/pao | 1.1.6 |
+| Composer (dev) | laravel/pail | 1.3.0 |
+| Composer (dev) | laravel/pint | 1.32.3 |
+| npm | vite | 8.3.8 |
+| npm | tailwindcss | 4.3.5 |
+| npm | @tailwindcss/vite | 4.3.5 |
+| npm | laravel-vite-plugin | 3.2.1 |
+| npm | @playwright/test | 1.65.1 |
+| npm | concurrently | 10.0.7 |
+| npm (optional) | @laravel/multiplex | 0.4.5 |
+
+The manifest ranges remain intentionally semver-compatible; the lockfiles are the reproducible installed-version source.
 
 ### Lockfile reconciliation
 
-- The previous recorded npm licence inventory was stale.
-- `package.json` and `package-lock.json` were changed together in commit `f73174de5b38b5826e6685050e2ede6a949e2520`.
-- Current-head `npm ci` and frontend build must pass before this inventory is treated as runtime-verified.
-- The source inventory is not legal approval; final distribution notice review remains open.
+- Direct Composer requirements match their locked packages and satisfy the declared constraints.
+- Direct npm development/optional dependencies match their lockfile package entries and satisfy the declared ranges.
+- Composer runtime/dev counts and npm package/licence counts were recalculated from the lockfiles on 2026-11-23; the October 19 counts are superseded.
+- CI runs `composer audit --locked` and a strict `npm audit --audit-level=high`.
+- GitHub advisory GHSA-fc5q-39xc-vjpf / CVE-2026-112366 was withdrawn on 2026-11-18 because it was determined not to be a security issue. The obsolete local exception has been removed; the audit gate now evaluates current advisories without a package-specific bypass.
 
 ## Release handling
 
@@ -65,6 +89,6 @@ The unused `@fontsource/anton` package (OFL-1.1) was removed after checking the 
 
 ## Status
 
-**Engineering licence inventory: UPDATED AT SOURCE; latest-main CI verification pending.**
+**Engineering licence inventory: refreshed against current lockfiles; exact-head CI verification pending.**
 
 This inventory does not close legal review, proprietary distribution terms, trademark clearance, or final release certification.
