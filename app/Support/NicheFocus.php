@@ -47,7 +47,11 @@ class NicheFocus
         }
 
         $membership = $user->businesses()->whereKey($business->id)->first();
+        $ownerMembership = $business->users()->wherePivot('role', 'owner')->first();
         $raw = $membership?->pivot?->business_focuses;
+        if (!is_array($raw) && (!is_string($raw) || trim($raw) === '')) {
+            $raw = $ownerMembership?->pivot?->business_focuses;
+        }
         $focuses = is_array($raw) ? $raw : (is_string($raw) ? json_decode($raw, true) : []);
         $focuses = is_array($focuses) ? $focuses : [];
         $focuses = array_values(array_unique(array_filter(
@@ -55,7 +59,8 @@ class NicheFocus
             static fn ($focus) => is_string($focus) && array_key_exists($focus, config('zazu.niches', []))
         )));
 
-        $primary = $this->selected($user, $business);
+        $primary = $this->selected($user, $business)
+            ?? (is_string($ownerMembership?->pivot?->primary_niche) ? $ownerMembership->pivot->primary_niche : null);
         if ($primary && !in_array($primary, $focuses, true)) {
             array_unshift($focuses, $primary);
         }
