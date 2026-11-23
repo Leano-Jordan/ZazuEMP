@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Support\BackupArchiveLimits;
+use App\Support\PrivateStoragePermissions;
 use App\Support\PostgresBackupSupport;
 
 use Illuminate\Console\Command;
@@ -44,7 +45,10 @@ class ZazuRestoreCommand extends Command
         }
 
         $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid()));
-        File::ensureDirectoryExists($work);
+        if (! app(PrivateStoragePermissions::class)->createDirectory($work)) {
+            $this->error('Could not create a private restore staging directory.');
+            return self::FAILURE;
+        }
 
         $privateRollback = null;
         $privateActivated = false;
@@ -291,6 +295,11 @@ class ZazuRestoreCommand extends Command
 
             $zip->close();
 
+            if (! app(PrivateStoragePermissions::class)->restrictDirectoryTree($work)) {
+                $this->error('Could not restrict restore staging permissions; no installation data was changed.');
+                return self::FAILURE;
+            }
+
             $manifestPath = $work.'/manifest.json';
             if (!is_file($manifestPath)) {
                 $this->error('The extracted backup manifest is missing.');
@@ -302,9 +311,8 @@ class ZazuRestoreCommand extends Command
             if ($hasPrivateStorage && !is_dir($storedPrivate)) {
                 // Empty private storage is still part of a complete backup and
                 // must replace stale files from the installation being restored.
-                File::ensureDirectoryExists($storedPrivate);
-                if (!is_dir($storedPrivate)) {
-                    throw new \RuntimeException('Could not stage the empty private-storage restore directory.');
+                if (! app(PrivateStoragePermissions::class)->createDirectory($storedPrivate)) {
+                    throw new \RuntimeException('Could not stage a private empty-storage restore directory.');
                 }
             }
 
@@ -367,6 +375,13 @@ class ZazuRestoreCommand extends Command
             } elseif ($driver === 'pgsql') {
                 $postgresRollbackPath = $work.'/pre-restore-database.sql';
                 (new PostgresBackupSupport())->dumpToFile($postgresRollbackPath);
+                if (! app(PrivateStoragePermissions::class)->restrictFile($postgresRollbackPath)) {
+                    throw new \RuntimeException('Could not restrict the PostgreSQL rollback snapshot.');
+                }
+            }
+
+            if ($hasPrivateStorage && ! app(PrivateStoragePermissions::class)->restrictDirectoryTree($storedPrivate)) {
+                throw new \RuntimeException('Could not restrict restored private-storage permissions.');
             }
 
             // Stage private storage only after every required database rollback point exists.
@@ -376,6 +391,11 @@ class ZazuRestoreCommand extends Command
 
                 if (is_dir($privateTarget) && !rename($privateTarget, $privateRollback)) {
                     throw new \RuntimeException('Could not stage the current private storage for safe replacement.');
+                }
+
+                if (is_dir($privateRollback)
+                    && ! app(PrivateStoragePermissions::class)->restrictDirectoryTree($privateRollback)) {
+                    throw new \RuntimeException('Could not restrict the preserved private-storage rollback directory.');
                 }
 
                 if (!rename($storedPrivate, $privateTarget)) {
@@ -402,8 +422,10 @@ class ZazuRestoreCommand extends Command
                 gc_collect_cycles();
 
                 $databaseStage = storage_path('app/.zazu-database-restore-'.Str::ulid().'.sqlite');
-                if (!copy($source, $databaseStage)) {
-                    throw new \RuntimeException('Could not stage the SQLite database for restore.');
+                if (!copy($source, $databaseStage)
+                    || ! app(PrivateStoragePermissions::class)->restrictFile($databaseStage)) {
+                    File::delete($databaseStage);
+                    throw new \RuntimeException('Could not stage a private SQLite database for restore.');
                 }
 
                 $sqliteTarget = $target;
@@ -419,6 +441,9 @@ class ZazuRestoreCommand extends Command
                         throw new \RuntimeException('Could not stage the current SQLite database for safe replacement.');
                     }
                     $sqliteDatabaseStaged = true;
+                    if (! app(PrivateStoragePermissions::class)->restrictFile($databaseRollback)) {
+                        throw new \RuntimeException('Could not restrict the SQLite database rollback snapshot.');
+                    }
                 }
 
                 if (is_file($wal)) {
@@ -427,6 +452,9 @@ class ZazuRestoreCommand extends Command
                         throw new \RuntimeException('Could not stage the current SQLite WAL file for safe replacement.');
                     }
                     $sqliteWalStaged = true;
+                    if (! app(PrivateStoragePermissions::class)->restrictFile($rollbackWal)) {
+                        throw new \RuntimeException('Could not restrict the SQLite WAL rollback snapshot.');
+                    }
                 }
 
                 if (is_file($shm)) {
@@ -435,6 +463,9 @@ class ZazuRestoreCommand extends Command
                         throw new \RuntimeException('Could not stage the current SQLite shared-memory file for safe replacement.');
                     }
                     $sqliteShmStaged = true;
+                    if (! app(PrivateStoragePermissions::class)->restrictFile($rollbackShm)) {
+                        throw new \RuntimeException('Could not restrict the SQLite shared-memory rollback snapshot.');
+                    }
                 }
 
                 if (! $this->renameWithRetry($databaseStage, $target)) {
@@ -610,8 +641,9 @@ class ZazuRestoreCommand extends Command
 
         File::put($path, $process->getOutput());
 
-        if (!is_file($path) || filesize($path) === 0) {
-            throw new \RuntimeException('The pre-restore MySQL rollback snapshot is empty.');
+        if (!is_file($path) || filesize($path) === 0
+            || ! app(PrivateStoragePermissions::class)->restrictFile($path)) {
+            throw new \RuntimeException('The pre-restore MySQL rollback snapshot is empty or could not be secured.');
         }
     }
 
