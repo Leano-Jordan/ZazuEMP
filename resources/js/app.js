@@ -2990,6 +2990,7 @@ function setupZazuOfflineForms() {
             let payload;
             let scheduleConflictNames = [];
             let customerPhotoChangeDeferred = false;
+            let serviceImageChangeDeferred = false;
             if (entity === 'customer') {
                 const offlineState = window.ZazuOffline.getState();
                 const serverId = form.dataset.zazuOfflineServerId;
@@ -3339,10 +3340,7 @@ function setupZazuOfflineForms() {
             } else if (entity === 'service') {
                 const state = window.ZazuOffline.getState();
                 const image = formData.get('image');
-                if (image instanceof File && image.size > 0) {
-                    window.alert('Service images need a connection. Save the service details first, then add the image while Zazu is online.');
-                    return;
-                }
+                serviceImageChangeDeferred = image instanceof File && image.size > 0;
                 const serverId = form.dataset.zazuOfflineServerId;
                 const existing = serverId
                     ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
@@ -3803,6 +3801,9 @@ function setupZazuOfflineForms() {
                 : 'Saved on this device. It will sync automatically when Zazu reconnects.';
             if (customerPhotoChangeDeferred) {
                 notice.textContent += ' Customer details were saved, but the profile photo change was not saved. Update the photo when Zazu is online.';
+            }
+            if (serviceImageChangeDeferred) {
+                notice.textContent += ' Service details were saved, but the image was not saved. Add the image when Zazu is online.';
             }
             } catch (error) {
                 // IndexedDB quota, blocked upgrades, and transaction failures
