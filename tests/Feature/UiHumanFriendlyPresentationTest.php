@@ -45,8 +45,8 @@ class UiHumanFriendlyPresentationTest extends TestCase
 
         $this->assertIsString($dashboard);
         $this->assertIsString($sentinel);
-        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $dashboard);
-        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $sentinel);
+        $this->assertStringContainsString("->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i')", $dashboard);
+        $this->assertStringContainsString("->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i')", $sentinel);
     }
 
     public function test_primary_navigation_and_dashboard_use_the_local_tabler_icon_component(): void
@@ -90,10 +90,11 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $config = file_get_contents(base_path('config/app.php'));
         $environment = file_get_contents(base_path('.env.example'));
 
-        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $owner);
-        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $admin);
-        $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $recovery);
-        $this->assertStringContainsString("'timezone' => env('APP_TIMEZONE', 'Africa/Johannesburg')", $config);
-        $this->assertStringContainsString('APP_TIMEZONE=Africa/Johannesburg', $environment);
+        $this->assertStringContainsString("->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i')", $owner);
+        $this->assertStringContainsString("->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i')", $admin);
+        $this->assertStringContainsString("->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i')", $recovery);
+        $this->assertStringContainsString("'display_timezone' => env('ZAZU_DISPLAY_TIMEZONE', 'Africa/Johannesburg')", $config);
+        $this->assertStringContainsString('ZAZU_DISPLAY_TIMEZONE=Africa/Johannesburg', $environment);
+        $this->assertStringContainsString("'timezone' => 'UTC'", $config);
     }
 }

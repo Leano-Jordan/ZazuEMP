@@ -27,7 +27,7 @@
             </form>
         @else
             <h2>Installation health</h2>
-            <p>Checked: {{ !empty($health['checked_at']) ? \Illuminate\Support\Carbon::parse($health['checked_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') : 'Unknown' }}</p>
+            <p>Checked: {{ !empty($health['checked_at']) ? \Illuminate\Support\Carbon::parse($health['checked_at'])->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i') : 'Unknown' }}</p>
             <p>Overall status: {{ strtoupper($health['status'] ?? 'UNKNOWN') }}</p>
             <ul>
                 @foreach($health['checks'] ?? [] as $check)

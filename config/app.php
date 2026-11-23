@@ -65,7 +65,10 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'Africa/Johannesburg'),
+    'timezone' => 'UTC',
+
+    // Human-facing dates and times; keep internal/API timestamps on UTC.
+    'display_timezone' => env('ZAZU_DISPLAY_TIMEZONE', 'Africa/Johannesburg'),
 
     /*
     |--------------------------------------------------------------------------

@@ -318,7 +318,7 @@
                 </div>
                 <span class="sentinel-pill">{{ strtoupper(str_replace('_', ' ', $health['status'])) }}</span>
             </div>
-            <div class="sentinel-muted sentinel-retention-note">Checked {{ !empty($health['checked_at']) ? \Illuminate\Support\Carbon::parse($health['checked_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') : 'Unknown' }}. This check does not query or modify business records.</div>
+            <div class="sentinel-muted sentinel-retention-note">Checked {{ !empty($health['checked_at']) ? \Illuminate\Support\Carbon::parse($health['checked_at'])->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i') : 'Unknown' }}. This check does not query or modify business records.</div>
             <div class="sentinel-health-grid">
                 @foreach($health['checks'] as $check)
                     <article class="sentinel-health-card sentinel-health-{{ $check['status'] }}">
@@ -346,7 +346,7 @@
                 <span class="sentinel-pill">{{ strtoupper($backupStatus['status']) }}</span>
             </div>
             @if($backupStatus['latest_at'])
-                <p><strong>Last backup:</strong> {{ \Illuminate\Support\Carbon::parse($backupStatus['latest_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') }} ({{ $backupStatus['age_hours'] }} hours ago)</p>
+                <p><strong>Last backup:</strong> {{ \Illuminate\Support\Carbon::parse($backupStatus['latest_at'])->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i') }} ({{ $backupStatus['age_hours'] }} hours ago)</p>
                 @if($backupStatus['status'] === 'attention')
                     @if(($backupStatus['age_hours'] ?? null) !== null && $backupStatus['age_hours'] > 26)
                         <p class="sentinel-health-attention">Backup overdue. Check the Windows scheduled task and verify a fresh archive is created.</p>

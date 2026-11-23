@@ -46,4 +46,7 @@ The current `package.json` has no icon package dependency. The dashboard current
 ## Additional presentation root causes confirmed
 
 - Business wallpaper and dashboard hero photography are separate settings. The business wallpaper was excluded from dashboard pages by the old `body.zazu-has-wallpaper:not(.zazu-dashboard-page)` selector. A dashboard-specific light/dark wallpaper layer now uses the existing `--zazu-wallpaper` variable; shell/content surfaces are transparent and mobile uses scroll attachment.
-- The application previously hard-coded `UTC` as its default timezone. Zazu's South African default is now `Africa/Johannesburg`, overridable with `APP_TIMEZONE`. Backup and health timestamps in Dashboard, Founder Control Centre, Owner health and Local Recovery are now formatted as `j M Y, H:i` in the configured timezone. API/sync timestamps remain ISO-8601.
+- The application retains UTC for internal/API timestamps. A separate `ZAZU_DISPLAY_TIMEZONE` controls human-facing dates and defaults to `Africa/Johannesburg`, overridable per installation. Backup and health timestamps in Dashboard, Founder Control Centre, Owner health and Local Recovery are now formatted as `j M Y, H:i` in the configured timezone. API/sync timestamps remain ISO-8601.
+
+
+**Timezone boundary decision:** keep Laravel's application/system timezone at UTC so database, sync and machine-facing timestamps do not silently change offset. Use the separate `ZAZU_DISPLAY_TIMEZONE` (South African default) only when rendering human-facing dates and times.

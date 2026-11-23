@@ -14,7 +14,7 @@
             <strong id="zazu-backup-warning-title">Backup protection needs attention</strong>
             <span>{{ $backupStatus['message'] }}</span>
             @if ($backupStatus['latest_at'])
-                <span>Latest on-PC archive: {{ $backupStatus['age_hours'] }} hours old ({{ \Illuminate\Support\Carbon::parse($backupStatus['latest_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') }}).</span>
+                <span>Latest on-PC archive: {{ $backupStatus['age_hours'] }} hours old ({{ \Illuminate\Support\Carbon::parse($backupStatus['latest_at'])->timezone(config('app.display_timezone', config('app.timezone')))->format('j M Y, H:i') }}).</span>
             @endif
             <span>{{ $backupStatus['secondary_message'] }}</span>
             <small>These archives cover the entire installation. Restoring one affects every business on this PC and remains an installation-operator task.</small>
@@ -23,7 +23,7 @@
 
     <section class="zazu-dash-hero">
         <div class="zazu-dash-hero-main">
-            <span class="zazu-dash-greeting">{{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}</span>
+            <span class="zazu-dash-greeting">{{ now(config('app.display_timezone', config('app.timezone')))->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}</span>
             <h2>{{ auth()->user()->name }} <span aria-hidden="true">👋</span></h2>
             <p class="zazu-dash-hero-lead">Run your event business from one place.</p>
             <p class="zazu-dash-hero-support">Manage events, quotes, customers, inventory, purchasing and finance.</p>

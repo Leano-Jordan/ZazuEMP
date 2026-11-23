@@ -2115,3 +2115,10 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Dashboard and Founder Control Centre backup timestamps were already converted in the preceding visual slice.
 - ISO-8601 remains unchanged for API, sync, persistence and machine-facing contracts.
 - Added regression coverage for all user-facing health timestamp surfaces and the timezone default.
+
+
+## Timezone boundary refinement — 2026-11-23
+
+- Kept Laravel's system timezone at UTC to preserve existing database, sync and API timestamp behaviour.
+- Added a separate `ZAZU_DISPLAY_TIMEZONE` setting, defaulting to `Africa/Johannesburg`, and changed human-facing date/time formatting to use it.
+- This keeps ISO-8601 machine contracts stable while presenting local dates to everyday users.
