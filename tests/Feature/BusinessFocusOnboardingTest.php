@@ -34,7 +34,6 @@ class BusinessFocusOnboardingTest extends TestCase
             ->assertSee('name="primary_niche"', false);
     }
 
-
     public function test_owner_can_save_multiple_business_focuses_and_a_primary_focus(): void
     {
         $business = Business::create([
@@ -74,7 +73,6 @@ class BusinessFocusOnboardingTest extends TestCase
         );
     }
 
-
     public function test_legacy_single_focus_submission_remains_compatible(): void
     {
         $business = Business::create([
@@ -98,7 +96,6 @@ class BusinessFocusOnboardingTest extends TestCase
             'business_focuses' => '["sound_dj"]',
         ]);
     }
-
 
     public function test_dj_only_business_gets_relevant_catalogue_categories_without_catering_clutter(): void
     {
@@ -125,7 +122,6 @@ class BusinessFocusOnboardingTest extends TestCase
             ->assertDontSee('value="Catering"', false)
             ->assertDontSee('value="Baking"', false);
     }
-
 
     public function test_setup_centre_summarises_active_and_hidden_owner_capabilities(): void
     {
@@ -158,7 +154,6 @@ class BusinessFocusOnboardingTest extends TestCase
             ->assertSee('Service: 1')
             ->assertSee('Rental: 1');
     }
-
 
     public function test_workspace_navigation_reflects_active_business_mix_without_hiding_shared_surfaces(): void
     {
@@ -198,7 +193,6 @@ class BusinessFocusOnboardingTest extends TestCase
             ->assertSee('Quotes')
             ->assertSee('Finance');
     }
-
 
     public function test_offline_bootstrap_includes_presentation_only_workspace_profile(): void
     {
@@ -242,7 +236,6 @@ class BusinessFocusOnboardingTest extends TestCase
         $this->assertSame(1, $profile['active_rentals']);
         $this->assertNotContains('Photography & video', $profile['catalogue_categories']);
     }
-
 
     private function selectBusinessFocus(User $user, Business $business): void
     {
