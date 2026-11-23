@@ -167,6 +167,36 @@ class ZazuHelperContextTest extends TestCase
             ->assertDontSee('Camera editing');
     }
 
+    public function test_helper_does_not_truncate_businesses_with_more_than_three_active_focus_areas(): void
+    {
+        $business = $this->makeBusiness('Helper Broad Service Mix');
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'primary_niche' => 'mixed',
+        ]);
+
+        foreach ([
+            ['name' => 'Sound hire', 'category' => 'Sound & entertainment'],
+            ['name' => 'Chair hire', 'category' => 'Furniture & equipment'],
+            ['name' => 'Catering', 'category' => 'Catering'],
+            ['name' => 'Wedding decor', 'category' => 'Decor'],
+        ] as $offering) {
+            BusinessCapability::create($offering + [
+                'business_id' => $business->id,
+                'capability_type' => 'service',
+                'pricing_basis' => 'custom',
+                'currency' => 'ZAR',
+                'is_active' => true,
+            ]);
+        }
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-zazu-helper-focuses="sound_dj,chairs_tents,catering_baking,decor"', false);
+    }
+
     public function test_helper_derives_decor_and_photography_guidance_from_active_capabilities_only(): void
     {
         $business = $this->makeBusiness('Helper Creative Services');
