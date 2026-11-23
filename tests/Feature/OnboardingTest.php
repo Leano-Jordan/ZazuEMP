@@ -185,6 +185,37 @@ class OnboardingTest extends TestCase
         $this->assertDatabaseCount('business_capabilities', 0);
     }
 
+    public function test_setup_centre_summarises_active_and_hidden_owner_capabilities(): void
+    {
+        $business = Business::create([
+            'name' => 'Capability Summary Business',
+            'slug' => 'capability-summary-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        foreach ([
+            ['name' => 'DJ service', 'capability_type' => 'service', 'is_active' => true],
+            ['name' => 'Chair hire', 'capability_type' => 'rental', 'is_active' => true],
+            ['name' => 'Archived decor', 'capability_type' => 'service', 'is_active' => false],
+        ] as $capability) {
+            BusinessCapability::create($capability + [
+                'business_id' => $business->id,
+                'category' => 'Other',
+                'pricing_basis' => 'custom',
+                'currency' => 'ZAR',
+            ]);
+        }
+
+        $this->get(route('onboarding.index'))
+            ->assertOk()
+            ->assertSee('data-zazu-capability-summary', false)
+            ->assertSee('2 active · 1 hidden')
+            ->assertSee('Service: 1 · Rental: 1');
+    }
+
     public function test_dashboard_exposes_the_current_operational_command_surface(): void
     {
         $business = Business::create([
