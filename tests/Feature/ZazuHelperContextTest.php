@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\BusinessCapability;
+use App\Models\Asset;
+use App\Models\AssetAllocation;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\EventPreparationItem;
@@ -46,6 +48,23 @@ class ZazuHelperContextTest extends TestCase
             'business_id' => $business->id,
             'name' => 'Restricted supplier',
         ]);
+        $restrictedAsset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'HELPER-STAFF-ASSET',
+            'name' => 'Restricted asset',
+            'status' => 'allocated',
+            'condition' => 'good',
+            'purchase_cost' => '500.00',
+            'currency' => 'ZAR',
+        ]);
+        AssetAllocation::create([
+            'business_id' => $business->id,
+            'asset_id' => $restrictedAsset->id,
+            'event_id' => $event->id,
+            'allocated_from' => now()->toDateString(),
+            'allocated_until' => now()->addDay()->toDateString(),
+            'status' => 'allocated',
+        ]);
         PurchaseOrder::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
@@ -63,7 +82,9 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('1 preparation item')
             ->assertSee('Review preparation')
             ->assertDontSee('purchase order')
-            ->assertDontSee('Review purchasing');
+            ->assertDontSee('Review purchasing')
+            ->assertDontSee('HELPER-STAFF-ASSET')
+            ->assertDontSee('Restricted asset');
     }
 
     public function test_helper_guidance_adapts_to_the_saved_business_focus(): void
@@ -192,6 +213,7 @@ class ZazuHelperContextTest extends TestCase
             'status' => 'blocked',
         ]);
         $this->createPlannedHelperCost($business, $event);
+        $assetTag = $this->createAllocatedHelperAsset($business, $event);
 
         $supplier = Supplier::create([
             'business_id' => $business->id,
@@ -234,8 +256,35 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('Sent')
             ->assertSee('Confirm equipment supplier cost')
             ->assertSee('Planned')
+            ->assertSee($assetTag)
+            ->assertSee('Allocated')
             ->assertDontSee('Catering preparation')
             ->assertDontSee('Camera editing');
+    }
+
+    private function createAllocatedHelperAsset(Business $business, Event $event): string
+    {
+        $assetTag = 'HELPER-ASSET-'.Str::upper(Str::random(5));
+        $asset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => $assetTag,
+            'name' => 'Stretch tent asset',
+            'status' => 'allocated',
+            'condition' => 'good',
+            'purchase_cost' => '1500.00',
+            'currency' => 'ZAR',
+        ]);
+
+        AssetAllocation::create([
+            'business_id' => $business->id,
+            'asset_id' => $asset->id,
+            'event_id' => $event->id,
+            'allocated_from' => now()->toDateString(),
+            'allocated_until' => now()->addDay()->toDateString(),
+            'status' => 'allocated',
+        ]);
+
+        return $assetTag;
     }
 
     private function createPlannedHelperCost(Business $business, Event $event): EventCost
