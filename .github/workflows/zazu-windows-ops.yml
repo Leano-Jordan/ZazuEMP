@@ -77,8 +77,36 @@ jobs:
           if ($samples.Count -lt 1) { throw 'The resource sampler must produce at least one sample in the smoke run.' }
           $metadata = Get-Content -LiteralPath $manifest.FullName -Raw | ConvertFrom-Json
           if (-not $metadata.cpuModel -or -not $metadata.logicalProcessors -or -not $metadata.installedMemoryGB) { throw 'The resource manifest is missing hardware identification fields.' }
+          if ($metadata.deviceTier -notin @('Entry', 'Mainstream', 'High-performance')) { throw 'The resource manifest is missing its hardware cohort classification.' }
+          if (-not $metadata.buildCommitSha) { throw 'The resource manifest must identify the source commit.' }
           if ($metadata.privacy -notmatch 'No telemetry is uploaded') { throw 'The sampler privacy declaration is missing.' }
-          Write-Host "PASS: Resource sampler produced $($samples.Count) local samples and a hardware manifest."
+
+          $requiredColumns = @(
+            'HostCpuPercent',
+            'HostMemoryUsedPercent',
+            'HostDiskReadBytesPerSec',
+            'HostDiskWriteBytesPerSec',
+            'HostDiskActivePercent',
+            'ProjectDriveFreeGB',
+            'ProjectDriveUsedPercent',
+            'HostNetworkReceivedBytesPerSec',
+            'HostNetworkSentBytesPerSec',
+            'ZazuCpuPercentOfWholeMachine',
+            'ZazuWorkingSetMB',
+            'ZazuPrivateMemoryMB',
+            'ZazuProcessMatched'
+          )
+          $actualColumns = @($samples[0].PSObject.Properties.Name)
+          foreach ($column in $requiredColumns) {
+            if ($column -notin $actualColumns) { throw "Resource sample is missing required metric: $column" }
+          }
+          if ($samples[0].ZazuCpuPercentOfWholeMachine -ne '') {
+            throw 'The first process CPU sample must be blank until a real CPU delta can be measured; zero would be misleading.'
+          }
+          if ($samples[0].ZazuProcessMatched -eq 'False' -and $samples[0].ZazuWorkingSetMB -ne '') {
+            throw 'Unmatched Zazu processes must produce missing values, not misleading zero process memory.'
+          }
+          Write-Host "PASS: Resource sampler produced $($samples.Count) local samples, complete host metrics and a hardware manifest."
 
       - name: Verify LAN launchers use compiled frontend assets
         shell: pwsh
