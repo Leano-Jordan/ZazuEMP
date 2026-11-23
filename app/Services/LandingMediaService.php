@@ -40,41 +40,85 @@ class LandingMediaService
      */
     public function library(): array
     {
+        return array_merge($this->bundledLibrary(), $this->uploadedLibrary());
+    }
+
+    /**
+     * @return array<string, array{label: string, url: string, source: string}>
+     */
+    private function bundledLibrary(): array
+    {
         $library = [];
         $seenPaths = [];
 
         foreach (config('zazu.landing_image_library', []) as $key => $entry) {
-            foreach ([
-                ['path' => $entry['url'] ?? null, 'label' => $entry['label'] ?? 'Landing image'],
-                ['path' => $entry['fallback'] ?? null, 'label' => ($entry['label'] ?? 'Landing image').' illustration'],
-            ] as $candidate) {
-                $path = (string) ($candidate['path'] ?? '');
-                if (!$this->isSafeLandingPath($path) || !$this->imageFileExists($path) || isset($seenPaths[$path])) {
-                    continue;
-                }
-
-                $library[$key.($candidate['path'] === ($entry['fallback'] ?? null) ? '_fallback' : '')] = [
-                    'label' => (string) $candidate['label'],
-                    'url' => $path,
-                    'source' => 'Bundled',
-                ];
-                $seenPaths[$path] = true;
-            }
+            $this->appendBundledEntry($library, $seenPaths, (string) $key, $entry);
         }
 
-        if (Schema::hasTable('platform_landing_media')) {
-            foreach (PlatformLandingMedia::query()->latest('created_at')->get() as $media) {
-                $path = (string) $media->path;
-                if (!$this->isSafeLandingPath($path) || !$this->imageFileExists($path)) {
-                    continue;
-                }
+        return $library;
+    }
 
-                $library['uploaded_'.$media->id] = [
-                    'label' => $media->label,
-                    'url' => $path,
-                    'source' => 'Uploaded',
-                ];
+    /**
+     * @param array<string, array{label: string, url: string, source: string}> $library
+     * @param array<string, bool> $seenPaths
+     * @param array<string, mixed> $entry
+     */
+    private function appendBundledEntry(array &$library, array &$seenPaths, string $key, array $entry): void
+    {
+        $label = (string) ($entry['label'] ?? 'Landing image');
+        $candidates = [
+            ['key' => $key, 'path' => $entry['url'] ?? null, 'label' => $label],
+            ['key' => $key.'_fallback', 'path' => $entry['fallback'] ?? null, 'label' => $label.' illustration'],
+        ];
+
+        foreach ($candidates as $candidate) {
+            $path = (string) ($candidate['path'] ?? '');
+
+            if (!$this->isAvailableLibraryPath($path, $seenPaths)) {
+                continue;
             }
+
+            $library[$candidate['key']] = [
+                'label' => $candidate['label'],
+                'url' => $path,
+                'source' => 'Bundled',
+            ];
+            $seenPaths[$path] = true;
+        }
+    }
+
+    /**
+     * @param array<string, bool> $seenPaths
+     */
+    private function isAvailableLibraryPath(string $path, array $seenPaths): bool
+    {
+        return $this->isSafeLandingPath($path)
+            && $this->imageFileExists($path)
+            && !isset($seenPaths[$path]);
+    }
+
+    /**
+     * @return array<string, array{label: string, url: string, source: string}>
+     */
+    private function uploadedLibrary(): array
+    {
+        if (!Schema::hasTable('platform_landing_media')) {
+            return [];
+        }
+
+        $library = [];
+        foreach (PlatformLandingMedia::query()->latest('created_at')->get() as $media) {
+            $path = (string) $media->path;
+
+            if (!$this->isSafeLandingPath($path) || !$this->imageFileExists($path)) {
+                continue;
+            }
+
+            $library['uploaded_'.$media->id] = [
+                'label' => $media->label,
+                'url' => $path,
+                'source' => 'Uploaded',
+            ];
         }
 
         return $library;
