@@ -36,7 +36,7 @@
 - Founder reports the uploaded encrypted `.zazu` archive failed to load repeatedly despite using the saved passphrase; subsequent response was `SYS-002`.
 - Confirmed in `ZazuErrorCatalog::forStatus()` and `codeFor()`: `SYS-002` maps to HTTP 429. `AppServiceProvider` configures the owner restore route for 3 requests per 10 minutes per authenticated user.
 - The existing global form submission guard already prevents repeated submission of the same form instance. Do not add a duplicate guard or weaken the limiter as a symptom patch.
-- The 429 explains the terminal rate-limit response only. It does **not** identify the first archive-load failure. Initial upload, PHP request limits, encryption detection/decryption, temporary-file staging and ZIP validation remain under investigation.
+- The 429 explains the terminal rate-limit response only. It does **not** identify the first archive-load failure. The Windows launcher now sets explicit PHP upload/POST and request-time limits (CASE-ZAZU-0044); the effective PHP values on the original installed run were not captured. Encryption detection/decryption, temporary-file staging and ZIP validation remain unproven as the original failure stage. The exact original cause remains unknown.
 - Restore gate remains **BLOCKED**. Founder must not retry until the first failing stage is identified. Preserve the original archive/passphrase and disposable target workspace. No live-business restore.
 
 ---
