@@ -204,6 +204,9 @@ while ((Get-Date) -le $deadline) {
         }
     }
 
+    $driveSnapshot = Get-CimSafe -ClassName 'Win32_LogicalDisk' -Filter "DeviceID='$projectDrive'" | Select-Object -First 1
+    $driveFreeGB = if ($driveSnapshot.Size) { [math]::Round(([double]$driveSnapshot.FreeSpace / 1GB), 2) } else { $null }
+    $driveUsedPercent = if ($driveSnapshot.Size -gt 0) { [math]::Round((1 - ([double]$driveSnapshot.FreeSpace / [double]$driveSnapshot.Size)) * 100, 2) } else { $null }
     $availableMB = if ($memoryCounter.AvailableMBytes) { [double]$memoryCounter.AvailableMBytes } else { $null }
     $totalMemoryGB = if ($computer.TotalPhysicalMemory) { [double]$computer.TotalPhysicalMemory / 1GB } else { $null }
     $memoryUsedPercent = if ($null -ne $availableMB -and $totalMemoryGB -gt 0) {
@@ -217,6 +220,8 @@ while ((Get-Date) -le $deadline) {
         HostMemoryAvailableMB = $availableMB
         HostDiskReadBytesPerSec = if ($diskCounter) { [double]$diskCounter.DiskReadBytesPersec } else { $null }
         HostDiskWriteBytesPerSec = if ($diskCounter) { [double]$diskCounter.DiskWriteBytesPersec } else { $null }
+        ProjectDriveFreeGB = $driveFreeGB
+        ProjectDriveUsedPercent = $driveUsedPercent
         HostNetworkReceivedBytesPerSec = $receivedBytes
         HostNetworkSentBytesPerSec = $sentBytes
         ZazuProcessCount = $processIds.Count
