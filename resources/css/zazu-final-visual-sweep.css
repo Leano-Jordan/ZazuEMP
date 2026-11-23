@@ -7004,3 +7004,223 @@ body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
         background-attachment: scroll, scroll !important;
     }
 }
+
+
+/* DIRECTOR 2026-11-23 — predictable accordion navigation.
+   Flyouts were overlapping adjacent destinations and the active Work group
+   was not retained after page navigation. Keep groups in the sidebar flow. */
+.zazu-sidebar {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+.zazu-nav {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.zazu-nav-hierarchical,
+.zazu-nav-hierarchy {
+    min-width: 0;
+    width: 100%;
+}
+.zazu-nav-area {
+    position: static;
+    width: 100%;
+}
+.zazu-nav-area-trigger {
+    width: 100%;
+    min-height: 48px;
+    padding-inline: 13px;
+    justify-content: space-between;
+}
+.zazu-nav-area-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+.zazu-nav-icon,
+.zazu-sidebar .zazu-icon {
+    width: 23px;
+    height: 23px;
+    flex: 0 0 23px;
+    stroke-width: 1.9;
+}
+.zazu-nav-flyout {
+    position: static;
+    display: none;
+    width: auto;
+    margin: 3px 0 9px 14px;
+    padding: 4px 0 4px 12px;
+    border: 0;
+    border-left: 2px solid color-mix(in srgb, var(--zazu-primary) 35%, var(--zazu-sidebar-muted));
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+}
+.zazu-nav-area.is-open > .zazu-nav-flyout {
+    display: block;
+}
+.zazu-nav-area:not(.is-open):hover > .zazu-nav-flyout {
+    display: none;
+}
+.zazu-nav-flyout-links {
+    display: grid;
+    gap: 3px;
+}
+.zazu-nav-flyout .zazu-nav-link {
+    min-height: 43px;
+    padding-inline: 12px;
+    font-size: 13px;
+}
+.zazu-nav-area-trigger:focus-visible,
+.zazu-nav-flyout .zazu-nav-link:focus-visible {
+    outline: 2px solid var(--zazu-focus);
+    outline-offset: 2px;
+}
+@media (max-width: 850px) {
+    .zazu-nav {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+    }
+    .zazu-nav-flyout {
+        position: static;
+        display: none;
+        width: auto;
+        margin: 2px 0 8px 12px;
+        padding: 4px 0 4px 11px;
+        border: 0;
+        border-left: 2px solid color-mix(in srgb, var(--zazu-primary) 35%, var(--zazu-sidebar-muted));
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+    .zazu-nav-area.is-open > .zazu-nav-flyout {
+        display: block;
+    }
+    .zazu-nav-area-trigger {
+        min-height: 50px;
+    }
+    .zazu-nav-flyout .zazu-nav-link {
+        min-height: 44px;
+    }
+}
+
+/* DIRECTOR 2026-11-23 — month board remains complete on narrow screens.
+   Keep all seven days in a horizontally scrollable calendar viewport rather
+   than hiding the grid or compressing seven columns into a phone width. */
+.zazu-calendar-grid-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    scrollbar-gutter: stable;
+    touch-action: pan-x pan-y;
+}
+.zazu-calendar-grid-scroll:focus-visible {
+    outline: 2px solid var(--zazu-focus);
+    outline-offset: -2px;
+}
+.zazu-calendar-grid-scroll > .zazu-calendar-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(96px, 1fr));
+    min-width: 728px;
+    width: 100%;
+    overflow: visible;
+}
+.zazu-calendar-grid-scroll > .zazu-calendar-grid > .zazu-calendar-label {
+    min-width: 0;
+    min-height: 38px;
+}
+.zazu-calendar-grid-scroll > .zazu-calendar-grid > .zazu-calendar-cell {
+    min-width: 0;
+    min-height: 112px;
+}
+.zazu-calendar-title-row {
+    min-width: 0;
+    flex-wrap: wrap;
+}
+.zazu-calendar-summary {
+    min-width: 0;
+}
+@media (max-width: 850px) {
+    .zazu-calendar-hero {
+        padding: 17px;
+    }
+    .zazu-calendar-title-row {
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .zazu-calendar-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .zazu-calendar-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .zazu-calendar-view-switch {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+    }
+    .zazu-calendar-view-switch::-webkit-scrollbar {
+        display: none;
+    }
+    .zazu-calendar-jump {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+        min-width: 0;
+    }
+    .zazu-calendar-jump input {
+        min-width: 0;
+        flex: 1 1 145px;
+    }
+}
+@media (max-width: 520px) {
+    .zazu-calendar-hero {
+        padding: 14px;
+    }
+    .zazu-calendar-title {
+        font-size: 25px;
+        line-height: 1.15;
+    }
+    .zazu-calendar-month-nav {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .zazu-calendar-summary {
+        gap: 7px;
+    }
+    .zazu-calendar-summary-item {
+        min-height: 76px;
+        padding: 11px;
+    }
+    .zazu-calendar-summary-value {
+        font-size: 20px;
+    }
+    .zazu-calendar-summary-label {
+        font-size: 10px;
+        line-height: 1.3;
+    }
+    .zazu-calendar-grid-scroll {
+        border-radius: 0 0 var(--zazu-radius-md) var(--zazu-radius-md);
+    }
+}
