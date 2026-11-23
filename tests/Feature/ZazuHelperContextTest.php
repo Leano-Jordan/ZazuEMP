@@ -240,7 +240,7 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('data-zazu-helper-focuses="chairs_tents"', false)
             ->assertSee('For this booking, review hire quantities, asset availability, delivery, setup, collection and condition.')
             ->assertDontSee('For this booking, review menu quantities, dietary details, purchasing, preparation and delivery.')
-            ->assertSee('data-zazu-helper-event-records="2"', false)
+            ->assertSee('data-zazu-helper-event-records="4"', false)
             ->assertSee('1 preparation item')
             ->assertSee('1 purchase order')
             ->assertSee('href="'.route('work.preparation.index', $event).'"', false)
