@@ -3,7 +3,7 @@
 **Date:** 2026-11-23  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Canonical branch:** `main` (no branches created)  
-**Current source head:** `223009302b5b529aa5b50eba6b4aaf70968d5fa0`  
+**Current source head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`  
 **Disposition:** V1 remains **NOT READY**. The product foundation is substantial; recovery acceptance, offline physical proof, populated commercial reconciliation and legal/brand closure remain release gates.
 
 ## 1. Scope and method
@@ -84,6 +84,19 @@ A Windows Ops contract check verifies these settings remain attached to the actu
 
 Pint rejected non-canonical array PHPDoc spacing in `BusinessExportController`. The docblocks were corrected. No mass formatting of unrelated legacy files was performed.
 
+### OFFLINE-001 — Customer metadata discarded when photo change is deferred (P1, corrected)
+
+**Defect:** When an operator created or edited a customer offline while selecting a profile photo or requesting photo removal, the offline submit handler displayed a connection warning and returned before queuing the otherwise valid customer metadata. The warning told the operator to save the details first, but the details were not saved.
+
+**Root cause:** The unsupported photo-change guard aborted the entire customer mutation instead of excluding only the unsupported file operation.
+
+**Correction:** The handler now records that a photo change must be deferred, builds and queues the normal business-scoped customer metadata mutation, and omits both photo bytes and photo-removal intent. The local save notice explicitly confirms that customer details were saved and the photo change was not.
+
+**Regression:** The offline browser journey selects a photo, submits the customer, verifies the metadata is in the local state and pending queue, asserts photo fields are absent from the mutation, and checks the operator-facing notice.
+
+**Verification:** Exact-head `c57bbd72` Laravel workflow [45229069891](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229069891) passed: 744 tests, 1 skipped, 5,230 assertions; offline browser 64 desktop tests, quote single-unit acceptance, 7 mobile-viewport tests, host-outage acceptance and phone-local attachment journey all passed; PostgreSQL migration/recovery passed. Zazu Quality [45229070049](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229070049) passed. SonarCloud was skipped.
+
+**Scope:** Offline customer text/contact metadata is saved; profile-photo upload/removal remains online-only. This does not claim offline image upload support.
 ## 4. Cross-domain review conclusions
 
 | Area | Assessment | Remaining boundary |
@@ -109,10 +122,16 @@ No additional confirmed finance/tenant-isolation defect was established in the s
 | Windows V1 package/fresh-install and encrypted/legacy archive acceptance | PASS — [run 45202614826](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45202614826) |
 | PHPMD after onboarding/encryption refactor | PASS — [run 45205108169](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45205108169) |
 | Director Health on final code head `620ab99b` | PASS — [run 45205116118](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45205116118) |
-| Laravel and Zazu Quality on final head `620ab99b` | QUEUED at report time — do not count as passes yet |
+| Exact-head Laravel on `c57bbd72` | PASS — 744 passed / 1 skipped / 5,230 assertions; [run 45229069891](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229069891) |
+| Exact-head offline browser acceptance on `c57bbd72` | PASS — 64 desktop + quote single-unit + 7 mobile viewport + host-outage + phone-local attachment journey; same Laravel workflow |
+| PostgreSQL migration/recovery on `c57bbd72` | PASS — same Laravel workflow |
+| Zazu Quality on `c57bbd72` | PASS — [run 45229070049](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229070049) |
+| Windows V1 package/fresh install on runtime-identical application code `51f809ce` | PASS — [run 45229065626](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229065626) |
+| Director Health on runtime-identical application code `51f809ce` | PASS — [run 45229065739](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229065739) |
+| SonarCloud | SKIPPED — not counted as a pass |
 | SonarCloud | SKIPPED — not counted as a pass |
 
-The Laravel 743-test result predates the latest archive transaction and maintainability refactors. It is supporting baseline evidence, not exact-head verification of those changes.
+The earlier 743-test result is historical baseline only. The exact-head `c57bbd72` run now verifies the archive transaction change, maintainability refactors, offline customer metadata/photo boundary and the complete current browser acceptance suite.
 
 ## 6. Formal V1 scorecard
 

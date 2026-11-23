@@ -253,3 +253,13 @@ A sync request can pass middleware authentication, then continue after the durab
 **Control:** sensitive sync reads and writes re-lock business → device inside their operation transaction, recheck active status, and compare the authenticated token hash with the persisted hash. Never treat the middleware's Eloquent model as current authorization state for a later transaction.
 
 **Status:** CONTROL VERIFIED — exact-head Laravel (670 passed / 1 skipped / 4,552 assertions), PostgreSQL migration/recovery, PHPMD and Psalm passed on `7d4b097`; offline-browser and Windows package acceptance were still in progress at the checkpoint.
+
+## REG-028 — Offline customer metadata must survive deferred photo changes
+
+A customer create/update form may include supported text/contact metadata alongside an unsupported profile-photo upload or removal. Rejecting the entire mutation discards valid work and contradicts the operator-facing instruction to save details first.
+
+**Control:** detect the unsupported photo operation without aborting the customer mutation. Queue only the supported business-scoped metadata, omit file bytes and removal intent, and show an explicit notice that the details were saved while the photo change remains pending an online update.
+
+**Regression:** offline browser coverage selects a profile photo, submits the customer, verifies local state and pending mutation metadata, asserts no photo fields are queued, and checks the partial-save notice.
+
+**Status:** CLOSED — exact-head Laravel (744 passed / 1 skipped / 5,230 assertions), desktop offline browser (64), mobile viewport (7), host-outage, phone-local attachment, PostgreSQL migration/recovery and Zazu Quality passed on `c57bbd72`. See CASE-ZAZU-0045 / ENG-JS-002. Customer photo upload/removal itself remains online-only.

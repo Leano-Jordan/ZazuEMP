@@ -1,7 +1,7 @@
 ## Director acceptance ledger — 2026-11-23
 
 **Audit:** [Widespread engineering audit and formal scorecard](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md)  
-**Current source head at audit:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`.
+**Latest verified source/test head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`.
 
 ### Owner checks already completed — do not repeat
 
@@ -12,7 +12,11 @@
 - [x] Onboarding controller complexity and public-method count reduced by extracting progress state and business-profile actions; PHPMD PASS.
 - [x] Archive encryption stream handling extracted from temporary-file lifecycle; obsolete helpers removed; PHPMD PASS.
 - [x] Business archive controller PHPDoc and route import formatting corrected; Zazu Quality PASS on 22300930.
-- [ ] Final offline browser acceptance and full exact-head regression reconciliation on 22300930 still running.
+- [x] Offline customer metadata is preserved when profile-photo upload/removal is deferred; photo bytes/removal intent are not queued, and the operator receives an explicit partial-save notice.
+- [x] Exact-head Laravel [45229069891](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229069891): 744 passed / 1 skipped / 5,230 assertions.
+- [x] Exact-head browser acceptance: 64 desktop, quote single-unit journey, 7 mobile viewport, host-outage monitor and phone-local attachment journey all passed.
+- [x] PostgreSQL migration/recovery and Zazu Quality [45229070049](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229070049) passed. SonarCloud skipped.
+- [x] Windows V1 package/fresh install passed on runtime-identical application code [51f809ce](https://github.com/Leano-Jordan/ZazuEMP/commit/51f809ce47751430caa97a5036a5320558a4c439) [run 45229065626](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229065626).
 
 
 - [x] Installed PC normal connected operation.

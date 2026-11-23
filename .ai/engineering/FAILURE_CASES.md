@@ -839,3 +839,23 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** Windows Ops workflow [45202625276](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45202625276) PASS on `9b95591`.
 
 **Scope note:** the exact effective PHP limits on the Founder's earlier installed run were not captured, so this mismatch is a confirmed configuration weakness but not a proven root cause of that specific failure. A successful installed restore after the launcher update is still required.
+
+### CASE-ZAZU-0045
+
+**Status:** CLOSED — exact-head Laravel and offline browser acceptance passed on `c57bbd72`.
+
+**Engineering code:** ENG-JS-002  
+**Class:** F1 — application defect  
+**Target:** `resources/js/app.js`, offline customer form submission.
+
+**Failure fingerprint:** An offline customer create/update form includes valid text/contact metadata and a selected profile photo or photo-removal request. The UI warns that photo changes require a connection, then aborts the whole mutation. No customer metadata is saved locally, despite the message instructing the operator to save details first.
+
+**Root cause:** The unsupported photo-change guard returned before building and queueing the supported customer metadata payload.
+
+**Correction on main:** The handler now records the photo operation as deferred, queues the supported customer metadata, excludes photo bytes and removal intent from the offline mutation, and appends an explicit notice that details were saved while the photo still requires a connection.
+
+**Regression:** The offline browser test creates a customer while offline with a selected profile photo, verifies the customer metadata is present in local state and the pending queue, asserts neither photo field is present in the mutation, and checks the partial-save notice.
+
+**Exact-head verification:** Laravel **744 passed / 1 skipped / 5,230 assertions**; offline browser **64 desktop + quote single-unit + 7 mobile viewport + host-outage + phone-local attachment passed**; PostgreSQL migration/recovery PASS on [run 45229069891](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229069891). Zazu Quality PASS on [run 45229070049](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45229070049). SonarCloud skipped.
+
+**Scope:** Offline customer metadata is supported. Customer photo upload/removal remains online-only. This case does not imply offline image upload support.

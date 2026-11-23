@@ -1,3 +1,15 @@
+## Latest Director verification — offline customer metadata/photo boundary — 2026-11-23
+
+**Verified main head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`.
+
+- CASE-ZAZU-0045 / ENG-JS-002 CLOSED: offline customer metadata is queued even when profile-photo upload/removal is deferred; no file bytes or removal intent are sent in the offline mutation.
+- Laravel: **744 passed / 1 skipped / 5,230 assertions**.
+- Offline browser: **64 desktop + quote single-unit + 7 mobile viewport + host-outage + phone-local attachment passed**.
+- PostgreSQL migration/recovery and Zazu Quality PASS; Windows package/fresh install PASS on runtime-identical app code `51f809ce`. SonarCloud skipped.
+- Formal 13-domain score remains **71/100**; no uplift.
+- Release gates unchanged: installed encrypted business restore, full installation recovery, physical Android offline cold-launch/restart/reconnect, populated live-business quote-to-profit reconciliation, POPIA operational sign-off and ZAZU name clearance.
+
+---
 ## Director audit reconciliation — 2026-11-23
 
 **Current source head:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`.  

@@ -4,6 +4,7 @@
 
 The restore/audit atomicity fix, explicit Windows PHP upload limits and maintainability refactors now pass exact-head Laravel/Quality/PHPMD/Psalm/Windows verification. No numerical uplift is awarded: Recovery already sits at 4/5 for automated archive/installation evidence, while the Founder's installed encrypted-archive restore attempt failed and operational acceptance still requires a successful controlled restore. Offline continuity remains 3/5 pending actual disconnected Android cold-start/restart/reconnect evidence. See [the 2026-11-23 Director audit](DIRECTOR_WIDESPREAD_AUDIT_2026-11-23.md).
 
+Latest exact-head evidence on `c57bbd72`: Laravel 744 passed / 1 skipped / 5,230 assertions; 64 desktop offline-browser tests, quote single-unit acceptance, 7 mobile-viewport tests, host-outage and phone-local attachment journeys passed; PostgreSQL migration/recovery and Zazu Quality passed. The offline customer photo-boundary defect was corrected and regression-tested. Windows package/fresh install passed on runtime-identical application code `51f809ce`. No score uplift: offline continuity remains 3/5 pending physical Android disconnected cold-start/restart/reconnect proof; recovery remains 4/5 pending the successful installed restore; legal/brand remains 1/5 pending operational sign-off and name clearance.
 **V1 remains NOT READY.**
 
 ---

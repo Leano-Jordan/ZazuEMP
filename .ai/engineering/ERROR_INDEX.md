@@ -64,6 +64,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-DATA-004 | CASE-ZAZU-0034 | Receiver bootstrap acknowledges an incomplete bounded snapshot | F1/F7 | CLOSED — exact-head CI verified on 559e66b |
 | ENG-RECOVERY-002 | CASE-ZAZU-0043 | Business archive restore committed before its success audit entry | F1 | CLOSED — exact-head Laravel PASS |
 | ENG-RUNTIME-003 | CASE-ZAZU-0044 | Windows PHP host upload limits inherited from machine php.ini | F4 | CLOSED AT LAUNCHER/CI LEVEL — installed restore still open |
+| ENG-JS-002 | CASE-ZAZU-0045 | Offline customer photo guard discarded valid customer metadata | F1 | CLOSED — exact-head Laravel/browser acceptance passed on c57bbd72 |
 | ENG-AUTH-001 | CASE-ZAZU-0035 | Bootstrap trusts a stale authenticated device snapshot after revocation or credential replacement | F1/F7 | CLOSED — exact-head CI verified on 559e66b |
 | ENG-UI-003 | CASE-ZAZU-0018 | Calendar agenda hidden on desktop/tablet | F1/F2 | VERIFIED — current browser suite green |
 | ENG-CSS-002 | CASE-ZAZU-0019 | Horizontal overflow at 1280px | F1/F2 | VERIFIED — current browser suite green |

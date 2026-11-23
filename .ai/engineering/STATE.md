@@ -1,3 +1,17 @@
+## Director continuation — offline customer photo boundary defect closed — 2026-11-23
+
+**Verified main head:** `c57bbd7233a325ed34deb9129f93fa0c9f7b6236`.
+
+- Widespread audit found a real offline customer-save defect: selecting a profile photo or requesting photo removal aborted the entire offline mutation, losing otherwise supported customer metadata.
+- Corrected `resources/js/app.js`: queue customer metadata, omit unsupported photo bytes/removal intent, and clearly disclose that the photo update is deferred until online.
+- Replaced the alert-based E2E that deadlocked by awaiting click before dialog acceptance with a behavioural regression asserting the metadata queue and explicit partial-save notice.
+- Exact-head Laravel: **744 passed / 1 skipped / 5,230 assertions**.
+- Exact-head offline browser: **64 desktop passed**, quote single-unit journey passed, **7 mobile viewport passed**, host-outage passed, phone-local attachment journey passed.
+- PostgreSQL migration/recovery and Zazu Quality passed. Windows package/fresh install passed on runtime-identical application code `51f809ce`. SonarCloud skipped.
+- Added CASE-ZAZU-0045 / ENG-JS-002 and REG-028; updated audit, checklist and formal scorecard.
+- Formal evidence maturity remains **71/100 (46/65)**. No score uplift. V1 remains NOT READY pending the existing owner-operated restore, physical Android offline/restart/reconnect, populated transaction reconciliation, POPIA operations and ZAZU name clearance.
+
+---
 ## Director widespread audit and consolidation — 2026-11-23
 
 **Current main source head:** `620ab99b81b0f3237cae0a0fe053d35b2e83a1cf`.  
