@@ -32,7 +32,7 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
     await expect(jobRow).toBeVisible();
     await jobRow.locator('[data-zazu-inspector-open]').first().click();
-    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await page.getByRole('tab', { name: 'Commercial position' }).click();
     await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
     await page.getByRole('link', { name: 'Open job record' }).click();
     await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
@@ -275,7 +275,7 @@ test('transient attachment upload failures retry while the app remains online', 
     const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
     await expect(jobRow).toBeVisible();
     await jobRow.locator('[data-zazu-inspector-open]').first().click();
-    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await page.getByRole('tab', { name: 'Commercial position' }).click();
     await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
     await page.getByRole('link', { name: 'Open job record' }).click();
     const attachmentForm = page.locator('[data-zazu-offline-attachment-form]');
@@ -442,7 +442,7 @@ test('reconciles an offline-created Work attachment after its job receives a ser
     const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
     await expect(jobRow).toBeVisible();
     await jobRow.locator('[data-zazu-inspector-open]').first().click();
-    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await page.getByRole('tab', { name: 'Commercial position' }).click();
     await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
     await page.getByRole('link', { name: 'Open job record' }).click();
     await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
@@ -764,7 +764,7 @@ test('late attachment upload response cannot recreate local files after logout',
     const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
     await expect(jobRow).toBeVisible();
     await jobRow.locator('[data-zazu-inspector-open]').first().click();
-    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await page.getByRole('tab', { name: 'Commercial position' }).click();
     await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
     await page.getByRole('link', { name: 'Open job record' }).click();
     const eventId = Number(await page.locator('[data-zazu-offline-attachment-form]').getAttribute('data-zazu-event-id'));
@@ -962,7 +962,7 @@ test('late private attachment download cannot repopulate local files after logou
     const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
     await expect(jobRow).toBeVisible();
     await jobRow.locator('[data-zazu-inspector-open]').first().click();
-    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await page.getByRole('tab', { name: 'Commercial position' }).click();
     await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
     await page.getByRole('link', { name: 'Open job record' }).click();
     const eventId = Number(await page.locator('[data-zazu-offline-attachment-form]').getAttribute('data-zazu-event-id'));
