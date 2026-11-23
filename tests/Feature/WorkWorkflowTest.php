@@ -99,6 +99,31 @@ class WorkWorkflowTest extends TestCase
         $this->assertSame('Audio', $requirement->category);
     }
 
+    public function test_one_off_job_service_remains_available_outside_the_catalogue(): void
+    {
+        $customer = Customer::create(['name' => 'One-off Service Customer']);
+
+        $response = $this->post(route('work.store'), [
+            'customer_id' => $customer->id,
+            'name' => 'One-off Service Work',
+            'event_type' => 'Other',
+            'event_date' => '2026-12-11',
+            'other_service' => 'Late-night transport',
+        ]);
+
+        $event = Event::query()->where('name', 'One-off Service Work')->firstOrFail();
+        $response->assertRedirect(route('work.show', $event));
+
+        $requirement = EventRequirement::query()
+            ->where('event_id', $event->id)
+            ->where('description', 'Late-night transport')
+            ->firstOrFail();
+
+        $this->assertNull($requirement->capability_id);
+        $this->assertSame('Other', $requirement->category);
+        $this->assertSame('service', $requirement->unit);
+    }
+
     public function test_work_can_be_created_from_a_customer_with_day_and_night_contacts(): void
     {
         $customer = Customer::create(['name' => 'Zazu Test Customer']);
