@@ -244,6 +244,10 @@ jobs:
       run: npx playwright install --with-deps chromium
     - name: Run public and authentication accessibility acceptance
       run: npm run test:e2e -- --project=chromium e2e/accessibility-smoke.spec.js
+    - name: Verify desktop navigation click-through
+      run: npm run test:e2e -- --project=chromium e2e/ui-theme.spec.ts --grep "opens and follows links"
+    - name: Verify mobile navigation click-through
+      run: npm run test:e2e -- --project=chromium-mobile e2e/ui-theme.spec.ts --grep "opens and follows links"
     - name: Run offline browser acceptance suite
       run: npm run test:e2e -- --project=chromium e2e/pwa-offline.spec.js e2e/offline-session-transition.spec.js e2e/offline-conflict-resolution.spec.js e2e/offline-attachment-sync.spec.js e2e/offline-work-creation.spec.js e2e/zazu-visual-foundation.spec.js
     - name: Run offline customer and Work acceptance on mobile viewport
