@@ -1884,9 +1884,9 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-
 }
 
 
-/* Compact business-derived context above navigation; presentation only. */
+/* Compact business-derived context below primary navigation; presentation only. */
 .zazu-workspace-profile {
-    margin: 10px 12px 14px;
+    margin: 12px 12px 8px;
     padding: 12px;
     border: 1px solid var(--zazu-border);
     border-radius: var(--zazu-radius-md);
@@ -1943,3 +1943,24 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-
     text-decoration: none;
 }
 .zazu-workspace-profile > a:hover { text-decoration: underline; }
+
+
+/* DIRECTOR — let the selected dashboard photograph read as an image, not a barely visible texture. */
+body.zazu-dashboard-page .zazu-dash-hero-side {
+    background-image:
+        linear-gradient(
+            110deg,
+            color-mix(in srgb, var(--zazu-surface) 76%, transparent) 0%,
+            color-mix(in srgb, var(--zazu-surface-2) 54%, transparent) 100%
+        ),
+        var(--zazu-dashboard-image) !important;
+    background-position: center;
+    background-size: cover;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
+    background-image:
+        linear-gradient(110deg, rgba(12, 32, 50, .78), rgba(12, 32, 50, .56)),
+        var(--zazu-dashboard-image) !important;
+    background-position: center;
+    background-size: cover;
+}
