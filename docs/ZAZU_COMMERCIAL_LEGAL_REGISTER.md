@@ -124,13 +124,13 @@ Current engineering control authority: `.ai/engineering/READINESS_REGISTER.md`. 
 **Company incorporation:** not yet completed  
 **Founder-to-company IP transfer:** not yet applicable  
 **Authentication/business isolation:** implemented in the current application foundation; final production acceptance still requires full authorization, runtime and release evidence  
-**POPIA operational documentation:** not yet complete  
-**Customer terms / SaaS agreement:** not yet complete  
-**Privacy notice:** not yet complete  
-**PAIA documentation:** not yet complete  
-**Incident-response operational procedure:** not yet complete  
-**Production media protection:** not yet complete  
-**Backup/restore evidence:** not yet complete
+**POPIA operational documentation:** release draft set exists; current source/legal refresh completed 2026-11-23; operational sign-off remains OPEN  
+**Customer terms / SaaS agreement:** draft exists; legal/commercial review and final contracting party details remain OPEN  
+**Privacy notice:** draft exists; publication details, actual deployment/providers, contact testing and legal review remain OPEN  
+**PAIA documentation:** operational-control draft exists; applicability, PAIA manual, registered Information Officer and publication requirements remain OPEN  
+**Incident-response operational procedure:** draft exists and includes section 22 escalation/eServices workflow; Information Officer registration, contact monitoring and tabletop/operational test remain OPEN  
+**Production media protection:** technical private-media controls exist; rights/provenance and deployment-specific evidence remain OPEN  
+**Backup/restore evidence:** automated recovery/package checks and Founder-verified installation/business backup files exist; intended-PC full restore drill remains OPEN
 
 No part of this checklist should be represented to customers as a statement of legal compliance merely because the engineering item is marked done.
 
@@ -320,3 +320,42 @@ Status: **engineering metadata refreshed; legal clearance still open.**
 ## 15. Provisional public customer/privacy contact — 2026-11-19
 
 The owner has approved **rosscorelabs@outlook.com** for current Zazu customer support, privacy/data-subject requests and initial customer incident reports. This is a provisional channel, not a dedicated Zazu mailbox. Replace it consistently when a dedicated address is established. Do not treat this email as a substitute for the Information Regulator's eServices security-compromise reporting channel or other statutory notification requirements. Before publication, test mailbox access, monitoring, identity verification and response handling.
+
+
+## 16. POPIA operational control refresh — 2026-11-23
+
+The release document set has been refreshed against the Information Regulator's current official materials. This is an engineering/operational checkpoint, not a legal opinion or a claim of POPIA compliance.
+
+### Current controls now documented
+
+- Data-subject request procedure distinguishes objection (Form 1), correction/deletion (Form 2), access requests under the applicable PAIA/POPIA route, and customer-managed records where Zazu is acting as operator. It records the owner-approved provisional contact channel and confirms that the request/export/deletion portal is not implemented.
+- Privacy notice draft now explains the hosted/local role distinction, the provisional request channel, the lack of self-service deletion, and minimisation of dietary/allergy information that may reveal health information.
+- Security incident runbook now uses the current Information Regulator eServices security-compromise portal, preserves the no-low-risk-threshold rule and distinguishes an operator's immediate duty to notify the responsible party from the responsible party's notification duty.
+- PAIA draft directs record-access requests to the applicable PAIA process rather than ordinary Zazu access or POPIA Form 2. Operator terms remain a template until a real provider relationship exists.
+
+### Current primary-source findings checked
+
+- Government Notice 6126, Government Gazette 52523 (17 April 2025) published the amended POPIA Regulations for immediate implementation. Regulation 2 provides accessible, free objection routes (Form 1); regulation 3 covers correction/deletion/destruction requests (Form 2), including accessible submission channels and written notification of action taken. The applicable legal deadline must be interpreted for the actual request; the product should not promise a blanket 30-day completion time.
+- Government Notice 7198, Government Gazette 54268 (6 March 2026) concerns health-information processing by specified classes of responsible parties and their applicable operators. It is not a blanket new regulation for every Zazu business. Zazu's free-text event notes may nevertheless contain dietary/allergy information; the notice now directs users to minimise those details and avoid medical diagnoses/history in general event notes.
+- The Information Regulator's 19 August 2025 security-compromise fact sheet says there is no low-risk reporting threshold; an operator must notify the responsible party immediately and the responsible party should notify the Regulator/data subjects as soon as reasonably sure a compromise occurred, without waiting for a completed investigation.
+
+### Release blockers still open
+
+- [ ] Confirm the responsible-party/operator role for each actual hosted and local deployment.
+- [ ] Verify the owner's formal Information Officer appointment/registration status before publishing the role as registered.
+- [ ] Test mailbox access, monitoring, identity-verification and response handling for rosscorelabs@outlook.com; it remains provisional.
+- [ ] Confirm the public service/registered address and publish only the correct contracting entity details.
+- [ ] Complete the PAIA applicability determination, manual and publication steps for the actual private body where required.
+- [ ] Complete an actual sub-operator/provider inventory and execute written operator terms where applicable.
+- [ ] Approve the retention schedule and test data/file disposal plus backup expiry; the schedule remains provisional and no full retention scheduler exists.
+- [ ] Complete legal review of the privacy notice, customer terms, request procedures and incident runbook.
+- [ ] Conduct and record an operational privacy-request and security-compromise tabletop exercise.
+
+### Official references
+
+- 2025 amended POPIA Regulations: https://www.justice.gov.za/legislation/notices/2025/20250417-gg52523gon6126-POPIA-Regulations-Amendment.pdf
+- 2026 health-information Regulations: https://www.justice.gov.za/legislation/notices/2026/20260306-gg54268gon7198-Paia-Regulations-Amended.pdf
+- Information Regulator security-compromise fact sheet: https://inforegulator.org.za/2025/08/19/fact-sheet-handling-of-security-compromises/
+- Information Regulator eServices: https://eservices.inforegulator.org.za/services.aspx
+
+**Disposition:** documentation refinement in this checkpoint is complete; operational POPIA sign-off remains **OPEN**. No compliance certification or legal sign-off is claimed.
