@@ -10,6 +10,10 @@ param(
 
     [int[]]$ListenPorts = @(8000, 8443),
 
+    [string]$BuildCommitSha = '',
+
+    [string]$PackagePath = '',
+
     [string]$OutputDirectory = (Join-Path $env:USERPROFILE 'Documents\Zazu\Performance')
 )
 
@@ -90,7 +94,7 @@ function Get-ZazuProcessIds {
 function Get-ZazuDataBytes {
     param([string]$RootPath)
     $total = [int64]0
-    foreach ($relative in @('database', 'storage\app\private', 'storage\app\backups')) {
+    foreach ($relative in @('database', 'storage\app\private', 'storage\app\public', 'storage\app\backups')) {
         $path = Join-Path $RootPath $relative
         if (Test-Path -LiteralPath $path) {
             try {
@@ -124,6 +128,26 @@ $physicalDisks = Get-CimSafe -ClassName 'Win32_DiskDrive' | ForEach-Object {
         SizeGB = if ($_.Size) { [math]::Round(([double]$_.Size / 1GB), 1) } else { $null }
     }
 }
+$installedMemoryGB = if ($computer.TotalPhysicalMemory) { [math]::Round(([double]$computer.TotalPhysicalMemory / 1GB), 1) } else { $null }
+$logicalProcessorCount = [Environment]::ProcessorCount
+$physicalCoreCount = ($processors | Measure-Object -Property NumberOfCores -Sum).Sum
+$deviceTier = 'Mainstream'
+if (($null -ne $installedMemoryGB -and $installedMemoryGB -le 8) -or $logicalProcessorCount -le 4) {
+    $deviceTier = 'Entry'
+} elseif ($installedMemoryGB -ge 16 -and $logicalProcessorCount -ge 8) {
+    $deviceTier = 'High-performance'
+}
+
+if ([string]::IsNullOrWhiteSpace($BuildCommitSha) -and (Get-Command git.exe -ErrorAction SilentlyContinue)) {
+    try {
+        $BuildCommitSha = (& git.exe -C $resolvedProject rev-parse HEAD 2>$null | Select-Object -First 1)
+        if ($LASTEXITCODE -ne 0) { $BuildCommitSha = '' }
+    } catch { $BuildCommitSha = '' }
+}
+$packageSha256 = $null
+if (-not [string]::IsNullOrWhiteSpace($PackagePath) -and (Test-Path -LiteralPath $PackagePath -PathType Leaf)) {
+    $packageSha256 = (Get-FileHash -LiteralPath $PackagePath -Algorithm SHA256).Hash
+}
 
 $manifest = [ordered]@{
     capturedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
@@ -132,9 +156,12 @@ $manifest = [ordered]@{
     osCaption = $operatingSystem.Caption
     osVersion = $operatingSystem.Version
     cpuModel = ($processors | Select-Object -First 1 -ExpandProperty Name)
-    logicalProcessors = [Environment]::ProcessorCount
-    physicalCores = ($processors | Measure-Object -Property NumberOfCores -Sum).Sum
-    installedMemoryGB = if ($computer.TotalPhysicalMemory) { [math]::Round(([double]$computer.TotalPhysicalMemory / 1GB), 1) } else { $null }
+    logicalProcessors = $logicalProcessorCount
+    physicalCores = $physicalCoreCount
+    installedMemoryGB = $installedMemoryGB
+    deviceTier = $deviceTier
+    buildCommitSha = $BuildCommitSha
+    packageSha256 = $packageSha256
     projectDrive = $projectDrive
     projectDriveSizeGB = if ($logicalDisk.Size) { [math]::Round(([double]$logicalDisk.Size / 1GB), 1) } else { $null }
     diskDevices = @($physicalDisks)
@@ -168,11 +195,12 @@ while ((Get-Date) -le $deadline) {
         Where-Object { $_.Name -eq '_Total' } | Select-Object -First 1
     $networkCounters = Get-CimSafe -ClassName 'Win32_PerfFormattedData_Tcpip_NetworkInterface'
 
-    $receivedBytes = [double](($networkCounters | Measure-Object -Property BytesReceivedPersec -Sum).Sum)
-    $sentBytes = [double](($networkCounters | Measure-Object -Property BytesSentPersec -Sum).Sum)
+    $receivedBytes = if ($networkCounters.Count -gt 0) { [double](($networkCounters | Measure-Object -Property BytesReceivedPersec -Sum).Sum) } else { $null }
+    $sentBytes = if ($networkCounters.Count -gt 0) { [double](($networkCounters | Measure-Object -Property BytesSentPersec -Sum).Sum) } else { $null }
     $processIds = @(Get-ZazuProcessIds -RootPath $resolvedProject -Ports $ListenPorts)
     $zazuProcesses = @()
     $zazuCpu = 0.0
+    $hasZazuCpuDelta = $false
     $zazuWorkingSet = [int64]0
     $zazuPrivateBytes = [int64]0
     $zazuReadBytesPerSec = 0.0
@@ -189,6 +217,7 @@ while ((Get-Date) -le $deadline) {
                 $cpuDelta = [math]::Max(0, ([double]$process.CPU - [double]$previousCpu[[string]$processId]))
                 $cpuPercent = ($cpuDelta / $elapsed / [math]::Max(1, [Environment]::ProcessorCount)) * 100
                 $zazuCpu += $cpuPercent
+                $hasZazuCpuDelta = $true
             }
             $previousCpu[[string]$processId] = [double]$process.CPU
             $zazuWorkingSet += [int64]$process.WorkingSet64
@@ -220,17 +249,19 @@ while ((Get-Date) -le $deadline) {
         HostMemoryAvailableMB = $availableMB
         HostDiskReadBytesPerSec = if ($diskCounter) { [double]$diskCounter.DiskReadBytesPersec } else { $null }
         HostDiskWriteBytesPerSec = if ($diskCounter) { [double]$diskCounter.DiskWriteBytesPersec } else { $null }
+        HostDiskActivePercent = if ($diskCounter) { [double]$diskCounter.PercentDiskTime } else { $null }
+        HostDiskQueueLength = if ($diskCounter) { [double]$diskCounter.AvgDiskQueueLength } else { $null }
         ProjectDriveFreeGB = $driveFreeGB
         ProjectDriveUsedPercent = $driveUsedPercent
         HostNetworkReceivedBytesPerSec = $receivedBytes
         HostNetworkSentBytesPerSec = $sentBytes
         ZazuProcessCount = $processIds.Count
         ZazuProcessNames = (@($zazuProcesses | Select-Object -Unique) -join ';')
-        ZazuCpuPercentOfWholeMachine = [math]::Round($zazuCpu, 2)
-        ZazuWorkingSetMB = [math]::Round(($zazuWorkingSet / 1MB), 2)
-        ZazuPrivateMemoryMB = [math]::Round(($zazuPrivateBytes / 1MB), 2)
-        ZazuProcessIoReadBytesPerSec = [math]::Round($zazuReadBytesPerSec, 0)
-        ZazuProcessIoWriteBytesPerSec = [math]::Round($zazuWriteBytesPerSec, 0)
+        ZazuCpuPercentOfWholeMachine = if ($hasZazuCpuDelta) { [math]::Round($zazuCpu, 2) } else { $null }
+        ZazuWorkingSetMB = if ($processIds.Count -gt 0) { [math]::Round(($zazuWorkingSet / 1MB), 2) } else { $null }
+        ZazuPrivateMemoryMB = if ($processIds.Count -gt 0) { [math]::Round(($zazuPrivateBytes / 1MB), 2) } else { $null }
+        ZazuProcessIoReadBytesPerSec = if ($processIds.Count -gt 0) { [math]::Round($zazuReadBytesPerSec, 0) } else { $null }
+        ZazuProcessIoWriteBytesPerSec = if ($processIds.Count -gt 0) { [math]::Round($zazuWriteBytesPerSec, 0) } else { $null }
         ZazuProcessMatched = ($processIds.Count -gt 0)
     }
 
