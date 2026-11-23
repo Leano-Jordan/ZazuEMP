@@ -248,7 +248,7 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('href="'.route('purchasing.index', ['event_id' => $event->id]).'"', false)
             ->assertSee('Review purchasing')
             ->assertSee('data-zazu-helper-event-record-link', false)
-            ->assertSee('data-zazu-helper-event-operational-details="3"', false)
+            ->assertSee('data-zazu-helper-event-operational-details="4"', false)
             ->assertSee('Current operational state')
             ->assertSee('Prepare tent hardware')
             ->assertSee('Blocked')
