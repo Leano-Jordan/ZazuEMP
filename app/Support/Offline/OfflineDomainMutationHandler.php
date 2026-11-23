@@ -1079,6 +1079,55 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $order = $this->resolveExpensePurchaseOrder($mutation->business_id, $payload);
         $supplier = $this->resolveExpenseSupplier($mutation->business_id, $payload);
 
+        if ($order instanceof PurchaseOrder) {
+            if (! in_array($order->status, ['ordered', 'received', 'cancelled'], true)) {
+                throw ValidationException::withMessages([
+                    'purchase_order_local_id' => 'An expense can only be linked to an ordered, received or cancelled purchase order.',
+                ]);
+            }
+
+            if ($order->event_id !== null && $event instanceof Event && (int) $order->event_id !== (int) $event->id) {
+                throw ValidationException::withMessages([
+                    'purchase_order_local_id' => 'The selected purchase order and job do not match.',
+                ]);
+            }
+
+            if ($order->event_id !== null && ! $event instanceof Event) {
+                $event = Event::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->whereKey($order->event_id)
+                    ->first();
+
+                if (! $event instanceof Event) {
+                    throw ValidationException::withMessages([
+                        'purchase_order_local_id' => 'The purchase order references an unavailable job.',
+                    ]);
+                }
+
+                $event = $this->lifecycle->lock($mutation->business_id, $event->id);
+                $this->lifecycle->assertFinanciallyActive($event);
+            }
+
+            if ($supplier instanceof Supplier && (int) $order->supplier_id !== (int) $supplier->id) {
+                throw ValidationException::withMessages([
+                    'supplier_local_id' => 'The selected supplier does not match the purchase order supplier.',
+                ]);
+            }
+
+            if (! $supplier instanceof Supplier) {
+                $supplier = Supplier::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->whereKey($order->supplier_id)
+                    ->first();
+
+                if (! $supplier instanceof Supplier) {
+                    throw ValidationException::withMessages([
+                        'purchase_order_local_id' => 'The purchase order references an unavailable supplier.',
+                    ]);
+                }
+            }
+        }
+
         $this->finance->recordExpense($mutation->business_id, $this->businessCurrency($mutation->business_id), [
             'idempotency_key' => $mutation->mutation_id,
             'event_id' => $event?->id,
