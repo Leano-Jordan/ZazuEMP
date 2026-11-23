@@ -170,6 +170,7 @@
                             <label class="zazu-field">
                                 <span class="zazu-label">Notes</span>
                                 <textarea name="notes" rows="4" class="zazu-textarea"></textarea>
+                                <span class="zazu-field-help">Keep notes limited to what the team needs to deliver the job. For allergies or dietary needs, record only the practical instruction; do not add diagnoses or medical history.</span>
                                 <span class="zazu-field-help">Add anything the team must know now. You can add more detail later.</span>
                             </label>
                         </div>
