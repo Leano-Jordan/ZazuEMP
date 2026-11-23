@@ -135,4 +135,5 @@ class DemoScenarioSeederTest extends TestCase
         $this->post('/settings/restore')->assertNotFound();
         $this->assertNull(app('router')->getRoutes()->getByName('settings.backup'));
         $this->assertNull(app('router')->getRoutes()->getByName('settings.restore'));
-  }
+    }
+}
