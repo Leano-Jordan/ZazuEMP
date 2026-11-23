@@ -2161,3 +2161,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 **Source commits:** `ae22ad8d` (server-rendered active navigation state), `e94c07a4` (accordion/icon/calendar responsive styles), `def0966d` (browser regressions).
 
 **Verification:** the prior exact-head workflow `45268313094` passed its listed Laravel, PostgreSQL, offline browser, mobile navigation, accessibility and coverage jobs. That result predates this corrective pass and is not evidence for these new changes. Exact-head CI and physical device acceptance for `def0966d` remain pending. Do not close this item until the new browser regression and normal quality gates pass.
+
+
+## Director corrective follow-through — navigation CI and device performance — 2026-11-24
+
+- Latest failure analysis found the desktop Work test was clicking an already-open active section, collapsing it before asserting. The browser test now verifies the server-rendered expanded state without toggling it closed; mobile still opens the menu through its actual toggle.
+- PHP Pint reported two pre-existing style violations in the changed interface regression test (concatenation spacing and two statements on one line). Both are corrected, along with the extra blank line.
+- Added `ops/windows/Measure-ZazuResources.ps1`: local-only Windows PowerShell 5.1 capture for host CPU/RAM/disk/network, Zazu PHP process CPU/private/working-set memory/process I/O, drive and application data footprint, and a hardware manifest. It never uploads samples.
+- Added `docs/DEVICE_PERFORMANCE_MATRIX.md` and a V1 checklist gate. Device cohorts are entry/constrained, mainstream and high-performance; identical seeded workflows and three repeated runs are required. Android must be measured independently. No arbitrary resource thresholds are set before collecting baselines.
+- Windows Ops CI now parses the sampler and smoke-tests CSV/manifest output. The first smoke assertion was too strict for a cold CI runner that may spend the entire short window in startup/data-size inspection; it now checks that at least one valid sample is emitted. This is a smoke test only, not a performance result.
+- Verification status at this update: the prior Laravel failure on stale nav assertions was addressed in the browser test; the prior Pint failure was addressed. New exact-head Laravel, browser, formatting, Windows Ops and package workflows are pending. Do not mark the UI gate closed until these finish successfully.
