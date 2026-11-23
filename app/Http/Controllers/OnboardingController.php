@@ -222,7 +222,7 @@ class OnboardingController extends Controller
         $primaryNiche = $validated['primary_niche']
             ?? $niches->selected($request->user(), $business)
             ?? ($focuses[0] ?? NicheFocus::DEFAULT);
-        if (!in_array($primaryNiche, $focuses, true)) {
+        if ($primaryNiche !== NicheFocus::MIXED && !in_array($primaryNiche, $focuses, true)) {
             array_unshift($focuses, $primaryNiche);
         }
         $focuses = array_values(array_unique($focuses));
