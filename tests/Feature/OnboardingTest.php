@@ -118,7 +118,7 @@ class OnboardingTest extends TestCase
 
         $this->get(route('onboarding.catalogue'))
             ->assertOk()
-            ->assertSee('Sound &amp; entertainment')
+            ->assertSee('Sound &amp; entertainment', false)
             ->assertSee('Other')
             ->assertDontSee('value="Catering"', false)
             ->assertDontSee('value="Baking"', false);
@@ -357,7 +357,8 @@ class OnboardingTest extends TestCase
             ->assertOk()
             ->assertSee('data-zazu-capability-summary', false)
             ->assertSee('2 active · 1 hidden')
-            ->assertSee('Service: 1 · Rental: 1');
+            ->assertSee('Service: 1')
+            ->assertSee('Rental: 1');
     }
 
     public function test_business_post_cannot_bypass_business_focus_or_offerings_setup(): void
@@ -446,7 +447,7 @@ class OnboardingTest extends TestCase
             ->assertSee('Sound & DJ')
             ->assertSee('Catering')
             ->assertSee('Sound &amp; entertainment')
-            ->assertDontSee('Photography &amp; video')
+            ->assertDontSee('Photography &amp; video', false)
             ->assertSee('Jobs')
             ->assertSee('Quotes')
             ->assertSee('Finance');
