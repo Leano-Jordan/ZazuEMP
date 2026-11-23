@@ -1149,6 +1149,7 @@ body.zazu-dashboard-page .zazu-dash-resource-grid .zazu-dash-health-item small {
     grid-column: 2;
     justify-self: end;
     max-width: 120px;
+    color: var(--zazu-ink-2) !important;
     font-size: 9px !important;
     line-height: 1.25 !important;
     text-align: right;
