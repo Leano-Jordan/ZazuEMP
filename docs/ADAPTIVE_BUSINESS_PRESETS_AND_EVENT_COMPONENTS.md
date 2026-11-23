@@ -238,3 +238,18 @@ Online creation validates the selected offering names against the active busines
 The Job-detail Helper's linked operational-record summary now provides direct, event-scoped destinations for the records it actually finds: preparation, purchase orders, asset allocations, recorded costs and travel costs. Purchase orders retain the current Job filter; the other links use their existing Job or asset workspaces. A link is rendered only when the corresponding record count was loaded under the member's existing workspace permission. Empty relationships still produce no recommendation, and this remains navigation to existing records—not a new workflow state or task generator.
 
 Regression coverage asserts that preparation and purchasing links appear for a booking with those records, and that a staff member without purchasing.view sees no purchasing record or Helper action while permitted preparation remains available. Exact-head CI and physical device acceptance are pending; no pass is claimed by this implementation checkpoint.
+
+
+## Capability-derived Helper focus expansion — 2026-11-23
+
+The owner-managed catalogue remains the source of truth. The saved `BusinessCapability.category` values now map additional active business capabilities into supported Helper focus areas:
+
+- Decor → Decor & styling
+- Photography & video → Photography & video
+- Transport → Transport & delivery
+
+These focus areas are also available as explicit primary business-focus choices during setup. Helper guidance now provides dashboard, Jobs-list and current-Job wording for each focus. For a current Job, its saved requirement categories still take precedence over the wider business mix. Inactive offerings are excluded from inferred focus; no capability or historical requirement is created, removed or rewritten by this mapping.
+
+This remains contextual guidance, not capability-driven authorization or module hiding. Existing permission checks and route middleware remain authoritative. Regression coverage verifies all three explicit focus choices and verifies that active Decor/Photography catalogue entries drive mixed-business guidance while an inactive Catering entry does not.
+
+**Next:** verify the resulting guidance against actual Decor, Photography and Transport Job records, then continue low-risk workspace progressive disclosure only where existing permissions and operational data support it. Offline capability aggregate parity and physical device acceptance remain separate gates.
