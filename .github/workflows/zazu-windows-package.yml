@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'app/**'
+      - 'tests/**'
+      - 'phpunit.xml'
       - 'bootstrap/**'
       - 'config/**'
       - 'database/**'
@@ -477,6 +479,40 @@ jobs:
           }
 
           Write-Host 'PASS: Windows PowerShell fresh install generated a private environment and app key, migrated SQLite, booted routes, and returned a usable loopback HTTP session cookie.'
+
+
+  windows-business-archive-acceptance:
+    name: Verify encrypted and legacy business archives on Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up PHP 8.4 with SQLite, Sodium and ZIP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
+        with:
+          php-version: '8.4'
+          extensions: curl, dom, fileinfo, mbstring, openssl, pdo_sqlite, sodium, tokenizer, xml, zip
+          coverage: none
+
+      - name: Install test dependencies
+        shell: powershell
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress
+          if ($LASTEXITCODE -ne 0) { throw 'Composer test dependency installation failed.' }
+
+      - name: Run Windows business archive encryption and restore acceptance
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          php artisan test --filter=BusinessArchiveEncryption
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Windows encrypted/legacy business archive acceptance failed.'
+          }
+
+          Write-Host 'PASS: Windows verified multi-chunk authenticated encryption, wrong-passphrase and tamper rejection, owner export/restore, and legacy plaintext archive restoration.'
 
 
   publish-prerelease:
