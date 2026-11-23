@@ -6,7 +6,7 @@
 - Updated the incident runbook to remove the obsolete regulator-channel placeholder and retain the current eServices process, immediate operator escalation and no-low-risk-threshold handling.
 - Updated PAIA and operator-control drafts so requests are routed by responsible-party role and operator templates are not represented as executed contracts.
 - Added `docs/RELEASE_PRIVACY_OPERATIONS_REGISTER_TEMPLATE.md` for data-subject request, security-compromise and provider inventories. The working register must be stored outside GitHub; no personal information or completed register entries belong in the repository.
-- Updated the privacy engineering baseline and legal register against the 2025 amended POPIA Regulations and the scoped 2026 health-information Regulations.
+- Updated the privacy engineering baseline and legal register against the 2025 amended POPIA Regulations and the scoped 2026 health/sex-life information Regulations.
 - Added minimal data-entry guidance on Job notes and requirement Special details: record only the operational instruction needed for the event; avoid diagnoses and medical history. `PrivacyDataMinimisationCopyTest` covers both surfaces.
 
 **Release disposition:** these changes improve documentation and user guidance; they do not provide a DSAR/export/deletion portal, automated retention/deletion scheduler, executed operator agreements, registered Information Officer evidence or legal sign-off. The operational POPIA gate remains OPEN. Do not claim compliance certification.
