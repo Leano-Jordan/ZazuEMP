@@ -79,10 +79,31 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.business');
         }
 
+        $selectedFocuses = $niches->selectedMany($request->user(), $business);
+        $serviceCategories = array_keys(config('zazu.service_categories'));
+        $specificFocuses = array_values(array_filter(
+            $selectedFocuses,
+            static fn (string $focus) => $focus !== NicheFocus::MIXED
+        ));
+
+        if ($specificFocuses) {
+            $relevantCategories = collect(config('zazu.niches', []))
+                ->only($specificFocuses)
+                ->pluck('capability_categories')
+                ->flatten()
+                ->unique()
+                ->all();
+            $serviceCategories = array_values(array_intersect($serviceCategories, $relevantCategories));
+            if (!in_array('Other', $serviceCategories, true)) {
+                $serviceCategories[] = 'Other';
+            }
+        }
+
         return view('onboarding.catalogue', [
             'business' => $business,
             'capabilities' => $business->capabilities()->latest()->get(),
-            'serviceCategories' => array_keys(config('zazu.service_categories')),
+            'serviceCategories' => $serviceCategories,
+            'selectedFocuses' => $selectedFocuses,
             'currencies' => config('zazu.currencies'),
             'defaultCurrency' => $business->currency ?? 'ZAR',
         ]);
