@@ -468,7 +468,17 @@ try {
         $env:SESSION_SECURE_COOKIE = 'true'
     }
 
-    $process = Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', "--host=$BindAddress", "--port=$Port") -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
+    # Keep the PHP built-in server aligned with the archive restore form's documented 100 MiB upload limit.
+# PHP's common CLI defaults (2M upload / 8M POST) otherwise reject valid business archives
+# before Laravel can inspect them, leaving an empty request and a misleading validation error.
+$serverArguments = @(
+    '-d', 'upload_max_filesize=100M',
+    '-d', 'post_max_size=110M',
+    '-d', 'max_execution_time=300',
+    '-d', 'max_input_time=300',
+    'artisan', 'serve', "--host=$BindAddress", "--port=$Port"
+)
+$process = Start-Process -FilePath $php -ArgumentList $serverArguments -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
 } finally {
     if ($SecureCookies) {
         [Environment]::SetEnvironmentVariable('SESSION_SECURE_COOKIE', $previousSecureCookieValue, 'Process')
