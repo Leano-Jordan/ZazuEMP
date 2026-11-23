@@ -98,7 +98,7 @@ class InterfaceRegressionTest extends TestCase
         $response = $this->actingAs($user)->get(route('calendar.index'));
 
         $response->assertOk()
-            ->assertSee('class="zazu-nav-area is-active" data-zazu-nav-area', false)
+            ->assertSee('class="zazu-nav-area is-active is-open" data-zazu-nav-area', false)
             ->assertSee('class="zazu-nav-link active"', false)
             ->assertSee('aria-current="page"', false)
             ->assertSee('>Calendar</a>', false);
