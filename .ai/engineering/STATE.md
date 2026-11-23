@@ -10,6 +10,8 @@
 
 **Source commits:** migration `9d028276`; resolver `542f3a17` / `14c1cbfd` / `9d1670ea`; controller `7aa334b2` / `7f40b735` / `afdbba0f`; onboarding view `c0c1baef` / `3d32546b` / `791281ea` / `d2ec9d26`; tests `cd7309d7` / `104974a1` / `d25fc133` / `ef6f32b8`; membership relations `8d7ef75d` / `94b3dc53`.
 
+**Final source/test head:** `5aaceef97f96755e168fde5222f5755bec16fa6c`. Final refinements also keep the balanced/mixed guidance preference separate from actual selected activities and preserve compatibility for older single-focus form submissions.
+
 **Verification disposition:** source and test files were re-read from `main`. Exact-head CI/PHPUnit, migration execution, rendered mobile/desktop onboarding and downstream workspace adaptation are **NOT YET VERIFIED**. Do not mark the foundation complete until these pass. This slice captures business identity/focus and adapts the next catalogue step; it does not yet implement the full capability-driven navigation/module matrix or event-specific downstream workflow adaptation.
 
 ## Business archive restore incident — 2026-11-23
