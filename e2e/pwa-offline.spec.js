@@ -1048,6 +1048,51 @@ test.describe('Zazu installed PWA offline shell', () => {
         )).toBe(true);
     });
 
+    test('saves offline service details while clearly deferring its image', async ({ page }, testInfo) => {
+        test.setTimeout(20_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Offline service image boundary contract runs once.');
+
+        await login(page);
+        await page.goto('/capabilities/create', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        await page.route('**/up', async route => {
+            if (route.request().method() === 'HEAD') {
+                await route.abort('failed');
+                return;
+            }
+            await route.continue();
+        });
+
+        await page.locator('input[name="name"]').fill('Offline service image boundary');
+        await page.locator('input[name="category"]').first().check();
+        await page.locator('select[name="capability_type"]').selectOption('service');
+        await page.locator('select[name="currency"]').selectOption('ZAR');
+        await page.locator('select[name="pricing_basis"]').selectOption('custom');
+        await page.locator('input[name="image"]').setInputFiles({
+            name: 'service.png',
+            mimeType: 'image/png',
+            buffer: Buffer.from('offline-service-image-fixture'),
+        });
+
+        await page.getByRole('button', { name: 'Save service' }).click();
+
+        const notice = page.locator('[data-zazu-offline-save-notice]');
+        await expect(notice).toContainText('Service details were saved, but the image was not saved');
+        await expect(notice).toContainText('Add the image when Zazu is online.');
+
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued).toHaveLength(1);
+        expect(queued[0].entity_type).toBe('service');
+        expect(queued[0].payload.record.name).toBe('Offline service image boundary');
+        expect(queued[0].payload.record).not.toHaveProperty('image');
+
+        const localState = await page.evaluate(() => window.ZazuOffline.getState());
+        expect(localState.catalogue.some(service =>
+            service.name === 'Offline service image boundary'
+            && service.capability_type === 'service'
+        )).toBe(true);
+    });
+
     test('links a phone-local customer to an offline Work record', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Offline customer-to-Work contract runs once.');
