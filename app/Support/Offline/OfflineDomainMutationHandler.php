@@ -1075,58 +1075,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['status' => 'Offline expense status must be unpaid or paid.']);
         }
 
-        $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
-        $order = $this->resolveExpensePurchaseOrder($mutation->business_id, $payload);
-        $supplier = $this->resolveExpenseSupplier($mutation->business_id, $payload);
-
-        if ($order instanceof PurchaseOrder) {
-            if (! in_array($order->status, ['ordered', 'received', 'cancelled'], true)) {
-                throw ValidationException::withMessages([
-                    'purchase_order_local_id' => 'An expense can only be linked to an ordered, received or cancelled purchase order.',
-                ]);
-            }
-
-            if ($order->event_id !== null && $event instanceof Event && (int) $order->event_id !== (int) $event->id) {
-                throw ValidationException::withMessages([
-                    'purchase_order_local_id' => 'The selected purchase order and job do not match.',
-                ]);
-            }
-
-            if ($order->event_id !== null && ! $event instanceof Event) {
-                $event = Event::query()
-                    ->where('business_id', $mutation->business_id)
-                    ->whereKey($order->event_id)
-                    ->first();
-
-                if (! $event instanceof Event) {
-                    throw ValidationException::withMessages([
-                        'purchase_order_local_id' => 'The purchase order references an unavailable job.',
-                    ]);
-                }
-
-                $event = $this->lifecycle->lock($mutation->business_id, $event->id);
-                $this->lifecycle->assertFinanciallyActive($event);
-            }
-
-            if ($supplier instanceof Supplier && (int) $order->supplier_id !== (int) $supplier->id) {
-                throw ValidationException::withMessages([
-                    'supplier_local_id' => 'The selected supplier does not match the purchase order supplier.',
-                ]);
-            }
-
-            if (! $supplier instanceof Supplier) {
-                $supplier = Supplier::query()
-                    ->where('business_id', $mutation->business_id)
-                    ->whereKey($order->supplier_id)
-                    ->first();
-
-                if (! $supplier instanceof Supplier) {
-                    throw ValidationException::withMessages([
-                        'purchase_order_local_id' => 'The purchase order references an unavailable supplier.',
-                    ]);
-                }
-            }
-        }
+        [$event, $order, $supplier] = $this->resolveOfflineExpenseReferences(
+            $mutation->business_id,
+            $payload,
+        );
 
         $this->finance->recordExpense($mutation->business_id, $this->businessCurrency($mutation->business_id), [
             'idempotency_key' => $mutation->mutation_id,
@@ -1148,6 +1100,103 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
 
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array{0: Event|null, 1: PurchaseOrder|null, 2: Supplier|null}
+     */
+    private function resolveOfflineExpenseReferences(int $businessId, array $payload): array
+    {
+        $event = $this->resolveOfflineEvent($businessId, $payload['event_local_id'] ?? null);
+        $order = $this->resolveExpensePurchaseOrder($businessId, $payload);
+        $supplier = $this->resolveExpenseSupplier($businessId, $payload);
+
+        $this->assertOfflineExpensePurchaseOrderStatus($order);
+
+        return [
+            $this->resolveOfflineExpenseOrderEvent($businessId, $event, $order),
+            $order,
+            $this->resolveOfflineExpenseOrderSupplier($businessId, $supplier, $order),
+        ];
+    }
+
+    private function assertOfflineExpensePurchaseOrderStatus(?PurchaseOrder $order): void
+    {
+        if ($order && ! in_array($order->status, ['ordered', 'received', 'cancelled'], true)) {
+            throw ValidationException::withMessages([
+                'purchase_order_local_id' => 'An expense can only be linked to an ordered, received or cancelled purchase order.',
+            ]);
+        }
+    }
+
+    private function resolveOfflineExpenseOrderEvent(
+        int $businessId,
+        ?Event $event,
+        ?PurchaseOrder $order,
+    ): ?Event {
+        if (! $order || $order->event_id === null) {
+            return $event;
+        }
+
+        if ($event && (int) $order->event_id !== (int) $event->id) {
+            throw ValidationException::withMessages([
+                'purchase_order_local_id' => 'The selected purchase order and job do not match.',
+            ]);
+        }
+
+        if ($event) {
+            return $event;
+        }
+
+        $event = Event::query()
+            ->where('business_id', $businessId)
+            ->whereKey($order->event_id)
+            ->first();
+
+        if (! $event) {
+            throw ValidationException::withMessages([
+                'purchase_order_local_id' => 'The purchase order references an unavailable job.',
+            ]);
+        }
+
+        $event = $this->lifecycle->lock($businessId, $event->id);
+        $this->lifecycle->assertFinanciallyActive($event);
+
+        return $event;
+    }
+
+    private function resolveOfflineExpenseOrderSupplier(
+        int $businessId,
+        ?Supplier $supplier,
+        ?PurchaseOrder $order,
+    ): ?Supplier {
+        if (! $order) {
+            return $supplier;
+        }
+
+        if ($supplier && (int) $order->supplier_id !== (int) $supplier->id) {
+            throw ValidationException::withMessages([
+                'supplier_local_id' => 'The selected supplier does not match the purchase order supplier.',
+            ]);
+        }
+
+        if ($supplier) {
+            return $supplier;
+        }
+
+        $supplier = Supplier::query()
+            ->where('business_id', $businessId)
+            ->whereKey($order->supplier_id)
+            ->first();
+
+        if (! $supplier) {
+            throw ValidationException::withMessages([
+                'purchase_order_local_id' => 'The purchase order references an unavailable supplier.',
+            ]);
+        }
+
+        return $supplier;
+    }
 
     private function resolveExpensePurchaseOrder(int $businessId, array $payload): ?PurchaseOrder
     {
