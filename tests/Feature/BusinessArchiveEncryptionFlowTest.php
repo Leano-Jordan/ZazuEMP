@@ -37,6 +37,27 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         @unlink($path);
     }
 
+    public function test_export_validation_never_flashes_archive_passphrases_to_the_session(): void
+    {
+        $business = Business::create([
+            'name' => 'Passphrase Flash Guard',
+            'slug' => 'passphrase-flash-guard',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($business);
+
+        $response = $this->post(route('exports.archive.download'), [
+            'archive_password' => 'correct horse battery staple',
+            'archive_password_confirmation' => 'different horse battery staple',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('archive_password');
+        $this->assertNull(session()->getOldInput('archive_password'));
+        $this->assertNull(session()->getOldInput('archive_password_confirmation'));
+    }
+
     public function test_encrypted_business_archive_requires_the_correct_passphrase_before_restore(): void
     {
         Storage::fake('private');
