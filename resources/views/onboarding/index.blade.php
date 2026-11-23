@@ -25,6 +25,10 @@
                         <div class="zazu-list-main">
                             <div class="zazu-list-title">Services & prices</div>
                             <div class="zazu-list-meta">Add the services, products, rentals and packages your business actually offers.</div>
+                            <div class="zazu-list-meta mt-1" data-zazu-capability-summary>
+                                {{ $activeCapabilities }} active · {{ $hiddenCapabilities }} hidden
+                                @if($capabilityTypeSummary !== '') · {{ $capabilityTypeSummary }} @endif
+                            </div>
                         </div>
                         <div class="zazu-list-side flex items-center gap-2">
                             <span class="zazu-chip {{ $catalogueStatus === 'completed' ? 'zazu-chip-success' : ($catalogueStatus === 'deferred' ? 'zazu-chip-neutral' : 'zazu-chip-info') }}">{{ $catalogueStatus === 'deferred' ? 'Deferred' : ucfirst(str_replace('_',' ', $catalogueStatus)) }}</span>
