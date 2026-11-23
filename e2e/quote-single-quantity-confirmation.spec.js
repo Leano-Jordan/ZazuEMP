@@ -29,13 +29,15 @@ test('quote builder blocks an unconfirmed quantity of one and recalculates after
     expect(customers.length, 'seeded demo customer is available').toBeGreaterThan(0);
     await page.locator('#customer_id').selectOption(customers[0]);
 
-    const eventTypes = page.locator('input[name="event_type"]');
-    await expect(eventTypes.first()).toBeAttached();
-    await eventTypes.first().check();
+    const eventTypeChoice = page.locator('label.zazu-choice-card:has(input[name="event_type"])').first();
+    await expect(eventTypeChoice).toBeVisible();
+    await eventTypeChoice.click();
+    await expect(eventTypeChoice.locator('input[name="event_type"]')).toBeChecked();
 
-    const offerings = page.locator('input[name="services[]"]');
-    await expect(offerings.first()).toBeAttached();
-    await offerings.first().check();
+    const serviceChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"])').first();
+    await expect(serviceChoice).toBeVisible();
+    await serviceChoice.click();
+    await expect(serviceChoice.locator('input[name="services[]"]')).toBeChecked();
 
     await form.locator('input[name="name"]').fill('Quantity confirmation acceptance ' + runId);
     const eventDate = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
