@@ -6388,6 +6388,11 @@ body.zazu-mobile-menu-open .zazu-helper {
     background: currentColor;
 }
 
+.zazu-dash-quote-stage.is-draft > span,
+.zazu-dash-quote-stage.is-draft > small {
+    color: var(--zazu-warning-ink);
+}
+
 .zazu-dash-commercial .zazu-dash-quote-stage.is-draft > span { color: var(--zazu-warning-ink); }
 .zazu-dash-commercial .zazu-dash-quote-stage.is-sent > span { color: var(--zazu-blue-brand); }
 .zazu-dash-commercial .zazu-dash-quote-stage.is-accepted > span { color: var(--zazu-success-ink); }

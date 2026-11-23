@@ -750,6 +750,11 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
 body.zazu-dashboard-page .zazu-dash-action-copy strong { font-size: 12px; }
 body.zazu-dashboard-page .zazu-dash-action-copy small { font-size: 10px; opacity: .78; }
 
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-copy small {
+    color: var(--zazu-primary-ink) !important;
+    opacity: 1 !important;
+}
+
 body.zazu-dashboard-page .zazu-dash-surface {
     border: 1px solid var(--dash-border) !important;
     border-radius: 13px !important;
