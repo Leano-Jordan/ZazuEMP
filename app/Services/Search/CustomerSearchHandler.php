@@ -4,6 +4,7 @@ namespace App\Services\Search;
 
 use App\Models\Business;
 use App\Models\Customer;
+use Illuminate\Database\Eloquent\Builder;
 
 class CustomerSearchHandler extends AbstractWorkspaceSearchHandler
 {
@@ -13,7 +14,26 @@ class CustomerSearchHandler extends AbstractWorkspaceSearchHandler
         if ($status !== '') {
             return [];
         }
-        $this->text($query, $term, ['name', 'legal_name', 'registration_number', 'tax_number', 'vat_number', 'billing_address']);
+        if ($term !== '') {
+            $like = '%'.$term.'%';
+
+            $query->where(function (Builder $builder) use ($like): void {
+                $builder
+                    ->where('name', 'like', $like)
+                    ->orWhere('legal_name', 'like', $like)
+                    ->orWhere('registration_number', 'like', $like)
+                    ->orWhere('tax_number', 'like', $like)
+                    ->orWhere('vat_number', 'like', $like)
+                    ->orWhere('billing_address', 'like', $like)
+                    ->orWhereHas('contacts', function (Builder $contacts) use ($like): void {
+                        $contacts
+                            ->where('name', 'like', $like)
+                            ->orWhere('phone', 'like', $like)
+                            ->orWhere('email', 'like', $like)
+                            ->orWhere('label', 'like', $like);
+                    });
+            });
+        }
         $this->applyStatusAndDate($query, '', $from, $to, 'created_at', false);
 
         return $query->latest()->limit(10)->get()->map(fn (Customer $customer) => [

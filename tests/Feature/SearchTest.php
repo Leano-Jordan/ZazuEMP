@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\Customer;
+use App\Models\CustomerContact;
 use App\Models\Event;
 use App\Models\EventAttachment;
 use App\Models\User;
@@ -249,5 +250,54 @@ class SearchTest extends TestCase
             ->assertViewHas('results', static fn (array $results): bool => $results === []);
     }
 
+
+    public function test_customer_search_matches_active_contact_details_without_exposing_deleted_contacts(): void
+    {
+        $business = Business::create([
+            'name' => 'Customer Contact Search',
+            'slug' => 'customer-contact-search-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Northside Events',
+        ]);
+
+        CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Thandi Mokoena',
+            'phone' => '0825550198',
+            'email' => 'thandi@northside.example',
+            'label' => 'Event coordinator',
+            'is_primary' => true,
+        ]);
+
+        $deletedContact = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Former Coordinator',
+            'phone' => '0825550199',
+            'email' => 'former@northside.example',
+            'label' => 'Former contact',
+        ]);
+        $deletedContact->delete();
+
+        $this->actingAs($user);
+
+        foreach (['Thandi Mokoena', '0825550198', 'thandi@northside.example', 'Event coordinator'] as $term) {
+            $this->get(route('search.index', ['q' => $term, 'type' => 'customer']))
+                ->assertOk()
+                ->assertSee('Northside Events');
+        }
+
+        $this->get(route('search.index', ['q' => 'former@northside.example', 'type' => 'customer']))
+            ->assertOk()
+            ->assertSee('0 records')
+            ->assertViewHas('results', static fn (array $results): bool => $results === []);
+    }
 
 }
