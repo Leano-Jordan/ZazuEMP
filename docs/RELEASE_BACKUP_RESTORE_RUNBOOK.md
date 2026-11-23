@@ -75,6 +75,18 @@ The current `zazu:backup` and `zazu:restore` commands operate on the **entire in
 
 Business-level export/restore is implemented separately through the owner-only Export business data screen (`/exports`). It uses a tenant-scoped `.zazu` archive with an explicit record allowlist and referenced business files; it excludes credentials, sessions, device-pairing tokens, licence entitlements and sensitive tax credentials. Restore is restricted to an empty, unpaired workspace and remaps record IDs. This does not replace installation-wide operator recovery.
 
+## Confidentiality and storage protection
+
+**Both archive formats are currently unencrypted ZIP files.** The installation archive contains the entire installation database and private storage; the business archive contains the selected business's allowlisted records and referenced files. Neither is password-protected.
+
+The installation backup's SHA-256 manifest detects payload changes; it does not encrypt the data or authenticate who created the archive. Business-archive validation enforces its structure and allowlists; it does not provide cryptographic confidentiality or creator authentication.
+
+- Treat every archive as sensitive personal and commercial information.
+- Keep off-disk copies on an encrypted removable drive or in a properly encrypted, access-controlled storage vault. Full-disk encryption helps protect a powered-off device but does not protect a copied archive once it leaves that device.
+- Do not email archives, attach them to support tickets, or place them in public/shared folders.
+- POSIX backup/restore staging is now restricted to owner-only directories/files (0700/0600). On Windows, protection depends on inherited NTFS ACLs for the installation and selected output destination; verify those ACLs before copying archives.
+- Application-level archive encryption remains an open hardening item. Do not describe ZIP checksums or local file permissions as encryption.
+
 The allowlist includes `invoice_number_sequences`, so the per-business invoice counter moves with the invoice records. Existing format-v1 archives created before this dataset was added remain restorable; the importer supplies an empty sequence dataset, and the invoice generator reconciles the next number against invoices already restored. Keep the sequence table in archive coverage tests whenever invoice issuance or archive datasets change.
 
 ## Backup
