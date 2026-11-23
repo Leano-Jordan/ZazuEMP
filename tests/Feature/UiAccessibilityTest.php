@@ -258,7 +258,10 @@ class UiAccessibilityTest extends TestCase
         $this->assertStringContainsString('color-scheme: light;', $css);
         $this->assertStringContainsString('color-scheme: dark;', $css);
         $this->assertStringContainsString('--zazu-ink: #14243B;', $css);
-        $this->assertStringContainsString('--zazu-muted: #64748B;', $css);
+        $this->assertStringContainsString('--zazu-muted: #475569;', $css);
+        $this->assertStringContainsString('--zazu-text-muted: var(--zazu-muted);', $css);
+        $this->assertStringContainsString('--zazu-text-body: var(--zazu-muted);', $css);
+        $this->assertStringContainsString('--zazu-muted: #A4B5C8;', $css);
         $this->assertStringContainsString('.zazu-command-title {', $css);
         $this->assertStringContainsString('color: #F7FBFF;', $css);
     }
