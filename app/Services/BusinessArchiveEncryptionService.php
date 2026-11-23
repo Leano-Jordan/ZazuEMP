@@ -37,7 +37,12 @@ final class BusinessArchiveEncryptionService
             throw new RuntimeException('The business archive could not be read for encryption.');
         }
 
-        $targetPath = $this->privateTemporaryFile();
+        try {
+            $targetPath = $this->privateTemporaryFile();
+        } catch (\Throwable $exception) {
+            fclose($source);
+            throw $exception;
+        }
         $target = @fopen($targetPath, 'wb');
         if ($target === false) {
             fclose($source);
@@ -127,7 +132,12 @@ final class BusinessArchiveEncryptionService
             throw new RuntimeException('The uploaded business archive could not be read.');
         }
 
-        $targetPath = $this->privateTemporaryFile();
+        try {
+            $targetPath = $this->privateTemporaryFile();
+        } catch (\Throwable $exception) {
+            fclose($source);
+            throw $exception;
+        }
         $target = @fopen($targetPath, 'wb');
         if ($target === false) {
             fclose($source);
@@ -213,14 +223,19 @@ final class BusinessArchiveEncryptionService
     private function assertAvailable(): void
     {
         if (! function_exists('sodium_crypto_secretstream_xchacha20poly1305_init_push')
-            || ! function_exists('sodium_crypto_pwhash')) {
+            || ! function_exists('sodium_crypto_secretstream_xchacha20poly1305_init_pull')
+            || ! function_exists('sodium_crypto_secretstream_xchacha20poly1305_push')
+            || ! function_exists('sodium_crypto_secretstream_xchacha20poly1305_pull')
+            || ! function_exists('sodium_crypto_pwhash')
+            || ! function_exists('sodium_memzero')) {
             throw new RuntimeException('PHP Sodium is required for encrypted business archives. Update or enable the PHP Sodium extension.');
         }
     }
 
     private function assertPassphrase(string $passphrase): void
     {
-        if (strlen($passphrase) < 12 || strlen($passphrase) > 128) {
+        $characters = mb_strlen($passphrase, 'UTF-8');
+        if ($characters < 12 || $characters > 128 || strlen($passphrase) > 512) {
             throw new RuntimeException('Use a business archive passphrase between 12 and 128 characters.');
         }
     }
