@@ -131,7 +131,10 @@ class WorkController extends Controller
         $catalogueServices = array_values(array_unique($validated['services'] ?? []));
         $services = $catalogueServices;
         if (!empty($validated['other_service'])) {
-            $services[] = Str::limit(trim($validated['other_service']), 100, '');
+            $customService = Str::limit(trim($validated['other_service']), 100, '');
+            if (! in_array($customService, $services, true)) {
+                $services[] = $customService;
+            }
         }
 
         $event = DB::transaction(function () use ($validated, $services, $catalogueServices, $business) {
