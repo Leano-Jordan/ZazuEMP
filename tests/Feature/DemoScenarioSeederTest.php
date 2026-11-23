@@ -68,7 +68,7 @@ class DemoScenarioSeederTest extends TestCase
         $this->get(route('work.index'))
             ->assertOk()
             ->assertSee('Buffet catering')
-            ->assertSee('Services &amp; preparation', false)
+            ->assertSee('Scope &amp; preparation', false)
             ->assertSee('11,500.00');
 
         $po = PurchaseOrder::query()->where('reference', 'PO-ZAZU-DEMO-001')->firstOrFail();
