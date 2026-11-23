@@ -265,7 +265,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
 
     // Use the visible choice cards exactly as an operator would.
     const eventTypeChoice = page.locator('#new-job-form label.zazu-choice-card:has(input[name="event_type"])').first();
-    const cateringChoice = page.locator('#new-job-form label.zazu-service-choice:has(input[name="services[]"][value="Catering"])');
+    const cateringChoice = page.locator('#new-job-form label.zazu-service-choice:has(input[name="services[]"][value="Buffet Catering"])');
     await eventTypeChoice.click();
     await cateringChoice.click();
     await expect(eventTypeChoice.locator('input[name="event_type"]')).toBeChecked();
