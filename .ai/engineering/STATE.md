@@ -2195,3 +2195,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Director Contract Lint #1821 completed successfully on the same head.
 - Zazu quality #6565 and CodeQL #8007 were still queued/in progress at the last status check. Their completion must be checked before claiming every exact-head quality gate is green.
 - No physical PC cohort run has been performed. The first owner-PC capture is still required; the report generator and CI smoke are not substitutes for a real workload.
+
+
+## Director visual communication continuation — recovery action icons — 2026-11-24
+
+- Expanded the vendored local Tabler icon subset with download, upload, lock, shield-check, alert, info and check symbols. No package/CDN/runtime dependency was added; offline rendering remains local.
+- Migrated the business archive create/restore cards and CSV download actions to semantic icons. Encryption and restore buttons now carry lock/shield-check cues; the previous Unicode arrows were removed.
+- Added a focused UiHumanFriendlyPresentationTest regression for the recovery action icon contract.
+- Updated docs/DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md.
+- This is one workflow slice. Remaining status/form icon migration and product-wide visual communication acceptance remain open; physical visual acceptance is not inferred.
+- Changes were committed directly to main. Exact-head Laravel, formatting, quality and browser checks must pass before acceptance.
