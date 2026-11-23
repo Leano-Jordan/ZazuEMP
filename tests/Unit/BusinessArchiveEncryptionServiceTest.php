@@ -87,4 +87,20 @@ class BusinessArchiveEncryptionServiceTest extends TestCase
             @unlink($legacy);
         }
     }
+    public function test_unreadable_archive_path_fails_closed_during_format_detection(): void
+    {
+        $service = app(BusinessArchiveEncryptionService::class);
+        $missing = sys_get_temp_dir().DIRECTORY_SEPARATOR.'zazu-missing-archive-'.Str::uuid();
+
+        try {
+            $service->isEncrypted($missing);
+            $this->fail('An unreadable archive must not be treated as a legacy plaintext archive.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame(
+                'The uploaded business archive could not be opened for format detection.',
+                $exception->getMessage()
+            );
+        }
+    }
+
 }
