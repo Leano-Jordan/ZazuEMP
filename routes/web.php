@@ -159,7 +159,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
 
         Route::get('/exports', [BusinessExportController::class, 'index'])->name('exports.index');
-        Route::get('/exports/archive', [BusinessExportController::class, 'downloadArchive'])->name('exports.archive.download');
+        Route::post('/exports/archive/download', [BusinessExportController::class, 'downloadArchive'])->middleware('throttle:3,10')->name('exports.archive.download');
         Route::post('/exports/archive', [BusinessExportController::class, 'restoreArchive'])->middleware('throttle:3,10')->name('exports.archive.restore');
         Route::get('/exports/{resource}', [BusinessExportController::class, 'download'])
             ->whereIn('resource', [
