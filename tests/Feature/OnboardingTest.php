@@ -13,6 +13,58 @@ class OnboardingTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_onboarding_starts_with_business_focus_before_the_catalogue(): void
+    {
+        $business = Business::create([
+            'name' => 'Business First Setup',
+            'slug' => 'business-first-setup',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $this->get(route('onboarding.catalogue'))
+            ->assertRedirect(route('onboarding.experience'));
+
+        $this->get(route('onboarding.experience'))
+            ->assertOk()
+            ->assertSee('What kind of business do you run?')
+            ->assertSee('name="business_focuses[]"', false)
+            ->assertSee('name="primary_niche"', false);
+    }
+
+    public function test_owner_can_save_multiple_business_focuses_and_a_primary_focus(): void
+    {
+        $business = Business::create([
+            'name' => 'Mixed Event Business',
+            'slug' => 'mixed-event-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = $this->signInAsOwner($business);
+
+        $this->post(route('onboarding.experience.store'), [
+            'experience_level' => 'basic',
+            'primary_niche' => 'sound_dj',
+            'business_focuses_present' => '1',
+            'business_focuses' => ['sound_dj', 'catering_baking', 'photography'],
+        ])->assertRedirect(route('onboarding.catalogue'));
+
+        $this->assertDatabaseHas('business_user', [
+            'business_id' => $business->id,
+            'user_id' => $user->id,
+            'primary_niche' => 'sound_dj',
+            'business_focuses' => '["sound_dj","catering_baking","photography"]',
+        ]);
+
+        $this->assertSame(
+            ['sound_dj', 'catering_baking', 'photography'],
+            app(\App\Support\NicheFocus::class)->selectedMany($user, $business)
+        );
+    }
+
     public function test_owner_can_save_catalogue_setup_with_minimum_information(): void
     {
         $business = Business::create([
@@ -28,7 +80,7 @@ class OnboardingTest extends TestCase
             'name' => 'Wedding catering',
         ]);
 
-        $response->assertRedirect(route('onboarding.experience'));
+        $response->assertRedirect(route('onboarding.business'));
 
         $this->assertDatabaseHas('business_capabilities', [
             'business_id' => $business->id,
@@ -62,7 +114,7 @@ class OnboardingTest extends TestCase
             'description' => 'Wedding and event catering.',
         ]);
 
-        $response->assertRedirect(route('onboarding.experience'));
+        $response->assertRedirect(route('onboarding.business'));
 
         $this->assertDatabaseHas('business_capabilities', [
             'business_id' => $business->id,
@@ -86,7 +138,7 @@ class OnboardingTest extends TestCase
         $this->signInAsOwner($business);
 
         $this->post(route('onboarding.catalogue.skip'))
-            ->assertRedirect(route('onboarding.experience'))
+            ->assertRedirect(route('onboarding.business'))
             ->assertSessionHas('info');
 
         $business->refresh();
@@ -94,11 +146,11 @@ class OnboardingTest extends TestCase
         $this->assertNull($business->catalogue_setup_completed_at);
         $this->assertNotNull($business->catalogue_setup_skipped_at);
 
-        $this->get(route('onboarding.catalogue'))->assertOk();
+        $this->get(route('onboarding.catalogue'))->assertRedirect(route('onboarding.experience'));
         $this->get(route('onboarding.index'))->assertOk();
 
         $this->post(route('onboarding.catalogue.finish'))
-            ->assertRedirect(route('onboarding.experience'));
+            ->assertRedirect(route('onboarding.business'));
 
         $this->assertNotNull($business->fresh()->catalogue_setup_completed_at);
         $this->assertNull($business->fresh()->catalogue_setup_skipped_at);
