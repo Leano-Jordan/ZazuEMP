@@ -260,3 +260,17 @@ This remains contextual guidance, not capability-driven authorization or module 
 The Setup Centre now reads the current business's existing `BusinessCapability` records and shows the owner the active offering count, hidden offering count and active mix by capability type. This is a read-only summary with a direct path to the existing catalogue configuration. It does not create a second settings store or expose this owner-only setup surface to staff. The query remains scoped through the current business relationship.
 
 Regression coverage includes active service, active rental and inactive service records. This summary complements the existing owner create/edit/deactivate controls; the catalogue remains the authoritative place to change offerings.
+
+
+## Capability activation/deactivation regression coverage — 2026-11-23
+
+Added focused feature coverage for the active-catalogue → business Helper → Job-context boundary:
+
+- A Job containing saved Decor, Photography & video and Transport requirements receives all three matching Helper focus areas and their corresponding booking guidance.
+- Deactivating a Decor capability removes it from the business-wide active focus and from staff catalogue visibility.
+- Owners retain the hidden catalogue record for reactivation.
+- The existing Job's saved requirement and Decor-specific Job guidance remain intact after the catalogue capability is deactivated.
+
+This is intentional: active catalogue state governs future discoverability and business-wide guidance; saved Job requirements remain the authority for the scope of work already recorded. Deactivation does not rewrite or erase historical/active Job requirements. The test also exercises the existing owner update route rather than mutating the database directly.
+
+**Verification:** source and regression tests are committed on `main`; exact-head Laravel, PHPMD, formatting and browser checks must pass before this slice is marked green. Offline PC/phone parity and physical acceptance remain separate.
