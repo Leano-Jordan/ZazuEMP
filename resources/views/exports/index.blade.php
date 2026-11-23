@@ -41,7 +41,7 @@
 
         <div class="zazu-export-archive-grid">
             <article class="zazu-export-action">
-                <div class="zazu-export-action-icon" aria-hidden="true">↓</div>
+                <div class="zazu-export-action-icon" aria-hidden="true"><x-icon name="download" size="21" /></div>
                 <h3>Create an archive</h3>
                 <p>Protect the archive with a unique passphrase. Keep that passphrase separately; Zazu cannot recover it if lost.</p>
                 <form method="POST" action="{{ route('exports.archive.download') }}" class="zazu-export-form">
@@ -55,12 +55,12 @@
                     @error('archive_password')
                         <p class="text-sm text-red-600">{{ $message }}</p>
                     @enderror
-                    <button type="submit" class="zazu-btn zazu-btn-primary">Encrypt &amp; download archive</button>
+                    <button type="submit" class="zazu-btn zazu-btn-primary"><x-icon name="lock" size="16" class="mr-2" /> Encrypt &amp; download archive</button>
                 </form>
             </article>
 
             <article class="zazu-export-action zazu-export-restore">
-                <div class="zazu-export-action-icon" aria-hidden="true">↥</div>
+                <div class="zazu-export-action-icon" aria-hidden="true"><x-icon name="upload" size="21" /></div>
                 <h3>Restore an archive</h3>
                 <p>Validate and restore a Zazu business archive into a clean, empty workspace.</p>
                 <form method="POST" action="{{ route('exports.archive.restore') }}" enctype="multipart/form-data" class="zazu-export-form">
@@ -77,13 +77,13 @@
                     @error('archive_password')
                         <p class="text-sm text-red-600">{{ $message }}</p>
                     @enderror
-                    <button type="submit" class="zazu-btn zazu-btn-secondary">Validate &amp; restore</button>
+                    <button type="submit" class="zazu-btn zazu-btn-secondary"><x-icon name="shield-check" size="16" class="mr-2" /> Validate &amp; restore</button>
                 </form>
             </article>
         </div>
 
         <div class="zazu-export-safety">
-            <strong>Restore safety boundary</strong>
+            <strong><x-icon name="shield-check" size="16" class="mr-1 inline-block align-[-3px]" /> Restore safety boundary</strong>
             <span>Restore is allowed only into an empty, unpaired business workspace. Existing records and offline sync state are never overwritten or merged. Record IDs are remapped and business ownership is re-bound. Older V1 archives remain importable but are unencrypted.</span>
         </div>
         <p class="zazu-export-footnote">Passwords, user sessions, device pairing tokens, licence entitlements and the SARS TCS PIN are never included. Re-enter the TCS PIN after restoring. Limits: 100 MB upload / 250 MB expanded archive. Incomplete or unsafe archives are rejected without committing partial database changes.</p>
@@ -115,7 +115,7 @@
                                         <strong>{{ $export['label'] }}</strong>
                                         <span>{{ $export['description'] }}</span>
                                     </div>
-                                    <a href="{{ route('exports.download', ['resource' => $export['resource']]) }}" class="zazu-btn zazu-btn-secondary">Download CSV</a>
+                                    <a href="{{ route('exports.download', ['resource' => $export['resource']]) }}" class="zazu-btn zazu-btn-secondary"><x-icon name="download" size="15" class="mr-2" /> Download CSV</a>
                                 </div>
                             @endforeach
                         </div>
