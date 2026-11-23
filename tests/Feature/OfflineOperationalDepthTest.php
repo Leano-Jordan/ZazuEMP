@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
+use App\Models\Supplier;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use App\Services\EventProfitabilityService;
@@ -129,6 +130,59 @@ class OfflineOperationalDepthTest extends TestCase
             'business_id' => $business->id,
             'action' => 'inventory.movement.recorded',
         ]);
+    }
+
+    public function test_offline_supplier_create_then_update_replays_once_and_advances_revision(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(OfflineDomainMutationHandler::class);
+        $supplierUuid = (string) Str::uuid();
+
+        $create = $recorder->record($device, 'supplier', $supplierUuid, 'create', [
+            'local_id' => $supplierUuid,
+            'record' => [
+                'name' => 'Offline Produce Supplier',
+                'contact_name' => 'Original Contact',
+                'email' => 'old@example.test',
+                'phone' => '0100000000',
+                'notes' => 'Created while disconnected.',
+            ],
+        ]);
+        $applier->apply($create, ['supplier' => $handler]);
+
+        $supplier = Supplier::query()->where('business_id', $business->id)->firstOrFail();
+        $identity = app(SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $this->assertSame($supplierUuid, $identity->entity_uuid);
+        $this->assertSame(1, (int) $identity->revision);
+
+        $update = $recorder->record($device, 'supplier', $supplierUuid, 'update', [
+            'local_id' => $supplierUuid,
+            'expected_revision' => 1,
+            'record' => [
+                'name' => 'Updated Produce Supplier',
+                'contact_name' => 'Updated Contact',
+                'email' => 'new@example.test',
+                'phone' => '0111234567',
+                'notes' => 'Updated before reconnect.',
+            ],
+        ]);
+        $applier->apply($update, ['supplier' => $handler]);
+        $applier->apply($update, ['supplier' => $handler]);
+
+        $this->assertSame(1, Supplier::query()->where('business_id', $business->id)->count());
+        $this->assertSame('Updated Produce Supplier', $supplier->fresh()->name);
+        $this->assertSame('Updated Contact', $supplier->fresh()->contact_name);
+        $this->assertSame('new@example.test', $supplier->fresh()->email);
+        $this->assertSame('0111234567', $supplier->fresh()->phone);
+        $this->assertSame('Updated before reconnect.', $supplier->fresh()->notes);
+        $this->assertSame(2, (int) DB::table('sync_entity_identities')
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'supplier')
+            ->where('entity_uuid', $supplierUuid)
+            ->value('revision'));
     }
 
     public function test_offline_inventory_issue_cannot_make_stock_negative(): void
