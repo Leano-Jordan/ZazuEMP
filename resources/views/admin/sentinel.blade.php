@@ -346,7 +346,7 @@
                 <span class="sentinel-pill">{{ strtoupper($backupStatus['status']) }}</span>
             </div>
             @if($backupStatus['latest_at'])
-                <p><strong>Last backup:</strong> {{ \\Illuminate\\Support\\Carbon::parse($backupStatus['latest_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') }} ({{ $backupStatus['age_hours'] }} hours ago)</p>
+                <p><strong>Last backup:</strong> {{ \Illuminate\\Support\\Carbon::parse($backupStatus['latest_at'])->timezone(config('app.timezone'))->format('j M Y, H:i') }} ({{ $backupStatus['age_hours'] }} hours ago)</p>
                 @if($backupStatus['status'] === 'attention')
                     @if(($backupStatus['age_hours'] ?? null) !== null && $backupStatus['age_hours'] > 26)
                         <p class="sentinel-health-attention">Backup overdue. Check the Windows scheduled task and verify a fresh archive is created.</p>
