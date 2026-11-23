@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
@@ -20,15 +21,36 @@ class WorkWorkflowTest extends TestCase
         $this->signInAsOwner();
     }
 
-    public function test_new_job_intake_presents_event_details_before_service_scope(): void
+    public function test_new_job_intake_presents_only_active_business_catalogue_offerings(): void
     {
+        $customer = Customer::create(['name' => 'Catalogue Owner Customer']);
+        BusinessCapability::create([
+            'business_id' => $customer->business_id,
+            'name' => 'Wedding Sound System',
+            'category' => 'Audio',
+            'capability_type' => 'rental',
+            'pricing_basis' => 'per_day',
+            'default_unit' => 'system',
+            'is_active' => true,
+        ]);
+        BusinessCapability::create([
+            'business_id' => $customer->business_id,
+            'name' => 'Retired Catering Package',
+            'category' => 'Catering',
+            'capability_type' => 'package',
+            'pricing_basis' => 'custom',
+            'is_active' => false,
+        ]);
+
         $response = $this->get(route('work.create'));
 
         $response->assertOk()
             ->assertSee('When and where?')
             ->assertSee('Select the services involved')
             ->assertSee('These selections create starting service requirements.')
-            ->assertSee('Event type');
+            ->assertSee('Event type')
+            ->assertSee('Wedding Sound System')
+            ->assertDontSee('Retired Catering Package');
 
         $content = $response->getContent();
         $schedulePosition = strpos($content, 'When and where?');
@@ -43,10 +65,16 @@ class WorkWorkflowTest extends TestCase
     public function test_initial_service_selection_is_saved_as_a_starter_requirement(): void
     {
         $customer = Customer::create(['name' => 'Starter Requirement Customer']);
-        $services = collect(config('zazu.service_categories'))->flatten()->values();
-        $service = $services->first();
-
-        $this->assertNotNull($service);
+        $capability = BusinessCapability::create([
+            'business_id' => $customer->business_id,
+            'name' => 'Premium Sound Package',
+            'category' => 'Audio',
+            'capability_type' => 'package',
+            'pricing_basis' => 'fixed',
+            'default_unit' => 'package',
+            'is_active' => true,
+        ]);
+        $service = $capability->name;
 
         $response = $this->post(route('work.store'), [
             'customer_id' => $customer->id,
@@ -66,7 +94,9 @@ class WorkWorkflowTest extends TestCase
             ->firstOrFail();
 
         $this->assertSame(1.0, (float) $requirement->quantity);
-        $this->assertSame('service', $requirement->unit);
+        $this->assertSame('package', $requirement->unit);
+        $this->assertSame($capability->id, $requirement->capability_id);
+        $this->assertSame('Audio', $requirement->category);
     }
 
     public function test_work_can_be_created_from_a_customer_with_day_and_night_contacts(): void
