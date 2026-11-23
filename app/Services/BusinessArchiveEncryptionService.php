@@ -92,6 +92,9 @@ final class BusinessArchiveEncryptionService
                 throw new RuntimeException('The encrypted business archive could not be finalized.');
             }
         } catch (\Throwable $exception) {
+            if (is_resource($target)) {
+                fclose($target);
+            }
             @unlink($targetPath);
             throw $exception instanceof RuntimeException
                 ? $exception
@@ -103,8 +106,12 @@ final class BusinessArchiveEncryptionService
             if (is_string($key)) {
                 sodium_memzero($key);
             }
-            fclose($source);
-            fclose($target);
+            if (is_resource($source)) {
+                fclose($source);
+            }
+            if (is_resource($target)) {
+                fclose($target);
+            }
         }
 
         return $targetPath;
@@ -178,6 +185,9 @@ final class BusinessArchiveEncryptionService
                 throw new RuntimeException('The encrypted business archive contains trailing data or could not be finalized.');
             }
         } catch (\Throwable $exception) {
+            if (is_resource($target)) {
+                fclose($target);
+            }
             @unlink($targetPath);
             throw $exception instanceof RuntimeException
                 ? $exception
@@ -189,8 +199,12 @@ final class BusinessArchiveEncryptionService
             if (is_string($key)) {
                 sodium_memzero($key);
             }
-            fclose($source);
-            fclose($target);
+            if (is_resource($source)) {
+                fclose($source);
+            }
+            if (is_resource($target)) {
+                fclose($target);
+            }
         }
 
         return $targetPath;
