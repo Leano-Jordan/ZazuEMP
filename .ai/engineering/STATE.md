@@ -1,3 +1,16 @@
+## Director incident response — Windows server readiness and accessibility regression — 2026-11-23
+
+**Implementation commits on `main`:** `45cec0f7`, `533d8a57`, `7f6fb9bf`.
+
+- Investigated Laravel workflow run `45238129152` on prior head `b726e683`. Laravel/PHP tests, PostgreSQL migration/recovery, offline/session contract checks, Vite configuration and asset build passed. The browser job failed in authenticated-workspace accessibility acceptance before downstream browser/offline journeys could run.
+- Exact accessibility defect: footer navigation links inherited `#64748B) against the light page canvas `#DCE5ED`, producing a 3.73:1 contrast ratio for normal 12px text (WCAG AA requires 4.5:1). Updated `.zazu-app-footer-nav a` to use the existing theme-aware `--zazu-ink-2` token; this keeps the dark theme tokenised rather than hardcoding a light-only colour.
+- Founder reports the local Zazu server is down / Start-Zazu is not working. The previous launcher declared success after a TCP handshake only, which could misreport a Laravel bootstrap failure as a healthy server. Updated `Start-ZazuDev.ps1` to require an HTTP response from the application root after TCP becomes available, distinguish TCP bind failure from HTTP/application failure, and include the probe result plus captured startup logs in its failure.
+- Added a Windows PowerShell parser/contract check to the Windows V1 package workflow for the launcher change.
+- **Not yet verified:** no local owner-PC startup was observed; the latest workflow run predates these changes; no claim is made that the reported server outage is resolved. Exact-head CI and later owner-PC launch evidence remain pending.
+- Preserve the existing server/database state. Do not request repeated browser smoke loops; use the focused CI accessibility run and the launcher diagnostics when the owner is next at the PC.
+
+---
+
 ## Director execution — offline service boundary and customer contact search — 2026-11-23
 
 **Current main code/test head:** `6226b5108ed3b125a795f739df68e55b010b5687`.
