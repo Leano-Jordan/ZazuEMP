@@ -81,7 +81,7 @@
         ->map(fn ($focus) => $nicheService->label($focus))
         ->values();
 
-    $event = request()->route('event');
+    $event = request()->route()?->parameter('event');
     $eventComponents = collect();
     $eventNicheFocuses = [];
 
@@ -141,19 +141,35 @@
     $eventOperationalRecords = collect();
 
     if ($routeName === 'work.show'
-        && $event instanceof \App\Models\Event
+        && $event instanceof \\App\\Models\\Event
         && $business
         && (int) $event->business_id === (int) $business->id) {
-        $permissions = app(\App\Support\PermissionService::class);
-
-        foreach ([
+        $permissions = app(\\App\\Support\\PermissionService::class);
+        $recordDefinitions = [
             'preparationItems' => ['label' => 'preparation item', 'permission' => 'work.view'],
             'purchaseOrders' => ['label' => 'purchase order', 'permission' => 'purchasing.view'],
             'assetAllocations' => ['label' => 'asset allocation', 'permission' => 'assets.view'],
             'costs' => ['label' => 'recorded cost', 'permission' => 'work.view'],
             'travelCosts' => ['label' => 'travel cost', 'permission' => 'work.view'],
-        ] as $relation => $definition) {
+        ];
+        $eventCountRelations = [];
+
+        foreach ($recordDefinitions as $relation => $definition) {
             if (!$permissions->allows($definition['permission'], auth()->user(), $business)) {
+                continue;
+            }
+
+            // Counts are loaded only for relations the current member may view,
+            // and constrained again to this business before they reach the UI.
+            $eventCountRelations[$relation] = fn ($query) => $query->where('business_id', $business->id);
+        }
+
+        if ($eventCountRelations !== []) {
+            $event->loadCount($eventCountRelations);
+        }
+
+        foreach ($recordDefinitions as $relation => $definition) {
+            if (!isset($eventCountRelations[$relation])) {
                 continue;
             }
 
