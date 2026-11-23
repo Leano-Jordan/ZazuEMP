@@ -336,12 +336,14 @@ Do not expand V1 scope to imitate every competitor. Close the identified reliabi
 
 ## Backup confidentiality follow-up — 2026-11-23
 
-The earlier audit finding remains valid: installation and business archives are plain ZIP files, not password-encrypted. SHA-256 integrity checks and business-archive allowlist validation do not provide confidentiality.
+The initial finding was valid: the installation archive and business .zazu exports were plain ZIP files. The decision has now been implemented with separate controls for the two recovery paths.
 
 **Implemented on main:**
-- Added owner-only POSIX permissions for installation backup staging and published backup archives (0700 directories / 0600 files).
-- Restore staging, extracted private media, preserved private-storage rollback, SQLite staging and rollback files, and SQL rollback snapshots now receive restrictive POSIX permissions before use.
-- Added regression coverage for private staging-tree permissions and the backup/restore round-trip's archive and restored private-media modes.
-- The business export screen now warns owners that .zazu archives are unencrypted and must not be emailed or placed in public file-sharing.
+- Installation backup staging, published backup archives and restore/rollback staging use owner-only POSIX permissions (0700 directories / 0600 files), with Windows staging under the installer's restricted backup directory.
+- New business V2 .zazu exports use streaming Sodium secretstream XChaCha20-Poly1305 with Argon2id-derived keys and a confirmed owner-supplied passphrase.
+- Restore requires the correct passphrase, authenticates every chunk and the final tag, decrypts to private temporary storage, then applies the existing strict archive schema, tenant and empty-workspace checks.
+- Legacy plaintext V1 business archives remain importable for migration compatibility; new exports are encrypted.
+- Installation-wide scheduled backups remain unattended plain ZIP files so recovery does not depend on a human passphrase. Off-disk copies must be encrypted and access-controlled.
+- Sodium is now an explicit Windows installer prerequisite and is included in Laravel and Windows package CI extension lists.
 
-**Remaining risk:** Windows relies on inherited NTFS ACLs, and neither archive format has application-level encryption. Off-disk copies must use encrypted removable media or an encrypted, access-controlled vault. Decide whether V1 requires passphrase-based archive encryption or whether documented encrypted-storage controls are sufficient; do not imply that the current format is encrypted.
+**Verification boundary:** the Sodium streaming algorithm passed a local PHP 8.4 multi-chunk and wrong-password smoke test. Full Laravel/ZipArchive CI and actual Windows installed-PC export/restore acceptance remain open. Do not claim those gates passed until the exact head is green and the installed workflow is exercised.
