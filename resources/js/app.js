@@ -2723,6 +2723,106 @@ function setupZazuOfflineDirectoryViews() {
                         panel.append(group);
                     }
 
+                    if (collection === 'inventory_items' && current.local_id) {
+                        const editButton = document.createElement('button');
+                        editButton.type = 'button';
+                        editButton.className = 'zazu-btn zazu-btn-ghost mt-3';
+                        editButton.textContent = 'Edit saved item';
+                        editButton.setAttribute('aria-expanded', 'false');
+                        editButton.addEventListener('click', () => {
+                            let form = panel.querySelector('[data-zazu-offline-inventory-edit]');
+                            if (form) {
+                                form.hidden = !form.hidden;
+                                editButton.setAttribute('aria-expanded', form.hidden ? 'false' : 'true');
+                                if (!form.hidden) form.querySelector('input[name="name"]')?.focus();
+                                return;
+                            }
+
+                            form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = window.location.pathname;
+                            form.className = 'zazu-form mt-3';
+                            form.dataset.zazuOfflineEntity = 'inventory_item';
+                            form.dataset.zazuOfflineLocalId = current.local_id;
+                            const serverId = current.server_id ?? current.id;
+                            if (serverId) form.dataset.zazuOfflineServerId = String(serverId);
+                            form.dataset.zazuOfflineForceQueue = '1';
+                            form.dataset.zazuOfflineInventoryEdit = '1';
+                            form.setAttribute('aria-label', 'Edit '+definition.title(current));
+
+                            const grid = document.createElement('div');
+                            grid.className = 'zazu-form-grid';
+                            const addField = (labelText, name, value, type = 'text', required = false, attributes = {}) => {
+                                const label = document.createElement('label');
+                                label.className = 'zazu-field';
+                                label.append(text('span', '', labelText));
+                                const input = document.createElement('input');
+                                input.type = type;
+                                input.name = name;
+                                input.value = value == null ? '' : String(value);
+                                input.required = required;
+                                for (const [attribute, attributeValue] of Object.entries(attributes)) {
+                                    input.setAttribute(attribute, String(attributeValue));
+                                }
+                                label.append(input);
+                                grid.append(label);
+                                return input;
+                            };
+
+                            addField('Name', 'name', current.name, 'text', true);
+                            addField('SKU', 'sku', current.sku || '');
+                            addField('Unit', 'unit', current.unit || 'unit', 'text', true);
+                            addField('Reorder level', 'reorder_level', current.reorder_level ?? '0', 'number', true, {
+                                min: '0',
+                                step: '0.01',
+                            });
+
+                            const capabilityLabel = document.createElement('label');
+                            capabilityLabel.className = 'zazu-field';
+                            capabilityLabel.append(text('span', '', 'Catalogue product'));
+                            const capabilitySelect = document.createElement('select');
+                            capabilitySelect.name = 'capability_id';
+                            const noCapability = document.createElement('option');
+                            noCapability.value = '';
+                            noCapability.textContent = 'Not linked';
+                            capabilitySelect.append(noCapability);
+                            for (const capability of window.ZazuOffline.getState()?.catalogue || []) {
+                                const capabilityId = capability.server_id ?? capability.id;
+                                if (!capabilityId) continue;
+                                const option = document.createElement('option');
+                                option.value = String(capabilityId);
+                                option.textContent = capability.name || 'Catalogue product';
+                                option.selected = Number(capabilityId) === Number(current.capability_id || 0);
+                                capabilitySelect.append(option);
+                            }
+                            capabilityLabel.append(capabilitySelect);
+                            grid.append(capabilityLabel);
+
+                            const hint = text('p', 'zazu-panel-copy', 'Edits are saved on this device and queued for sync.');
+                            const actions = document.createElement('div');
+                            actions.className = 'zazu-actionbar mt-3';
+                            const save = document.createElement('button');
+                            save.type = 'submit';
+                            save.className = 'zazu-btn zazu-btn-primary';
+                            save.textContent = 'Save item';
+                            const cancel = document.createElement('button');
+                            cancel.type = 'button';
+                            cancel.className = 'zazu-btn zazu-btn-ghost';
+                            cancel.textContent = 'Cancel';
+                            cancel.addEventListener('click', () => {
+                                form.hidden = true;
+                                editButton.setAttribute('aria-expanded', 'false');
+                            });
+                            actions.append(save, cancel);
+                            form.append(grid, hint, actions);
+                            panel.append(form);
+                            editButton.setAttribute('aria-expanded', 'true');
+                            setupZazuOfflineForms();
+                            form.querySelector('input[name="name"]')?.focus();
+                        });
+                        panel.append(editButton);
+                    }
+
                     panel.append(text('p', 'zazu-panel-copy mt-3', 'This is the last synchronised and locally saved version on this device. Reconnect to refresh it.'));
                 });
                 actions.append(detailButton);
@@ -2969,7 +3069,8 @@ function setupZazuOfflineForms() {
                 const selectedCustomerValue = form.querySelector('select[name="customer_id"]')?.value || '';
                 const hasUnresolvedLocalCustomer = selectedCustomerValue.startsWith('local:');
 
-                if (navigator.onLine && !hasUnresolvedLocalCustomer && await canReachZazuOrigin()) {
+                if (form.dataset.zazuOfflineForceQueue !== '1'
+                    && navigator.onLine && !hasUnresolvedLocalCustomer && await canReachZazuOrigin()) {
                     delete form.dataset.zazuOfflineSubmitting;
                     // Preserve the browser's normal Laravel form/redirect flow
                     // after the origin has been confirmed reachable. A phone-local
@@ -3177,19 +3278,27 @@ function setupZazuOfflineForms() {
                 payload.__operation = existing?.local_id ? 'update' : 'create';
             } else if (entity === 'inventory_item') {
                 const state = window.ZazuOffline.getState();
+                const localRecordId = form.dataset.zazuOfflineLocalId;
+                const serverId = form.dataset.zazuOfflineServerId;
+                const existing = state?.inventory_items?.find(item =>
+                    (localRecordId && item.local_id === localRecordId)
+                    || (serverId && Number(item.id ?? item.server_id) === Number(serverId))
+                );
                 const capabilityId = get('capability_id');
                 const capability = capabilityId
                     ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(capabilityId))
                     : null;
                 payload = {
-                    local_id: localId,
-                    server_id: null,
+                    local_id: existing?.local_id || localRecordId || localId,
+                    server_id: existing?.server_id ?? (serverId ? Number(serverId) : null),
                     name: get('name'),
                     sku: get('sku') || null,
                     unit: get('unit') || 'unit',
                     reorder_level: get('reorder_level') || '0',
                     capability_local_id: capability?.local_id || null,
+                    pending_sync: true,
                 };
+                payload.__operation = existing?.local_id ? 'update' : 'create';
             } else if (entity === 'asset') {
                 const state = window.ZazuOffline.getState();
                 const serverId = form.dataset.zazuOfflineServerId;
