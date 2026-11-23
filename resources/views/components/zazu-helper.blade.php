@@ -211,6 +211,53 @@
         }
     }
 
+    $eventOperationalDetails = collect();
+
+    if ($routeName === 'work.show'
+        && $event instanceof \\App\\Models\\Event
+        && $business
+        && (int) $event->business_id === (int) $business->id) {
+        $permissions = app(\\App\\Support\\PermissionService::class);
+
+        if ($permissions->allows('work.view', auth()->user(), $business)) {
+            foreach ($event->preparationItems
+                ->whereIn('status', ['open', 'blocked'])
+                ->take(2) as $item) {
+                $eventOperationalDetails->push([
+                    'area' => 'Preparation',
+                    'title' => $item->title,
+                    'state' => ucfirst((string) $item->status),
+                    'href' => route('work.preparation.index', $event),
+                    'action' => 'Open preparation',
+                ]);
+            }
+
+            foreach ($event->costs->where('status', 'planned')->take(2) as $cost) {
+                $eventOperationalDetails->push([
+                    'area' => 'Costing',
+                    'title' => $cost->description,
+                    'state' => 'Planned',
+                    'href' => route('work.costs.index', $event),
+                    'action' => 'Review costs',
+                ]);
+            }
+        }
+
+        if ($permissions->allows('purchasing.view', auth()->user(), $business)) {
+            foreach ($event->purchaseOrders
+                ->whereIn('status', ['draft', 'sent', 'ordered'])
+                ->take(2) as $purchaseOrder) {
+                $eventOperationalDetails->push([
+                    'area' => 'Purchasing',
+                    'title' => $purchaseOrder->reference,
+                    'state' => ucfirst((string) $purchaseOrder->status),
+                    'href' => route('purchasing.index', ['event_id' => $event->id]),
+                    'action' => 'Open purchasing',
+                ]);
+            }
+        }
+    }
+
     $steps = $guides[$routeName] ?? [];
 @endphp
 
@@ -273,6 +320,22 @@
                                 <span>{{ $record['label'] }}</span>
                                 <span aria-hidden="true"> · </span>
                                 <a href="{{ $record['href'] }}" class="zazu-helper-link" data-zazu-helper-event-record-link>{{ $record['action'] }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            @if ($eventOperationalDetails->isNotEmpty())
+                <div class="zazu-helper-step" data-zazu-helper-event-operational-details="{{ $eventOperationalDetails->count() }}">
+                    <div class="zazu-helper-step-label">Current operational state</div>
+                    <ul class="list-disc pl-5" data-zazu-helper-event-operational-list>
+                        @foreach ($eventOperationalDetails as $detail)
+                            <li data-zazu-helper-event-operational-detail data-area="{{ strtolower($detail['area']) }}">
+                                <strong>{{ $detail['area'] }}:</strong>
+                                <span>{{ $detail['title'] }}</span>
+                                <span class="zazu-chip zazu-chip-neutral">{{ $detail['state'] }}</span>
+                                <span aria-hidden="true"> · </span>
+                                <a href="{{ $detail['href'] }}" class="zazu-helper-link" data-zazu-helper-event-operational-link>{{ $detail['action'] }}</a>
                             </li>
                         @endforeach
                     </ul>
