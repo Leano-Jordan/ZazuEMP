@@ -22,6 +22,7 @@
 - [x] Added regression coverage for private staging and restored private-media permissions.
 - [x] New business V2 `.zazu` exports use streaming Sodium secretstream XChaCha20-Poly1305 with Argon2id-derived keys and authenticated chunk/final-tag verification.
 - [x] Export requires a confirmed 12–128 character passphrase; restore requires the matching passphrase for V2 archives.
+- [x] Passphrase and confirmation are excluded from validation flash/session old input; export and restore use independent owner-scoped rate limits (3 attempts per 10 minutes).
 - [x] Existing plaintext V1 business archives remain importable for compatibility; owners are warned to re-export or securely protect old copies.
 - [x] Installation-wide scheduled backups remain unattended plain ZIP files; off-disk copies require encrypted removable media or an encrypted, access-controlled vault.
 - [ ] Verify the configured secondary destination is BitLocker-protected USB or an encrypted, access-controlled cloud vault. The runner verifies SHA-256 only; it does not enforce or attest destination encryption.
