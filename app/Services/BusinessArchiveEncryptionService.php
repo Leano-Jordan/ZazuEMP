@@ -21,7 +21,12 @@ final class BusinessArchiveEncryptionService
         }
 
         try {
-            return fread($handle, strlen(self::MAGIC)) === self::MAGIC;
+            $magic = fread($handle, strlen(self::MAGIC));
+            if ($magic === false) {
+                throw new RuntimeException('The uploaded business archive format header could not be read.');
+            }
+
+            return $magic === self::MAGIC;
         } finally {
             fclose($handle);
         }
