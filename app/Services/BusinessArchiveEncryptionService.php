@@ -17,7 +17,7 @@ final class BusinessArchiveEncryptionService
     {
         $handle = @fopen($path, 'rb');
         if ($handle === false) {
-            return false;
+            throw new RuntimeException('The uploaded business archive could not be opened for format detection.');
         }
 
         try {
