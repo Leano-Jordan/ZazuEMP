@@ -256,6 +256,31 @@
                 ]);
             }
         }
+
+        if ($permissions->allows('assets.view', auth()->user(), $business)) {
+            $allocations = $event->assetAllocations()
+                ->where('business_id', $business->id)
+                ->where('status', 'allocated')
+                ->whereHas('asset', fn ($query) => $query->where('business_id', $business->id))
+                ->with(['asset' => fn ($query) => $query->where('business_id', $business->id)])
+                ->latest('allocated_from')
+                ->limit(2)
+                ->get();
+
+            foreach ($allocations as $allocation) {
+                if (!$allocation->asset) {
+                    continue;
+                }
+
+                $eventOperationalDetails->push([
+                    'area' => 'Assets',
+                    'title' => trim($allocation->asset->asset_tag.' · '.$allocation->asset->name),
+                    'state' => 'Allocated',
+                    'href' => route('assets.index'),
+                    'action' => 'Review assets',
+                ]);
+            }
+        }
     }
 
     $steps = $guides[$routeName] ?? [];
