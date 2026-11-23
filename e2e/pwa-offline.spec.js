@@ -1001,9 +1001,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         )).toBe(true);
     });
 
-    test('does not claim an offline customer photo was saved when only metadata can be queued', async ({ page }, testInfo) => {
+    test('saves offline customer details while clearly deferring the profile photo change', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
-        test.skip(testInfo.project.name !== 'chromium', 'Offline file boundary contract runs once.');
+        test.skip(testInfo.project.name !== 'chromium', 'Offline customer photo boundary contract runs once.');
 
         await login(page);
         await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
@@ -1018,21 +1018,34 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await page.locator('input[name="name"]').fill('Photo boundary customer');
         await page.locator('input[name="primary_contact_name"]').fill('Photo Contact');
+        await page.locator('input[name="primary_contact_phone"]').fill('0123456789');
         await page.locator('input[name="profile_photo"]').setInputFiles({
             name: 'profile.png',
             mimeType: 'image/png',
             buffer: Buffer.from('offline-photo-fixture'),
         });
 
-        const [alert] = await Promise.all([
-            page.waitForEvent('dialog'),
-            page.getByRole('button', { name: 'Save customer' }).click(),
-        ]);
-        expect(alert.message()).toContain('Customer profile photo changes need a connection');
-        await alert.accept();
+        await page.getByRole('button', { name: 'Save customer' }).click();
 
-        await expect(page.getByRole('button', { name: 'Save customer' })).toBeEnabled();
-        expect(await page.evaluate(async () => window.ZazuOffline.pending())).toHaveLength(0);
+        const notice = page.locator('[data-zazu-offline-save-notice]');
+        await expect(notice).toContainText('Customer details were saved, but the profile photo change was not saved');
+        await expect(notice).toContainText('Update the photo when Zazu is online.');
+
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued).toHaveLength(1);
+        expect(queued[0].entity_type).toBe('customer');
+        expect(queued[0].payload.record.name).toBe('Photo boundary customer');
+        expect(queued[0].payload.record.contact_name).toBe('Photo Contact');
+        expect(queued[0].payload.record.phone).toBe('0123456789');
+        expect(queued[0].payload.record).not.toHaveProperty('profile_photo');
+        expect(queued[0].payload.record).not.toHaveProperty('remove_profile_photo');
+
+        const localState = await page.evaluate(() => window.ZazuOffline.getState());
+        expect(localState.customers.some(customer =>
+            customer.name === 'Photo boundary customer'
+            && customer.contact_name === 'Photo Contact'
+            && customer.phone === '0123456789'
+        )).toBe(true);
     });
 
     test('links a phone-local customer to an offline Work record', async ({ page }, testInfo) => {
