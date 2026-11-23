@@ -1018,14 +1018,14 @@ test('offline forms and cached Work detail preserve their exact route while othe
 
 
 test('a hanging host with Wi-Fi still connected falls back quickly to the local dashboard shell', async () => {
-    const worker = bootWorker(async request => {
+    const worker = bootWorker(async (request, init) => {
         if (new URL(request.url).pathname === '/dashboard') {
             return new MockResponse('<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Local dashboard shell</main></body></html>', {
                 headers: { 'content-type': 'text/html; charset=utf-8' },
             });
         }
         return new Promise((resolve, reject) => {
-            const signal = arguments[1]?.signal;
+            const signal = init?.signal;
             if (signal?.aborted) {
                 reject(new Error('aborted'));
                 return;
