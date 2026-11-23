@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\BusinessSpreadsheetExportService;
-use App\Services\BusinessArchiveService;
 use App\Services\BusinessArchiveEncryptionService;
+use App\Services\BusinessArchiveService;
+use App\Services\BusinessSpreadsheetExportService;
 use App\Support\Audit;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Str;
-use RuntimeException;
 use App\Support\CurrentBusiness;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BusinessExportController extends Controller
 {
@@ -29,7 +29,6 @@ class BusinessExportController extends Controller
             'exports' => $exports->catalog($business),
         ]);
     }
-
 
     public function downloadArchive(
         Request $request,
