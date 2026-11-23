@@ -75,6 +75,18 @@ jobs:
             throw 'The shared host launcher does not expose its compiled-assets mode.'
           }
           foreach ($required in @(
+            'upload_max_filesize=100M',
+            'post_max_size=110M',
+            'max_execution_time=300',
+            'max_input_time=300',
+            '-ArgumentList $serverArguments'
+          )) {
+            if (-not $hostLauncher.Contains($required)) {
+              throw "PHP server upload/runtime limit is missing: $required"
+            }
+          }
+
+          foreach ($required in @(
             'function Prepare-ZazuBuiltAssets',
             '$hotFile = Join-Path $publicDirectory ''hot''',
             '$manifestFile = Join-Path $buildDirectory ''manifest.json''',
