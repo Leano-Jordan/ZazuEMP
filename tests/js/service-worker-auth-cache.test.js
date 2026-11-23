@@ -1024,7 +1024,14 @@ test('a hanging host with Wi-Fi still connected falls back quickly to the local 
                 headers: { 'content-type': 'text/html; charset=utf-8' },
             });
         }
-        return new Promise(() => {});
+        return new Promise((resolve, reject) => {
+            const signal = arguments[1]?.signal;
+            if (signal?.aborted) {
+                reject(new Error('aborted'));
+                return;
+            }
+            signal?.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+        });
     }, {}, true);
     await worker.dispatchMessage({
         type: 'prime-pages',
