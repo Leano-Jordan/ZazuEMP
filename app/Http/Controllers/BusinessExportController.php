@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Services\BusinessArchiveEncryptionService;
 use App\Services\BusinessArchiveService;
 use App\Services\BusinessSpreadsheetExportService;
