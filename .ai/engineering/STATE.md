@@ -2171,3 +2171,20 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Added `docs/DEVICE_PERFORMANCE_MATRIX.md` and a V1 checklist gate. Device cohorts are entry/constrained, mainstream and high-performance; identical seeded workflows and three repeated runs are required. Android must be measured independently. No arbitrary resource thresholds are set before collecting baselines.
 - Windows Ops CI now parses the sampler and smoke-tests CSV/manifest output. The first smoke assertion was too strict for a cold CI runner that may spend the entire short window in startup/data-size inspection; it now checks that at least one valid sample is emitted. This is a smoke test only, not a performance result.
 - Verification status at this update: the prior Laravel failure on stale nav assertions was addressed in the browser test; the prior Pint failure was addressed. New exact-head Laravel, browser, formatting, Windows Ops and package workflows are pending. Do not mark the UI gate closed until these finish successfully.
+
+
+## Director device-performance instrumentation follow-through — 2026-11-24
+
+**Added on `main`:**
+- `ops/windows/Measure-ZazuResources.ps1`: Windows PowerShell 5.1 sampler for host CPU/RAM/disk/network plus the matched Zazu PHP process tree, volume free/used space and Zazu data footprint. It classifies a provisional Entry/Mainstream/High-performance cohort and writes local CSV + JSON only.
+- The sampler records source commit identity (GitHub Actions SHA or local Git) and accepts an installer/package path for SHA-256 capture. First-sample process CPU and unmatched process metrics remain blank rather than falsely reporting zero.
+- `ops/windows/Summarize-ZazuResources.ps1`: turns matching samples into a privacy-safe Markdown report with sample counts, p50, p95, min and max.
+- `docs/DEVICE_PERFORMANCE_MATRIX.md`: defines consistent workloads, three repetitions, p50/p95 comparisons, PC cohorts, measurement scope and separate physical Android acceptance. No arbitrary performance budgets are declared before real baselines exist.
+- Windows Ops CI parses and smoke-tests the collector. It now also smoke-tests report generation and required metric columns.
+
+**CI findings and corrections:**
+- The first strict smoke test exposed missing commit identity on a Windows runner. The workflow now passes `GITHUB_SHA` explicitly; local source checkouts fall back to Git.
+- Windows Ops run #89 passed after the commit-identity correction. The subsequent p50/p95 report-generator run and exact-head quality checks are still pending; do not claim the complete instrumentation suite is green until those finish.
+- The earlier UI correction's exact-head Laravel/offline browser/formatting/security gates passed on commit `67509849`; physical PC and Android acceptance are not inferred from CI.
+
+**Important acceptance boundary:** this is opt-in local measurement tooling, not always-on customer telemetry. No samples are uploaded. The hardware cohorts are comparison labels, not certified minimum specifications. A physical entry-level PC, mainstream PC and high-performance PC must run the same anonymised dataset/workload before Zazu can claim broad hardware compatibility. Android client resource usage must be captured separately from the PC host.
