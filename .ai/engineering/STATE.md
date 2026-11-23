@@ -1800,7 +1800,7 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Added a POSIX permission unit test and extended the installation backup/restore round-trip to assert the published archive and restored private media permissions.
 - Added an owner-facing warning on the business archive screen that `.zazu` exports are not password-encrypted.
 
-**Open confidentiality decision:** installation and business archives remain plain ZIP files. Checksums/allowlist validation do not encrypt or authenticate the archive. POSIX staging permissions and Windows NTFS ACLs reduce local exposure but do not protect copied archives. Off-disk storage must be encrypted and access-controlled. Decide whether application-level passphrase encryption is mandatory for V1 before making any confidentiality claim.
+**Resolved business-archive confidentiality decision (2026-11-23):** new business V2 `.zazu` exports are encrypted with Sodium secretstream XChaCha20-Poly1305 and Argon2id-derived keys; export requires a confirmed passphrase and restore requires the matching passphrase. Existing plaintext V1 business archives remain importable for compatibility and should be re-exported. Installation-wide scheduled backups remain unattended plain ZIP files; off-disk copies require encrypted, access-controlled storage.
 
 **Verification boundary:** source and test changes are committed/read back from `main`; exact-head Laravel, Windows PowerShell, PHPMD, formatting and quality checks are pending. No new CI pass is claimed.
 
