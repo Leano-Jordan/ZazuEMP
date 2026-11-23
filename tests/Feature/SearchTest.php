@@ -283,6 +283,24 @@ class SearchTest extends TestCase
         ]);
         $deletedContact->delete();
 
+        $foreignBusiness = Business::create([
+            'name' => 'Foreign Contact Search',
+            'slug' => 'foreign-contact-search-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $foreignCustomer = Customer::create([
+            'business_id' => $foreignBusiness->id,
+            'name' => 'Foreign Events',
+        ]);
+        CustomerContact::create([
+            'customer_id' => $foreignCustomer->id,
+            'name' => 'Foreign Contact',
+            'phone' => '0825550200',
+            'email' => 'private@foreign.example',
+            'label' => 'Confidential contact',
+        ]);
+
         $this->actingAs($user);
 
         foreach (['Thandi Mokoena', '0825550198', 'thandi@northside.example', 'Event coordinator'] as $term) {
@@ -292,6 +310,11 @@ class SearchTest extends TestCase
         }
 
         $this->get(route('search.index', ['q' => 'former@northside.example', 'type' => 'customer']))
+            ->assertOk()
+            ->assertSee('0 records')
+            ->assertViewHas('results', static fn (array $results): bool => $results === []);
+
+        $this->get(route('search.index', ['q' => 'private@foreign.example', 'type' => 'customer']))
             ->assertOk()
             ->assertSee('0 records')
             ->assertViewHas('results', static fn (array $results): bool => $results === []);
