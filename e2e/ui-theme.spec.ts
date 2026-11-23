@@ -121,31 +121,31 @@ test.describe('Zazu UI theme and navigation', () => {
         }
     });
 
-    test('keeps calendar reachable from the active Work navigation group', async ({ page }) => {
+    test('opens and follows links from the active Work navigation group on desktop and mobile', async ({ page }) => {
         await login(page);
-        await page.goto('/calendar');
-        await expect(page).toHaveURL(/\/calendar/);
+        await page.goto('/dashboard');
 
         const workArea = page.locator('[data-zazu-nav-area].is-active').filter({ hasText: 'Work' }).first();
+        const workTrigger = workArea.getByRole('button', { name: 'Work', exact: true });
         const calendarLink = workArea.locator('a.zazu-nav-link').filter({ hasText: /^Calendar$/ });
 
         await expect(workArea).toHaveCount(1);
         await expect(workArea).toHaveClass(/is-active/);
-        await expect(calendarLink).toHaveAttribute('aria-current', 'page');
 
         const mobileNavigationToggle = page.getByRole('button', { name: 'Open navigation' });
         if (await mobileNavigationToggle.isVisible()) {
             await mobileNavigationToggle.click();
-            const workTrigger = workArea.getByRole('button', { name: 'Work', exact: true });
-            if (await workTrigger.isVisible()) {
-                await workTrigger.click();
-            }
             await expect(workArea).toHaveClass(/is-open/);
         } else {
-            await workArea.getByRole('button', { name: 'Work', exact: true }).click();
+            await workTrigger.click();
+            await expect(workArea).toHaveClass(/is-open/);
         }
 
         await expect(calendarLink).toBeVisible();
+        await expect(calendarLink).toHaveAttribute('href', /\/calendar$/);
+        await calendarLink.click();
+        await expect(page).toHaveURL(/\/calendar$/);
+        await expect(calendarLink).toHaveAttribute('aria-current', 'page');
     });
 
     test('navigates landing to login and workspace operations without server errors', async ({ page }) => {
