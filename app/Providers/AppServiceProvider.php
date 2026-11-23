@@ -47,9 +47,33 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerRevisionTracking();
+        $this->registerRateLimiters();
+    }
 
+    private function registerRevisionTracking(): void
+    {
         $revisionTracker = app(SyncEntityRevisionTracker::class);
 
+        $this->registerPrimaryRevisionListeners($revisionTracker);
+        $this->registerNestedRevisionListeners($revisionTracker);
+
+        Event::listen('eloquent.created: '.AssetAllocation::class, function ($record) use ($revisionTracker): void {
+            $revisionTracker->touch($record, 'asset_allocation');
+        });
+        Event::listen('eloquent.updated: '.AssetAllocation::class, function ($record) use ($revisionTracker): void {
+            $revisionTracker->touch($record, 'asset_allocation');
+        });
+        Event::listen('eloquent.deleting: '.AssetAllocation::class, function ($record) use ($revisionTracker): void {
+            $revisionTracker->touch($record, 'asset_allocation');
+        });
+        Event::listen('eloquent.restored: '.AssetAllocation::class, function ($record) use ($revisionTracker): void {
+            $revisionTracker->touch($record, 'asset_allocation');
+        });
+    }
+
+    private function registerPrimaryRevisionListeners(SyncEntityRevisionTracker $revisionTracker): void
+    {
         foreach ([
             Customer::class => 'customer',
             WorkEvent::class => 'job',
@@ -70,10 +94,10 @@ class AppServiceProvider extends ServiceProvider
                 });
             }
         }
+    }
 
-        // Nested rows are part of their parent's offline snapshot. A change to
-        // one must invalidate the parent snapshot even when the parent row itself
-        // was not updated by the online workflow.
+    private function registerNestedRevisionListeners(SyncEntityRevisionTracker $revisionTracker): void
+    {
         $nestedRevisionParents = [
             CustomerContact::class => ['customer', 'customer'],
             EventRequirement::class => ['event', 'job'],
@@ -94,13 +118,10 @@ class AppServiceProvider extends ServiceProvider
                 });
             }
         }
+    }
 
-        foreach (['created', 'updated', 'deleting', 'restored'] as $event) {
-            Event::listen('eloquent.'.$event.': '.AssetAllocation::class, function ($record) use ($revisionTracker): void {
-                $revisionTracker->touch($record, 'asset_allocation');
-            });
-        }
-
+    private function registerRateLimiters(): void
+    {
         RateLimiter::for('login', function (Request $request) {
             $identifier = Str::lower(trim($request->string('identifier')->toString()));
 
@@ -149,4 +170,5 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by('sync:'.($token ? hash('sha256', $token) : $request->ip()));
         });
     }
+
 }
