@@ -2188,3 +2188,10 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - The earlier UI correction's exact-head Laravel/offline browser/formatting/security gates passed on commit `67509849`; physical PC and Android acceptance are not inferred from CI.
 
 **Important acceptance boundary:** this is opt-in local measurement tooling, not always-on customer telemetry. No samples are uploaded. The hardware cohorts are comparison labels, not certified minimum specifications. A physical entry-level PC, mainstream PC and high-performance PC must run the same anonymised dataset/workload before Zazu can claim broad hardware compatibility. Android client resource usage must be captured separately from the PC host.
+
+
+**Latest instrumentation verification — commit `6f18aa17`:**
+- Windows Ops Scripts run #99 completed successfully on the exact current `main` head. This includes PowerShell parsing, local sampler smoke, full metric-column checks, commit identity, truthful missing-value semantics, p50/p95 report generation, and the existing Windows launcher/backup/installer contract tests.
+- Director Contract Lint #1821 completed successfully on the same head.
+- Zazu quality #6565 and CodeQL #8007 were still queued/in progress at the last status check. Their completion must be checked before claiming every exact-head quality gate is green.
+- No physical PC cohort run has been performed. The first owner-PC capture is still required; the report generator and CI smoke are not substitutes for a real workload.
