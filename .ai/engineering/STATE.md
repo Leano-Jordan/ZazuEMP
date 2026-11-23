@@ -1798,7 +1798,7 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Restore staging, extracted private media, preserved private-storage rollback, SQLite staging/rollback files and MySQL/PostgreSQL rollback snapshots are restricted before activation/use.
 - All temporary backup, restore and rollback artifacts now live under `storage/app/zazu-backups/`, not the broadly inherited `storage/app` root. The Windows installer already applies a restricted ACL to `storage/app/zazu-backups` for the installation owner, SYSTEM and local Administrators.
 - Added a POSIX permission unit test and extended the installation backup/restore round-trip to assert the published archive and restored private media permissions.
-- Added an owner-facing warning on the business archive screen that `.zazu` exports are not password-encrypted.
+- Replaced the old plaintext-export warning with owner-facing V2 passphrase/encryption guidance; V1 plaintext archives remain importable for migration only.
 
 **Resolved business-archive confidentiality decision (2026-11-23):** new business V2 `.zazu` exports are encrypted with Sodium secretstream XChaCha20-Poly1305 and Argon2id-derived keys; export requires a confirmed passphrase and restore requires the matching passphrase. Existing plaintext V1 business archives remain importable for compatibility and should be re-exported. Installation-wide scheduled backups remain unattended plain ZIP files; off-disk copies require encrypted, access-controlled storage.
 
@@ -1811,3 +1811,14 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - A local PHP 8.4.24 check of `PrivateStoragePermissions` passed: owner-only 0700/0600 modes were applied and symlink-containing trees were rejected.
 - The local container does not have PHP ZipArchive installed, so ZipArchive creation/restore and the Laravel backup/restore feature suite were not executed locally.
 - GitHub commit-status/workflow-run lookups returned no check records for the latest commit. Exact-head Laravel, PHPMD, formatting, Windows package/ACL and Zazu Quality results remain unconfirmed; do not claim green.
+
+
+## Business archive encryption implementation — 2026-11-23
+
+- New business archive downloads now use a POST owner flow with confirmed 12–128 character passphrases; the passphrase is never persisted or written to audit metadata.
+- Added a streaming authenticated encryption envelope (ZAZUENC2) using PHP Sodium secretstream XChaCha20-Poly1305 and Argon2id interactive key derivation (64 MiB memory). Chunk authentication and a required final tag prevent accepting truncated or modified exports without loading the archive into memory.
+- Restore detects encrypted V2 envelopes, requires the passphrase, decrypts to a private temporary file, then runs the existing ZIP allowlist, tenant ownership, empty-workspace and rollback checks. Wrong/missing passphrases stop before restore mutation.
+- Existing plaintext V1 .zazu archives remain importable for compatibility; no new plaintext business exports are created.
+- Installation-wide scheduled backups remain unattended ZIP files by design; they do not depend on a human passphrase. Off-disk copies must be encrypted and access-controlled.
+- Added Sodium to the Windows installer prerequisite check and the Laravel/Windows package CI PHP extension lists. Added multi-chunk round-trip, wrong-passphrase, tamper, legacy detection and controller flow regression tests.
+- Local PHP 8.4/Sodium algorithm smoke test passed for a 2 MiB+ multi-chunk payload and wrong-password rejection. Full Laravel/ZipArchive CI and installed Windows acceptance remain pending.
