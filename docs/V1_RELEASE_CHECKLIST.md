@@ -20,8 +20,11 @@
 - [x] Restricted POSIX restore staging, extracted private media and rollback snapshots before activation.
 - [x] Moved Windows backup/restore staging and rollback artifacts under `storage/app/zazu-backups/`, which the current installer already restricts to the installation owner, SYSTEM and local Administrators.
 - [x] Added regression coverage for private staging and restored private-media permissions.
-- [x] Added an owner-facing warning that business archives are not password-encrypted.
-- [ ] Decide whether V1 requires application-level archive encryption or whether encrypted storage/NTFS ACL controls are the accepted release boundary. Both archive formats remain plain ZIP files; integrity checks are not confidentiality.
+- [x] New business V2 `.zazu` exports use streaming Sodium secretstream XChaCha20-Poly1305 with Argon2id-derived keys and authenticated chunk/final-tag verification.
+- [x] Export requires a confirmed 12–128 character passphrase; restore requires the matching passphrase for V2 archives.
+- [x] Existing plaintext V1 business archives remain importable for compatibility; owners are warned to re-export or securely protect old copies.
+- [x] Installation-wide scheduled backups remain unattended plain ZIP files; off-disk copies require encrypted removable media or an encrypted, access-controlled vault.
+- [ ] Exact-head CI and real Windows installed-PC encrypted export/restore acceptance.
 
 ### Capability-to-Job integration coverage
 
