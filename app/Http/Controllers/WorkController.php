@@ -128,12 +128,13 @@ class WorkController extends Controller
         $validated = $request->validate($this->rules(), $this->validationMessages());
         $scheduleValidator->validate($validated);
 
-        $services = array_values(array_unique($validated['services'] ?? []));
+        $catalogueServices = array_values(array_unique($validated['services'] ?? []));
+        $services = $catalogueServices;
         if (!empty($validated['other_service'])) {
             $services[] = Str::limit(trim($validated['other_service']), 100, '');
         }
 
-        $event = DB::transaction(function () use ($validated, $services, $business) {
+        $event = DB::transaction(function () use ($validated, $services, $catalogueServices, $business) {
             // Serialize customer/contact selection against concurrent customer
             // edits before taking the snapshot copied into the new Work record.
             DB::table('businesses')->where('id', $business->id)->lockForUpdate()->first();
@@ -141,12 +142,12 @@ class WorkController extends Controller
             $capabilities = BusinessCapability::query()
                 ->where('business_id', $business->id)
                 ->where('is_active', true)
-                ->whereIn('name', $services)
+                ->whereIn('name', $catalogueServices)
                 ->lockForUpdate()
                 ->get()
                 ->groupBy('name');
 
-            foreach ($services as $service) {
+            foreach ($catalogueServices as $service) {
                 if ($capabilities->get($service)?->count() !== 1) {
                     throw ValidationException::withMessages([
                         'services' => 'Choose services from your active business catalogue. Refresh the form if your catalogue has changed.',
@@ -187,14 +188,14 @@ class WorkController extends Controller
             ]);
 
             foreach ($services as $service) {
-                $capability = $capabilities->get($service)->first();
+                $capability = $capabilities->get($service)?->first();
                 EventRequirement::create([
                     'event_id' => $event->id,
-                    'capability_id' => $capability->id,
-                    'description' => $capability->name,
-                    'category' => $capability->category ?: 'Other',
+                    'capability_id' => $capability?->id,
+                    'description' => $capability?->name ?? $service,
+                    'category' => $capability?->category ?: 'Other',
                     'quantity' => 1,
-                    'unit' => $capability->default_unit ?: 'service',
+                    'unit' => $capability?->default_unit ?: 'service',
                     'status' => 'open',
                 ]);
             }
@@ -430,7 +431,7 @@ class WorkController extends Controller
             'event_address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
             'services' => ['nullable', 'array'],
-            'services.*' => ['string', 'max:100'],
+            'services.*' => ['string', 'max:255'],
             'other_service' => ['nullable', 'string', 'max:100'],
         ];
     }
