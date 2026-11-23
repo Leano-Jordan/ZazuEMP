@@ -195,6 +195,71 @@ test('offline inventory item edits update the local record and queue a revision-
     });
 });
 
+test('offline inventory item edits update the local record and queue a revision-checked update', async ({ page }) => {
+    const localId = randomUUID();
+    const serverId = 7654399;
+
+    await login(page);
+    await page.context().setOffline(true);
+    await page.evaluate(async ({ localId, serverId }) => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.customers = [];
+        state.jobs = [];
+        state.quotes = [];
+        state.inventory_items = [{
+            id: serverId,
+            server_id: serverId,
+            local_id: localId,
+            revision: 4,
+            name: 'Original inventory item',
+            sku: 'OLD-01',
+            unit: 'box',
+            reorder_level: '2.00',
+            capability_id: null,
+            on_hand: '12.00',
+            movements: [],
+        }];
+        state.local_dirty = false;
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    }, { localId, serverId });
+
+    const workspace = page.locator('[data-zazu-offline-workspace]');
+    await expect(workspace).toBeVisible();
+    const inventory = workspace.locator('[data-zazu-offline-collection="inventory_items"]');
+    await inventory.getByRole('button', { name: 'View saved details' }).click();
+    await inventory.getByRole('button', { name: 'Edit saved item' }).click();
+    await inventory.getByLabel('Name').fill('Updated inventory item');
+    await inventory.getByLabel('SKU').fill('NEW-01');
+    await inventory.getByLabel('Reorder level').fill('5.00');
+    await inventory.getByRole('button', { name: 'Save item' }).click();
+
+    await expect.poll(async () => page.evaluate(async localId => {
+        const state = window.ZazuOffline.getState();
+        const record = state.inventory_items.find(item => item.local_id === localId);
+        const mutation = (await window.ZazuOffline.pending()).find(item => item.entity_type === 'inventory_item');
+
+        return {
+            name: record?.name,
+            sku: record?.sku,
+            reorderLevel: record?.reorder_level,
+            localDirty: state.local_dirty,
+            operation: mutation?.operation,
+            expectedRevision: mutation?.payload?.expected_revision,
+            queuedName: mutation?.payload?.record?.name,
+        };
+    }, localId)).toEqual({
+        name: 'Updated inventory item',
+        sku: 'NEW-01',
+        reorderLevel: '5.00',
+        localDirty: true,
+        operation: 'update',
+        expectedRevision: 4,
+        queuedName: 'Updated inventory item',
+    });
+});
+
 test('offline workspace exposes locally stored quotes with their sync state', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const jobLocalId = randomUUID();
