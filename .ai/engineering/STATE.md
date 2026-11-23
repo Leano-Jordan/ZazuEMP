@@ -1864,3 +1864,12 @@ The test uses the actual owner update route and verifies owner/staff catalogue p
 - Added responsive export-specific styling in `resources/css/app.css`; CSV rows are compact and actions remain keyboard-accessible through native `details/summary`.
 - Updated `BusinessSpreadsheetExportTest` to assert the grouped directory and archive actions. Exact-head CI is pending for commit `163fc6095ff129856dde8e6dbc8c398b6964a024`.
 - Remaining owner-operated gate: restore the downloaded archive only into a separate empty/unpaired test business workspace. Never restore into the populated live workspace.
+
+
+## Android host-outage navigation hardening — 2026-11-23
+
+- Founder reports that the physical Android client can remain on a stale last-online page after the PC host stops, despite existing browser-emulated host-outage coverage. Physical behaviour remains an open acceptance defect until retested on the installed phone.
+- Source trace found the service worker only falls back after a 4-second navigation fetch timeout when Android remains connected to Wi-Fi and `navigator.onLine` stays true. This path was not explicitly covered with a hanging origin request; existing tests covered fast failures and browser-offline state.
+- Reduced the service-worker navigation timeout to 1.8 seconds and added an abort-aware regression test that keeps browser network status online, stalls the host request, and verifies the worker serves the authenticated local dashboard shell rather than stale route HTML.
+- Implementation: `public/sw.js`; regression: `tests/js/service-worker-auth-cache.test.js`. Exact-head CI pending at `8d72e959acc9de580705072a4f741a788144aa53`.
+- This is a targeted responsiveness hardening, not proof that the physical Android issue is resolved. Confirm HTTPS origin, controlling service worker, primed cache and actual cold-launch behaviour on the phone before closing the gate.
