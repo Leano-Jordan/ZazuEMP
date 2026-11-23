@@ -8411,6 +8411,32 @@ body.zazu-has-wallpaper .zazu-content {
 .zazu-quote-quantity-field input { border-width: 2px; border-color: #b97812; min-height: 48px; }
 .zazu-quote-quantity-field input::placeholder { color: var(--zazu-muted); opacity: 1; }
 .zazu-quote-quantity-field .zazu-field-help strong { color: var(--zazu-ink); }
+.zazu-quote-single-confirm-wrap {
+    margin-top: 8px;
+}
+.zazu-quote-single-confirm-wrap[hidden] {
+    display: none;
+}
+.zazu-quote-single-confirm {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 12px;
+    border: 1px solid color-mix(in srgb, #d59a32 65%, var(--zazu-border));
+    border-radius: 9px;
+    background: color-mix(in srgb, #d59a32 9%, var(--zazu-surface));
+    color: var(--zazu-ink);
+    font-size: 13px;
+    line-height: 1.45;
+    cursor: pointer;
+}
+.zazu-quote-single-confirm input {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex: 0 0 auto;
+    accent-color: #b97812;
+}
 @media (prefers-reduced-motion: no-preference) {
     .zazu-quote-quantity-field input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, #d59a32 25%, transparent); }
 }
