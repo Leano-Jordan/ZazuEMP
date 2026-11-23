@@ -60,7 +60,9 @@ class ZazuHelperContextTest extends TestCase
             ->assertOk()
             ->assertSee('data-zazu-helper-event-records="1"', false)
             ->assertSee('1 preparation item')
-            ->assertDontSee('purchase order');
+            ->assertSee('Review preparation')
+            ->assertDontSee('purchase order')
+            ->assertDontSee('Review purchasing');
     }
 
     public function test_helper_guidance_adapts_to_the_saved_business_focus(): void
@@ -216,6 +218,11 @@ class ZazuHelperContextTest extends TestCase
             ->assertSee('data-zazu-helper-event-records="2"', false)
             ->assertSee('1 preparation item')
             ->assertSee('1 purchase order')
+            ->assertSee('href="'.route('work.preparation.index', $event).'"', false)
+            ->assertSee('Review preparation')
+            ->assertSee('href="'.route('purchasing.index', ['event_id' => $event->id]).'"', false)
+            ->assertSee('Review purchasing')
+            ->assertSee('data-zazu-helper-event-record-link', false)
             ->assertDontSee('Catering preparation')
             ->assertDontSee('Camera editing');
     }
