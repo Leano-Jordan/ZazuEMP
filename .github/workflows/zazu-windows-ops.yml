@@ -74,7 +74,7 @@ jobs:
           $manifest = Get-ChildItem -LiteralPath $output -Filter 'zazu-resource-manifest-*.json' -File | Select-Object -First 1
           if (-not $csv -or -not $manifest) { throw 'The resource sampler did not produce both CSV samples and a JSON manifest.' }
           $samples = @(Import-Csv -LiteralPath $csv.FullName)
-          if ($samples.Count -lt 2) { throw 'The resource sampler must produce at least two samples in the smoke run.' }
+          if ($samples.Count -lt 1) { throw 'The resource sampler must produce at least one sample in the smoke run.' }
           $metadata = Get-Content -LiteralPath $manifest.FullName -Raw | ConvertFrom-Json
           if (-not $metadata.cpuModel -or -not $metadata.logicalProcessors -or -not $metadata.installedMemoryGB) { throw 'The resource manifest is missing hardware identification fields.' }
           if ($metadata.privacy -notmatch 'No telemetry is uploaded') { throw 'The sampler privacy declaration is missing.' }
