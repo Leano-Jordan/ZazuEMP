@@ -18,6 +18,7 @@
 
 - [x] Restricted POSIX installation backup staging and published ZIP permissions to owner-only access.
 - [x] Restricted POSIX restore staging, extracted private media and rollback snapshots before activation.
+- [x] Moved Windows backup/restore staging and rollback artifacts under `storage/app/zazu-backups/`, which the current installer already restricts to the installation owner, SYSTEM and local Administrators.
 - [x] Added regression coverage for private staging and restored private-media permissions.
 - [x] Added an owner-facing warning that business archives are not password-encrypted.
 - [ ] Decide whether V1 requires application-level archive encryption or whether encrypted storage/NTFS ACL controls are the accepted release boundary. Both archive formats remain plain ZIP files; integrity checks are not confidentiality.
