@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Business;
-use App\Models\BusinessCapability;
 use App\Models\Asset;
 use App\Models\AssetAllocation;
+use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\EventPreparationItem;
