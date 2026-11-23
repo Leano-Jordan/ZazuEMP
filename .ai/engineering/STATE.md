@@ -2079,3 +2079,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Added focused regressions for inheritance, mismatched event, mismatched supplier and draft-order rejection. All four passed in the Laravel run for `3288833` (alongside the existing `OfflineExpenseReferenceIsolationTest` cases).
 - The first full-suite run exposed unrelated stale UI/service-worker assertions and a restore-reference visibility defect. The restore validation message now places its incident reference in the first visible archive error; affected regression expectations have been aligned with the current onboarding, export and host-outage UI.
 - Exact-head verification of the follow-up repairs is pending. Do not claim V1 acceptance from this engineering slice.
+
+## Director visual communication correction — 2026-11-23
+
+- Moved the derived business-mix context panel below the primary navigation; its source data, visibility rules and permissions are unchanged.
+- Corrected the dashboard hero image visibility. The existing image variable already chose the business image or bundled stock fallback; later CSS overlays were too opaque to communicate the image. The dashboard now uses a readable but visibly photographic overlay in both themes and no longer renders a duplicate conditional image element.
+- Formatted backup timestamps in Dashboard and Founder Control Centre as local `j M Y, H:i` values using the configured application timezone. ISO timestamps remain unchanged in internal/API contracts.
+- Added focused presentation regressions and `docs/DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md`.
+- Icon licensing review: Tabler Icons (MIT) selected as the single future Zazu icon standard; Lucide (ISC) and Heroicons (MIT) are viable alternatives. No package/CDN dependency has been introduced yet. The next slice is a local, curated Tabler subset with the upstream licence notice and a shared Blade component.
+- Broader visual rollout remains in progress: icon consistency, typography hierarchy, control sizing, colour semantics, information structure and purposeful/reduced motion.
+
