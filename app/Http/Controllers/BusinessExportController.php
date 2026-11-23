@@ -86,24 +86,52 @@ class BusinessExportController extends Controller
 
         $business = $currentBusiness->model($request->user());
         $uploadedPath = $validated['archive']->getRealPath();
-        $restorePath = $uploadedPath;
+        $restorePath = is_string($uploadedPath) ? $uploadedPath : '';
         $decryptedPath = null;
+        $restoreStage = 'upload_access';
 
         try {
-            if ($encryption->isEncrypted($uploadedPath)) {
+            if ($restorePath === '' || ! is_file($restorePath) || ! is_readable($restorePath)) {
+                throw new RuntimeException('The uploaded business archive could not be accessed by the server.');
+            }
+
+            $restoreStage = 'encryption_detection';
+            if ($encryption->isEncrypted($restorePath)) {
                 if (! filled($validated['archive_password'] ?? null)) {
                     return back()->withErrors(['archive_password' => 'Enter the passphrase used when this business archive was created.']);
                 }
 
-                $decryptedPath = $encryption->decryptFile($uploadedPath, $validated['archive_password']);
+                $restoreStage = 'decryption';
+                $decryptedPath = $encryption->decryptFile($restorePath, $validated['archive_password']);
                 $restorePath = $decryptedPath;
             }
 
+            $restoreStage = 'archive_validation_and_restore';
             $result = $archives->restore($restorePath, $business);
         } catch (RuntimeException $exception) {
-            return back()->withErrors(['archive' => $exception->getMessage()]);
-        } catch (\JsonException) {
-            return back()->withErrors(['archive' => 'The uploaded archive is damaged or contains invalid data.']);
+            $incidentId = (string) Str::uuid();
+            Log::warning('Business archive restore failed.', [
+                'incident_id' => $incidentId,
+                'stage' => $restoreStage,
+                'business_id' => (int) $business->id,
+                'user_id' => (int) $request->user()->getAuthIdentifier(),
+                'upload_bytes' => $validated['archive']->getSize(),
+                'exception_class' => $exception::class,
+            ]);
+
+            return back()->withErrors(['archive' => $exception->getMessage().' Reference: '.$incidentId]);
+        } catch (\\JsonException $exception) {
+            $incidentId = (string) Str::uuid();
+            Log::warning('Business archive restore failed while decoding archive data.', [
+                'incident_id' => $incidentId,
+                'stage' => $restoreStage,
+                'business_id' => (int) $business->id,
+                'user_id' => (int) $request->user()->getAuthIdentifier(),
+                'upload_bytes' => $validated['archive']->getSize(),
+                'exception_class' => $exception::class,
+            ]);
+
+            return back()->withErrors(['archive' => 'The uploaded archive is damaged or contains invalid data. Reference: '.$incidentId]);
         } finally {
             if (is_string($decryptedPath)) {
                 @unlink($decryptedPath);
