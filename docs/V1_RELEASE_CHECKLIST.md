@@ -632,3 +632,12 @@ Exact-head Laravel, PostgreSQL migration smoke, PHPMD, Zazu Quality, Director He
 - SonarCloud: **SKIPPED**, not counted.
 
 **Release decision:** This closes one financial reporting defect only. V1 remains **NOT READY** pending physical Android acceptance, owner-operated installed-target recovery, populated live-business commercial reconciliation and POPIA operational controls.
+
+
+### Quote single-unit safety — implementation checkpoint 2026-11-23
+
+- [x] Default one-quantity starter lines render blank in quote entry and require the operator to enter the intended quantity.
+- [x] An entered quantity of exactly one requires a per-line confirmation on both new quote and draft revision screens.
+- [x] Server-side validation rejects quantity one without confirmation on both actions.
+- [x] Regression tests cover rejection, explicit confirmation and revision-update behaviour.
+- [ ] Exact-head Laravel, PHPMD, Zazu Quality/Pint and browser acceptance for this implementation commit.
