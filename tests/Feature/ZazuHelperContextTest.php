@@ -90,7 +90,6 @@ class ZazuHelperContextTest extends TestCase
         }
     }
 
-
     public function test_helper_combines_primary_focus_with_multiple_active_catalogue_capabilities(): void
     {
         $business = $this->makeBusiness('Helper Multi Service Business');
