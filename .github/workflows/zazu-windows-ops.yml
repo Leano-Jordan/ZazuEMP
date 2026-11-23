@@ -121,7 +121,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'The Zazu performance report generator exited unsuccessfully.' }
           if (-not (Test-Path -LiteralPath $report -PathType Leaf)) { throw 'The performance report was not created.' }
           $reportContent = Get-Content -LiteralPath $report -Raw
-          foreach ($required in @('Zazu device performance report', 'Host CPU', 'Host memory used', 'Zazu data footprint', 'Storage devices', 'p50', 'p95', 'not zero usage')) {
+          foreach ($required in @('Zazu device performance report', 'Host CPU', 'Host memory used', 'Zazu data footprint', 'Zazu project storage type', 'Storage devices', 'p50', 'p95', 'not zero usage')) {
             if ($reportContent -notmatch [regex]::Escape($required)) { throw "The performance report is missing required evidence: $required" }
           }
           Write-Host 'PASS: Resource samples produce a privacy-safe p50/p95 comparison report.'
