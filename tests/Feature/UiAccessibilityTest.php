@@ -250,6 +250,8 @@ class UiAccessibilityTest extends TestCase
         $css = file_get_contents(resource_path('css/app.css'));
 
         $this->assertStringContainsString('--zazu-sidebar-ink: #23394D;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-muted: #475569;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-muted: #BAC6D0;', $css);
         $this->assertStringContainsString('color-scheme: light;', $css);
         $this->assertStringContainsString('color-scheme: dark;', $css);
         $this->assertStringContainsString('--zazu-ink: #14243B;', $css);
