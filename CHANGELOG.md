@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-23 — Encrypted business archive V2
+
+- Added owner passphrase-protected business archive export and restore using streaming Sodium secretstream XChaCha20-Poly1305 with Argon2id key derivation.
+- Added authenticated chunk/final-tag verification, private temporary decryption, passphrase confirmation, independent export/restore rate limits and backward-compatible import of plaintext V1 business archives.
+- Added Sodium to the Windows installer prerequisite check and all PHP acceptance workflow extension lists.
+- Kept installation-wide scheduled backups unattended and unencrypted; documented encrypted off-disk storage as an operator requirement. The runner verifies SHA-256 copy integrity but does not encrypt or attest secondary destination encryption.
+- Added multi-chunk, wrong-passphrase, tamper, legacy compatibility and controller flow regression coverage.
+
+## 2026-11-21 — Offline sync authorization and recovery hardening
 ## 2026-11-21 — Offline sync authorization and recovery hardening
 
 - The installed offline runtime now checks the Zazu host while Wi-Fi remains connected, surfaces a non-destructive outage notice and links to the cached local workspace.
