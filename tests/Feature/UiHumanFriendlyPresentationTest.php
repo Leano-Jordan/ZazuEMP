@@ -48,4 +48,25 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $dashboard);
         $this->assertStringContainsString("->timezone(config('app.timezone'))->format('j M Y, H:i')", $sentinel);
     }
+
+    public function test_primary_navigation_and_dashboard_use_the_local_tabler_icon_component(): void
+    {
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $component = file_get_contents(resource_path('views/components/icon.blade.php'));
+        $notices = file_get_contents(base_path('THIRD_PARTY_NOTICES.md'));
+
+        $this->assertIsString($layout);
+        $this->assertIsString($dashboard);
+        $this->assertIsString($component);
+        $this->assertIsString($notices);
+        $this->assertStringContainsString('<x-icon name="briefcase"', $layout);
+        $this->assertStringContainsString('<x-icon name="wallet"', $layout);
+        $this->assertStringContainsString('<x-icon name="calendar-event"', $dashboard);
+        $this->assertStringContainsString('<x-icon name="file-invoice"', $dashboard);
+        $this->assertStringContainsString('stroke="currentColor"', $component);
+        $this->assertStringContainsString('Tabler Icons', $notices);
+        $this->assertStringContainsString('MIT License', $notices);
+        $this->assertStringNotContainsString('https://cdn.', $component);
+    }
 }

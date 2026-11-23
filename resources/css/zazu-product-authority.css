@@ -1964,3 +1964,9 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
     background-position: center;
     background-size: cover;
 }
+
+
+/* Shared local Tabler icon rhythm — icons are decorative beside visible labels. */
+.zazu-nav-area-title { display: inline-flex; align-items: center; gap: 9px; }
+.zazu-nav-icon { flex: 0 0 18px; width: 18px; height: 18px; opacity: .92; }
+.zazu-icon { display: block; flex: 0 0 auto; width: 1.25em; height: 1.25em; }

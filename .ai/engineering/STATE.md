@@ -2089,3 +2089,12 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Icon licensing review: Tabler Icons (MIT) selected as the single future Zazu icon standard; Lucide (ISC) and Heroicons (MIT) are viable alternatives. No package/CDN dependency has been introduced yet. The next slice is a local, curated Tabler subset with the upstream licence notice and a shared Blade component.
 - Broader visual rollout remains in progress: icon consistency, typography hierarchy, control sizing, colour semantics, information structure and purposeful/reduced motion.
 
+
+
+## Director icon system — first local migration — 2026-11-23
+
+- Selected Tabler Icons under MIT and vendored a curated outline subset into a shared Blade component at `resources/views/components/icon.blade.php`.
+- Added the upstream copyright/licence notice to `THIRD_PARTY_NOTICES.md`; no external CDN, runtime icon package or network request is required, preserving offline rendering.
+- Migrated primary navigation groups, Dashboard metric icons and Dashboard quick actions to the shared component. Existing visible labels remain; icons are decorative and do not become the only action cue.
+- Added regression coverage for the shared component, local-only delivery and licence notice.
+- Remaining visual work: migrate status/form icons, audit controls and page hierarchy, and verify actual browser rendering across light/dark and mobile layouts.
