@@ -802,3 +802,40 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression:** `test_finance_invoiced_total_excludes_unissued_draft_invoices` creates a draft invoice of 999.00, an issued invoice of 100.00 and a paid invoice of 200.00, then verifies the dashboard total is 300.00.
 
 **Exact-head evidence:** Laravel, offline browser acceptance, PostgreSQL migration/recovery, Zazu Quality, PHPMD, Director Health and Push on main passed on `c43ab8db309a2ccedd48d2298077e3a602b72a5d`. SonarCloud was skipped and is not counted.
+
+
+
+### CASE-ZAZU-0043
+
+**Status:** IMPLEMENTED — exact-head Laravel regression pending at the 2026-11-23 audit checkpoint.
+
+**Engineering code:** ENG-RECOVERY-002  
+**Class:** F1 — application defect  
+**Target:** `BusinessArchiveService::restore()` and `BusinessExportController::restoreValidatedArchive()`.
+
+**Failure fingerprint:** a restore transaction commits imported database rows and private files; the controller then writes the `business.archive_restored` audit row outside that transaction. If audit recording fails, the request reports failure even though the workspace has already been populated. A retry is then rejected by the empty-target guard.
+
+**Root cause:** the success audit was not part of the restore transaction boundary.
+
+**Correction on main:** the service now accepts an after-restore callback and executes it inside the same database transaction. An audit exception rolls back database changes and enters the existing cleanup path for newly written private files.
+
+**Regression:** encrypted restore flow deliberately creates a SQLite trigger that rejects `business.archive_restored`. It asserts that the target customer is absent and the only private file remaining is the original source file.
+
+**Scope note:** this is a confirmed source-level consistency defect found during the widespread audit. It is not asserted to be the root cause of the Founder's earlier archive-upload failure.
+
+
+### CASE-ZAZU-0044
+
+**Status:** CLOSED at launcher/source and Windows Ops CI level; installed restore acceptance remains OPEN.
+
+**Engineering code:** ENG-RUNTIME-003  
+**Class:** F4 — runtime/environment contract  
+**Target:** `ops/windows/Start-ZazuDev.ps1`.
+
+**Failure fingerprint:** the business archive restore form accepts files up to 100 MiB, but the Windows PHP built-in server was started without explicit upload, POST or request-time limits. Effective limits were inherited from the machine's PHP CLI configuration; a lower `post_max_size` can cause PHP to discard the request before Laravel receives the uploaded file.
+
+**Correction on main:** the launcher now passes explicit PHP runtime options: `upload_max_filesize=100M`, `post_max_size=110M`, `max_execution_time=300` and `max_input_time=300`. The Windows Ops workflow asserts that these values remain attached to the PHP server argument list.
+
+**Verification:** Windows Ops workflow [45202625276](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45202625276) PASS on `9b95591`.
+
+**Scope note:** the exact effective PHP limits on the Founder's earlier installed run were not captured, so this mismatch is a confirmed configuration weakness but not a proven root cause of that specific failure. A successful installed restore after the launcher update is still required.
