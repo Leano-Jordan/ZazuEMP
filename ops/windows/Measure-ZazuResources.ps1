@@ -146,7 +146,7 @@ try {
         $projectStorageType = $physicalDisk.MediaType.ToString()
     }
 } catch {
-    $projectStorageType = 'Unknown'
+    # Keep an NVMe classification if the optional Storage module is unavailable.
 }
 $deviceTier = 'Mainstream'
 if (($null -ne $installedMemoryGB -and $installedMemoryGB -le 8) -or $logicalProcessorCount -le 4 -or $projectStorageType -eq 'HDD') {
