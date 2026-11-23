@@ -10,13 +10,17 @@ use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
+use App\Services\EventProfitabilityService;
+use App\Support\Offline\OfflineDomainMutationHandler;
+use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
-use App\Support\Offline\SyncMutationRecorder;
 use App\Support\Offline\SyncMutationHandler;
-use Illuminate\Support\Facades\DB;
+use App\Support\Offline\SyncMutationRecorder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class OfflineOperationalDepthTest extends TestCase
@@ -58,8 +62,8 @@ class OfflineOperationalDepthTest extends TestCase
 
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
-        $eventUuid = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job')->entity_uuid;
+        $handler = app(OfflineDomainMutationHandler::class);
+        $eventUuid = app(SyncEntityIdentityRegistry::class)->identify($event, 'job')->entity_uuid;
 
         $itemUuid = (string) Str::uuid();
         $itemMutation = $recorder->record($device, 'inventory_item', $itemUuid, 'create', [
@@ -74,7 +78,7 @@ class OfflineOperationalDepthTest extends TestCase
         $applier->apply($itemMutation, ['inventory_item' => $handler]);
 
         $item = InventoryItem::query()->where('business_id', $business->id)->firstOrFail();
-        $itemIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($item, 'inventory_item')->entity_uuid;
+        $itemIdentity = app(SyncEntityIdentityRegistry::class)->identify($item, 'inventory_item')->entity_uuid;
 
         $movementMutation = $recorder->record($device, 'inventory_movement', (string) Str::uuid(), 'create', [
             'local_id' => (string) Str::uuid(),
@@ -137,7 +141,7 @@ class OfflineOperationalDepthTest extends TestCase
             'unit' => 'litre',
             'reorder_level' => '1.00',
         ]);
-        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $registry = app(SyncEntityIdentityRegistry::class);
         $itemUuid = $registry->identify($item, 'inventory_item')->entity_uuid;
 
         $movement = InventoryMovement::create([
@@ -163,7 +167,7 @@ class OfflineOperationalDepthTest extends TestCase
 
         $this->expectException(ValidationException::class);
         app(SyncMutationApplier::class)->apply($mutation, [
-            'inventory_movement' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            'inventory_movement' => app(OfflineDomainMutationHandler::class),
         ]);
 
         $this->assertSame(5.0, $item->fresh()->on_hand);
@@ -180,10 +184,10 @@ class OfflineOperationalDepthTest extends TestCase
             'name' => 'Offline Cost Job',
             'status' => 'confirmed',
         ]);
-        $eventUuid = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job')->entity_uuid;
+        $eventUuid = app(SyncEntityIdentityRegistry::class)->identify($event, 'job')->entity_uuid;
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
 
         $costUuid = (string) Str::uuid();
         $mutation = $recorder->record($device, 'event_cost', $costUuid, 'create', [
@@ -206,7 +210,7 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('500.00', $cost->actual_amount);
         $this->assertSame($event->id, $cost->event_id);
 
-        $profitability = app(\App\Services\EventProfitabilityService::class);
+        $profitability = app(EventProfitabilityService::class);
         $contribution = $profitability->forBusiness($business)->firstWhere('event_id', $event->id);
         $this->assertNotNull($contribution);
         $this->assertSame(50000, $contribution['actual_cost_cents']);
@@ -261,13 +265,13 @@ class OfflineOperationalDepthTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $registry = app(SyncEntityIdentityRegistry::class);
         $assetUuid = $registry->identify($asset, 'asset')->entity_uuid;
         $eventUuid = $registry->identify($event, 'job')->entity_uuid;
         $secondEventUuid = $registry->identify($secondEvent, 'job')->entity_uuid;
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
 
         $allocationUuid = (string) Str::uuid();
         $create = $recorder->record($device, 'asset_allocation', $allocationUuid, 'create', [
@@ -346,13 +350,13 @@ class OfflineOperationalDepthTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $registry = app(SyncEntityIdentityRegistry::class);
         $assetUuid = $registry->identify($asset, 'asset')->entity_uuid;
         $futureEventUuid = $registry->identify($futureEvent, 'job')->entity_uuid;
         $openEndedEventUuid = $registry->identify($openEndedEvent, 'job')->entity_uuid;
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
 
         $futureUuid = (string) Str::uuid();
         $future = $recorder->record($device, 'asset_allocation', $futureUuid, 'create', [
@@ -379,7 +383,7 @@ class OfflineOperationalDepthTest extends TestCase
         try {
             $applier->apply($openEnded, ['asset_allocation' => $handler]);
             $this->fail('An open-ended earlier allocation must overlap a later booking.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+        } catch (HttpException $exception) {
             $this->assertSame(422, $exception->getStatusCode());
         }
 
@@ -397,7 +401,7 @@ class OfflineOperationalDepthTest extends TestCase
             'event_type' => 'Other',
             'status' => 'completed',
         ]);
-        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $identity = app(SyncEntityIdentityRegistry::class)
             ->identify($event, 'job')
             ->entity_uuid;
 
@@ -411,10 +415,10 @@ class OfflineOperationalDepthTest extends TestCase
             ],
         ]);
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
-                'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+                'job' => app(OfflineDomainMutationHandler::class),
             ]);
         } finally {
             $this->assertSame('Completed Catering Job', $event->fresh()->name);
@@ -446,7 +450,7 @@ class OfflineOperationalDepthTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $registry = app(SyncEntityIdentityRegistry::class);
         $assetUuid = $registry->identify($asset, 'asset')->entity_uuid;
         $mutation = app(SyncMutationRecorder::class)->record($device, 'asset', $assetUuid, 'update', [
             'local_id' => $assetUuid,
@@ -461,7 +465,7 @@ class OfflineOperationalDepthTest extends TestCase
 
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
-                'asset' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+                'asset' => app(OfflineDomainMutationHandler::class),
             ]);
             $this->fail('The offline update must reject a tag already owned by another asset.');
         } catch (ValidationException) {
@@ -489,7 +493,7 @@ class OfflineOperationalDepthTest extends TestCase
                 ['record' => ['name' => 'Must not be recorded']],
             );
             $this->fail('A stale authenticated device snapshot must not record after revocation.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+        } catch (HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
 
@@ -515,7 +519,8 @@ class OfflineOperationalDepthTest extends TestCase
             'token_expires_at' => null,
         ]);
 
-        $handler = new class implements SyncMutationHandler {
+        $handler = new class implements SyncMutationHandler
+        {
             public function apply(SyncMutation $mutation): void
             {
                 throw new \RuntimeException('The domain handler must not run for a revoked device.');
@@ -525,11 +530,10 @@ class OfflineOperationalDepthTest extends TestCase
         try {
             app(SyncMutationApplier::class)->apply($mutation, ['job' => $handler]);
             $this->fail('A queued mutation from a revoked device must not be applied.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+        } catch (HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
 
         $this->assertSame('pending', $mutation->fresh()->status);
     }
-
 }
