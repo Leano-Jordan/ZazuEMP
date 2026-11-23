@@ -447,7 +447,7 @@ $dailyBackupDirectory = Join-Path $ProjectPath 'storage\app\zazu-backups\daily'
 $latestDailyBackup = Get-ChildItem -Path $dailyBackupDirectory -Filter 'zazu-backup-*.zip' -File -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
 if (-not $latestDailyBackup) {
-    Write-Warning 'No routine installation backup was found. The daily task should create one at 02:00; keep a separate USB/cloud copy as well.'
+    Write-Warning 'No routine installation backup was found. The daily task should create one at 02:00; keep a separate copy on BitLocker-protected USB or in an encrypted, access-controlled cloud vault.'
 } else {
     $backupAge = (Get-Date).ToUniversalTime() - $latestDailyBackup.LastWriteTimeUtc
     Write-Host ("Latest installation backup: {0} ({1} hours ago)" -f $latestDailyBackup.Name, [math]::Floor($backupAge.TotalHours))
