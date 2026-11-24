@@ -189,8 +189,12 @@ class UiHumanFriendlyPresentationTest extends TestCase
             $this->assertStringContainsString('class="zazu-label"', $view);
             $this->assertStringContainsString('class="zazu-input"', $view);
             $this->assertStringContainsString('class="zazu-select"', $view);
-            $this->assertStringContainsString('class="zazu-textarea"', $view);
             $this->assertStringContainsString('class="zazu-actionbar zazu-actionbar-sticky"', $view);
+        }
+
+        // Inventory item definitions have no notes column; operational notes belong to stock movements.
+        foreach ([$expense, $payment] as $view) {
+            $this->assertStringContainsString('class="zazu-textarea"', $view);
         }
 
         $this->assertStringContainsString('data-zazu-offline-entity="inventory_item"', $inventory);
