@@ -21,6 +21,20 @@ The Founder notes that the business areas can feel operationally separate/disjoi
 
 **Evidence boundary:** this report does not yet independently demonstrate installed-app cold launch with the host unavailable, airplane-mode operation, offline-created record persistence and exactly-once reconnect sync, attachment round-trip, owner-PC off-disk backup/full restore, or a reconciled quote-to-profit calculation across one identified job. Those remain separate checks unless separately evidenced. The screenshots are dashboard captures, not transaction-level proof. All supplied business data is fictional and contains no live customer or financial information.
 
+## Phase 1 — connected physical operation and shared workspace
+
+**Status: OWNER-VERIFIED PASS — completed physically by the Founder multiple times, reaffirmed 2026-11-24.**
+
+The Founder confirms that Phase 1 has already been completed on the actual Windows PC and linked Android phone, repeatedly: normal connected operation, both devices accessing the same Zazu EMP workspace, and the populated fictional business modules being usable. This is accepted owner evidence. Do not ask the Founder to repeat Phase 1, reinstall the app, recreate the existing test records, or re-prove ordinary connected operation.
+
+Phase 1 covers connected operation and shared-workspace use only. It does not imply that offline navigation, cold launch, disconnected writes, restart persistence, attachment round-trip or reconnect reconciliation have passed.
+
+## Phase 2 — offline acceptance (ACTIVE; not yet passed)
+
+The Founder has physically stopped the PC host while the phone remained connected to Wi-Fi and observed that offline navigation still presents the cached Dashboard shell for other links, with the offline collections appearing together as one long page. This is a confirmed physical failure of the current offline experience, not a request to repeat Phase 1.
+
+Engineering is focused on correcting route-aware offline presentation and proving it with automated regression coverage before asking for another physical run. Phase 2 remains OPEN until the phone can open each supported offline area as a distinct view, unsupported areas clearly explain that a connection is required, local records remain intact, and disconnected/restart/reconnect behaviour is physically verified.
+
 ## Before testing
 
 - Zazu must be reachable from both the PC and phone at the **same stable HTTPS origin**. A temporary LAN `http://` address is not sufficient for installed-PWA acceptance.
