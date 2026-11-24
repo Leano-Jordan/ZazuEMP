@@ -1,3 +1,22 @@
+## Current execution checkpoint — 2026-11-24
+
+**Current main head after Gate 0 and offline contract documentation:** `11764afffbeab784da07368b5efab20118b12aa9` plus the documentation-link commits recorded in Git history.
+
+**Gate 0 — CLOSED (automated evidence only).** Exact-head source commit `803c02c23a14347810ae51c3afbfa0e88c6f627e` completed:
+- Laravel workflow: all four jobs PASS — full Laravel tests, coverage, offline browser acceptance (including mobile viewport, host-outage and phone-local attachment journeys), and PostgreSQL migration/registration/backup/restore/private-file recovery.
+- Windows V1 Package: build, encrypted/legacy archive acceptance and fresh-install PowerShell verification PASS. Prerelease publication was skipped by workflow policy and is not a failed test.
+- Zazu Quality: formatting, secret scan, Composer security audit and application checks PASS.
+- PHPMD, Director Health Report, Push on main and all three CodeQL language analyses PASS.
+- SonarCloud analysis was SKIPPED and is not represented as a pass.
+
+**Gate 1 — ACTIVE: supported offline continuity.** Added `docs/ZAZU_V1_OFFLINE_CAPABILITY_CONTRACT.md` as the action-by-action source of truth, linked from the offline architecture and Android acceptance procedure. It documents supported local mutations, cached/local reads, deferred/online-only boundaries, session/business isolation invariants and the exact physical acceptance still required.
+
+**Not accepted by CI:** physical Android fully disconnected cold launch/restart/reconnect; owner-PC installed offline/restart acceptance; actual multi-device continuity under physical network loss. These remain OPEN and must not be inferred from browser automation.
+
+**Next single objective:** close any verified mismatch between the offline capability contract and real form/queue behaviour, then preserve a focused exact-head regression. No broad test reruns or physical acceptance claims without device evidence.
+
+---
+
 ## Zazu Engine Director consolidation and commercial V1 mandate — 2026-11-24
 
 **Policy committed:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` is now the canonical binding product and delivery policy. **Zazu Engine Director (Jarvis)** is the single accountable role; discovery, architecture, implementation, security, QA, UX, performance, recovery and release are capabilities/procedures under that Director. Morpheus is retired as a separate identity. Existing skills remain procedures, not independent agents, backlogs or acceptance authorities.
@@ -10,7 +29,7 @@
 
 **Repository changes:** unified identity and routing in `.ai/engineering/00_DIRECTOR_ENGINE.md`; aligned `AGENTS.md`, `CLAUDE.md`, `README.md`, `.ai/engineering/README.md` and `memory.md`. All changes made directly on `main`; no branches created; no application source, database or production data changed.
 
-**Next active target:** Gate 0 — inspect the latest exact-main Laravel, Zazu Quality and Windows package failure logs, classify each root cause, then fix the smallest confirmed defect without weakening tests. Re-read current main SHA and workflow status first.
+**Historical next-target note superseded:** Gate 0 is closed by the exact-head evidence recorded in the current execution checkpoint above. Gate 1 is now active.
 
 ---
 
