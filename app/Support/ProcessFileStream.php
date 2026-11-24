@@ -1,9 +1,9 @@
 <?php
 
-namespace App\\Support;
+namespace App\Support;
 
 use RuntimeException;
-use Symfony\\Component\\Process\\Process;
+use Symfony\Component\Process\Process;
 
 /**
  * Runs database client processes without buffering complete dumps in PHP memory.
@@ -41,7 +41,7 @@ final class ProcessFileStream
             if (!fflush($output)) {
                 throw new RuntimeException('Could not flush the completed database dump to disk.');
             }
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             fclose($output);
             if (is_file($path) && !unlink($path)) {
                 throw new RuntimeException($exception->getMessage().' The incomplete dump could not be removed.', 0, $exception);
