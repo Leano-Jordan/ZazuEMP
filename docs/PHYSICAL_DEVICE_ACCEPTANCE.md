@@ -19,7 +19,9 @@ The Founder has repeatedly exercised the actual Windows PC installation and link
 
 ## Phase 2 — offline physical acceptance
 
-**Status: OPEN — current physical failure observed.** With the PC host stopped and the phone still on Wi-Fi, navigation to other areas continues to receive the cached Dashboard shell; the offline collections are presented together rather than as distinct route-specific screens. The Founder has reported this directly on 2026-11-24. Engineering must correct and regression-test route-aware offline presentation before requesting another owner test.
+**Status: OPEN — current physical failure observed; engineering remediation in progress.** With the PC host stopped and the phone still on Wi-Fi, navigation to other areas continues to receive the cached Dashboard shell; the online Dashboard and offline collections are presented together rather than as distinct route-specific screens.
+
+Source investigation found that the cached Dashboard slot is nested under `.zazu-content`, while the previous route-isolation selector incorrectly targeted direct children of `main#main-content`. It therefore failed to hide the Dashboard itself. A second defect meant local workspace update events did not reapply the active route. The implementation now targets the actual layout boundary and browser regression coverage exercises real unprimed-route fallback. Do not request another owner test until exact-head CI passes.
 
 Phase 1 does not close Phase 2. Offline host-loss, airplane-mode cold launch, restart persistence, local mutations, attachment round-trip and exactly-once reconnect remain separate acceptance checks.
 
