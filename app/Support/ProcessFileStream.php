@@ -36,6 +36,7 @@ final class ProcessFileStream
         self::assertNonEmptyOutput($path, $failureMessage);
     }
 
+    /** @param resource $output */
     private static function outputCallback(Process $process, $output, string &$diagnostic): \Closure
     {
         return static function (string $type, string $chunk) use ($process, $output, &$diagnostic): void {
@@ -58,6 +59,7 @@ final class ProcessFileStream
         }
     }
 
+    /** @param resource $output */
     private static function removeFailedOutput($output, string $path, \Throwable $exception): never
     {
         fclose($output);
