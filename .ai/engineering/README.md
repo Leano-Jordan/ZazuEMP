@@ -315,12 +315,12 @@ Colour, typography, spacing and component geometry remain under one shared visua
 
 ## SINGLE-ENTRY / SYNCHRONIZED ENGINE MODEL
 
-**Director/Morpheus is the sole entry point.**
+**Zazu Engine Director (Jarvis) is the sole accountable entry point.**
 
 Capability procedures are synchronized capabilities under Director. They do not maintain competing state, acceptance authority or next-action queues.
 
 Execution:
-DIRECTOR → ROUTE → SPECIALIST → DIRECTOR → CHANGE → VERIFY → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD
+DIRECTOR → SELECT CAPABILITY → DIRECTOR → CHANGE → VERIFY → CHALLENGE → DIRECTOR → ACCEPT/REPAIR → RECORD
 
 For UI work, the owner is not expected to provide UI theory. The UI/UX capability is responsible for applying established principles and surfacing concrete findings.
 
