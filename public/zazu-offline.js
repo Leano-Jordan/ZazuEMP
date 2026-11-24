@@ -703,7 +703,23 @@
                     continue;
                 }
 
-                const result = await response.json();
+                let result;
+                try {
+                    result = await response.json();
+                } catch {
+                    // The server may have committed the upload before a proxy or
+                    // interrupted response corrupted its JSON acknowledgement.
+                    // Keep the original bytes and idempotency key so retry can
+                    // safely recover the existing server record instead of
+                    // creating a duplicate or stranding the local attachment.
+                    await writeAttachmentRecord({
+                        ...record,
+                        attempts: Number(record.attempts || 0) + 1,
+                        retryable: true,
+                        last_error: 'The upload response could not be verified. This file remains saved on this device and will retry safely.',
+                    }, uploadSessionGeneration);
+                    continue;
+                }
                 if (sessionCleared || sessionGeneration !== uploadSessionGeneration
                     || state?.sync?.token !== uploadToken) break;
                 const confirmedAttachment = result.attachment;
