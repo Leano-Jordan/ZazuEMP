@@ -3262,9 +3262,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.error).toContain('no longer authorised to sync');
         expect(outcome.error).toContain('pair the device again');
         expect(outcome.recoveryRequired).toBe(true);
-        expect(outcome.pending).toContain(mutationIds.customerMutationId);
-        expect(outcome.pending).toContain(mutationIds.paymentMutationId);
-        expect(outcome.invoice).toMatchObject({ status: 'issued', total: '100.00', paid_amount: '0.00', balance: '100.00', payments: [] });
+        expect(outcome.pending).toContain(mutationId);
         expect(outcome.tokenPresent).toBe(true);
         await expect(page.locator('[data-zazu-sync-recovery]')).toBeVisible();
         await expect(page.locator('[data-zazu-sync-recovery-message]')).toContainText('saved offline changes remain');
@@ -3340,7 +3338,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.customerName).toBe('Keep this customer');
         expect(outcome.token).toBe('new-repair-token');
         expect(outcome.recoveryRequired).toBe(false);
-        expect(outcome.pending).toContain(mutationId);
+        expect(outcome.pending).toContain(mutationIds.customerMutationId);
+        expect(outcome.pending).toContain(mutationIds.paymentMutationId);
+        expect(outcome.invoice).toMatchObject({ status: 'issued', total: '100.00', paid_amount: '0.00', balance: '100.00', payments: [] });
     });
 
     test('a cross-business pairing response is revoked without changing local workspace data', async ({ page }) => {
