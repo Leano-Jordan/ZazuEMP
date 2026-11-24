@@ -45,8 +45,8 @@ class ZazuBackupRestoreTest extends TestCase
             });
             DB::table('backup_probe')->insert(['value' => 'before backup']);
 
-            $this->artisan('zazu:backup', ['--output' => $output])
-                ->assertExitCode(0);
+            $exitCode = Artisan::call('zazu:backup', ['--output' => $output]);
+            $this->assertSame(0, $exitCode, Artisan::output());
 
             $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
             $this->assertCount(1, $archives);
