@@ -167,6 +167,45 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(helperConnectivity).toBeHidden({ timeout: 15_000 });
     });
 
+    test('renders one route-specific offline view and never expands every collection into the dashboard', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Offline route rendering contract runs on desktop and phone viewport.');
+
+        await page.route('**/up', route => route.fulfill({
+            status: 503,
+            contentType: 'text/plain',
+            body: 'unavailable',
+        }));
+        await login(page);
+
+        const workspace = page.locator('[data-zazu-offline-workspace]');
+        await expect(workspace).toBeVisible({ timeout: 15_000 });
+
+        const visitOfflinePath = async (path) => page.evaluate(pathname => {
+            history.replaceState({}, '', pathname);
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, path);
+
+        await visitOfflinePath('/dashboard');
+        await expect(workspace.locator('[data-zazu-offline-active-view]')).toHaveAttribute('data-zazu-offline-active-view', 'overview');
+        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(0);
+        await expect(workspace.locator('[aria-label="Offline workspace navigation"]')).toBeVisible();
+
+        await visitOfflinePath('/customers');
+        await expect(workspace.locator('[data-zazu-offline-active-view]')).toHaveAttribute('data-zazu-offline-active-view', 'customers');
+        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(1);
+        await expect(workspace.locator('[data-zazu-offline-view="customers"]')).toBeVisible();
+
+        await visitOfflinePath('/capabilities');
+        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(1);
+        await expect(workspace.locator('[data-zazu-offline-view="catalogue"]')).toBeVisible();
+
+        await visitOfflinePath('/calendar');
+        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(0);
+        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toBeVisible();
+        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toContainText('This screen is not available offline yet');
+    });
+
     test('reconciles exact delivered aggregates before acknowledging receiver sync', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Receiver delivery reconciliation contract runs once.');
