@@ -4330,10 +4330,15 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await login(page);
         await page.goto('/work', { waitUntil: 'domcontentloaded' });
-        const workLink = page.locator('a[href^="/work/"]:not([href="/work/create"])').first();
-        await expect(workLink).toBeVisible();
-        const workUrl = await workLink.getAttribute('href');
-        expect(workUrl).toMatch(new RegExp('^/work/[0-9]+$'));
+        // The Work register exposes each server-backed row by its event ID.
+        // Its primary action is a button that opens an inspector, not a /work/{id}
+        // anchor, so selecting an assumed detail link makes this test depend on
+        // incidental UI markup rather than the seeded record contract.
+        const workRow = page.locator('[data-zazu-server-job-id]').first();
+        await expect(workRow).toBeVisible();
+        const eventId = await workRow.getAttribute('data-zazu-server-job-id');
+        expect(eventId).toMatch(/^[0-9]+$/);
+        const workUrl = `/work/${eventId}`;
 
         await page.goto(workUrl, { waitUntil: 'domcontentloaded' });
         await expect(page).toHaveURL(new URL(workUrl, page.url()).href);
