@@ -167,3 +167,12 @@ If the connected environment cannot render the real application, mark the work S
 ## Immediate next execution slice
 
 Do not begin with a global palette rewrite. First complete the Blade/component inventory and map each screenshot page to its actual view, shared components and CSS owner. Then choose one high-impact, low-blast-radius slice—preferably the dashboard or one core Work/Quote page family—and implement it through the existing authority. Capture the rendered result before proceeding to the next family.
+
+
+## Founder direction — refinement, not replacement (2026-11-24)
+
+The visual programme is explicitly an incremental improvement of the existing Zazu interface and identity. Reference products may inform isolated usability techniques, but must never become a visual template or a target for imitation. Do not re-skin Zazu to resemble Advanced SystemCare or any other product.
+
+Start with the actual screen and improve what is already there: spacing, alignment, hierarchy, typography, contrast, sizing, icon clarity, status communication, form density, responsive behaviour and consistency. Retain useful layouts, imagery, navigation, panels, components and Zazu's established character wherever they are serving users. Simplify only where repetition or clutter demonstrably harms comprehension. Replace a component only when a concrete usability, accessibility, reliability or maintainability reason justifies it.
+
+This is a refinement mandate, not a wholesale redesign. No blanket removal of artwork, no forced minimalism, no generic SaaS conversion, no unnecessary component replacement, and no feature or workflow removal in the name of visual cleanliness. Every change must have a clear before/after benefit and preserve existing behaviour.
