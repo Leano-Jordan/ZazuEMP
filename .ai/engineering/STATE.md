@@ -1,6 +1,6 @@
 ## Current execution checkpoint — 2026-11-24 (offline acceptance correction; Phase 1 owner sign-off retained)
 
-**Current main head:** `3716d76444453540964f46bd2a944f9ea459386c`.
+**Current main head:** `d155a3078d3251c2df3cfd2853dbb75502018c9e` (latest application implementation: `3716d76444453540964f46bd2a944f9ea459386c`).
 
 **Founder acceptance correction:** Phase 1 — normal connected operation on the physical Windows PC and linked Android phone, both using the same workspace — is **OWNER-VERIFIED PASS, completed multiple times by the Founder** and reaffirmed on 2026-11-24. The populated fictional workspace and module-level connected use are already accepted. Do not request repeated connected setup, reinstall, or duplicate record creation. This does not close offline acceptance.
 
@@ -14,7 +14,7 @@
 - `f3fb80cbd0008e8bfb321db4f1290e249638ee60` and `4eb64bc50dbf04436a26a9af0e2bbb1e7cecb300` — Playwright regression for dashboard overview, Customers, Services/Catalogue and unsupported Calendar routing; assertion selector correction.
 - Owner acceptance runbook, physical-device acceptance, Android offline procedure and offline capability contract updated in commits `d4fe907e`, `18dce966`, `c3925bad`, `28622a7d` to preserve Phase 1 sign-off and explicitly record the Phase 2 physical failure/current remediation.
 
-**Verification state:** code and regression are committed. Exact-head CI is queued on `3716d76444453540964f46bd2a944f9ea459386c`: Laravel run `45413486142`, Zazu Quality `45413486378`, Windows V1 Package `45413486537`, Push-on-main/CodeQL `45413486940`. SonarCloud is skipped and is not a pass. Do not claim the defect fixed or request another physical test until CI passes. Then perform one focused phone retest: stop PC host + Caddy while phone stays on Wi-Fi; verify Dashboard is a short navigation landing, Customers/Jobs/Quotes/etc show one relevant view, unsupported routes show a connection-required message, and no unrelated collections appear. Preserve all IndexedDB data and queues.
+**Verification state:** code and regression are committed. Exact-head CI for the application implementation `3716d76444453540964f46bd2a944f9ea459386c` was queued: Laravel run `45413486142`, Zazu Quality `45413486378`, Windows V1 Package `45413486537`, Push-on-main/CodeQL `45413486940`. Documentation-only checkpoint `d155a3078d3251c2df3cfd2853dbb75502018c9e` also triggered Zazu Quality, Push-on-main and contract lint; final CI evidence must be read from the latest exact main head. SonarCloud is skipped and is not a pass. Do not claim the defect fixed or request another physical test until CI passes. Then perform one focused phone retest: stop PC host + Caddy while phone stays on Wi-Fi; verify Dashboard is a short navigation landing, Customers/Jobs/Quotes/etc show one relevant view, unsupported routes show a connection-required message, and no unrelated collections appear. Preserve all IndexedDB data and queues.
 
 **Next single objective:** verify exact-head CI for the offline route-isolation change, resolve any failures, then continue Phase 2 with host-loss, true airplane-mode cold launch/restart, local writes, attachment persistence and exactly-once reconnect. Keep owner-PC installed acceptance distinct. No branches; all changes directly on `main`. No other V1 gate work until this offline acceptance defect is closed.
 
