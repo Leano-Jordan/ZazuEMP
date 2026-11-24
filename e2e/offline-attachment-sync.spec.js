@@ -321,6 +321,17 @@ test('transient attachment upload failures retry while the app remains online', 
             expect(body).toContain('retry-after-outage.txt');
 
             if (requests.uploads === 1) {
+                // The upload may have committed, but the response body was
+                // corrupted in transit. Retrying must reuse the same key.
+                await route.fulfill({
+                    status: 201,
+                    contentType: 'application/json',
+                    body: '{ malformed acknowledgement',
+                });
+                return;
+            }
+
+            if (requests.uploads === 2) {
                 await route.fulfill({
                     status: 503,
                     contentType: 'application/json',
@@ -359,7 +370,7 @@ test('transient attachment upload failures retry while the app remains online', 
         );
     }, eventId);
 
-    await expect.poll(() => requests.uploads, { timeout: 15_000 }).toBe(2);
+    await expect.poll(() => requests.uploads, { timeout: 20_000 }).toBe(3);
     const outcome = await page.evaluate(async id => {
         const records = await window.ZazuOffline.loadAttachments(id);
         const record = records.find(item => item.original_name === 'retry-after-outage.txt');
@@ -375,7 +386,7 @@ test('transient attachment upload failures retry while the app remains online', 
     }, eventId);
 
     expect(outcome.status).toBe('synced');
-    expect(outcome.attempts).toBe(2);
+    expect(outcome.attempts).toBe(3);
     expect(outcome.retryable).toBe(false);
     expect(outcome.lastError).toBeNull();
     expect(outcome.key).toBe(requests.key);
