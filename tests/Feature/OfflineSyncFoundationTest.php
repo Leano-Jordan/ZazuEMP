@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Customer;
 use App\Http\Controllers\SyncController;
 use App\Models\SyncDelivery;
 use App\Models\SyncCursor;
@@ -553,6 +554,80 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(1, SyncCursor::query()
             ->where('sync_device_id', $destinationDevice->id)
             ->value('last_acknowledged_sequence'));
+    }
+
+    public function test_replayed_customer_push_after_lost_response_does_not_apply_twice(): void
+    {
+        $business = Business::create([
+            'name' => 'Lost Push Response Business',
+            'slug' => 'lost-push-response-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $entityId = (string) Str::uuid();
+        $customerName = 'Lost push response customer';
+        $payload = [
+            'local_id' => $entityId,
+            'record' => [
+                'name' => $customerName,
+                'contact_name' => 'Primary Contact',
+                'phone' => '0123456789',
+            ],
+        ];
+        $pushSameMutation = function () use ($device, $mutationId, $entityId, $payload): array {
+            $request = Request::create('/api/sync/push', 'POST', [
+                'mutations' => [[
+                    'id' => $mutationId,
+                    'entity_type' => 'customer',
+                    'entity_id' => $entityId,
+                    'operation' => 'create',
+                    'payload' => $payload,
+                ]],
+            ]);
+            $request->attributes->set('sync_device', $device);
+
+            return app(SyncController::class)->push(
+                $request,
+                app(SyncMutationRecorder::class),
+                app(SyncMutationApplier::class),
+                app(OfflineDomainMutationHandler::class),
+                app(SyncConflictRecorder::class),
+            )->getData(true)['recorded'][0];
+        };
+
+        // The first server response represents the response that the browser
+        // never receives. The second identical push is the post-restart retry.
+        $first = $pushSameMutation();
+        $retry = $pushSameMutation();
+
+        $this->assertSame('applied', $first['status']);
+        $this->assertSame('applied', $retry['status']);
+        $this->assertSame($mutationId, $first['id']);
+        $this->assertSame($first['sequence'], $retry['sequence']);
+        $this->assertSame($first['identity']['server_id'], $retry['identity']['server_id']);
+        $this->assertSame(1, Customer::query()
+            ->where('business_id', $business->id)
+            ->where('name', $customerName)
+            ->count());
+        $this->assertSame(1, SyncMutation::query()
+            ->where('business_id', $business->id)
+            ->where('mutation_id', $mutationId)
+            ->count());
+        $this->assertSame(1, SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'customer')
+            ->where('entity_uuid', $entityId)
+            ->count());
+        $this->assertSame(1, (int) SyncMutation::query()
+            ->where('mutation_id', $mutationId)
+            ->value('attempts'));
     }
 
     public function test_sync_pull_does_not_return_later_mutations_past_a_non_pending_delivery(): void

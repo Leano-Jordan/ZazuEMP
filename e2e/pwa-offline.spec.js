@@ -922,6 +922,135 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(chip).toHaveAttribute('title', /HTTP 503/);
     });
 
+    test('replays the same server-accepted customer mutation after the first push response is lost and the page restarts', async ({ page, context }, testInfo) => {
+        test.setTimeout(60_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Accepted-mutation lost-response recovery runs once against the real server.');
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await trustCurrentDevice(page);
+
+        const customerName = 'Lost response replay ' + Date.now().toString(36);
+        const localId = await page.evaluate(async ({ name }) => {
+            await window.ZazuOffline.ready;
+            const localId = crypto.randomUUID();
+            const nextState = structuredClone(window.ZazuOffline.getState());
+            nextState.customers.push({
+                local_id: localId,
+                server_id: null,
+                name,
+                contact_name: 'Replay Test Contact',
+                phone: '0123456789',
+                revision: 1,
+                pending_sync: true,
+            });
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: localId,
+                record: {
+                    name,
+                    contact_name: 'Replay Test Contact',
+                    phone: '0123456789',
+                },
+            }, nextState);
+            return localId;
+        }, { name: customerName });
+
+        const queuedBeforePush = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queuedBeforePush).toHaveLength(1);
+        const mutationId = queuedBeforePush[0].id;
+
+        let pushAttempts = 0;
+        let firstServerResponse = null;
+        let retryServerResponse = null;
+        await page.route('**/api/sync/push', async route => {
+            pushAttempts += 1;
+            const request = route.request().postDataJSON();
+            const response = await route.fetch();
+            const body = await response.body();
+            const result = JSON.parse(body.toString('utf8'));
+            const capture = {
+                httpStatus: response.status(),
+                requestMutationId: request.mutations?.[0]?.id,
+                recorded: result.recorded || [],
+            };
+
+            if (pushAttempts === 1) {
+                firstServerResponse = capture;
+                // The real Laravel endpoint has already committed the mutation.
+                // Abort only the browser-facing response to simulate a lost ACK.
+                await route.abort('failed');
+                return;
+            }
+
+            retryServerResponse = capture;
+            await route.fulfill({
+                status: response.status(),
+                headers: response.headers(),
+                body,
+            });
+        });
+
+        await context.setOffline(false);
+        await expect.poll(() => pushAttempts, { timeout: 15_000 }).toBe(1);
+        await expect.poll(() => firstServerResponse?.recorded?.[0]?.status, { timeout: 5_000 })
+            .toBe('applied');
+        expect(firstServerResponse.httpStatus).toBe(200);
+        expect(firstServerResponse.requestMutationId).toBe(mutationId);
+        expect(firstServerResponse.recorded[0].id).toBe(mutationId);
+
+        // The browser did not receive the applied response, so the queue must
+        // still contain the original mutation identity and payload.
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length))
+            .toBe(1);
+        await context.setOffline(true);
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+
+        const afterRestart = await page.evaluate(async () => ({
+            paired: window.ZazuOffline.isPaired(),
+            pending: await window.ZazuOffline.pending(),
+        }));
+        expect(afterRestart.paired).toBe(true);
+        expect(afterRestart.pending).toHaveLength(1);
+        expect(afterRestart.pending[0].id).toBe(mutationId);
+        expect(afterRestart.pending[0].payload.local_id).toBe(localId);
+
+        // Reconnection causes the durable queue to replay the exact same
+        // mutation. The server must return the already-applied result.
+        await context.setOffline(false);
+        await expect.poll(() => pushAttempts, { timeout: 15_000 }).toBe(2);
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length))
+            .toBe(0);
+
+        expect(retryServerResponse.httpStatus).toBe(200);
+        expect(retryServerResponse.requestMutationId).toBe(mutationId);
+        expect(retryServerResponse.recorded).toHaveLength(1);
+        expect(retryServerResponse.recorded[0].id).toBe(mutationId);
+        expect(retryServerResponse.recorded[0].status).toBe('applied');
+        expect(retryServerResponse.recorded[0].sequence).toBe(firstServerResponse.recorded[0].sequence);
+        expect(retryServerResponse.recorded[0].identity.server_id)
+            .toBe(firstServerResponse.recorded[0].identity.server_id);
+
+        const bootstrap = await page.evaluate(async ({ name }) => {
+            const token = window.ZazuOffline.getState().sync.token;
+            const response = await fetch('/api/sync/bootstrap', {
+                headers: { Accept: 'application/json', Authorization: 'Bearer ' + token },
+            });
+            const data = await response.json();
+            return {
+                status: response.status,
+                matchingCustomers: (data.customers || []).filter(customer => customer.name === name)
+                    .map(customer => customer.id),
+            };
+        }, { name: customerName });
+        expect(bootstrap.status).toBe(200);
+        expect(bootstrap.matchingCustomers).toHaveLength(1);
+        expect(bootstrap.matchingCustomers[0]).toBe(retryServerResponse.recorded[0].identity.server_id);
+        expect(pushAttempts).toBe(2);
+    });
+
     test('automatically retries pending mutations when the host returns after the reconnect event', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Reconnect retry contract runs once.');
