@@ -2215,3 +2215,11 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Extended the curated Blade icon subset and added `test_work_quotes_and_customers_use_local_semantic_status_and_action_icons`.
 - Updated `docs/DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md` with the migration scope and remaining Finance/Purchasing audit.
 - **Verification pending:** exact-head Laravel, PHPMD/quality, browser acceptance, Windows package and CodeQL. Physical PC/Android acceptance and real-device performance captures remain separate.
+
+
+## Director visual communication implementation — Finance and Purchasing — 2026-11-24
+
+- Verified exact prior head `51e52a0`: Director contract lint, Rosscore Director Health Report, Zazu quality (formatting, secret scan, application build/asset budgets, service-worker race test and Composer security audit) and CodeQL push workflow all completed successfully.
+- Extended local Tabler status cues to Finance invoices, Finance expenses and Purchasing orders. Existing labels/chip styles, routes, permissions, transaction logic and status values are unchanged; unknown finance states fall back to neutral information.
+- Added `test_finance_and_purchasing_use_local_semantic_status_icons` and updated the visual audit.
+- **Verification pending for this new head:** Laravel feature suite, PHPMD, browser acceptance and any package/recovery workflows that trigger on the new commits. Physical PC/Android acceptance and real-device resource captures remain separate.
