@@ -46,15 +46,9 @@ For the physical Android PWA install and disconnected-device acceptance route, f
 
 ## Engineering system
 
-Zazu uses one master control identity and bounded specialist engines:
+Zazu has one accountable engineering/product role: **Zazu Engine Director (Jarvis)**. Discovery, product strategy, implementation, security, verification, UX, performance, recovery and release are capabilities used by the same Director—not separate agents, backlogs or acceptance authorities. Existing skills remain reusable procedures.
 
-- **Morpheus / Jarvis** — control plane, routing, state, acceptance and progress control.
-- **Discovery & Design** — reconnaissance, workflow truth, architecture and decision boundaries.
-- **Builder** — implementation, database, security implementation and debugging.
-- **Guardian** — independent verification, regression breaking, forensics, security challenge and data-integrity review.
-- **Release** — commercial readiness, recovery, deployment and release evidence.
-- **UI/UX Improvement** — permanent cross-cutting interface and product-quality capability.
-- **Verification & Quality** — test, browser, static-analysis, CI/YAML and runtime evidence classification.
+The binding commercial and V1 execution policy is [Zazu Engine Director — Commercial V1 Mandate](docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md). It defines product positioning, what to preserve/defer, the formal 13-domain scorecard, ordered release gates and the 30 November 2026 controlled-pilot target. Current status and evidence remain in `.ai/engineering/STATE.md`.
 
 The system is **state-driven, not conversation-driven**. Meaningful cycles follow:
 
