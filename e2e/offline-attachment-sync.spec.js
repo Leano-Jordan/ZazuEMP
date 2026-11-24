@@ -299,6 +299,9 @@ test('an accepted attachment with a lost response survives restart and retries t
     const fileBytes = 'attachment accepted exactly once despite a lost response';
     const requests = [];
     let firstResponseLost = false;
+    let allowCanonicalRetry = false;
+    let releaseAutomaticRetry;
+    const automaticRetryGate = new Promise(resolve => { releaseAutomaticRetry = resolve; });
     await page.route('**/api/sync/**', async route => {
         const request = route.request();
         const url = new URL(request.url());
@@ -328,9 +331,16 @@ test('an accepted attachment with a lost response survives restart and retries t
 
             if (requests.length === 1) {
                 // Model the server committing the idempotent upload before the
-                // browser loses its acknowledgement. The retry below returns
-                // the canonical already-existing attachment.
+                // browser loses its acknowledgement.
                 firstResponseLost = true;
+                await route.abort('failed');
+                return;
+            }
+            if (!allowCanonicalRetry) {
+                // The production retry scheduler may immediately retry while
+                // the device is still online. Hold that request until the test
+                // disconnects, so restart durability can be inspected first.
+                await automaticRetryGate;
                 await route.abort('failed');
                 return;
             }
@@ -369,12 +379,13 @@ test('an accepted attachment with a lost response survives restart and retries t
     }, { eventId, fileBytes });
 
     await page.context().setOffline(false);
-    await expect.poll(() => requests.length, { timeout: 10_000 }).toBe(1);
+    await expect.poll(() => requests.length, { timeout: 10_000 }).toBe(2);
     await expect.poll(() => firstResponseLost).toBe(true);
 
-    // Stop automatic retries, then prove the durable file survives a complete
-    // document restart before allowing the same idempotent upload to retry.
+    // Stop the already-started automatic retry, then prove the durable file
+    // survives a complete document restart before allowing canonical recovery.
     await page.context().setOffline(true);
+    releaseAutomaticRetry();
     const afterLostResponse = await page.evaluate(async eventId => {
         const records = await window.ZazuOffline.loadAttachments(eventId);
         const record = records.find(item => item.original_name === 'lost-acknowledgement.txt');
@@ -412,9 +423,10 @@ test('an accepted attachment with a lost response survives restart and retries t
         text: fileBytes,
     });
 
+    allowCanonicalRetry = true;
     await page.context().setOffline(false);
     await page.evaluate(async () => window.ZazuOffline.syncAttachments());
-    await expect.poll(() => requests.length, { timeout: 10_000 }).toBe(2);
+    await expect.poll(() => requests.length, { timeout: 10_000 }).toBe(3);
     const reconciled = await page.evaluate(async eventId => {
         const records = await window.ZazuOffline.loadAttachments(eventId);
         const record = records.find(item => item.original_name === 'lost-acknowledgement.txt');
@@ -434,8 +446,9 @@ test('an accepted attachment with a lost response survives restart and retries t
         serverId: 99881,
         text: fileBytes,
     });
-    expect(requests).toHaveLength(2);
+    expect(requests).toHaveLength(3);
     expect(requests[1].key).toBe(requests[0].key);
+    expect(requests[2].key).toBe(requests[0].key);
 });
 
 test('transient attachment upload failures retry while the app remains online', async ({ page }, testInfo) => {
