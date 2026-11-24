@@ -3533,6 +3533,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(offlineResponse?.ok()).toBe(true);
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+        await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
+        await expect(page.locator('.zazu-dash-hero')).toBeHidden();
+        await expect(page.locator('.zazu-dash-overview')).toBeHidden();
     });
     test('primes Customers and Work routes for disconnected phone navigation', async ({ page, context }) => {
         test.setTimeout(90_000);
@@ -3592,6 +3595,25 @@ test.describe('Zazu installed PWA offline shell', () => {
                 await expect(page.getByRole('heading', { name: heading })).toBeVisible();
                 await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
             }
+
+            // These routes are deliberately not primed. The service worker
+            // must fall back to the cached Dashboard shell, and the client must
+            // isolate the requested local view instead of showing the Dashboard
+            // and every collection together.
+            const supplierFallback = await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
+            expect(supplierFallback?.ok()).toBe(true);
+            await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
+            await expect(page.locator('[data-zazu-offline-active-view="suppliers"]')).toBeVisible();
+            await expect(page.locator('[data-zazu-offline-view="suppliers"]')).toBeVisible();
+            await expect(page.locator('.zazu-dash-hero')).toBeHidden();
+            await expect(page.locator('.zazu-dash-overview')).toBeHidden();
+            await expect(page.locator('.zazu-dash-grid')).toBeHidden();
+
+            const unsupportedFallback = await page.goto('/calendar', { waitUntil: 'domcontentloaded' });
+            expect(unsupportedFallback?.ok()).toBe(true);
+            await expect(page.locator('[data-zazu-offline-unavailable]')).toBeVisible();
+            await expect(page.locator('[data-zazu-offline-view]:visible')).toHaveCount(0);
+            await expect(page.locator('.zazu-dash-hero')).toBeHidden();
         } finally {
             await context.setOffline(false);
         }
