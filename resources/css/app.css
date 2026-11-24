@@ -8732,3 +8732,41 @@ body.zazu-has-wallpaper .zazu-content {
     .zazu-export-row .zazu-btn { padding-inline: 8px; }
     .zazu-export-section-heading { align-items: flex-start; }
 }
+
+
+/* Offline mode is a deliberate workspace state, not an online dashboard overlay. */
+.zazu-offline-mode [aria-label="Offline workspace navigation"] {
+    display: none !important;
+}
+.zazu-offline-overview {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+}
+.zazu-offline-overview > .zazu-dash-surface {
+    display: grid;
+    align-content: start;
+    gap: 7px;
+    min-width: 0;
+    padding: 18px;
+}
+.zazu-offline-overview-value {
+    color: var(--zazu-ink);
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 850;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.zazu-offline-overview-status strong {
+    color: var(--zazu-ink);
+    font-size: 15px;
+    line-height: 1.35;
+}
+.zazu-offline-mode .zazu-sidebar .zazu-nav-area[hidden] {
+    display: none !important;
+}
+@media (max-width: 760px) {
+    .zazu-offline-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+    .zazu-offline-overview { grid-template-columns: minmax(0, 1fr); }
+}
