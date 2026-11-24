@@ -207,6 +207,4 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('class="zazu-actionbar zazu-actionbar-sticky"', $purchaseCreate);
         $this->assertStringNotContainsString('<span>Job (optional)</span>', $purchaseCreate);
         $this->assertStringNotContainsString('<span>Supplier ', $purchaseCreate);
-    }
-
-}
+    }}
