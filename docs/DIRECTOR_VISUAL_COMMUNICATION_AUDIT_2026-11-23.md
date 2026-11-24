@@ -110,3 +110,11 @@ The current `package.json` has no icon package dependency. The dashboard current
 - Preserved routes, field names, option values, defaults, idempotency keys and offline entity markers.
 - Added regression coverage alongside the existing operational presentation checks. The related assertions were consolidated into the existing presentation test method to remain within the PHPMD public-method limit.
 - Remaining: rendered visual acceptance at desktop/mobile breakpoints, plus the rest of the Jobs/Quotes/Purchasing form sweep.
+
+
+## Purchasing form label hierarchy — 2026-11-24
+
+- The purchase-order creation form already used Zazu's shared control classes, responsive grid, sticky action bar and offline entity marker, but its field captions were plain spans. This made the longest, line-item-heavy form visually inconsistent with the Inventory and Finance forms just normalised.
+- Applied the shared `zazu-label` treatment to supplier/job/currency/date, line description/quantity/unit/price/catalogue and notes captions, including the dynamically added line template. Required markers, helper text, line-total feedback, field names, JS hooks, idempotency key, route and offline marker are unchanged.
+- Added focused regression assertions to the existing presentation test method; no new test class/method or business logic was introduced.
+- This closes only the purchasing-create label inconsistency. Quote and Job editor page-level layout, responsive rendering and physical visual acceptance remain open.
