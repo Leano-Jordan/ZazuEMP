@@ -30,6 +30,8 @@ The scheduled Windows runner now persists the secondary archive's absolute path,
 
 The owner-operated backup and full restore drill on the intended PC remains mandatory.
 
+The business archive restore endpoint is limited to three attempts per authenticated owner per 10 minutes. If the limit is reached, Zazu returns a restore-specific wait message and blocks that request before archive processing. This throttle is a protection control, not a diagnosis of an earlier upload, passphrase or archive failure; do not weaken it to work around an unexplained restore error.
+
 ---
 
 ## Windows scheduled-backup runtime verification — CI PASS — 2026-11-21
