@@ -83,3 +83,12 @@ The current `package.json` has no icon package dependency. The dashboard current
 - Extended the curated local icon component only; no icon package, remote asset, CDN, route, permission or workflow change.
 - Added a focused feature regression covering the three view surfaces and required local icon definitions.
 - This is a targeted visual communication slice. Finance and Purchasing remain in the next audit queue; full page-level spacing/width review remains separate.
+
+
+## Finance and Purchasing status icon migration — 2026-11-24
+
+- Added local semantic Tabler cues beside invoice, expense and purchase-order statuses while retaining their readable status labels and existing chip styling.
+- Purchase-order icons follow the model's explicit lifecycle: draft/sent/ordered are pending, received is complete, and cancelled is stopped. Finance statuses use conservative label mappings with a neutral fallback for unknown states.
+- No transaction logic, status values, permissions, routes or workflow behaviour changed. Icons remain inline/local and offline-safe.
+- Added a focused feature regression for Finance and Purchasing status presentation.
+- The remaining visual audit is page-level composition, spacing and responsive acceptance; these icon changes do not close those separate checks.
