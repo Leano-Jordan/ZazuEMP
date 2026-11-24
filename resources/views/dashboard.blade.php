@@ -252,8 +252,9 @@
 <section class="zazu-dash-surface" data-zazu-offline-workspace hidden aria-label="Offline workspace">
     <header class="zazu-dash-surface-head zazu-dash-panel-head">
         <div class="zazu-dash-panel-heading">
-            <h2>Saved on this device</h2>
-            <p class="zazu-card-description">Customers, jobs and quotes saved on this device remain available here when the server is disconnected.</p>
+            <span class="zazu-dash-kicker">Device workspace</span>
+            <h2>Offline workspace</h2>
+            <p class="zazu-card-description">Your locally saved business records. Changes stay on this device until Zazu reconnects.</p>
         </div>
         <nav class="zazu-action-group" aria-label="Offline workspace navigation">
             @php($offlineWorkspacePermissions = app(\App\Support\PermissionService::class))
@@ -284,6 +285,28 @@
         </nav>
         <span class="zazu-chip zazu-chip-neutral">Device local</span>
     </header>
+    <section class="zazu-dash-grid zazu-offline-overview" data-zazu-offline-view="overview" aria-label="Offline workspace overview">
+        <article class="zazu-dash-surface">
+            <span class="zazu-dash-kicker">Saved records</span>
+            <strong class="zazu-offline-overview-value" data-zazu-offline-overview-count="records">0</strong>
+            <span>Available on this device</span>
+        </article>
+        <article class="zazu-dash-surface">
+            <span class="zazu-dash-kicker">Waiting to sync</span>
+            <strong class="zazu-offline-overview-value" data-zazu-offline-overview-count="pending">0</strong>
+            <span>Local changes not yet confirmed by the server</span>
+        </article>
+        <article class="zazu-dash-surface">
+            <span class="zazu-dash-kicker">Needs attention</span>
+            <strong class="zazu-offline-overview-value" data-zazu-offline-overview-count="conflicts">0</strong>
+            <span>Conflicts requiring a decision</span>
+        </article>
+        <article class="zazu-dash-surface zazu-offline-overview-status">
+            <span class="zazu-dash-kicker">Workspace status</span>
+            <strong data-zazu-offline-overview-status>Your saved workspace is ready on this device</strong>
+            <span>Reconnect to send queued changes and refresh server data.</span>
+        </article>
+    </section>
     <section class="zazu-dash-surface" data-zazu-offline-unavailable hidden aria-labelledby="zazu-offline-unavailable-title">
         <h3 id="zazu-offline-unavailable-title" class="zazu-dash-panel-heading">This area needs a connection</h3>
         <p class="zazu-card-description">This screen is not available offline yet. Your saved business records remain on this device. Reconnect to use this area, or return to the offline workspace.</p>
