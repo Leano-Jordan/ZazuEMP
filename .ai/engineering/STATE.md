@@ -2461,3 +2461,22 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Exact-head coverage, Pint, application quality, secret scan, Composer security audit, PHPMD, Director Health, populated upgrade/rollback and push on main passed.
 - Offline browser acceptance remains in progress at this checkpoint. Physical Android offline acceptance, owner-PC recovery drill, original physical encrypted archive failure diagnosis, and independent off-host backup verification remain OPEN.
 - SonarCloud was skipped by workflow configuration and is not a pass.
+
+
+## Offline workspace concurrency acceptance — 2026-11-24
+
+**Verified application/test head:** `ffb5b5c02dceb598b06836c4002d1de2709f7e3c` on canonical `main`.
+
+- Closed the client-side multi-tab stale-snapshot data-integrity gap. `writeState` and `queueMutation` now read the latest IndexedDB workspace inside their write transaction and merge only the current tab's changes relative to its last durable baseline.
+- Record collections merge by stable local/server identity. Independent changes from another tab are retained; a stale edit/delete of the same record is rejected for refresh/reconciliation rather than silently replacing the newer record.
+- Workspace state and mutation queue remain in the same IndexedDB transaction. Queue order and same-record predecessor dependencies remain transactionally determined.
+- A workspace-updated BroadcastChannel message refreshes other active tabs. IndexedDB remains authoritative when a tab misses the notification or BroadcastChannel is unavailable.
+- Explicit session replacement retains its own session-field boundary. Bootstrap version metadata cannot block a legitimate session transition; the business workspace and record-level conflict checks remain protected.
+- State references returned by `getState()` remain stable across persistence commits. Direct bootstrap, acknowledgement and conflict-resolution writes advance the durable baseline so later writes do not compare against an obsolete snapshot.
+- Added adversarial two-tab regression: tab one and tab two create independent local customers from the same stale starting snapshot; both survive with deterministic queue order. A concurrent edit to the same customer is rejected without losing the newer value.
+- Corrected route acceptance to assert one route-specific offline view at a time. Dashboard no longer has to expose every local collection simultaneously. Quote fallback test now leaves Quotes unprimed online, disconnects, then verifies the service-worker Dashboard fallback.
+- Corrected profile rendering to resolve the profile panel at render time and refresh independently of route-view handling. Pairing/bootstrap metadata replacement is handled separately from business-record conflict detection.
+
+**Exact-head evidence:** Laravel **761 passed / 1 skipped / 5,433 assertions**; PostgreSQL migration/recovery passed; desktop offline browser suite **72 passed**; quote single-unit confirmation passed; mobile customer/Work **11 passed**; mobile host-outage acceptance passed; phone-local attachment journey passed. Zazu Quality, formatting, application checks, Composer security audit, secret scan, Hadolint, CodeQL and push-on-main passed. SonarCloud was skipped by workflow configuration.
+
+**Acceptance boundary:** this closes the automated same-browser multi-tab consistency subgate. It does not prove full multi-device synchronisation, real-device Android cold launch/restart/reconnect, or owner-PC offline acceptance. Phase 2 remains open. Next engineering priority is interrupted mutation response/replay and conflict preservation, followed by attachment interruption/retry/reconciliation. Physical Android and owner-PC acceptance remain separately recorded.

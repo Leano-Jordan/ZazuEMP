@@ -85,6 +85,8 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-CONTRACT-007 | CASE-ZAZU-0038 | Expired-session URL assertion conflicts with service-worker cached-shell fallback | F2/F8 | CLOSED — exact-head browser acceptance passed without flaky retries on b26df40e |
 
 
+| ENG-DATA-005 | CASE-ZAZU-0049 | Concurrent browser tabs persist stale whole-workspace snapshots | F1 | CLOSED — exact-head two-tab adversarial regression and full offline browser acceptance passed on ffb5b5c |
+
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
 
 - CASE-ZAZU-0016 through CASE-ZAZU-0020 are historical failure fingerprints. Owner-reported current-head browser execution is green; retain the fingerprints for recurrence detection and do not reopen without a new failing fingerprint.

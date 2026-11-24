@@ -334,3 +334,19 @@ When a confirmed mechanism has no existing code:
 ## Runtime catalog boundary
 
 The runtime catalog remains authoritative for safe operator-facing errors. Engineering codes belong in internal diagnostics and repository records unless a deliberate product decision exposes them.
+
+
+## Director execution checkpoint — 2026-11-24 — offline multi-tab integrity
+
+**Verified source/test head:** `ffb5b5c02dceb598b06836c4002d1de2709f7e3c` on canonical `main`.
+
+- Closed the same-browser multi-tab stale workspace write defect with transactional delta merging against the latest IndexedDB state.
+- Independent tab edits are retained. Same-record stale edits are rejected instead of silently overwriting the newer durable value.
+- Added a two-tab adversarial regression covering stale snapshots, independent customer creation, queue ordering and same-record conflict rejection.
+- Preserved session replacement boundaries, stable `getState()` references and durable baseline tracking through bootstrap, acknowledgement and conflict resolution.
+- Corrected offline route tests to enforce one route-specific view and to exercise the unprimed Quotes service-worker fallback after disconnection.
+- Exact-head automated acceptance: 72 desktop offline tests, 11 mobile customer/Work tests, quote single-unit confirmation, host-outage acceptance and phone-local attachment journey all passed.
+- Laravel: 761 passed / 1 skipped / 5,433 assertions. PostgreSQL migration/recovery, coverage, Zazu Quality, formatting, application checks, Composer security audit, secret scan, Hadolint, CodeQL and push-on-main passed. SonarCloud skipped.
+- This closes the automated multi-tab consistency subgate only. Physical Android and owner-PC acceptance remain separate. Interrupted mutation replay, conflict recovery and attachment retry durability remain the next data-lifecycle priorities.
+
+**Release decision:** Phase 2 remains OPEN. Do not claim full offline parity or physical device certification from browser evidence.

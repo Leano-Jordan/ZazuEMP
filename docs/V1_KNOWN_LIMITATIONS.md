@@ -61,3 +61,11 @@ This document records boundaries that are explicit in the V1 scope and current r
 ## Release interpretation
 
 These limitations do not by themselves block V1 where they match the frozen scope. Remaining owner-dependent gates include the Windows installation backup/off-disk copy/restore drill, physical Android offline acceptance, populated commercial reconciliation, POPIA operational sign-off and ZAZU name clearance. PostgreSQL commercial/sync testing becomes a gate only if a PostgreSQL host is selected. Any new blocker must be a reproducible failure in an agreed V1 workflow, a demonstrated security/privacy/data-integrity failure, or an explicitly owner-approved requirement.
+
+
+### Same-browser multi-tab consistency — automated subgate verified 2026-11-24
+
+- Multiple tabs sharing one business-scoped IndexedDB workspace now merge independent local record changes against the latest durable state inside the write transaction.
+- Concurrent edits to the same record are rejected when based on a stale snapshot; the newer durable record is preserved for explicit refresh/reconciliation.
+- Desktop browser regression passed 72 tests, including the adversarial two-tab case. Mobile customer/Work, simulated host outage and phone-local attachment journeys also passed.
+- This is not full multi-device synchronisation and does not expand the frozen list of offline-supported operations. Physical Android cold launch/restart/reconnect and owner-PC offline acceptance remain separate, open gates.

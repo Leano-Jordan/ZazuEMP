@@ -477,3 +477,30 @@ Offline expense mutations now enforce the online finance relationship rules befo
 - The resolved relationships are passed to the canonical finance transaction service, which retains its locking, ownership and financial-state checks.
 
 Regression coverage verifies successful inheritance and rejection of event mismatch, supplier mismatch and draft purchase orders. This is server-side sync validation; it does not expand the list of operations accepted while disconnected or close physical Android acceptance.
+
+
+### Concurrent browser tabs and durable workspace writes — 2026-11-24
+
+**Implementation and regression:** `ffb5b5c02dceb598b06836c4002d1de2709f7e3c` on `main`.  
+**Engineering case:** ENG-DATA-005 / CASE-ZAZU-0049 — CLOSED for the same-browser IndexedDB persistence boundary.
+
+The offline engine previously gave each tab an in-memory workspace snapshot while sharing one IndexedDB database. A transactional queue insert did not, by itself, prevent a tab from writing its older complete workspace snapshot over changes made by another tab.
+
+The corrected write contract is:
+
+1. Each tab retains a snapshot of the last state it knows was durably committed.
+2. A write transaction reads the latest persisted workspace and computes the tab's delta from its durable baseline to its proposed state.
+3. Record collections merge by stable local/server identity. Independent record additions and changes from other tabs are preserved.
+4. If the same record changed since the tab's baseline, a stale update or delete is rejected. The latest durable value is retained; the stale tab must refresh and reconcile rather than silently win.
+5. Workspace state and the mutation queue are committed in one IndexedDB transaction. Queue order and same-record predecessor dependencies are calculated from the transaction's current queue.
+6. Successful writes advance the durable baseline and preserve the stable object reference returned by `getState()`.
+7. Cross-tab BroadcastChannel notifications refresh active views. Notifications are an optimisation; correctness does not depend on receiving one because every write re-reads IndexedDB transactionally.
+8. Explicit session replacement can replace session credentials and bootstrap metadata without bypassing business identity, record conflict detection or the persisted-session guard on ordinary writes.
+
+Direct bootstrap, mutation acknowledgement and conflict-resolution state writes also advance the durable baseline. This prevents a later local write from comparing against a stale pre-sync snapshot.
+
+**Adversarial regression:** two tabs load the same initial workspace. Tab one creates a customer; tab two, deliberately missing cross-tab notifications, creates a different customer from its stale snapshot. Both records must survive, with deterministic queue order. Tab one then updates a shared customer; tab two's stale edit must be rejected and the newer value retained.
+
+**Exact-head verification:** 72 desktop Chromium offline tests passed; 11 mobile customer/Work tests passed; quote single-unit confirmation, simulated host-outage recovery and phone-local attachment journey passed. Laravel passed 761 tests / 1 skipped / 5,433 assertions; PostgreSQL migration/recovery passed; quality, formatting, security scan, Hadolint, CodeQL and push-on-main passed. SonarCloud was skipped.
+
+**Boundary:** this verifies multiple tabs sharing one browser's business-scoped IndexedDB. It is not a claim of full multi-device synchronisation. Physical Android cold launch/restart/reconnect and owner-PC offline acceptance remain separate gates. The wider offline sync lifecycle remains open for interrupted response replay, conflict recovery and attachment interruption/retry/reconciliation.
