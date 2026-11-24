@@ -125,12 +125,13 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
-function shouldPreferOfflineShell(request, pathname) {
+function shouldPreferOfflineShell(request, pathname, coldLaunch = false) {
     if (request.mode !== 'navigate') return false;
+    if (coldLaunch) return true;
 
     // These authenticated routes contain real offline-capable forms or
-    // job-specific controls. Preserve their exact cached HTML when it exists;
-    // cachedAppPage still falls back to the dashboard shell when it does not.
+    // job-specific controls. Preserve their exact cached HTML when an
+    // existing Zazu page navigates within the workspace.
     const preserveExactRoute = [
         '/customers/create',
         '/work/create',
@@ -581,6 +582,9 @@ self.addEventListener('fetch', (event) => {
     }
 
     const requestGeneration = activeUserGeneration;
+    // A top-level navigation with no initiating client is a cold app launch
+    // (for example, opening the installed Zazu icon while the host is down).
+    const preferOfflineShell = shouldPreferOfflineShell(request, url.pathname, event.clientId === '');
     const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
     const isAppPage = request.method === 'GET'
         && url.origin === self.location.origin
@@ -593,7 +597,7 @@ self.addEventListener('fetch', (event) => {
             // attempting the unreachable Laravel host. Resolve the authenticated
             // page from its user/business cache immediately instead.
             if (self.navigator?.onLine === false) {
-                return cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname));
+                return cachedAppPage(request, preferOfflineShell);
             }
 
             try {
@@ -622,7 +626,7 @@ self.addEventListener('fetch', (event) => {
                 // with stale authenticated HTML.
                 if (!response.ok) {
                     if (response.status >= 500 && response.status <= 599) {
-                        return cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname));
+                        return cachedAppPage(request, preferOfflineShell);
                     }
                     return response;
                 }
@@ -633,7 +637,7 @@ self.addEventListener('fetch', (event) => {
                 event.waitUntil(cacheRenderedPage(request, response.clone(), requestGeneration));
                 return response;
             } catch {
-                return cachedAppPage(request, shouldPreferOfflineShell(request, url.pathname));
+                return cachedAppPage(request, preferOfflineShell);
             }
         })());
         return;
