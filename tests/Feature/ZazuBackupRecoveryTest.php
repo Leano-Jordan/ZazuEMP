@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -12,7 +13,7 @@ class ZazuBackupRecoveryTest extends TestCase
 {
     public function test_sqlite_backup_includes_committed_wal_records(): void
     {
-        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+        if (! class_exists(ZipArchive::class) || ! in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $this->markTestSkipped('PHP Zip and SQLite extensions are required for backup tests.');
         }
 
@@ -89,7 +90,7 @@ class ZazuBackupRecoveryTest extends TestCase
             $this->markTestSkipped('Fake MySQL command integration uses POSIX shell scripts.');
         }
 
-        $root = storage_path('app/zazu-mysql-rollback-test-'.\Illuminate\Support\Str::ulid());
+        $root = storage_path('app/zazu-mysql-rollback-test-'.Str::ulid());
         $bin = $root.'/bin';
         $archive = $root.'/candidate.zip';
         $countFile = $root.'/mysql-count.txt';
@@ -118,7 +119,7 @@ class ZazuBackupRecoveryTest extends TestCase
         chmod($bin.'/mysqldump', 0755);
         chmod($bin.'/mysql', 0755);
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
         $zip->addFromString('manifest.json', json_encode([
             'application' => 'Zazu EMP',
