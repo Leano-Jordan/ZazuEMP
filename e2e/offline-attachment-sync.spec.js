@@ -265,6 +265,179 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
 });
 
 
+test('an accepted attachment with a lost response survives restart and retries the same bytes and idempotency key', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Lost attachment acknowledgement recovery runs once in Chromium.');
+
+    await page.addInitScript(() => {
+        window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+    });
+    await login(page);
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+
+    const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
+    await expect(jobRow).toBeVisible();
+    await jobRow.locator('[data-zazu-inspector-open]').first().click();
+    await page.getByRole('tab', { name: 'Commercial position' }).click();
+    await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
+    await page.getByRole('link', { name: 'Open job record' }).click();
+
+    const form = page.locator('[data-zazu-offline-attachment-form]');
+    const eventId = Number(await form.getAttribute('data-zazu-event-id'));
+    const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+    expect(eventId).toBeGreaterThan(0);
+    expect(businessId).toBeGreaterThan(0);
+
+    await page.evaluate(async ({ token, businessId }) => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = { token, device: { id: 987681, business_id: businessId } };
+        state.local_dirty = false;
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+    }, { token: DEVICE_TOKEN, businessId });
+
+    const fileBytes = 'attachment accepted exactly once despite a lost response';
+    const requests = [];
+    let firstResponseLost = false;
+    await page.route('**/api/sync/**', async route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        expect(request.headers()['authorization']).toBe('Bearer ' + DEVICE_TOKEN);
+
+        if (url.pathname === '/api/sync/pull') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+            return;
+        }
+        if (url.pathname === '/api/sync/bootstrap') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+            return;
+        }
+        if (url.pathname === '/api/sync/attachments' && request.method() === 'GET') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+            return;
+        }
+        if (url.pathname === '/api/sync/attachments' && request.method() === 'POST') {
+            const body = request.postDataBuffer() || Buffer.alloc(0);
+            const bodyText = body.toString('latin1');
+            const key = bodyText.match(/name="idempotency_key"\r\n\r\n([^\r\n]+)/)?.[1] || null;
+            const uploadedEventId = Number(bodyText.match(/name="event_id"\r\n\r\n([^\r\n]+)/)?.[1] || 0);
+            expect(key).toMatch(/^[0-9a-f-]{36}$/i);
+            expect(uploadedEventId).toBe(eventId);
+            expect(body.includes(Buffer.from(fileBytes))).toBe(true);
+            requests.push({ key, eventId: uploadedEventId, body });
+
+            if (requests.length === 1) {
+                // Model the server committing the idempotent upload before the
+                // browser loses its acknowledgement. The retry below returns
+                // the canonical already-existing attachment.
+                firstResponseLost = true;
+                await route.abort('failed');
+                return;
+            }
+
+            expect(key).toBe(requests[0].key);
+            expect(body.includes(Buffer.from(fileBytes))).toBe(true);
+            await route.fulfill({
+                status: 201,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    duplicate: true,
+                    attachment: {
+                        id: 99881,
+                        event_id: eventId,
+                        idempotency_key: key,
+                        original_name: 'lost-acknowledgement.txt',
+                        mime_type: 'text/plain',
+                        size: Buffer.byteLength(fileBytes),
+                        description: '',
+                        created_at: new Date().toISOString(),
+                    },
+                }),
+            });
+            return;
+        }
+
+        await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+    });
+
+    await page.context().setOffline(true);
+    await page.evaluate(async ({ eventId, fileBytes }) => {
+        await window.ZazuOffline.queueAttachment(
+            eventId,
+            new File([fileBytes], 'lost-acknowledgement.txt', { type: 'text/plain' })
+        );
+    }, { eventId, fileBytes });
+
+    await page.context().setOffline(false);
+    await expect.poll(() => requests.length, { timeout: 10_000 }).toBe(1);
+    await expect.poll(() => firstResponseLost).toBe(true);
+
+    // Stop automatic retries, then prove the durable file survives a complete
+    // document restart before allowing the same idempotent upload to retry.
+    await page.context().setOffline(true);
+    const afterLostResponse = await page.evaluate(async eventId => {
+        const records = await window.ZazuOffline.loadAttachments(eventId);
+        const record = records.find(item => item.original_name === 'lost-acknowledgement.txt');
+        const file = record ? await window.ZazuOffline.getAttachmentFile(record.idempotency_key) : null;
+        return {
+            status: record?.status ?? null,
+            retryable: record?.retryable ?? null,
+            key: record?.idempotency_key ?? null,
+            text: file ? await file.text() : null,
+        };
+    }, eventId);
+    expect(afterLostResponse.status).toBe('pending');
+    expect(afterLostResponse.retryable).toBe(true);
+    expect(afterLostResponse.key).toBe(requests[0].key);
+    expect(afterLostResponse.text).toBe(fileBytes);
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
+    await page.evaluate(async () => window.ZazuOffline.ready);
+    const afterRestart = await page.evaluate(async eventId => {
+        const records = await window.ZazuOffline.loadAttachments(eventId);
+        const record = records.find(item => item.original_name === 'lost-acknowledgement.txt');
+        const file = record ? await window.ZazuOffline.getAttachmentFile(record.idempotency_key) : null;
+        return {
+            status: record?.status ?? null,
+            retryable: record?.retryable ?? null,
+            key: record?.idempotency_key ?? null,
+            text: file ? await file.text() : null,
+        };
+    }, eventId);
+    expect(afterRestart).toEqual({
+        status: 'pending',
+        retryable: true,
+        key: requests[0].key,
+        text: fileBytes,
+    });
+
+    await page.context().setOffline(false);
+    await page.evaluate(async () => window.ZazuOffline.syncAttachments());
+    await expect.poll(() => requests.length, { timeout: 10_000 }).toBe(2);
+    const reconciled = await page.evaluate(async eventId => {
+        const records = await window.ZazuOffline.loadAttachments(eventId);
+        const record = records.find(item => item.original_name === 'lost-acknowledgement.txt');
+        const file = record ? await window.ZazuOffline.getAttachmentFile(record.idempotency_key) : null;
+        return {
+            status: record?.status ?? null,
+            retryable: record?.retryable ?? null,
+            key: record?.idempotency_key ?? null,
+            serverId: record?.attachment?.id ?? null,
+            text: file ? await file.text() : null,
+        };
+    }, eventId);
+    expect(reconciled).toEqual({
+        status: 'synced',
+        retryable: false,
+        key: requests[0].key,
+        serverId: 99881,
+        text: fileBytes,
+    });
+    expect(requests).toHaveLength(2);
+    expect(requests[1].key).toBe(requests[0].key);
+});
+
 test('transient attachment upload failures retry while the app remains online', async ({ page }, testInfo) => {
     test.setTimeout(45_000);
     test.skip(testInfo.project.name !== 'chromium', 'Attachment retry timer contract runs once in Chromium.');
