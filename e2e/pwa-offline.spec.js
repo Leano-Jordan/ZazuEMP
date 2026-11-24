@@ -3771,10 +3771,17 @@ test.describe('Zazu installed PWA offline shell', () => {
         // accepted locally, the same form must discover that local acceptance.
         await page.goto('/finance/invoices/create', { waitUntil: 'domcontentloaded' });
         await expect(page.locator('form[data-zazu-offline-entity="invoice"]')).toBeVisible();
+        // Return to the cached Dashboard while online. Do not visit Quotes
+        // before disconnecting: that would cache the normal server-rendered page
+        // and bypass the service-worker Dashboard fallback under test.
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+
         await context.setOffline(true);
         const quoteRoute = await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
-        expect(quoteRoute?.ok(), 'The cached Quotes route must load after disconnection.').toBe(true);
+        expect(quoteRoute?.ok(), 'The unprimed Quotes route must load through the cached Dashboard fallback.').toBe(true);
         await waitForOfflineRuntime(page);
+        await expect(page.locator('[data-zazu-offline-active-view="quotes"]')).toBeVisible();
 
         const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'OFFLINE-QUOTE-001' });
         await expect(quoteRow).toBeVisible();
