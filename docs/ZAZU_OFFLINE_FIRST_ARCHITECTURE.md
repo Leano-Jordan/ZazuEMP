@@ -1,3 +1,9 @@
+## Current V1 capability boundary
+
+The authoritative action-by-action offline capability contract is [ZAZU V1 Offline Capability Contract](ZAZU_V1_OFFLINE_CAPABILITY_CONTRACT.md). It separates device-local mutations, cached reads, online-only/deferred actions and the physical acceptance evidence still required. Do not infer full offline parity from the historical engineering notes below.
+
+---
+
 ### Authenticated mutation application boundary — 2026-11-21
 
 **Implementation:** [e66da83](https://github.com/Leano-Jordan/ZazuEMP/commit/e66da83a38f449482d83e9be9ffa6b4449830158).  
