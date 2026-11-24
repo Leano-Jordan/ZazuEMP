@@ -939,7 +939,7 @@ function setupZazuOfflineWorkspaceProfile() {
     };
 
     window.addEventListener('zazu:offline-ready', bind, { once: true });
-    window.addEventListener('zazu:offline-state-updated', render);
+    window.addEventListener('zazu:offline-state-updated', () => { applyOfflineRouteView(); render(); });
     bind();
 }
 
