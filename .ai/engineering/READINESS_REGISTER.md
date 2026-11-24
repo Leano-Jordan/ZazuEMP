@@ -1,3 +1,5 @@
+**Canonical policy:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` governs commercial positioning, V1 scope, formal scorecard, ordered release gates and the controlled-pilot target. This register is evidence/status, not a competing strategy document. Current-main evidence supersedes older dated checkpoints below.
+
 ## Latest Director engineering evidence — 2026-11-23
 
 - CASE-ZAZU-0046 / ENG-JS-003 CLOSED: offline service metadata survives deferred image upload; image bytes are not queued.
