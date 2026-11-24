@@ -13,7 +13,7 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await page.locator('[data-auth-submit]').click();
     await page.waitForURL(url => url.pathname !== '/login');
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-        await expect(coldLaunch).toHaveURL((url) => new URL(url).pathname.endsWith('/dashboard'));
+    await expect(page).toHaveURL((url) => new URL(url).pathname.endsWith('/dashboard'));
     await waitForOfflineRuntime(page);
 }
 
@@ -4349,7 +4349,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await context.setOffline(true);
         const coldLaunch = await context.newPage();
         await coldLaunch.goto(new URL(workUrl, page.url()).href, { waitUntil: 'domcontentloaded' });
-        await expect(coldLaunch).toHaveURL(/\\/dashboard$/);
+        await expect(coldLaunch).toHaveURL((url) => new URL(url).pathname.endsWith('/dashboard'));
         await expect(coldLaunch.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeVisible();
 
