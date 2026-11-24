@@ -58,6 +58,10 @@ The local workspace renders device-stored records and sync state for the followi
 
 This is a local snapshot, not a live view of another device or server. Fresh records, server-side changes and unprimed routes are unavailable until reconnection. The dashboard fallback links into the specifically cached Customers and Work routes; do not infer that every application route is cached.
 
+### Offline visibility invariant
+
+All route isolation and offline fallback visibility changes rely on the HTML `hidden` attribute. Component styles must not override that semantic state. The shared stylesheet therefore enforces `[hidden] { display: none !important; }`; future dashboard or component display rules must preserve this invariant. Browser acceptance must assert that hidden Dashboard content is actually not rendered, not merely that the attribute was set.
+
 ### Offline navigation contract
 
 The service worker may return the cached Dashboard HTML shell for a requested authenticated route when the host is unavailable; it preserves the requested URL. The client must then render one route-specific offline view inside that shell. The Dashboard offline landing view is navigation-only and must not expand every local collection into one long page. Supported routes map to their corresponding local collection view. Routes without an implemented offline view must show an explicit connection-required message and must not expose unrelated collections.
