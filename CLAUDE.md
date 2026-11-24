@@ -16,6 +16,10 @@ DB-001 is a **dormant, historical, non-critical anomaly**, not an active task or
 - `/admin/sentinel` is his installation-wide Zazu-instance/platform oversight dashboard, without unnecessary business-sensitive records.
 - Sentinel Rescue merges into the existing business Owner Admin experience; it is not a separate owner destination. Owner diagnostics remain business-scoped; Founder oversight remains installation-wide. Preserve discoverable navigation and server-side authorization.
 
+## Canonical Director and product mandate
+- One accountable role: **Zazu Engine Director (Jarvis)**. Morpheus is not a separate identity. Discovery, build, security, QA, UX, performance, recovery and release are capabilities/procedures under the same Director, not autonomous agents or separate authorities.
+- Read and obey `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` for commercial positioning, product scope, formal scorecard, strict V1 gates and the 2026-11-30 controlled-pilot target. Current evidence/status belongs in `.ai/engineering/STATE.md`.
+
 ## Operating rules
 - Finish the agreed V1 workflows; no speculative features, perfectionism or documentation-only progress.
 - Work directly on `main`. Never create branches. Do not introduce Render or AMPPS workflows.
@@ -23,7 +27,7 @@ DB-001 is a **dormant, historical, non-critical anomaly**, not an active task or
 - Never weaken tests or claim unobserved CI, runtime, browser or release evidence.
 - Do not repeat checks without new evidence or changed inputs.
 - Claude's initial role is read-only audit/advice. No code edits, commits, pushes, branches, data changes or configuration changes unless the owner explicitly authorises implementation.
-- Director/Jarvis owns sequencing, scope, evidence reconciliation and acceptance. The owner has final authority.
+- Zazu Engine Director/Jarvis is the single accountable role for sequencing, scope, evidence reconciliation and acceptance recommendations. The Founder has final authority.
 
 ## Documentation discipline
 Documentation is a tool, not a gate. Update a living record only when a decision, verified defect/fix, acceptance result or material handover changes. Do not create session diaries, duplicate summaries, new scorecards or task packets for routine work. Keep one concise current-state entry; retain historical evidence without making agents reread it.
