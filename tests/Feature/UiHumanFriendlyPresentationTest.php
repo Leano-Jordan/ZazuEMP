@@ -196,6 +196,17 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('data-zazu-offline-entity="inventory_item"', $inventory);
         $this->assertStringContainsString('data-zazu-offline-entity="expense"', $expense);
         $this->assertStringContainsString('data-zazu-offline-entity="payment"', $payment);
+
+        $purchaseCreate = file_get_contents(resource_path('views/purchasing/create.blade.php'));
+        $this->assertIsString($purchaseCreate);
+        $this->assertGreaterThanOrEqual(15, substr_count($purchaseCreate, 'class="zazu-label"'));
+        $this->assertStringContainsString('class="zazu-form p-5"', $purchaseCreate);
+        $this->assertStringContainsString('data-add-purchase-line', $purchaseCreate);
+        $this->assertStringContainsString('id="purchase-line-template"', $purchaseCreate);
+        $this->assertStringContainsString('data-zazu-offline-entity="purchase_order"', $purchaseCreate);
+        $this->assertStringContainsString('class="zazu-actionbar zazu-actionbar-sticky"', $purchaseCreate);
+        $this->assertStringNotContainsString('<span>Job (optional)</span>', $purchaseCreate);
+        $this->assertStringNotContainsString('<span>Supplier ', $purchaseCreate);
     }
 
 }
