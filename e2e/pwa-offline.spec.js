@@ -180,6 +180,9 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const workspace = page.locator('[data-zazu-offline-workspace]');
         await expect(workspace).toBeVisible({ timeout: 15_000 });
+        await expect(page.locator('.zazu-dash-hero')).toBeHidden();
+        await expect(page.locator('.zazu-dash-overview')).toBeHidden();
+        await expect(page.locator('.zazu-dash-grid')).toBeHidden();
 
         const visitOfflinePath = async (path) => page.evaluate(pathname => {
             history.replaceState({}, '', pathname);
