@@ -101,3 +101,12 @@ The current `package.json` has no icon package dependency. The dashboard current
 - Preserved the existing responsive form grid and sticky action bar; no global width changes or business-rule changes.
 - Added a focused feature regression to prevent these compact forms from drifting back to browser-default control styling.
 - This is a consistency correction, not a full visual acceptance. Purchasing and the longer Job/Quote editors remain on the broader form audit.
+
+
+## Compact form consistency correction — 2026-11-24
+
+- Normalised Inventory item creation, Finance expense entry and Finance payment entry to the shared Zazu label, input, select and textarea styles. Previously these compact forms relied on browser defaults, unlike adjacent workflows.
+- Restored visible required markers, decimal input modes and a concise reorder-level explanation. Existing form grids and sticky action bars remain contextual; no global width rule was added.
+- Preserved routes, field names, option values, defaults, idempotency keys and offline entity markers.
+- Added regression coverage alongside the existing operational presentation checks. The related assertions were consolidated into the existing presentation test method to remain within the PHPMD public-method limit.
+- Remaining: rendered visual acceptance at desktop/mobile breakpoints, plus the rest of the Jobs/Quotes/Purchasing form sweep.
