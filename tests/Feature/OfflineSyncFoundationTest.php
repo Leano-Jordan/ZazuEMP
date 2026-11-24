@@ -2,25 +2,46 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\SyncController;
 use App\Models\Business;
 use App\Models\Customer;
-use App\Http\Controllers\SyncController;
-use App\Models\SyncDelivery;
+use App\Models\CustomerContact;
+use App\Models\Event;
+use App\Models\EventAttachment;
+use App\Models\EventPreparationItem;
+use App\Models\InventoryItem;
+use App\Models\InventoryMovement;
+use App\Models\Invoice;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
+use App\Models\PurchaseOrderReceipt;
+use App\Models\Quote;
+use App\Models\Supplier;
+use App\Models\SyncConflict;
 use App\Models\SyncCursor;
+use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
-use App\Models\SyncMutation;
 use App\Models\SyncEntityIdentity;
+use App\Models\SyncMutation;
+use App\Support\CurrentBusiness;
 use App\Support\Offline\OfflineDomainMutationHandler;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Database\QueryException;
-use App\Support\Offline\SyncMutationProtocol;
+use App\Support\Offline\SyncBootstrapPayloadBuilder;
+use App\Support\Offline\SyncConflictRecorder;
+use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationHandler;
+use App\Support\Offline\SyncMutationProtocol;
 use App\Support\Offline\SyncMutationRecorder;
-use App\Support\Offline\SyncConflictRecorder;
+use App\Support\Offline\SyncMutationRelatedIdentityResolver;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 /**
@@ -110,7 +131,7 @@ class OfflineSyncFoundationTest extends TestCase
                     $mutationId,
                 );
                 $this->fail('A reused mutation ID with changed content must be rejected.');
-            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+            } catch (HttpException $exception) {
                 $this->assertSame(409, $exception->getStatusCode());
             }
         }
@@ -146,7 +167,6 @@ class OfflineSyncFoundationTest extends TestCase
         );
     }
 
-
     public function test_mutation_recorder_rejects_unsupported_streams_without_allocating_sequences(): void
     {
         $business = Business::create([
@@ -171,7 +191,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'future-stream',
             );
             $this->fail('The recorder must reject streams the client protocol cannot consume.');
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
             $this->assertArrayHasKey('stream', $exception->errors());
         }
 
@@ -242,11 +262,10 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('pending', SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->where('delivery_sequence', 2)->value('status'));
         $this->assertSame('applied', SyncMutation::query()->where('sequence', 1)->first()->status);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         $protocol->acknowledgeThrough($destinationDevice, 3);
     }
-
 
     public function test_delivery_publication_skips_a_device_revoked_after_destination_scan(): void
     {
@@ -284,7 +303,7 @@ class OfflineSyncFoundationTest extends TestCase
                     return;
                 }
 
-                \Illuminate\Support\Facades\DB::table('sync_devices')
+                DB::table('sync_devices')
                     ->where('id', $destinationDevice->id)
                     ->update(['status' => 'revoked', 'revoked_at' => now()]);
                 $revokedDuringScan = true;
@@ -335,7 +354,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncMutationProtocol::class)->acknowledgeThrough($destinationDevice, 1);
             $this->fail('An acknowledgement must not advance over a non-pending delivery.');
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
             $this->assertArrayHasKey('sequence', $exception->errors());
         }
 
@@ -375,7 +394,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncMutationProtocol::class)->pull($authenticatedSnapshot);
             $this->fail('A stale authenticated device snapshot must not pull after revocation.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+        } catch (HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
     }
@@ -412,7 +431,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncMutationProtocol::class)->acknowledgeThrough($authenticatedSnapshot, 1);
             $this->fail('A stale authenticated device snapshot must not acknowledge after revocation.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+        } catch (HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
 
@@ -443,7 +462,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncController::class)->bootstrap($revokedRequest);
             $this->fail('A stale bootstrap authentication snapshot must not disclose business data after revocation.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+        } catch (HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
 
@@ -462,7 +481,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncController::class)->bootstrap($replacedRequest);
             $this->fail('A bootstrap request authenticated with a replaced credential must be rejected.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+        } catch (HttpException $exception) {
             $this->assertSame(401, $exception->getStatusCode());
         }
     }
@@ -685,20 +704,19 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             $protocol->pull($device, 'unbounded-client-stream');
             $this->fail('Unknown sync streams must be rejected.');
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
             $this->assertArrayHasKey('stream', $exception->errors());
         }
 
         try {
             $protocol->acknowledgeThrough($device, 0, 'another-unbounded-stream');
             $this->fail('Unknown sync streams must be rejected.');
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
             $this->assertArrayHasKey('stream', $exception->errors());
         }
 
         $this->assertSame(0, SyncCursor::query()->where('sync_device_id', $device->id)->count());
     }
-
 
     public function test_pending_mutation_is_not_published_until_applied(): void
     {
@@ -732,7 +750,6 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('event-race', $batch->first()->entity_id);
     }
 
-
     public function test_sync_applier_rolls_back_domain_application_when_delivery_publish_fails(): void
     {
         $business = Business::create([
@@ -759,14 +776,16 @@ class OfflineSyncFoundationTest extends TestCase
             ['record' => ['name' => 'atomic']],
         );
 
-        app()->instance(SyncMutationRecorder::class, new class extends SyncMutationRecorder {
+        app()->instance(SyncMutationRecorder::class, new class extends SyncMutationRecorder
+        {
             public function publish(SyncMutation $mutation): void
             {
                 throw new \RuntimeException('simulated delivery failure');
             }
         });
 
-        $handler = new class implements SyncMutationHandler {
+        $handler = new class implements SyncMutationHandler
+        {
             public function apply(SyncMutation $mutation): void
             {
                 $mutation->update(['last_error' => 'handler side effect']);
@@ -810,7 +829,7 @@ class OfflineSyncFoundationTest extends TestCase
             ['name' => 'Protected'],
         );
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(SyncMutationApplier::class)->apply($mutation, []);
     }
@@ -836,7 +855,7 @@ class OfflineSyncFoundationTest extends TestCase
             'installation_id' => (string) Str::uuid(),
         ]);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(SyncConflictRecorder::class)->record(
             $first->id,
@@ -896,22 +915,22 @@ class OfflineSyncFoundationTest extends TestCase
         );
 
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
 
         $first = $applier->apply($mutation, ['customer' => $handler]);
         $second = $applier->apply($first, ['customer' => $handler]);
 
         $this->assertSame('applied', $first->status);
         $this->assertSame($first->id, $second->id);
-        $this->assertSame(1, \App\Models\Customer::query()->where('business_id', $business->id)->where('name', 'Offline Customer')->count());
-        $contact = \App\Models\CustomerContact::query()
+        $this->assertSame(1, Customer::query()->where('business_id', $business->id)->where('name', 'Offline Customer')->count());
+        $contact = CustomerContact::query()
             ->whereHas('customer', fn ($q) => $q->where('business_id', $business->id))
             ->first();
         $this->assertSame('Mandla Dlamini', $contact?->name);
         $this->assertSame('0123456789', $contact?->phone);
         $this->assertSame('customer@example.test', $contact?->email);
 
-        $customer = \App\Models\Customer::query()->where('business_id', $business->id)->where('name', 'Offline Customer')->firstOrFail();
+        $customer = Customer::query()->where('business_id', $business->id)->where('name', 'Offline Customer')->firstOrFail();
         $this->assertSame('Mandla Events', $customer->legal_name);
         $this->assertSame('2026/12345', $customer->registration_number);
         $this->assertSame('TAX-7788', $customer->tax_number);
@@ -945,7 +964,7 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-PREP-001',
             'name' => 'Offline Wedding',
@@ -953,7 +972,7 @@ class OfflineSyncFoundationTest extends TestCase
             'event_date' => now()->addDays(14)->toDateString(),
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $eventIdentity = app(SyncEntityIdentityRegistry::class)->identify($event, 'job');
         $localId = (string) Str::uuid();
         $recorder = app(SyncMutationRecorder::class);
         $mutation = $recorder->record(
@@ -976,18 +995,18 @@ class OfflineSyncFoundationTest extends TestCase
         );
 
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $first = $applier->apply($mutation, ['preparation' => $handler]);
         $second = $applier->apply($first, ['preparation' => $handler]);
 
         $this->assertSame('applied', $first->status);
         $this->assertSame($first->id, $second->id);
-        $this->assertSame(1, \App\Models\EventPreparationItem::query()
+        $this->assertSame(1, EventPreparationItem::query()
             ->where('business_id', $business->id)
             ->where('event_id', $event->id)
             ->where('title', 'Confirm buffet equipment')
             ->count());
-        $this->assertSame('ready', \App\Models\EventPreparationItem::query()->where('event_id', $event->id)->value('status'));
+        $this->assertSame('ready', EventPreparationItem::query()->where('event_id', $event->id)->value('status'));
     }
 
     public function test_offline_job_creation_preserves_customer_relationship_by_local_identity(): void
@@ -1002,7 +1021,7 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $customer = \App\Models\Customer::create([
+        $customer = Customer::create([
             'business_id' => $business->id,
             'name' => 'Offline Linked Customer',
         ]);
@@ -1013,7 +1032,7 @@ class OfflineSyncFoundationTest extends TestCase
             'label' => 'Primary',
             'is_primary' => true,
         ]);
-        $customerIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $customerIdentity = app(SyncEntityIdentityRegistry::class)
             ->identify($customer, 'customer');
 
         $localId = (string) Str::uuid();
@@ -1039,7 +1058,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $handler = app(OfflineDomainMutationHandler::class);
         $applied = app(SyncMutationApplier::class)->apply($mutation, ['job' => $handler]);
-        $event = \App\Models\Event::query()
+        $event = Event::query()
             ->where('business_id', $business->id)
             ->where('name', 'Offline linked job')
             ->firstOrFail();
@@ -1117,11 +1136,11 @@ class OfflineSyncFoundationTest extends TestCase
             app(SyncConflictRecorder::class),
         );
         $data = $response->getData(true);
-        $event = \App\Models\Event::query()
+        $event = Event::query()
             ->where('business_id', $business->id)
             ->where('name', 'Dependent offline job')
             ->firstOrFail();
-        $customer = \App\Models\Customer::query()
+        $customer = Customer::query()
             ->where('business_id', $business->id)
             ->where('name', 'Dependency-created customer')
             ->firstOrFail();
@@ -1150,11 +1169,11 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $firstBusiness->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $customer = \App\Models\Customer::create([
+        $customer = Customer::create([
             'business_id' => $secondBusiness->id,
             'name' => 'Foreign Customer',
         ]);
-        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $identity = app(SyncEntityIdentityRegistry::class)
             ->identify($customer, 'customer');
         $localId = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
@@ -1171,7 +1190,7 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         );
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         app(SyncMutationApplier::class)->apply($mutation, [
             'job' => app(OfflineDomainMutationHandler::class),
         ]);
@@ -1195,13 +1214,13 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $first->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $second->id,
             'reference' => 'OTHER-001',
             'name' => 'Other Business Event',
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $eventIdentity = app(SyncEntityIdentityRegistry::class)->identify($event, 'job');
         $localId = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
@@ -1217,12 +1236,11 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         );
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         app(SyncMutationApplier::class)->apply($mutation, [
-            'preparation' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            'preparation' => app(OfflineDomainMutationHandler::class),
         ]);
     }
-
 
     public function test_offline_purchase_order_create_is_business_scoped_and_idempotent(): void
     {
@@ -1236,11 +1254,11 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Offline Supplier',
         ]);
-        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $supplierIdentity = app(SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
         $localId = (string) Str::uuid();
         $lineLocalId = (string) Str::uuid();
 
@@ -1262,7 +1280,7 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         );
 
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $applier = app(SyncMutationApplier::class);
 
         $first = $applier->apply($mutation, ['purchase_order' => $handler]);
@@ -1270,17 +1288,17 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->assertSame('applied', $first->status);
         $this->assertSame($first->id, $second->id);
-        $this->assertSame(1, \App\Models\PurchaseOrder::query()
+        $this->assertSame(1, PurchaseOrder::query()
             ->where('business_id', $business->id)
             ->where('reference', 'PO-OFFLINE-'.strtoupper(substr($localId, 0, 8)))
             ->count());
-        $this->assertSame('2500.00', \App\Models\PurchaseOrder::query()
+        $this->assertSame('2500.00', PurchaseOrder::query()
             ->where('business_id', $business->id)
             ->value('total_amount'));
-        $this->assertSame(1, \App\Models\PurchaseOrderItem::query()
+        $this->assertSame(1, PurchaseOrderItem::query()
             ->where('business_id', $business->id)
             ->count());
-        $this->assertSame(1, \App\Models\SyncEntityIdentity::query()
+        $this->assertSame(1, SyncEntityIdentity::query()
             ->where('business_id', $business->id)
             ->where('entity_type', 'purchase_order_item')
             ->where('entity_uuid', $lineLocalId)
@@ -1305,11 +1323,11 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $first->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $second->id,
             'name' => 'Foreign Supplier',
         ]);
-        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $supplierIdentity = app(SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
         $localId = (string) Str::uuid();
 
         $mutation = app(SyncMutationRecorder::class)->record(
@@ -1329,11 +1347,11 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         );
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         app(SyncMutationApplier::class)->apply($mutation, [
-            'purchase_order' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            'purchase_order' => app(OfflineDomainMutationHandler::class),
         ]);
-        $this->assertSame(0, \App\Models\PurchaseOrder::query()->where('business_id', $first->id)->count());
+        $this->assertSame(0, PurchaseOrder::query()->where('business_id', $first->id)->count());
     }
 
     public function test_offline_purchase_receipt_is_idempotent_and_preserves_business_boundary(): void
@@ -1348,11 +1366,11 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Receiving Supplier',
         ]);
-        $order = \App\Models\PurchaseOrder::create([
+        $order = PurchaseOrder::create([
             'business_id' => $business->id,
             'supplier_id' => $supplier->id,
             'idempotency_key' => (string) Str::uuid(),
@@ -1362,7 +1380,7 @@ class OfflineSyncFoundationTest extends TestCase
             'total_amount' => '500.00',
             'ordered_at' => now()->toDateString(),
         ]);
-        $line = \App\Models\PurchaseOrderItem::create([
+        $line = PurchaseOrderItem::create([
             'business_id' => $business->id,
             'purchase_order_id' => $order->id,
             'description' => 'Catering trays',
@@ -1372,16 +1390,16 @@ class OfflineSyncFoundationTest extends TestCase
             'unit_price' => '50.00',
             'line_total' => '500.00',
         ]);
-        $inventoryItem = \App\Models\InventoryItem::create([
+        $inventoryItem = InventoryItem::create([
             'business_id' => $business->id,
             'name' => 'Catering trays',
             'unit' => 'units',
             'reorder_level' => '0.00',
         ]);
-        $inventoryIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $inventoryIdentity = app(SyncEntityIdentityRegistry::class)
             ->identify($inventoryItem, 'inventory_item');
-        $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
-        $lineIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($line, 'purchase_order_item');
+        $orderIdentity = app(SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
+        $lineIdentity = app(SyncEntityIdentityRegistry::class)->identify($line, 'purchase_order_item');
         $mutationId = (string) Str::uuid();
 
         $receiptLocalId = (string) Str::uuid();
@@ -1400,11 +1418,11 @@ class OfflineSyncFoundationTest extends TestCase
             $mutationId,
         );
 
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $applier = app(SyncMutationApplier::class);
         $first = $applier->apply($mutation, ['purchase_receipt' => $handler]);
         $second = $applier->apply($first, ['purchase_receipt' => $handler]);
-        $relatedIdentities = app(\App\Support\Offline\SyncMutationRelatedIdentityResolver::class)
+        $relatedIdentities = app(SyncMutationRelatedIdentityResolver::class)
             ->resolve($first);
         $this->assertEqualsCanonicalizing(
             ['purchase_order', 'inventory_item'],
@@ -1414,11 +1432,11 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('applied', $first->status);
         $this->assertSame($first->id, $second->id);
         $this->assertSame('4.00', $line->fresh()->received_quantity);
-        $this->assertSame(1, \App\Models\PurchaseOrderReceipt::query()
+        $this->assertSame(1, PurchaseOrderReceipt::query()
             ->where('business_id', $business->id)
             ->where('idempotency_key', $mutationId)
             ->count());
-        $this->assertSame(1, \App\Models\InventoryMovement::query()
+        $this->assertSame(1, InventoryMovement::query()
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
             ->count());
@@ -1439,13 +1457,13 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Identity Supplier',
         ]);
-        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $supplierIdentity = app(SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
         $lineLocalId = (string) Str::uuid();
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $applier = app(SyncMutationApplier::class);
 
         $first = app(SyncMutationRecorder::class)->record($device, 'purchase_order', (string) Str::uuid(), 'create', [
@@ -1469,9 +1487,9 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         ]);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         $applier->apply($second, ['purchase_order' => $handler]);
-        $this->assertSame(1, \App\Models\PurchaseOrderItem::query()->where('business_id', $business->id)->count());
+        $this->assertSame(1, PurchaseOrderItem::query()->where('business_id', $business->id)->count());
     }
 
     public function test_offline_purchase_order_can_be_created_then_received_by_local_line_identity(): void
@@ -1486,19 +1504,19 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Chain Supplier',
         ]);
-        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $supplierIdentity = app(SyncEntityIdentityRegistry::class)
             ->identify($supplier, 'supplier');
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-CHAIN-001',
             'name' => 'Offline Chain Event',
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $eventIdentity = app(SyncEntityIdentityRegistry::class)
             ->identify($event, 'job');
 
         $orderLocalId = (string) Str::uuid();
@@ -1528,7 +1546,7 @@ class OfflineSyncFoundationTest extends TestCase
         );
 
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $applier->apply($create, ['purchase_order' => $handler]);
 
         $receipt = app(SyncMutationRecorder::class)->record(
@@ -1547,22 +1565,22 @@ class OfflineSyncFoundationTest extends TestCase
 
         $applier->apply($receipt, ['purchase_receipt' => $handler]);
 
-        $orderIdentity = \App\Models\SyncEntityIdentity::query()
+        $orderIdentity = SyncEntityIdentity::query()
             ->where('business_id', $business->id)
             ->where('entity_type', 'purchase_order')
             ->where('entity_uuid', $orderLocalId)
             ->firstOrFail();
-        $order = \App\Models\PurchaseOrder::findOrFail($orderIdentity->record_id);
+        $order = PurchaseOrder::findOrFail($orderIdentity->record_id);
         $line = $order->items()->firstOrFail();
 
         $this->assertSame('3.00', $line->received_quantity);
         $this->assertSame('ordered', $order->fresh()->status);
-        $this->assertSame(1, \App\Models\InventoryMovement::query()
+        $this->assertSame(1, InventoryMovement::query()
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
             ->where('purchase_order_item_id', $line->id)
             ->count());
-        $movement = \App\Models\InventoryMovement::query()
+        $movement = InventoryMovement::query()
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
             ->where('purchase_order_item_id', $line->id)
@@ -1589,15 +1607,15 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Partial Supplier',
         ]);
-        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $supplierIdentity = app(SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
         $orderLocalId = (string) Str::uuid();
         $lineOne = (string) Str::uuid();
         $lineTwo = (string) Str::uuid();
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $applier = app(SyncMutationApplier::class);
 
         $create = app(SyncMutationRecorder::class)->record($device, 'purchase_order', $orderLocalId, 'create', [
@@ -1625,9 +1643,9 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             $applier->apply($emptyReceipt, ['purchase_receipt' => $handler]);
             $this->fail('An all-zero offline receipt must not consume its idempotency key.');
-        } catch (\Illuminate\Validation\ValidationException) {
+        } catch (ValidationException) {
             $this->assertSame('pending', $emptyReceipt->fresh()->status);
-            $this->assertSame(0, \App\Models\PurchaseOrderReceipt::query()
+            $this->assertSame(0, PurchaseOrderReceipt::query()
                 ->where('business_id', $business->id)
                 ->count());
         }
@@ -1641,16 +1659,16 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $applier->apply($partial, ['purchase_receipt' => $handler]);
 
-        $orderIdentity = \App\Models\SyncEntityIdentity::query()
+        $orderIdentity = SyncEntityIdentity::query()
             ->where('business_id', $business->id)
             ->where('entity_type', 'purchase_order')
             ->where('entity_uuid', $orderLocalId)
             ->firstOrFail();
-        $order = \App\Models\PurchaseOrder::findOrFail($orderIdentity->record_id);
+        $order = PurchaseOrder::findOrFail($orderIdentity->record_id);
         $items = $order->items()->orderBy('id')->get();
         $this->assertSame(['4.00', '3.00'], $items->pluck('received_quantity')->all());
         $this->assertSame('ordered', $order->fresh()->status);
-        $this->assertSame(2, \App\Models\InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
+        $this->assertSame(2, InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
 
         $final = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', (string) Str::uuid(), 'create', [
             'local_id' => (string) Str::uuid(),
@@ -1664,8 +1682,8 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->assertSame(['10.00', '8.00'], $order->fresh()->items()->orderBy('id')->pluck('received_quantity')->all());
         $this->assertSame('received', $order->fresh()->status);
-        $this->assertSame(4, \App\Models\InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
-        $this->assertSame(2, \App\Models\PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
+        $this->assertSame(4, InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
+        $this->assertSame(2, PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
 
         $this->assertPurchaseOrderDeliveryReconcilesOnSecondDevice($receivingDevice, $order);
     }
@@ -1688,9 +1706,9 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $first->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \App\Models\Supplier::create(['business_id' => $first->id, 'name' => 'First Supplier']);
-        $foreignSupplier = \App\Models\Supplier::create(['business_id' => $second->id, 'name' => 'Second Supplier']);
-        $order = \App\Models\PurchaseOrder::create([
+        $supplier = Supplier::create(['business_id' => $first->id, 'name' => 'First Supplier']);
+        $foreignSupplier = Supplier::create(['business_id' => $second->id, 'name' => 'Second Supplier']);
+        $order = PurchaseOrder::create([
             'business_id' => $first->id,
             'supplier_id' => $supplier->id,
             'idempotency_key' => (string) Str::uuid(),
@@ -1699,7 +1717,7 @@ class OfflineSyncFoundationTest extends TestCase
             'currency' => 'ZAR',
             'total_amount' => '100.00',
         ]);
-        $foreignOrder = \App\Models\PurchaseOrder::create([
+        $foreignOrder = PurchaseOrder::create([
             'business_id' => $second->id,
             'supplier_id' => $foreignSupplier->id,
             'idempotency_key' => (string) Str::uuid(),
@@ -1708,7 +1726,7 @@ class OfflineSyncFoundationTest extends TestCase
             'currency' => 'ZAR',
             'total_amount' => '100.00',
         ]);
-        $foreignLine = \App\Models\PurchaseOrderItem::create([
+        $foreignLine = PurchaseOrderItem::create([
             'business_id' => $second->id,
             'purchase_order_id' => $foreignOrder->id,
             'description' => 'Foreign line',
@@ -1717,8 +1735,8 @@ class OfflineSyncFoundationTest extends TestCase
             'unit_price' => '100.00',
             'line_total' => '100.00',
         ]);
-        $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
-        $foreignLineIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($foreignLine, 'purchase_order_item');
+        $orderIdentity = app(SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
+        $foreignLineIdentity = app(SyncEntityIdentityRegistry::class)->identify($foreignLine, 'purchase_order_item');
         $mutation = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', (string) Str::uuid(), 'create', [
             'local_id' => (string) Str::uuid(),
             'record' => [
@@ -1727,14 +1745,13 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         ]);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         app(SyncMutationApplier::class)->apply($mutation, [
-            'purchase_receipt' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            'purchase_receipt' => app(OfflineDomainMutationHandler::class),
         ]);
-        $this->assertSame(0, \App\Models\InventoryMovement::query()->where('business_id', $first->id)->count());
+        $this->assertSame(0, InventoryMovement::query()->where('business_id', $first->id)->count());
         $this->assertSame('0.00', $foreignLine->fresh()->received_quantity);
     }
-
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_sync_push_orders_purchase_receipt_after_parent_purchase_order_even_when_batch_is_reversed(): void
@@ -1751,11 +1768,11 @@ class OfflineSyncFoundationTest extends TestCase
             'installation_id' => (string) Str::uuid(),
         ]);
 
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'business_id' => $business->id,
             'name' => 'Offline Push Supplier',
         ]);
-        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $supplierIdentity = app(SyncEntityIdentityRegistry::class)
             ->identify($supplier, 'supplier');
 
         $purchaseOrderLocalId = (string) Str::uuid();
@@ -1800,16 +1817,16 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         ];
 
-        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+        $request = Request::create('/api/sync/push', 'POST', [
             'mutations' => [$receiptMutation, $purchaseOrderMutation],
         ]);
         $request->attributes->set('sync_device', $device);
 
-        $response = app(\App\Http\Controllers\SyncController::class)->push(
+        $response = app(SyncController::class)->push(
             $request,
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
-            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
 
@@ -1819,7 +1836,7 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertCount(2, $data['applied']);
         $this->assertSame([], array_filter($data['recorded'], fn (array $item) => $item['status'] !== 'applied'));
 
-        $order = \App\Models\PurchaseOrder::query()
+        $order = PurchaseOrder::query()
             ->where('business_id', $business->id)
             ->where('reference', 'PO-OFFLINE-'.strtoupper(substr($purchaseOrderLocalId, 0, 8)))
             ->firstOrFail();
@@ -1828,16 +1845,15 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->assertSame('received', $order->status);
         $this->assertSame('4.00', $line->received_quantity);
-        $this->assertSame(1, \App\Models\InventoryMovement::query()
+        $this->assertSame(1, InventoryMovement::query()
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
             ->count());
-        $this->assertSame(0, \App\Models\SyncMutation::query()
+        $this->assertSame(0, SyncMutation::query()
             ->where('business_id', $business->id)
             ->where('status', 'pending')
             ->count());
     }
-
 
     public function test_offline_quote_create_and_draft_update_preserve_local_identity_and_totals(): void
     {
@@ -1851,15 +1867,15 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-QUOTE-001',
             'name' => 'Offline Quote Event',
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $eventIdentity = app(SyncEntityIdentityRegistry::class)->identify($event, 'job');
         $quoteLocalId = (string) Str::uuid();
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $applier = app(SyncMutationApplier::class);
 
         $create = app(SyncMutationRecorder::class)->record($device, 'quote', $quoteLocalId, 'create', [
@@ -1882,9 +1898,9 @@ class OfflineSyncFoundationTest extends TestCase
 
         $applier->apply($create, ['quote' => $handler]);
 
-        $quote = \App\Models\Quote::query()->where('event_id', $event->id)->firstOrFail();
+        $quote = Quote::query()->where('event_id', $event->id)->firstOrFail();
         $version = $quote->latestVersion()->firstOrFail();
-        $this->assertSame($quoteLocalId, \App\Models\SyncEntityIdentity::query()
+        $this->assertSame($quoteLocalId, SyncEntityIdentity::query()
             ->where('business_id', $business->id)
             ->where('entity_type', 'quote')
             ->where('record_id', $quote->id)
@@ -1916,7 +1932,6 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('Updated catering package', $version->items->first()->description);
     }
 
-
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_sync_push_orders_reversed_commercial_chain_by_dependency(): void
     {
@@ -1935,13 +1950,13 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-COMM-001',
             'name' => 'Offline Commercial Event',
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $eventIdentity = app(SyncEntityIdentityRegistry::class)->identify($event, 'job');
         $quoteLocalId = (string) Str::uuid();
         $acceptanceLocalId = (string) Str::uuid();
         $invoiceLocalId = (string) Str::uuid();
@@ -2012,16 +2027,16 @@ class OfflineSyncFoundationTest extends TestCase
             ],
         ];
 
-        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+        $request = Request::create('/api/sync/push', 'POST', [
             'mutations' => [$paymentMutation, $invoiceMutation, $acceptanceMutation, $quoteMutation],
         ]);
         $request->attributes->set('sync_device', $device);
 
-        $response = app(\App\Http\Controllers\SyncController::class)->push(
+        $response = app(SyncController::class)->push(
             $request,
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
-            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
         $data = $response->getData(true);
@@ -2029,15 +2044,15 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertCount(4, $data['applied']);
         $this->assertSame([], array_filter($data['recorded'], fn (array $item) => $item['status'] !== 'applied'));
 
-        $invoice = \App\Models\Invoice::query()->where('business_id', $business->id)->firstOrFail();
+        $invoice = Invoice::query()->where('business_id', $business->id)->firstOrFail();
         $this->assertSame('1000.00', $invoice->total);
         $this->assertSame('250.00', $invoice->paid_amount);
-        $this->assertSame('accepted', \App\Models\Quote::query()->whereKey($invoice->quote_id)->value('status'));
+        $this->assertSame('accepted', Quote::query()->whereKey($invoice->quote_id)->value('status'));
 
         // Verify that a second paired installation receives the committed
         // commercial chain, reconciles nested payment data, and acknowledges
         // only its contiguous delivery prefix.
-        $protocol = app(\App\Support\Offline\SyncMutationProtocol::class);
+        $protocol = app(SyncMutationProtocol::class);
         $delivered = $protocol->pull($receivingDevice, 'business', 100);
         $this->assertCount(4, $delivered);
         $this->assertSame([1, 2, 3, 4], $delivered->pluck('delivery_sequence')->all());
@@ -2049,7 +2064,7 @@ class OfflineSyncFoundationTest extends TestCase
         $deliverySequences = $delivered->pluck('delivery_sequence')
             ->map(static fn ($sequence): int => (int) $sequence)
             ->all();
-        $remoteSnapshot = app(\App\Support\Offline\SyncBootstrapPayloadBuilder::class)
+        $remoteSnapshot = app(SyncBootstrapPayloadBuilder::class)
             ->build($receivingDevice, $deliverySequences);
         $remoteInvoice = collect($remoteSnapshot['invoices'])->first(
             fn (array $item): bool => (int) ($item['server_id'] ?? 0) === (int) $invoice->id,
@@ -2078,13 +2093,13 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-FIN-001',
             'name' => 'Offline Finance Event',
             'status' => 'draft',
         ]);
-        $quote = \App\Models\Quote::create([
+        $quote = Quote::create([
             'event_id' => $event->id,
             'reference' => 'QUO-OFF-FIN-001',
             'status' => 'sent',
@@ -2112,10 +2127,10 @@ class OfflineSyncFoundationTest extends TestCase
             'source_snapshot' => ['offline' => false],
         ]);
 
-        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $registry = app(SyncEntityIdentityRegistry::class);
         $quoteIdentity = $registry->identify($quote, 'quote');
         $eventIdentity = $registry->identify($event, 'job');
-        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $handler = app(OfflineDomainMutationHandler::class);
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
 
@@ -2141,14 +2156,14 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $applier->apply($invoiceMutation, ['invoice' => $handler]);
 
-        $invoice = \App\Models\Invoice::query()->where('business_id', $business->id)->firstOrFail();
+        $invoice = Invoice::query()->where('business_id', $business->id)->firstOrFail();
         $this->assertSame('1000.00', $invoice->total);
 
         $paymentLocalId = (string) Str::uuid();
         $paymentMutation = $recorder->record($device, 'payment', $paymentLocalId, 'create', [
             'local_id' => $paymentLocalId,
             'record' => [
-                'invoice_local_id' => app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($invoice, 'invoice')->entity_uuid,
+                'invoice_local_id' => app(SyncEntityIdentityRegistry::class)->identify($invoice, 'invoice')->entity_uuid,
                 'type' => 'deposit',
                 'amount' => '250.00',
                 'method' => 'bank_transfer',
@@ -2186,7 +2201,7 @@ class OfflineSyncFoundationTest extends TestCase
     {
         $business = Business::create([
             'name' => 'Retryable Sync Business',
-            'slug' => 'retryable-sync-' . Str::lower(Str::random(8)),
+            'slug' => 'retryable-sync-'.Str::lower(Str::random(8)),
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
@@ -2241,7 +2256,7 @@ class OfflineSyncFoundationTest extends TestCase
     {
         $business = Business::create([
             'name' => 'Conflict Push Business',
-            'slug' => 'conflict-push-' . Str::lower(Str::random(8)),
+            'slug' => 'conflict-push-'.Str::lower(Str::random(8)),
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
@@ -2254,7 +2269,7 @@ class OfflineSyncFoundationTest extends TestCase
         $mutationId = (string) Str::uuid();
         $localId = (string) Str::uuid();
 
-        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+        $request = Request::create('/api/sync/push', 'POST', [
             'mutations' => [[
                 'id' => $mutationId,
                 'entity_type' => 'customer',
@@ -2270,16 +2285,16 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $request->attributes->set('sync_device', $device);
 
-        $response = app(\App\Http\Controllers\SyncController::class)->push(
+        $response = app(SyncController::class)->push(
             $request,
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
-            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
         $data = $response->getData(true);
 
-        $conflict = \App\Models\SyncConflict::query()
+        $conflict = SyncConflict::query()
             ->where('business_id', $business->id)
             ->where('mutation_id', $mutationId)
             ->firstOrFail();
@@ -2289,7 +2304,7 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('open', $conflict->status);
         $this->assertSame('domain_rejection', $conflict->conflict_type);
 
-        $secondRequest = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+        $secondRequest = Request::create('/api/sync/push', 'POST', [
             'mutations' => [[
                 'id' => $mutationId,
                 'entity_type' => 'customer',
@@ -2305,24 +2320,23 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $secondRequest->attributes->set('sync_device', $device);
 
-        app(\App\Http\Controllers\SyncController::class)->push(
+        app(SyncController::class)->push(
             $secondRequest,
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
-            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
 
-        $this->assertSame(1, \App\Models\SyncConflict::query()
+        $this->assertSame(1, SyncConflict::query()
             ->where('business_id', $business->id)
             ->where('mutation_id', $mutationId)
             ->count());
     }
 
-
     public function test_sync_attachment_upload_is_business_scoped_and_idempotent(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('private');
+        Storage::fake('private');
 
         $business = Business::create([
             'name' => 'Attachment Sync Business',
@@ -2337,7 +2351,7 @@ class OfflineSyncFoundationTest extends TestCase
             'status' => 'active',
         ]);
 
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'reference' => 'ATT-SYNC-001',
             'name' => 'Attachment Sync Event',
@@ -2345,18 +2359,19 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
 
         $idempotencyKey = (string) Str::uuid();
-        $makeRequest = function () use ($device, $event, $idempotencyKey): \Illuminate\Http\Request {
-            $request = \Illuminate\Http\Request::create('/api/sync/attachments', 'POST', [
+        $makeRequest = function () use ($device, $event, $idempotencyKey): Request {
+            $request = Request::create('/api/sync/attachments', 'POST', [
                 'event_id' => $event->id,
                 'idempotency_key' => $idempotencyKey,
             ], [], [
-                'file' => \Illuminate\Http\UploadedFile::fake()->create('menu.pdf', 10, 'application/pdf'),
+                'file' => UploadedFile::fake()->create('menu.pdf', 10, 'application/pdf'),
             ]);
             $request->attributes->set('sync_device', $device);
+
             return $request;
         };
 
-        $controller = app(\App\Http\Controllers\SyncController::class);
+        $controller = app(SyncController::class);
         $first = $controller->uploadAttachment($makeRequest());
         $second = $controller->uploadAttachment($makeRequest());
 
@@ -2364,21 +2379,20 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(200, $second->getStatusCode());
         $this->assertFalse($first->getData(true)['duplicate']);
         $this->assertTrue($second->getData(true)['duplicate']);
-        $this->assertSame(1, \App\Models\EventAttachment::query()
+        $this->assertSame(1, EventAttachment::query()
             ->where('business_id', $business->id)
             ->where('idempotency_key', $idempotencyKey)
             ->count());
 
-        $attachment = \App\Models\EventAttachment::query()->firstOrFail();
-        \Illuminate\Support\Facades\Storage::disk('private')->assertExists($attachment->path);
+        $attachment = EventAttachment::query()->firstOrFail();
+        Storage::disk('private')->assertExists($attachment->path);
     }
-
 
     public function test_sync_pairing_code_is_consumed_once(): void
     {
         $business = Business::create([
             'name' => 'Pairing Business',
-            'slug' => 'pairing-' . Str::lower(Str::random(8)),
+            'slug' => 'pairing-'.Str::lower(Str::random(8)),
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
@@ -2389,7 +2403,7 @@ class OfflineSyncFoundationTest extends TestCase
             'installation_id' => (string) Str::uuid(),
             'status' => 'pending',
             'metadata' => [
-                'pairing_code_hash' => \Illuminate\Support\Facades\Hash::make($code),
+                'pairing_code_hash' => Hash::make($code),
                 'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
             ],
         ]);
@@ -2421,7 +2435,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->travelBack();
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         $controller->provision($makeRequest());
     }
 
@@ -2430,7 +2444,7 @@ class OfflineSyncFoundationTest extends TestCase
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
 
-        $customer = \App\Models\Customer::create([
+        $customer = Customer::create([
             'business_id' => $business->id,
             'name' => 'Offline Pairing Customer',
             'legal_name' => 'Offline Pairing Events',
@@ -2443,7 +2457,7 @@ class OfflineSyncFoundationTest extends TestCase
             'is_primary' => true,
         ]);
 
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'customer_id' => $customer->id,
             'reference' => 'PAIRING-001',
@@ -2452,13 +2466,13 @@ class OfflineSyncFoundationTest extends TestCase
             'event_date' => now()->addDays(14)->toDateString(),
             'status' => 'confirmed',
         ]);
-        $quote = \App\Models\Quote::create([
+        $quote = Quote::create([
             'event_id' => $event->id,
             'reference' => 'PAIRING-Q-001',
             'status' => 'draft',
             'currency' => 'ZAR',
         ]);
-        $preparation = \App\Models\EventPreparationItem::create([
+        $preparation = EventPreparationItem::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
             'title' => 'Confirm venue access',
@@ -2473,7 +2487,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $pairingResponse = app(SyncController::class)->createPairing(
             $pairingRequest,
-            app(\App\Support\CurrentBusiness::class),
+            app(CurrentBusiness::class),
         );
         $pairing = $pairingResponse->getData(true);
         $this->assertMatchesRegularExpression('/^\d{8}$/', $pairing['pairing_code']);
@@ -2514,7 +2528,7 @@ class OfflineSyncFoundationTest extends TestCase
         $pairingRequest->setUserResolver(fn () => $user);
         $pairing = app(SyncController::class)->createPairing(
             $pairingRequest,
-            app(\App\Support\CurrentBusiness::class),
+            app(CurrentBusiness::class),
         )->getData(true);
 
         $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
@@ -2524,12 +2538,12 @@ class OfflineSyncFoundationTest extends TestCase
             'device_type' => 'phone',
         ]));
 
-        $customer = \App\Models\Customer::create([
+        $customer = Customer::create([
             'business_id' => $business->id,
             'name' => 'Customer Added After Pairing',
             'legal_name' => 'Post Pairing Events',
         ]);
-        $event = \App\Models\Event::create([
+        $event = Event::create([
             'business_id' => $business->id,
             'customer_id' => $customer->id,
             'reference' => 'PAIRING-002',
@@ -2538,13 +2552,13 @@ class OfflineSyncFoundationTest extends TestCase
             'event_date' => now()->addDays(21)->toDateString(),
             'status' => 'confirmed',
         ]);
-        $quote = \App\Models\Quote::create([
+        $quote = Quote::create([
             'event_id' => $event->id,
             'reference' => 'PAIRING-Q-002',
             'status' => 'draft',
             'currency' => 'ZAR',
         ]);
-        \App\Models\EventPreparationItem::create([
+        EventPreparationItem::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
             'title' => 'New post-pairing preparation',
@@ -2568,7 +2582,7 @@ class OfflineSyncFoundationTest extends TestCase
     {
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
-        $selectedCustomer = \App\Models\Customer::create([
+        $selectedCustomer = Customer::create([
             'business_id' => $business->id,
             'name' => 'Pinned Offline Customer',
         ]);
@@ -2579,7 +2593,7 @@ class OfflineSyncFoundationTest extends TestCase
         $pairingRequest->setUserResolver(fn () => $user);
         $pairing = app(SyncController::class)->createPairing(
             $pairingRequest,
-            app(\App\Support\CurrentBusiness::class),
+            app(CurrentBusiness::class),
         )->getData(true);
 
         $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
@@ -2593,11 +2607,11 @@ class OfflineSyncFoundationTest extends TestCase
             'device_type' => 'phone',
         ]));
 
-        $unselectedCustomer = \App\Models\Customer::create([
+        $unselectedCustomer = Customer::create([
             'business_id' => $business->id,
             'name' => 'Newer Customer Not Selected',
         ]);
-        $unselectedIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+        $unselectedIdentity = app(SyncEntityIdentityRegistry::class)
             ->identify($unselectedCustomer, 'customer');
         $unselectedCustomer->update(['name' => 'Delivered but not pinned']);
         $sourceDevice = SyncDevice::create([
@@ -2621,7 +2635,7 @@ class OfflineSyncFoundationTest extends TestCase
             'applied_at' => now(),
         ]);
         app(SyncMutationRecorder::class)->publish($mutation);
-        $delivery = \App\Models\SyncDelivery::query()
+        $delivery = SyncDelivery::query()
             ->where('business_id', $business->id)
             ->where('destination_device_id', $device->id)
             ->where('sync_mutation_id', $mutation->id)
@@ -2646,7 +2660,7 @@ class OfflineSyncFoundationTest extends TestCase
     {
         $business = Business::create([
             'name' => 'Conflict Business',
-            'slug' => 'conflict-' . Str::lower(Str::random(8)),
+            'slug' => 'conflict-'.Str::lower(Str::random(8)),
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
@@ -2746,7 +2760,7 @@ class OfflineSyncFoundationTest extends TestCase
             app(SyncConflictRecorder::class),
         );
         $recorded = $response->getData(true)['recorded'][0];
-        $conflict = \App\Models\SyncConflict::query()->findOrFail($recorded['conflict_id']);
+        $conflict = SyncConflict::query()->findOrFail($recorded['conflict_id']);
 
         $this->assertSame('mutation_identity_mismatch', $recorded['conflict_type']);
         $this->assertNull($recorded['related_identity']);
@@ -2778,7 +2792,7 @@ class OfflineSyncFoundationTest extends TestCase
             app(SyncConflictRecorder::class),
         );
         $this->assertSame($conflict->id, $duplicateResponse->getData(true)['recorded'][0]['conflict_id']);
-        $this->assertSame(1, \App\Models\SyncConflict::query()
+        $this->assertSame(1, SyncConflict::query()
             ->where('business_id', $business->id)
             ->where('mutation_id', $mutationId)
             ->where('conflict_type', 'mutation_identity_mismatch')
@@ -2813,7 +2827,7 @@ class OfflineSyncFoundationTest extends TestCase
     {
         $business = Business::create([
             'name' => 'Identity Handoff Business',
-            'slug' => 'identity-handoff-' . Str::lower(Str::random(8)),
+            'slug' => 'identity-handoff-'.Str::lower(Str::random(8)),
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
@@ -2941,7 +2955,7 @@ class OfflineSyncFoundationTest extends TestCase
             'installation_id' => (string) Str::uuid(),
             'status' => 'pending',
             'metadata' => [
-                'pairing_code_hash' => \Illuminate\Support\Facades\Hash::make($code),
+                'pairing_code_hash' => Hash::make($code),
                 'pairing_expires_at' => now()->subSecond()->toIso8601String(),
             ],
         ]);
@@ -2955,7 +2969,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncController::class)->provision($request);
             $this->fail('An expired pairing code must not provision a device.');
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
             $this->assertArrayHasKey('pairing_code', $exception->errors());
         }
 
@@ -2963,9 +2977,9 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertNull($device->fresh()->metadata['sync_token_hash'] ?? null);
     }
 
-    private function assertPurchaseOrderDeliveryReconcilesOnSecondDevice(SyncDevice $receivingDevice, \App\Models\PurchaseOrder $order): void
+    private function assertPurchaseOrderDeliveryReconcilesOnSecondDevice(SyncDevice $receivingDevice, PurchaseOrder $order): void
     {
-        $protocol = app(\App\Support\Offline\SyncMutationProtocol::class);
+        $protocol = app(SyncMutationProtocol::class);
         $deliveries = $protocol->pull($receivingDevice, 'business', 100);
         $this->assertCount(3, $deliveries);
         $this->assertSame(
@@ -2990,7 +3004,7 @@ class OfflineSyncFoundationTest extends TestCase
             collect($remoteOrder['items'])->pluck('record.received_quantity')->all(),
         );
 
-        $receivedInventoryIds = \Illuminate\Support\Facades\DB::table('inventory_movements')
+        $receivedInventoryIds = DB::table('inventory_movements')
             ->where('business_id', $order->business_id)
             ->where('purchase_order_id', $order->id)
             ->distinct()
@@ -3008,5 +3022,4 @@ class OfflineSyncFoundationTest extends TestCase
         $cursor = $protocol->acknowledgeThrough($receivingDevice, 3, 'business');
         $this->assertSame(3, (int) $cursor->last_acknowledged_sequence);
     }
-
 }
