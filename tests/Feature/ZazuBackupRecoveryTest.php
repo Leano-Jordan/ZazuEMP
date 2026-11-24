@@ -152,6 +152,7 @@ class ZazuBackupRecoveryTest extends TestCase
             $output = Artisan::output();
 
             $this->assertSame(1, $exitCode, $output);
+            $this->assertFileExists($countFile, $output.' MySQL executable invocation marker was not created.');
             $this->assertSame('2', trim(File::get($countFile)), 'MySQL should be invoked once for candidate import and once for rollback.');
             $this->assertStringContainsString('-- candidate restore SQL', File::get($logDirectory.'/import-1.sql'));
             $this->assertStringContainsString('-- pre-restore snapshot marker', File::get($logDirectory.'/import-2.sql'));
