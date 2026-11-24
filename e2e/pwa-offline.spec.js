@@ -4324,4 +4324,37 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
+    test('cold installed-app launch opens the local workspace while in-app Work navigation retains its cached detail', async ({ page, context }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Cold-launch navigation contract runs on desktop and phone viewport.');
+
+        await login(page);
+        await page.goto('/work', { waitUntil: 'domcontentloaded' });
+        const workLink = page.locator('a[href^="/work/"]:not([href="/work/create"])').first();
+        await expect(workLink).toBeVisible();
+        const workUrl = await workLink.getAttribute('href');
+        expect(workUrl).toMatch(new RegExp('^/work/[0-9]+$'));
+
+        await page.goto(workUrl, { waitUntil: 'domcontentloaded' });
+        await expect(page).toHaveURL(new URL(workUrl, page.url()).href);
+        await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+        await expect.poll(() => page.evaluate(async (path) => {
+            for (const name of await caches.keys()) {
+                const cache = await caches.open(name);
+                if (await cache.match(new URL(path, window.location.origin).href)) return true;
+            }
+            return false;
+        }, workUrl)).toBe(true);
+
+        await context.setOffline(true);
+        const coldLaunch = await context.newPage();
+        await coldLaunch.goto(new URL(workUrl, page.url()).href, { waitUntil: 'domcontentloaded' });
+        await expect(coldLaunch).toHaveURL(/\\/dashboard$/);
+        await expect(coldLaunch.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeVisible();
+
+        await page.goto(workUrl, { waitUntil: 'domcontentloaded' });
+        await expect(page).toHaveURL(new URL(workUrl, page.url()).href);
+    });
+
 });
