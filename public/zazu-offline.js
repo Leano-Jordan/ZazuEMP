@@ -15,6 +15,7 @@
     const STATE = 'state';
     const QUEUE = 'mutations';
     let state = null;
+    let durableStateSnapshot = null;
     let syncing = false;
     let syncRequested = false;
     let activeSyncController = null;
@@ -97,6 +98,111 @@
         return opening;
     }
 
+    function cloneWorkspaceState(value) {
+        if (typeof structuredClone === 'function') return structuredClone(value);
+        return JSON.parse(JSON.stringify(value));
+    }
+
+    function sameWorkspaceValue(left, right) {
+        return JSON.stringify(left) === JSON.stringify(right);
+    }
+
+    function workspaceRecordIdentity(record) {
+        const identity = record?.local_id ?? record?.server_id ?? record?.id;
+        return identity === null || identity === undefined || identity === ''
+            ? null
+            : String(identity);
+    }
+
+    function mergeWorkspaceChanges(latest, baseline, proposed) {
+        const merged = cloneWorkspaceState(latest || {});
+        const beforeState = baseline || {};
+        const proposedState = proposed || {};
+        const keys = new Set([...Object.keys(beforeState), ...Object.keys(proposedState)]);
+
+        for (const key of keys) {
+            const before = beforeState[key];
+            const after = proposedState[key];
+            if (sameWorkspaceValue(before, after)) continue;
+
+            const current = latest?.[key];
+            if (Array.isArray(before) && Array.isArray(after) && Array.isArray(current)) {
+                const beforeEntries = new Map();
+                const afterEntries = new Map();
+                const currentEntries = new Map();
+                const hasStableIdentity = [before, after, current].every(collection => {
+                    const entries = collection.map(item => [workspaceRecordIdentity(item), item]);
+                    if (entries.some(([identity]) => identity === null)
+                        || new Set(entries.map(([identity]) => identity)).size !== entries.length) {
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (!hasStableIdentity) {
+                    if (!sameWorkspaceValue(current, before) && !sameWorkspaceValue(current, after)) {
+                        throw new Error('This workspace changed in another tab. Refresh the workspace and retry your change.');
+                    }
+                    merged[key] = cloneWorkspaceState(after);
+                    continue;
+                }
+
+                for (const item of before) beforeEntries.set(workspaceRecordIdentity(item), item);
+                for (const item of after) afterEntries.set(workspaceRecordIdentity(item), item);
+                for (const item of current) currentEntries.set(workspaceRecordIdentity(item), item);
+
+                const result = [...current];
+                for (const [identity, beforeItem] of beforeEntries) {
+                    const afterItem = afterEntries.get(identity);
+                    const currentItem = currentEntries.get(identity);
+                    const currentIndex = result.findIndex(item => workspaceRecordIdentity(item) === identity);
+
+                    if (afterItem === undefined) {
+                        if (currentItem === undefined) continue;
+                        if (!sameWorkspaceValue(currentItem, beforeItem)) {
+                            throw new Error('This record changed in another tab. Refresh it before deleting or editing it.');
+                        }
+                        result.splice(currentIndex, 1);
+                        currentEntries.delete(identity);
+                        continue;
+                    }
+
+                    if (sameWorkspaceValue(beforeItem, afterItem)) continue;
+                    if (currentItem !== undefined && sameWorkspaceValue(currentItem, afterItem)) continue;
+                    if (currentItem === undefined || !sameWorkspaceValue(currentItem, beforeItem)) {
+                        throw new Error('This record changed in another tab. Refresh it before applying your edit.');
+                    }
+
+                    result[currentIndex] = cloneWorkspaceState(afterItem);
+                    currentEntries.set(identity, afterItem);
+                }
+
+                for (const [identity, afterItem] of afterEntries) {
+                    if (beforeEntries.has(identity)) continue;
+                    const currentItem = currentEntries.get(identity);
+                    if (currentItem !== undefined) {
+                        if (!sameWorkspaceValue(currentItem, afterItem)) {
+                            throw new Error('A record with this local identity was added in another tab. Refresh the workspace and retry.');
+                        }
+                        continue;
+                    }
+                    result.push(cloneWorkspaceState(afterItem));
+                    currentEntries.set(identity, afterItem);
+                }
+
+                merged[key] = result;
+                continue;
+            }
+
+            if (!sameWorkspaceValue(current, before) && !sameWorkspaceValue(current, after)) {
+                throw new Error('This workspace changed in another tab. Refresh the workspace and retry your change.');
+            }
+            merged[key] = cloneWorkspaceState(after);
+        }
+
+        return merged;
+    }
+
     async function readState() {
         const db = await openDb();
         const stored = await new Promise((resolve, reject) => {
@@ -175,28 +281,44 @@
     async function writeState({ allowSessionChange = false } = {}) {
         const stateToWrite = state;
         const expectedToken = stateToWrite?.sync?.token || null;
+        const baseline = durableStateSnapshot || cloneWorkspaceState(stateToWrite || blank());
         const db = await openDb();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STATE, 'readwrite');
             const store = tx.objectStore(STATE);
             const current = store.get('current');
             let sessionMismatch = false;
+            let mergeError = null;
+            let mergedState = null;
 
             current.onsuccess = () => {
-                const persistedToken = current.result?.sync?.token || null;
+                const persistedState = current.result || blank();
+                const persistedToken = persistedState?.sync?.token || null;
                 if (!allowSessionChange && persistedToken !== expectedToken) {
                     sessionMismatch = true;
                     tx.abort();
                     return;
                 }
-                store.put(stateToWrite, 'current');
+
+                try {
+                    mergedState = mergeWorkspaceChanges(persistedState, baseline, stateToWrite);
+                    store.put(mergedState, 'current');
+                } catch (error) {
+                    mergeError = error;
+                    tx.abort();
+                }
             };
             current.onerror = () => tx.abort();
-            tx.oncomplete = resolve;
-            tx.onerror = () => reject(tx.error || new Error('Local offline state write failed.'));
+            tx.oncomplete = () => {
+                state = mergedState;
+                durableStateSnapshot = cloneWorkspaceState(mergedState);
+                sessionChannel?.postMessage({ type: 'workspace-updated' });
+                resolve();
+            };
+            tx.onerror = () => reject(mergeError || tx.error || new Error('Local offline state write failed.'));
             tx.onabort = () => reject(sessionMismatch
                 ? new Error('The offline device session changed before local state could be saved.')
-                : (tx.error || new Error('Local offline state write was aborted.')));
+                : (mergeError || tx.error || new Error('Local offline state write was aborted.')));
         });
     }
 
@@ -1342,6 +1464,23 @@
     }
 
     sessionChannel?.addEventListener('message', event => {
+        if (event.data?.type === 'workspace-updated') {
+            if (sessionCleared) return;
+            Promise.resolve().then(async () => {
+                await ready;
+                if (sessionCleared) return;
+                const nextState = await readState();
+                if (!nextState) return;
+                if ((nextState.sync?.token || null) !== (state?.sync?.token || null)) return;
+                state = nextState;
+                durableStateSnapshot = cloneWorkspaceState(nextState);
+                window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+            }).catch(() => {
+                // IndexedDB remains authoritative; the next local write re-reads it transactionally.
+            });
+            return;
+        }
+
         if (event.data?.type === 'clear-session') {
             sessionCleared = true;
             sessionGeneration++;
@@ -1370,6 +1509,7 @@
             }
 
             state = nextState;
+            durableStateSnapshot = cloneWorkspaceState(nextState);
             sessionCleared = false;
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             if (!navigator.onLine) return;
@@ -1425,7 +1565,9 @@
         if (!storageAvailable) {
             throw new Error('Local offline storage is unavailable; this change was not saved.');
         }
-        const expectedToken = (nextState || state)?.sync?.token || null;
+        const proposedState = nextState || state;
+        const expectedToken = proposedState?.sync?.token || null;
+        const baseline = durableStateSnapshot || cloneWorkspaceState(state || blank());
         const record = payload?.record && typeof payload.record === 'object' && !Array.isArray(payload.record)
             ? payload.record
             : (payload || {});
@@ -1457,18 +1599,19 @@
         }
 
         return new Promise((resolve, reject) => {
-            const stateToPersist = { ...(nextState || state), local_dirty: true };
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
             const stateStore = tx.objectStore(STATE);
             const queueStore = tx.objectStore(QUEUE);
             const currentState = stateStore.get('current');
             const queuedRequest = queueStore.getAll();
             let sessionMismatch = false;
+            let mergeError = null;
+            let stateToPersist = null;
             let currentReady = false;
             let queueReady = false;
 
             const prepareMutation = () => {
-                if (!currentReady || !queueReady || sessionMismatch) return;
+                if (!currentReady || !queueReady || sessionMismatch || mergeError) return;
                 const queueItems = queuedRequest.result || [];
                 const hasLegacyOrder = queueItems.some(item => !Number.isSafeInteger(Number(item.queue_order)) || Number(item.queue_order) < 1);
                 if (hasLegacyOrder) {
@@ -1480,6 +1623,19 @@
                 }
                 const nextQueueOrder = queueItems.reduce((maximum, item) => Math.max(maximum, Number(item.queue_order) || 0), 0) + 1;
                 mutation.queue_order = nextQueueOrder;
+
+                try {
+                    stateToPersist = mergeWorkspaceChanges(
+                        currentState.result || blank(),
+                        baseline,
+                        proposedState
+                    );
+                    stateToPersist.local_dirty = true;
+                } catch (error) {
+                    mergeError = error;
+                    tx.abort();
+                    return;
+                }
 
                 const queuedForEntity = queueItems
                     .filter(item => ['pending', 'failed'].includes(item.status)
@@ -1518,17 +1674,26 @@
             queuedRequest.onerror = () => tx.abort();
             tx.oncomplete = () => {
                 state = stateToPersist;
+                durableStateSnapshot = cloneWorkspaceState(stateToPersist);
+                sessionChannel?.postMessage({ type: 'workspace-updated' });
                 if (navigator.onLine) scheduleSyncRetry();
                 resolve(mutation);
             };
             tx.onerror = () => {
-                if (sessionMismatch) return;
+                if (sessionMismatch || mergeError) return;
                 storageAvailable = false;
                 reject(tx.error || new Error('Local offline queue transaction failed.'));
             };
             tx.onabort = () => {
                 if (sessionMismatch) {
                     reject(new Error('The device session changed before this offline change could be saved. Refresh the workspace and retry.'));
+                    return;
+                }
+                if (mergeError) {
+                    state = cloneWorkspaceState(currentState.result || state || blank());
+                    durableStateSnapshot = cloneWorkspaceState(state);
+                    window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                    reject(mergeError);
                     return;
                 }
                 storageAvailable = false;
@@ -2283,6 +2448,7 @@
     async function boot() {
         try {
             state = (await readState()) || blank();
+            durableStateSnapshot = cloneWorkspaceState(state);
         } catch (error) {
             // A storage failure must not leave every caller waiting on ready.
             // Resolve startup, but refuse local mutations because they cannot be

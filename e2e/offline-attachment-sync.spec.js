@@ -1055,6 +1055,131 @@ test('late private attachment download cannot repopulate local files after logou
     })).toBe(0);
 });
 
+test('concurrent offline tabs merge unrelated records and reject stale same-record edits', async ({ page, context }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Multi-tab workspace consistency contract runs once in Chromium.');
+
+    await page.addInitScript(() => {
+        window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+    });
+    await login(page);
+    await page.evaluate(async () => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        const businessId = Number(document.body.dataset.zazuBusinessId);
+        state.sync = { token: 'cross-tab-workspace-token', device: { id: 987670, business_id: businessId } };
+        state.customers = [{
+            local_id: 'cross-tab-shared-customer',
+            server_id: null,
+            name: 'Original shared customer',
+            revision: 1,
+        }];
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+    });
+
+    const secondTab = await context.newPage();
+    await secondTab.addInitScript(() => {
+        window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        // Deliberately remove cross-tab notifications to exercise the durable
+        // merge path when a suspended or restricted browser misses a message.
+        window.BroadcastChannel = undefined;
+    });
+    await secondTab.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.getState().sync?.token))
+        .toBe('cross-tab-workspace-token');
+
+    await context.setOffline(true);
+
+    await page.evaluate(async () => {
+        const nextState = structuredClone(window.ZazuOffline.getState());
+        nextState.customers.push({
+            local_id: 'cross-tab-tab-one-customer',
+            name: 'Customer created in tab one',
+            revision: 1,
+        });
+        await window.ZazuOffline.queueMutation('customer', 'create', {
+            local_id: 'cross-tab-tab-one-customer',
+            record: { name: 'Customer created in tab one' },
+        }, nextState);
+    });
+
+    // This second tab still holds the original snapshot. Its transaction must
+    // merge its new record with tab one's durable write rather than replace it.
+    await secondTab.evaluate(async () => {
+        const nextState = structuredClone(window.ZazuOffline.getState());
+        nextState.customers.push({
+            local_id: 'cross-tab-tab-two-customer',
+            name: 'Customer created in tab two',
+            revision: 1,
+        });
+        await window.ZazuOffline.queueMutation('customer', 'create', {
+            local_id: 'cross-tab-tab-two-customer',
+            record: { name: 'Customer created in tab two' },
+        }, nextState);
+    });
+
+    await page.evaluate(async () => {
+        const nextState = structuredClone(window.ZazuOffline.getState());
+        const customer = nextState.customers.find(item => item.local_id === 'cross-tab-shared-customer');
+        customer.name = 'Updated by tab one';
+        customer.revision = 2;
+        await window.ZazuOffline.queueMutation('customer', 'update', {
+            local_id: customer.local_id,
+            record: { name: customer.name },
+        }, nextState);
+    });
+
+    const staleEditError = await secondTab.evaluate(async () => {
+        const nextState = structuredClone(window.ZazuOffline.getState());
+        const customer = nextState.customers.find(item => item.local_id === 'cross-tab-shared-customer');
+        customer.name = 'Stale edit from tab two';
+        customer.revision = 2;
+        try {
+            await window.ZazuOffline.queueMutation('customer', 'update', {
+                local_id: customer.local_id,
+                record: { name: customer.name },
+            }, nextState);
+            return null;
+        } catch (error) {
+            return error.message;
+        }
+    });
+    expect(staleEditError).toContain('changed in another tab');
+
+    const durable = await page.evaluate(async () => {
+        const businessId = Number(document.body.dataset.zazuBusinessId);
+        const database = await new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-client-business-' + businessId);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error || new Error('Could not inspect the durable workspace.'));
+        });
+        const result = await new Promise((resolve, reject) => {
+            const tx = database.transaction(['state', 'mutations'], 'readonly');
+            const stateRequest = tx.objectStore('state').get('current');
+            const queueRequest = tx.objectStore('mutations').getAll();
+            tx.oncomplete = () => resolve({
+                state: stateRequest.result,
+                mutations: queueRequest.result || [],
+            });
+            tx.onerror = () => reject(tx.error || new Error('Could not inspect the durable workspace transaction.'));
+        });
+        database.close();
+        return result;
+    });
+
+    expect(durable.state.customers.map(item => item.local_id)).toEqual(expect.arrayContaining([
+        'cross-tab-shared-customer',
+        'cross-tab-tab-one-customer',
+        'cross-tab-tab-two-customer',
+    ]));
+    expect(durable.state.customers.find(item => item.local_id === 'cross-tab-shared-customer').name)
+        .toBe('Updated by tab one');
+    expect(durable.mutations).toHaveLength(3);
+    expect(durable.mutations.map(item => item.queue_order).sort((a, b) => a - b)).toEqual([1, 2, 3]);
+
+    await secondTab.close();
+});
+
 test('re-pair in one tab replaces the stale device session in other open tabs', async ({ page, context }, testInfo) => {
     test.setTimeout(45_000);
     test.skip(testInfo.project.name !== 'chromium', 'Cross-tab device session contract runs once in Chromium.');
