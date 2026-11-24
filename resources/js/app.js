@@ -2988,6 +2988,17 @@ function setupZazuOfflineDirectoryViews() {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
         if (!workspace) return;
 
+        // Keep the connected Dashboard and any pending local-record directory
+        // unchanged while the origin is healthy. Route isolation applies only
+        // when this cached shell is serving as the offline fallback.
+        if (lastOriginAvailable) {
+            workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => { section.hidden = false; });
+            const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
+            if (unavailable) unavailable.hidden = true;
+            workspace.dataset.zazuOfflineActiveView = 'online';
+            return;
+        }
+
         const pathname = window.location.pathname.replace(/\/$/, '') || '/';
         const route = offlineRouteViews.find(([pattern]) => pattern.test(pathname));
         const activeView = pathname === '/dashboard'
