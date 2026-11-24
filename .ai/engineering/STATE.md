@@ -2223,3 +2223,12 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Extended local Tabler status cues to Finance invoices, Finance expenses and Purchasing orders. Existing labels/chip styles, routes, permissions, transaction logic and status values are unchanged; unknown finance states fall back to neutral information.
 - Added `test_finance_and_purchasing_use_local_semantic_status_icons` and updated the visual audit.
 - **Verification pending for this new head:** Laravel feature suite, PHPMD, browser acceptance and any package/recovery workflows that trigger on the new commits. Physical PC/Android acceptance and real-device resource captures remain separate.
+
+
+## Director form consistency implementation — Inventory and Finance — 2026-11-24
+
+- Inspected the highest-use create forms. Found three compact forms (Inventory item, Finance expense, Finance payment) using browser-default controls and plain label spans while adjacent Zazu forms use the shared label/input/select/textarea styles. This was a concrete source of visual inconsistency, not a reason for a global CSS override.
+- Normalised those three views to the existing shared classes, restored required markers, and added decimal input modes and a concise reorder threshold explanation. Preserved field names, route actions, option values, idempotency keys, offline entity markers, defaults and sticky action bars.
+- Added `test_inventory_and_finance_compact_forms_use_shared_label_and_control_styles`.
+- Updated the Director visual audit.
+- **Verification pending for this implementation:** exact-head Laravel, formatting, quality and browser/offline acceptance. No physical device acceptance is implied.
