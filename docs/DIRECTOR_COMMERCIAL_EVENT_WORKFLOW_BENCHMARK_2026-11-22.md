@@ -1,5 +1,7 @@
 # Director Commercial Event Workflow Benchmark — 2026-11-22
 
+> **Historical research input:** Current product direction, competitor positioning, V1 scope and release priorities are governed by [Zazu Engine Director — Commercial V1 Mandate](ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md). This benchmark remains supporting evidence, not a competing mandate or current implementation status.
+
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Research date:** 2026-11-22  
