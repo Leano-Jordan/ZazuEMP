@@ -1,6 +1,6 @@
 ## Current execution checkpoint — 2026-11-24
 
-**Current main head after Gate 0 and offline contract documentation:** `11764afffbeab784da07368b5efab20118b12aa9` plus the documentation-link commits recorded in Git history.
+**Current main head before this state update:** `c7988318830c47cbac830d6b549b0fd8772b6c6d` (offline capability contract, architecture and Android acceptance links, and local data-at-rest boundary).
 
 **Gate 0 — CLOSED (automated evidence only).** Exact-head source commit `803c02c23a14347810ae51c3afbfa0e88c6f627e` completed:
 - Laravel workflow: all four jobs PASS — full Laravel tests, coverage, offline browser acceptance (including mobile viewport, host-outage and phone-local attachment journeys), and PostgreSQL migration/registration/backup/restore/private-file recovery.
@@ -13,7 +13,7 @@
 
 **Not accepted by CI:** physical Android fully disconnected cold launch/restart/reconnect; owner-PC installed offline/restart acceptance; actual multi-device continuity under physical network loss. These remain OPEN and must not be inferred from browser automation.
 
-**Next single objective:** close any verified mismatch between the offline capability contract and real form/queue behaviour, then preserve a focused exact-head regression. No broad test reruns or physical acceptance claims without device evidence.
+**Next single objective:** threat-model the offline IndexedDB persistence and trusted sync credential boundary, including shared-profile/XSS/device-loss scenarios. Decide the smallest defensible protection that preserves no-network cold launch and recovery; add adversarial tests before changing persistence. Do not claim application-level encryption at rest. Physical Android and owner-PC acceptance remain separately OPEN.
 
 ---
 
