@@ -1,5 +1,7 @@
 # Zazu Director — Product Definition & Direction Log
 
+> **Current authority:** Product positioning, V1 scope, commercial strategy, scorecard and release acceptance are governed by [Zazu Engine Director — Commercial V1 Mandate](ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md). This file is a historical product-decision log; older baseline statements and implementation assessments below are not current-state evidence. Current implementation facts come from `.ai/engineering/STATE.md` and the source at `main`.
+
 > Living product-direction record for the Zazu EMP Director. This document records user-approved product decisions and principles so other Director sessions can continue from the same direction.
 >
 > **Current baseline checked:** `02299044aec9d80d158640d0f0775791febae659` — 2026-10-03.
