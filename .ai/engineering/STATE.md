@@ -2232,3 +2232,11 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Added `test_inventory_and_finance_compact_forms_use_shared_label_and_control_styles`.
 - Updated the Director visual audit.
 - **Verification pending for this implementation:** exact-head Laravel, formatting, quality and browser/offline acceptance. No physical device acceptance is implied.
+
+
+## Director form consistency implementation — Inventory and Finance — 2026-11-24
+
+- Identified three compact forms (Inventory item, Finance expense, Finance payment) using browser-default controls and plain label spans while adjacent Zazu workflows use shared form classes.
+- Normalised those views to shared Zazu labels, inputs, selects and textareas; restored visible required markers, decimal input modes and a short reorder-level explanation. Preserved route actions, field names, option values, defaults, idempotency keys, offline entity markers and sticky action bars.
+- Added regression assertions into the existing operational presentation test method. The first PHPMD run flagged 12 public methods in the test class; consolidated the new Finance/Purchasing and form assertions into the existing operational presentation test, bringing the class back to 10 public methods without relaxing PHPMD.
+- **Verification pending on code/test commit `e86bdbd2`:** PHPMD, Laravel feature/browser/PostgreSQL jobs, Zazu quality, Windows package and CodeQL. The follow-on documentation-only commit does not change the tested application code. No physical PC/Android acceptance is implied.
