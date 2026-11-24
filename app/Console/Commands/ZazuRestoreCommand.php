@@ -3,10 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Support\BackupArchiveLimits;
-use App\Support\PrivateStoragePermissions;
 use App\Support\PostgresBackupSupport;
+use App\Support\PrivateStoragePermissions;
 use App\Support\ProcessFileStream;
-
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -20,6 +19,7 @@ class ZazuRestoreCommand extends Command
     private const FORMAT_VERSION = 2;
 
     protected $signature = 'zazu:restore {archive : Path to a Zazu backup ZIP} {--force : Skip the interactive confirmation}';
+
     protected $description = 'Restore a Zazu database and private storage from a verified backup archive';
 
     /**
@@ -29,26 +29,29 @@ class ZazuRestoreCommand extends Command
      */
     public function handle(): int
     {
-        if (!class_exists(ZipArchive::class)) {
+        if (! class_exists(ZipArchive::class)) {
             $this->error('The PHP Zip extension is required for Zazu restores.');
+
             return self::FAILURE;
         }
 
         $archive = $this->argument('archive');
 
-        if (!is_file($archive) || !is_readable($archive)) {
+        if (! is_file($archive) || ! is_readable($archive)) {
             $this->error('Backup archive was not found or cannot be read.');
+
             return self::FAILURE;
         }
 
-        if (!$this->option('force') && !$this->confirm('This replaces the current Zazu database and private files. Continue?')) {
+        if (! $this->option('force') && ! $this->confirm('This replaces the current Zazu database and private files. Continue?')) {
             return self::SUCCESS;
         }
 
-        $work = storage_path('app/zazu-backups/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid()));
+        $work = storage_path('app/zazu-backups/.zazu-restore-'.now()->format('Ymd_His').'_'.Str::lower((string) Str::ulid()));
         if (! app(PrivateStoragePermissions::class)->createDirectory($work)) {
             File::deleteDirectory($work);
             $this->error('Could not create a private restore staging directory.');
+
             return self::FAILURE;
         }
 
@@ -72,15 +75,17 @@ class ZazuRestoreCommand extends Command
         $temporaryMemoryDatabasePath = null;
 
         try {
-            $zip = new ZipArchive();
+            $zip = new ZipArchive;
             if ($zip->open($archive, ZipArchive::RDONLY | ZipArchive::CHECKCONS) !== true) {
                 $this->error('The backup archive could not be opened or verified.');
+
                 return self::FAILURE;
             }
 
-            if (!BackupArchiveLimits::canIncludeArchiveEntries($zip->numFiles)) {
+            if (! BackupArchiveLimits::canIncludeArchiveEntries($zip->numFiles)) {
                 $zip->close();
                 $this->error('The backup archive contains an invalid number of entries.');
+
                 return self::FAILURE;
             }
 
@@ -88,6 +93,7 @@ class ZazuRestoreCommand extends Command
             if ($manifestIndex === false) {
                 $zip->close();
                 $this->error('The archive is not a valid Zazu backup.');
+
                 return self::FAILURE;
             }
 
@@ -95,6 +101,7 @@ class ZazuRestoreCommand extends Command
             if ($manifestContents === false) {
                 $zip->close();
                 $this->error('The backup manifest could not be read.');
+
                 return self::FAILURE;
             }
 
@@ -103,36 +110,41 @@ class ZazuRestoreCommand extends Command
             } catch (\JsonException) {
                 $zip->close();
                 $this->error('The backup manifest is invalid.');
+
                 return self::FAILURE;
             }
 
             if (($manifest['application'] ?? null) !== 'Zazu EMP') {
                 $zip->close();
                 $this->error('The backup manifest is not for Zazu EMP.');
+
                 return self::FAILURE;
             }
 
             $formatVersion = (int) ($manifest['format_version'] ?? 1);
-            if (!in_array($formatVersion, [1, self::FORMAT_VERSION], true)) {
+            if (! in_array($formatVersion, [1, self::FORMAT_VERSION], true)) {
                 $zip->close();
                 $this->error('The backup format version is not supported by this Zazu installation.');
+
                 return self::FAILURE;
             }
 
-            if ($formatVersion >= 2 && !array_key_exists('checksums', $manifest)) {
+            if ($formatVersion >= 2 && ! array_key_exists('checksums', $manifest)) {
                 $zip->close();
                 $this->error('The backup integrity manifest is missing.');
+
                 return self::FAILURE;
             }
 
             $declaredContents = $manifest['contents'] ?? null;
             if ($formatVersion >= 2 && (
-                !is_array($declaredContents)
-                || !in_array('database', $declaredContents, true)
-                || !in_array('private_storage', $declaredContents, true)
+                ! is_array($declaredContents)
+                || ! in_array('database', $declaredContents, true)
+                || ! in_array('private_storage', $declaredContents, true)
             )) {
                 $zip->close();
                 $this->error('The backup contents manifest is incomplete.');
+
                 return self::FAILURE;
             }
 
@@ -140,6 +152,7 @@ class ZazuRestoreCommand extends Command
             if (($manifest['database_driver'] ?? null) !== $driver) {
                 $zip->close();
                 $this->error('The backup database driver does not match the current Zazu database configuration.');
+
                 return self::FAILURE;
             }
 
@@ -157,12 +170,14 @@ class ZazuRestoreCommand extends Command
                 if ($name === false || $stat === false || str_contains($name, "\0")) {
                     $zip->close();
                     $this->error('The backup archive contains an invalid entry.');
+
                     return self::FAILURE;
                 }
 
                 if (str_contains($name, '\\')) {
                     $zip->close();
                     $this->error('The backup archive contains an ambiguous path.');
+
                     return self::FAILURE;
                 }
 
@@ -175,28 +190,31 @@ class ZazuRestoreCommand extends Command
                     || str_starts_with($name, '/')
                     || (strlen($name) >= 3 && ctype_alpha($name[0]) && $name[1] === ':' && ($name[2] === '/' || $name[2] === '\\'))
                     || in_array('..', $parts, true)
-                    || (in_array('', $parts, true) && !str_ends_with($name, '/'))
+                    || (in_array('', $parts, true) && ! str_ends_with($name, '/'))
                 ) {
                     $zip->close();
                     $this->error('The backup archive contains an unsafe path.');
+
                     return self::FAILURE;
                 }
 
                 if (isset($seen[$normalized])) {
                     $zip->close();
                     $this->error('The backup archive contains duplicate entries.');
+
                     return self::FAILURE;
                 }
                 $seen[$normalized] = true;
 
-                if (!str_ends_with($name, '/')) {
+                if (! str_ends_with($name, '/')) {
                     $archiveFiles[$name] = true;
                 }
 
                 $size = (int) ($stat['size'] ?? 0);
-                if (!BackupArchiveLimits::canIncludeUncompressedBytes($uncompressedBytes, $size)) {
+                if (! BackupArchiveLimits::canIncludeUncompressedBytes($uncompressedBytes, $size)) {
                     $zip->close();
                     $this->error('The backup archive is too large to restore safely.');
+
                     return self::FAILURE;
                 }
                 $uncompressedBytes += $size;
@@ -205,15 +223,17 @@ class ZazuRestoreCommand extends Command
                     if ($name !== $databaseEntry) {
                         $zip->close();
                         $this->error('The backup contains a database for the wrong driver.');
+
                         return self::FAILURE;
                     }
-                } elseif ($name !== 'manifest.json' && !str_starts_with($name, $privateEntryPrefix)) {
+                } elseif ($name !== 'manifest.json' && ! str_starts_with($name, $privateEntryPrefix)) {
                     $zip->close();
                     $this->error('The backup contains an unsupported file.');
+
                     return self::FAILURE;
                 }
 
-                if (str_starts_with($name, $privateEntryPrefix) && !str_ends_with($name, '/')) {
+                if (str_starts_with($name, $privateEntryPrefix) && ! str_ends_with($name, '/')) {
                     $hasPrivateStorage = true;
                 }
 
@@ -223,6 +243,7 @@ class ZazuRestoreCommand extends Command
                     if ($opsys === ZipArchive::OPSYS_UNIX && (($attributes >> 16) & 0170000) === 0120000) {
                         $zip->close();
                         $this->error('The backup contains a symbolic link and cannot be restored safely.');
+
                         return self::FAILURE;
                     }
                 }
@@ -239,16 +260,18 @@ class ZazuRestoreCommand extends Command
                 sort($actualFiles, SORT_STRING);
                 sort($checksumFiles, SORT_STRING);
 
-                if (!is_array($checksums) || $actualFiles !== $checksumFiles) {
+                if (! is_array($checksums) || $actualFiles !== $checksumFiles) {
                     $zip->close();
                     $this->error('The backup integrity manifest does not match its archive contents.');
+
                     return self::FAILURE;
                 }
 
                 foreach ($checksums as $name => $expectedChecksum) {
-                    if (!is_string($name) || !is_string($expectedChecksum) || !preg_match('/^[a-f0-9]{64}$/i', $expectedChecksum)) {
+                    if (! is_string($name) || ! is_string($expectedChecksum) || ! preg_match('/^[a-f0-9]{64}$/i', $expectedChecksum)) {
                         $zip->close();
                         $this->error('The backup integrity manifest contains an invalid checksum.');
+
                         return self::FAILURE;
                     }
 
@@ -256,13 +279,14 @@ class ZazuRestoreCommand extends Command
                     if ($stream === false) {
                         $zip->close();
                         $this->error('A backup file could not be read for integrity verification.');
+
                         return self::FAILURE;
                     }
 
                     $context = hash_init('sha256');
                     $readFailed = false;
 
-                    while (!feof($stream)) {
+                    while (! feof($stream)) {
                         $chunk = fread($stream, 1024 * 1024);
                         if ($chunk === false) {
                             $readFailed = true;
@@ -275,9 +299,10 @@ class ZazuRestoreCommand extends Command
 
                     fclose($stream);
 
-                    if ($readFailed || !hash_equals(strtolower($expectedChecksum), hash_final($context))) {
+                    if ($readFailed || ! hash_equals(strtolower($expectedChecksum), hash_final($context))) {
                         $zip->close();
                         $this->error('A backup file failed its SHA-256 integrity check.');
+
                         return self::FAILURE;
                     }
                 }
@@ -286,12 +311,14 @@ class ZazuRestoreCommand extends Command
             if ($zip->locateName($databaseEntry) === false) {
                 $zip->close();
                 $this->error('The backup database is missing.');
+
                 return self::FAILURE;
             }
 
-            if (!$zip->extractTo($work)) {
+            if (! $zip->extractTo($work)) {
                 $zip->close();
                 $this->error('Could not extract the verified backup archive.');
+
                 return self::FAILURE;
             }
 
@@ -299,18 +326,20 @@ class ZazuRestoreCommand extends Command
 
             if (! app(PrivateStoragePermissions::class)->restrictDirectoryTree($work)) {
                 $this->error('Could not restrict restore staging permissions; no installation data was changed.');
+
                 return self::FAILURE;
             }
 
             $manifestPath = $work.'/manifest.json';
-            if (!is_file($manifestPath)) {
+            if (! is_file($manifestPath)) {
                 $this->error('The extracted backup manifest is missing.');
+
                 return self::FAILURE;
             }
 
             $storedPrivate = $work.'/storage/private';
             $privateTarget = storage_path('app/private');
-            if ($hasPrivateStorage && !is_dir($storedPrivate)) {
+            if ($hasPrivateStorage && ! is_dir($storedPrivate)) {
                 // Empty private storage is still part of a complete backup and
                 // must replace stale files from the installation being restored.
                 if (! app(PrivateStoragePermissions::class)->createDirectory($storedPrivate)) {
@@ -323,8 +352,9 @@ class ZazuRestoreCommand extends Command
                 $source = $work.'/database.sqlite';
                 $target = config('database.connections.sqlite.database');
 
-                if (!is_file($source)) {
+                if (! is_file($source)) {
                     $this->error('SQLite restore database is unavailable.');
+
                     return self::FAILURE;
                 }
 
@@ -338,34 +368,39 @@ class ZazuRestoreCommand extends Command
                     $temporaryMemoryDatabasePath = $target;
                 }
 
-                if (!$target) {
+                if (! $target) {
                     $this->error('SQLite restore target is unavailable.');
+
                     return self::FAILURE;
                 }
 
                 $targetParent = dirname($target);
-                if (is_link($target) || is_dir($target) || (file_exists($target) && !is_file($target))) {
+                if (is_link($target) || is_dir($target) || (file_exists($target) && ! is_file($target))) {
                     $this->error('SQLite restore target must be a regular database file, not a symbolic link, directory or special file.');
+
                     return self::FAILURE;
                 }
 
-                if (!is_dir($targetParent) || !is_writable($targetParent)) {
+                if (! is_dir($targetParent) || ! is_writable($targetParent)) {
                     $this->error('SQLite restore target directory must exist and be writable before restore can begin.');
+
                     return self::FAILURE;
                 }
             } elseif ($driver === 'mysql' || $driver === 'pgsql') {
                 $sql = $work.'/database.sql';
 
-                if (!is_file($sql)) {
+                if (! is_file($sql)) {
                     $this->error(ucfirst($driver).' dump is missing from the backup.');
+
                     return self::FAILURE;
                 }
             } else {
                 $this->error('Restore currently supports SQLite, MySQL and PostgreSQL installations.');
+
                 return self::FAILURE;
             }
 
-            if (!$this->validateStagedDatabase($driver, $work)) {
+            if (! $this->validateStagedDatabase($driver, $work)) {
                 return self::FAILURE;
             }
 
@@ -376,7 +411,7 @@ class ZazuRestoreCommand extends Command
                 $this->snapshotMysqlForRollback($mysqlRollbackPath);
             } elseif ($driver === 'pgsql') {
                 $postgresRollbackPath = $work.'/pre-restore-database.sql';
-                (new PostgresBackupSupport())->dumpToFile($postgresRollbackPath);
+                (new PostgresBackupSupport)->dumpToFile($postgresRollbackPath);
                 if (! app(PrivateStoragePermissions::class)->restrictFile($postgresRollbackPath)) {
                     throw new \RuntimeException('Could not restrict the PostgreSQL rollback snapshot.');
                 }
@@ -391,7 +426,7 @@ class ZazuRestoreCommand extends Command
             if ($hasPrivateStorage) {
                 $privateRollback = storage_path('app/zazu-backups/.zazu-private-rollback-'.Str::ulid());
 
-                if (is_dir($privateTarget) && !rename($privateTarget, $privateRollback)) {
+                if (is_dir($privateTarget) && ! rename($privateTarget, $privateRollback)) {
                     throw new \RuntimeException('Could not stage the current private storage for safe replacement.');
                 }
 
@@ -400,7 +435,7 @@ class ZazuRestoreCommand extends Command
                     throw new \RuntimeException('Could not restrict the preserved private-storage rollback directory.');
                 }
 
-                if (!rename($storedPrivate, $privateTarget)) {
+                if (! rename($storedPrivate, $privateTarget)) {
                     // Leave the original private directory staged. The catch path
                     // performs and verifies rollback; finally must never delete it
                     // if reactivation fails.
@@ -424,7 +459,7 @@ class ZazuRestoreCommand extends Command
                 gc_collect_cycles();
 
                 $databaseStage = storage_path('app/zazu-backups/.zazu-database-restore-'.Str::ulid().'.sqlite');
-                if (!copy($source, $databaseStage)
+                if (! copy($source, $databaseStage)
                     || ! app(PrivateStoragePermissions::class)->restrictFile($databaseStage)) {
                     File::delete($databaseStage);
                     throw new \RuntimeException('Could not stage a private SQLite database for restore.');
@@ -481,7 +516,7 @@ class ZazuRestoreCommand extends Command
                 $this->importMysqlDump($work.'/database.sql');
             } elseif ($driver === 'pgsql') {
                 $postgresRestoreStarted = true;
-                (new PostgresBackupSupport())->restoreFromFile($work.'/database.sql');
+                (new PostgresBackupSupport)->restoreFromFile($work.'/database.sql');
             }
 
             $this->info('Zazu restore completed from '.$archive);
@@ -501,7 +536,7 @@ class ZazuRestoreCommand extends Command
 
             if ($postgresRestoreStarted && $postgresRollbackPath !== null && is_file($postgresRollbackPath)) {
                 try {
-                    (new PostgresBackupSupport())->restoreFromFile($postgresRollbackPath);
+                    (new PostgresBackupSupport)->restoreFromFile($postgresRollbackPath);
                 } catch (\Throwable $rollbackException) {
                     $rollbackFailure = $rollbackException->getMessage();
                     // Keep the only pre-restore PostgreSQL snapshot available for manual recovery.
@@ -514,15 +549,15 @@ class ZazuRestoreCommand extends Command
                 gc_collect_cycles();
                 $sqliteRollbackErrors = [];
 
-                if ($sqliteDatabaseActivated && is_file($sqliteTarget) && !File::delete($sqliteTarget)) {
+                if ($sqliteDatabaseActivated && is_file($sqliteTarget) && ! File::delete($sqliteTarget)) {
                     $sqliteRollbackErrors[] = 'Could not remove the candidate SQLite database before rollback.';
                 }
 
-                if (($sqliteDatabaseActivated || $sqliteWalStaged) && is_file($sqliteTarget.'-wal') && !File::delete($sqliteTarget.'-wal')) {
+                if (($sqliteDatabaseActivated || $sqliteWalStaged) && is_file($sqliteTarget.'-wal') && ! File::delete($sqliteTarget.'-wal')) {
                     $sqliteRollbackErrors[] = 'Could not remove the candidate SQLite WAL file before rollback.';
                 }
 
-                if (($sqliteDatabaseActivated || $sqliteShmStaged) && is_file($sqliteTarget.'-shm') && !File::delete($sqliteTarget.'-shm')) {
+                if (($sqliteDatabaseActivated || $sqliteShmStaged) && is_file($sqliteTarget.'-shm') && ! File::delete($sqliteTarget.'-shm')) {
                     $sqliteRollbackErrors[] = 'Could not remove the candidate SQLite shared-memory file before rollback.';
                 }
 
@@ -532,7 +567,7 @@ class ZazuRestoreCommand extends Command
                         [$sqliteWalStaged, $databaseRollback.'-wal', $sqliteTarget.'-wal', 'SQLite WAL rollback file'],
                         [$sqliteDatabaseStaged, $databaseRollback, $sqliteTarget, 'SQLite database rollback file'],
                     ] as [$wasStaged, $source, $destination, $label]) {
-                        if ($wasStaged && (!is_file($source) || !$this->renameWithRetry($source, $destination))) {
+                        if ($wasStaged && (! is_file($source) || ! $this->renameWithRetry($source, $destination))) {
                             $sqliteRollbackErrors[] = 'Could not restore the '.$label.'.';
                         }
                     }
@@ -554,12 +589,12 @@ class ZazuRestoreCommand extends Command
             $privateTarget = storage_path('app/private');
             $privateRollbackErrors = [];
 
-            if ($privateActivated && is_dir($privateTarget) && !File::deleteDirectory($privateTarget)) {
+            if ($privateActivated && is_dir($privateTarget) && ! File::deleteDirectory($privateTarget)) {
                 $privateRollbackErrors[] = 'Could not remove the candidate private storage before rollback.';
             }
 
             if ($privateRollbackErrors === [] && $privateRollback !== null && is_dir($privateRollback)) {
-                if (file_exists($privateTarget) || !rename($privateRollback, $privateTarget)) {
+                if (file_exists($privateTarget) || ! rename($privateRollback, $privateTarget)) {
                     $privateRollbackErrors[] = 'Could not reactivate the original private storage.';
                 } else {
                     $privateRollback = null;
@@ -599,22 +634,22 @@ class ZazuRestoreCommand extends Command
                 DB::purge('sqlite');
                 config(['database.connections.sqlite.database' => $originalSqliteDatabase]);
                 foreach ([$temporaryMemoryDatabasePath, $temporaryMemoryDatabasePath.'-wal', $temporaryMemoryDatabasePath.'-shm'] as $temporaryFile) {
-                    if (is_string($temporaryFile) && is_file($temporaryFile) && !File::delete($temporaryFile)) {
+                    if (is_string($temporaryFile) && is_file($temporaryFile) && ! File::delete($temporaryFile)) {
                         $this->warn('Could not remove temporary SQLite restore file: '.$temporaryFile);
                     }
                 }
             }
-            if (!$preserveWork) {
+            if (! $preserveWork) {
                 File::deleteDirectory($work);
             }
-            if (!$preserveDatabaseRollback && $databaseRollback !== null) {
+            if (! $preserveDatabaseRollback && $databaseRollback !== null) {
                 foreach ([$databaseRollback.'-shm', $databaseRollback.'-wal', $databaseRollback] as $rollbackFile) {
-                    if (is_file($rollbackFile) && !File::delete($rollbackFile)) {
+                    if (is_file($rollbackFile) && ! File::delete($rollbackFile)) {
                         $this->warn('Could not remove a temporary SQLite rollback artifact: '.$rollbackFile);
                     }
                 }
             }
-            if (!$preservePrivateRollback && $privateRollback !== null && is_dir($privateRollback) && !File::deleteDirectory($privateRollback)) {
+            if (! $preservePrivateRollback && $privateRollback !== null && is_dir($privateRollback) && ! File::deleteDirectory($privateRollback)) {
                 $this->warn('Could not remove the temporary private-storage rollback directory: '.$privateRollback);
             }
         }
@@ -645,7 +680,7 @@ class ZazuRestoreCommand extends Command
 
     private function importMysqlDump(string $path): void
     {
-        if (!is_file($path) || filesize($path) === 0) {
+        if (! is_file($path) || filesize($path) === 0) {
             throw new \RuntimeException('MySQL import dump is empty or unavailable.');
         }
 
@@ -674,12 +709,14 @@ class ZazuRestoreCommand extends Command
 
                 if ($result !== 'ok') {
                     $this->error('The backup SQLite database failed its integrity check.');
+
                     return false;
                 }
 
                 return true;
             } catch (\Throwable $exception) {
                 $this->error('The backup SQLite database could not be validated: '.$exception->getMessage());
+
                 return false;
             }
         }
@@ -687,8 +724,9 @@ class ZazuRestoreCommand extends Command
         if ($driver === 'mysql' || $driver === 'pgsql') {
             $path = $work.'/database.sql';
 
-            if (!is_file($path) || filesize($path) === 0) {
+            if (! is_file($path) || filesize($path) === 0) {
                 $this->error('The '.ucfirst($driver).' backup dump is empty or unavailable.');
+
                 return false;
             }
 
