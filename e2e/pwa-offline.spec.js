@@ -1042,22 +1042,17 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(retryServerResponse.recorded[0].identity.server_id)
             .toBe(firstServerResponse.recorded[0].identity.server_id);
 
-        const bootstrap = await page.evaluate(async ({ name }) => {
-            const token = window.ZazuOffline.getState().sync.token;
-            const response = await fetch('/api/sync/bootstrap', {
-                headers: { Accept: 'application/json', Authorization: 'Bearer ' + token },
-            });
-            const data = await response.json();
-            return {
-                status: response.status,
-                matchingCustomers: (data.selected || [])
-                    .filter(item => item.type === 'customer' && item.record?.name === name)
-                    .map(item => item.server_id),
-            };
-        }, { name: customerName });
-        expect(bootstrap.status).toBe(200);
-        expect(bootstrap.matchingCustomers).toHaveLength(1);
-        expect(bootstrap.matchingCustomers[0]).toBe(retryServerResponse.recorded[0].identity.server_id);
+        const reconciledCustomer = await page.evaluate(({ id }) => {
+            const record = window.ZazuOffline.getState().customers
+                .find(customer => customer.local_id === id);
+            return record ? {
+                serverId: record.server_id ?? record.id ?? null,
+                pendingSync: record.pending_sync === true,
+            } : null;
+        }, { id: localId });
+        expect(reconciledCustomer).not.toBeNull();
+        expect(reconciledCustomer.serverId).toBe(retryServerResponse.recorded[0].identity.server_id);
+        expect(reconciledCustomer.pendingSync).toBe(false);
         expect(pushAttempts).toBe(2);
     });
 
