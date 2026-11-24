@@ -22,6 +22,7 @@ This directory contains the operational documentation set for a commercial Zazu 
 | RELEASE_CUSTOMER_TERMS_DRAFT.md | Commercial/customer service terms | Updated commercial draft — feature matrix, checkout and legal review outstanding |
 | RELEASE_PAIA_OPERATIONAL_CONTROL.md | PAIA records/request handling | Operational draft — applicability and details require review |
 | RELEASE_MEDIA_RIGHTS_REGISTER.md | Provenance and rights register for event/landing media | Operational register — final assets/rights evidence required |
+| ICON_LIBRARY_AND_PROVENANCE_AUDIT.md | UI icon implementation, commercial-use licensing and existing SVG provenance | Audit complete — Lucide recommended; existing path provenance remains unverified |
 | RELEASE_DEPLOYMENT_RUNBOOK.md | Deployment and clean-install control | Operational draft |
 | RELEASE_BACKUP_RESTORE_RUNBOOK.md | Installation-wide operator backup/restore and recovery procedure | Operational draft — hosted offsite backup destination and customer-facing scope must be confirmed |
 | RELEASE_UPGRADE_ROLLBACK_RUNBOOK.md | Existing-install upgrade and rollback control | Operational draft |
