@@ -2240,3 +2240,11 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Normalised those views to shared Zazu labels, inputs, selects and textareas; restored visible required markers, decimal input modes and a short reorder-level explanation. Preserved route actions, field names, option values, defaults, idempotency keys, offline entity markers and sticky action bars.
 - Added regression assertions into the existing operational presentation test method. The first PHPMD run flagged 12 public methods in the test class; consolidated the new Finance/Purchasing and form assertions into the existing operational presentation test, bringing the class back to 10 public methods without relaxing PHPMD.
 - **Verification pending on code/test commit `e86bdbd2`:** PHPMD, Laravel feature/browser/PostgreSQL jobs, Zazu quality, Windows package and CodeQL. The follow-on documentation-only commit does not change the tested application code. No physical PC/Android acceptance is implied.
+
+
+## Purchasing form label hierarchy — 2026-11-24
+
+- Normalised all purchase-order creation field captions to the shared `zazu-label` style, including the dynamic order-line template. This aligns the longest repeatable form with Inventory and Finance field hierarchy.
+- Preserved routes, field names, validation markers, helper text, idempotency key, offline entity marker, add/remove line behaviour and total calculation.
+- Extended the existing `UiHumanFriendlyPresentationTest` method rather than adding another public test method, keeping the class within its PHPMD method-count limit.
+- **Verification pending:** exact-head Laravel, Zazu Quality, PHPMD, browser acceptance and Windows package checks. No visual or release acceptance claim until automated and physical evidence is available.
