@@ -21,6 +21,13 @@ $icons = [
     'check' => '<path d="M5 12l4 4l10 -10" />',
     'lock' => '<path d="M5 11h14v10h-14z" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /><path d="M12 15v2" />',
     'file-plus' => '<path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2" /><path d="M12 11l0 6" /><path d="M9 14l6 0" />',
+    'circle-check' => '<path d="M8 12l2.5 2.5l5.5 -5.5" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />',
+    'clock' => '<path d="M12 7v5l3 2" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />',
+    'circle-x' => '<path d="M15 9l-6 6" /><path d="M9 9l6 6" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />',
+    'eye' => '<path d="M2 12s3.5 -7 10 -7s10 7 10 7s-3.5 7 -10 7s-10 -7 -10 -7" /><path d="M12 9a3 3 0 1 0 0 6a3 3 0 0 0 0 -6" />',
+    'pencil' => '<path d="M4 20l4 -1l10.5 -10.5a2.12 2.12 0 0 0 -3 -3l-10.5 10.5l-1 4" /><path d="M13.5 6.5l4 4" />',
+    'trash' => '<path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M5 7l1 13h12l1 -13" /><path d="M9 7v-3h6v3" />',
+    'plus' => '<path d="M12 5v14" /><path d="M5 12h14" />'
 ];
 $iconMarkup = $icons[$name] ?? $icons['briefcase'];
 @endphp
