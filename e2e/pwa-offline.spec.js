@@ -3771,10 +3771,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         // accepted locally, the same form must discover that local acceptance.
         await page.goto('/finance/invoices/create', { waitUntil: 'domcontentloaded' });
         await expect(page.locator('form[data-zazu-offline-entity="invoice"]')).toBeVisible();
-        await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        await context.setOffline(true);
+        const quoteRoute = await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        expect(quoteRoute?.ok(), 'The cached Quotes route must load after disconnection.').toBe(true);
         await waitForOfflineRuntime(page);
 
-        await context.setOffline(true);
         const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'OFFLINE-QUOTE-001' });
         await expect(quoteRow).toBeVisible();
         await quoteRow.getByRole('button', { name: 'View offline' }).click();
