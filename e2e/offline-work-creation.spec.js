@@ -22,6 +22,13 @@ async function trustCurrentDevice(page) {
     await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
 }
 
+async function selectOfflineView(page, path) {
+    await page.evaluate(pathname => {
+        history.replaceState({}, '', pathname);
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    }, path);
+}
+
 test('offline workspace remains visible for synced device-local records when the Zazu server is unavailable', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const customerName = 'Synced offline customer ' + runId;
@@ -68,8 +75,11 @@ test('offline workspace remains visible for synced device-local records when the
 
     const workspace = page.locator('[data-zazu-offline-workspace]');
     await expect(workspace).toBeVisible();
+    await selectOfflineView(page, '/customers');
     await expect(workspace.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+    await selectOfflineView(page, '/work');
     await expect(workspace.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    await selectOfflineView(page, '/quotes');
     await expect(workspace.locator('[data-zazu-local-record="quote"]').filter({ hasText: jobName })).toBeVisible();
 
     await page.context().setOffline(false);
@@ -114,6 +124,7 @@ test('offline workspace stays visible after reconnect while a non-core mutation 
 
     const workspace = page.locator('[data-zazu-offline-workspace]');
     await expect(workspace).toBeVisible();
+    await selectOfflineView(page, '/inventory');
     const inventory = workspace.locator('[data-zazu-offline-collection="inventory_items"]');
     await expect(inventory.getByText('Offline stock pending update')).toBeVisible();
     await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
@@ -162,6 +173,7 @@ test('offline inventory item edits update the local record and queue a revision-
 
     const workspace = page.locator('[data-zazu-offline-workspace]');
     await expect(workspace).toBeVisible();
+    await selectOfflineView(page, '/inventory');
     const inventory = workspace.locator('[data-zazu-offline-collection="inventory_items"]');
     await inventory.getByRole('button', { name: 'View saved details' }).click();
     await inventory.getByRole('button', { name: 'Edit saved item' }).click();
@@ -225,6 +237,7 @@ test('offline supplier edits update local contact details and queue a revision-c
 
     const workspace = page.locator('[data-zazu-offline-workspace]');
     await expect(workspace).toBeVisible();
+    await selectOfflineView(page, '/suppliers');
     const suppliers = workspace.locator('[data-zazu-offline-collection="suppliers"]');
     await suppliers.getByRole('button', { name: 'View saved details' }).click();
     await suppliers.getByRole('button', { name: 'Edit saved supplier' }).click();
@@ -300,6 +313,7 @@ test('editing a locally created supplier preserves the queued create-before-upda
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }, localId);
 
+    await selectOfflineView(page, '/suppliers');
     const suppliers = page.locator('[data-zazu-offline-workspace] [data-zazu-offline-collection="suppliers"]');
     await suppliers.getByRole('button', { name: 'View saved details' }).click();
     await suppliers.getByRole('button', { name: 'Edit saved supplier' }).click();
@@ -562,7 +576,9 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await coldLaunchPage.evaluate(() => window.ZazuOffline.ready);
     await expect(coldLaunchPage.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
     await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeVisible({ timeout: 8000 });
+    await selectOfflineView(coldLaunchPage, '/customers');
     await expect(coldLaunchPage.locator('[data-zazu-offline-workspace] [data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+    await selectOfflineView(coldLaunchPage, '/work');
     await expect(coldLaunchPage.locator('[data-zazu-offline-workspace] [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
     const coldLaunchQueue = await coldLaunchPage.evaluate(async () => await window.ZazuOffline.pending());
     expect(coldLaunchQueue.map((mutation) => mutation.id)).toEqual(expect.arrayContaining(persistedQueue.map((mutation) => mutation.id)));
@@ -786,5 +802,6 @@ test('offline workspace appears when the Zazu host is unreachable but the browse
     }).toBeGreaterThan(0);
     await expect.poll(() => page.evaluate(() => navigator.onLine)).toBe(true);
     await expect(workspace).toBeVisible();
+    await selectOfflineView(page, '/customers');
     await expect(workspace.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
 });
