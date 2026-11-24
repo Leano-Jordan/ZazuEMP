@@ -137,6 +137,7 @@
             'sync_authorization_required',
             'sync_registration_blocked',
             'sync_registration_consent',
+            'version',
         ]);
 
         for (const key of keys) {

@@ -939,12 +939,15 @@ function setupZazuOfflineWorkspaceProfile() {
     };
 
     window.addEventListener('zazu:offline-ready', bind, { once: true });
-    window.addEventListener('zazu:offline-state-updated', () => { applyOfflineRouteView(); render(); });
+    window.addEventListener('zazu:offline-state-updated', render);
     bind();
 }
 
 
 const initializeZazuUi = () => {
+    // Bind local profile rendering before optional UI initializers so a
+    // non-critical widget failure cannot leave offline business data stale.
+    setupZazuOfflineWorkspaceProfile();
     setupZazuAuthExperience();
     setupZazuMobileNavigation();
     setupZazuHierarchicalNavigation();
@@ -953,7 +956,6 @@ const initializeZazuUi = () => {
     setupZazuCatalogue();
     setupZazuUserMenus();
     setupZazuBusinessSwitcher();
-    setupZazuOfflineWorkspaceProfile();
     setupZazuToasts();
     setupBrandingUploads();
     setupZazuHelper();
