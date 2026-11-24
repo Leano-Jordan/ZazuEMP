@@ -288,4 +288,6 @@ Replace the archive path with the exact artifact created by the backup command. 
 
 ## Backup creation integrity check
 
+Database client streaming: MySQL and PostgreSQL SQL dumps are streamed to private staging files, and restore imports stream from those files. PHP does not retain the complete SQL dump in a process output string or input string. Process diagnostics are bounded to the most recent 8 KiB. This reduces PHP memory pressure; it does not raise the existing 2 GiB uncompressed archive ceiling or replace disk-space planning.
+
 The backup command does not publish the ZIP immediately after writing it. It reopens the temporary archive with ZIP consistency checking, validates the Zazu format and configured database driver, checks exact payload membership against the manifest, and recomputes every payload SHA-256. A failed check prevents publication. Restore independently repeats its own validation before any installation mutation.
