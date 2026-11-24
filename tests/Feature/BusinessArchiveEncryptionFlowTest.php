@@ -334,4 +334,32 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         $this->assertStringContainsString('Restore request reference:', $error);
         $this->assertNull(session()->getOldInput('archive_password'));
     }
+    public function test_restore_rate_limit_returns_a_recovery_specific_message(): void
+    {
+        $business = Business::create([
+            'name' => 'Restore Rate Limit Business',
+            'slug' => 'restore-rate-limit-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $owner = $this->signInAsOwner($business);
+        RateLimiter::clear('business-archive-restore:'.$owner->getAuthIdentifier());
+
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            $this->post(route('exports.archive.restore'), [])
+                ->assertRedirect()
+                ->assertSessionHasErrors('archive');
+        }
+
+        $blocked = $this->post(route('exports.archive.restore'), [])
+            ->assertRedirect(route('exports.index'))
+            ->assertSessionHasErrors('archive');
+
+        $message = session('errors')->getBag('default')->first('archive');
+        $this->assertStringContainsString('Too many restore attempts.', $message);
+        $this->assertStringContainsString('Wait ', $message);
+        $this->assertStringContainsString('blocked before restore processing', $message);
+        $this->assertStringContainsString('no data was imported', $message);
+    }
+
 }
