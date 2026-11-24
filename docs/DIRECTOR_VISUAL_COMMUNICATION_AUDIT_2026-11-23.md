@@ -92,3 +92,12 @@ The current `package.json` has no icon package dependency. The dashboard current
 - No transaction logic, status values, permissions, routes or workflow behaviour changed. Icons remain inline/local and offline-safe.
 - Added a focused feature regression for Finance and Purchasing status presentation.
 - The remaining visual audit is page-level composition, spacing and responsive acceptance; these icon changes do not close those separate checks.
+
+
+## Inventory and Finance form consistency — 2026-11-24
+
+- Normalised the Inventory item, Finance expense and Finance payment forms to the shared Zazu field-label, input, select and textarea classes.
+- Reintroduced visible required markers on mandatory fields, added input-mode hints for decimal amounts and a short reorder-level explanation. Kept the existing field names, option values, defaults, idempotency keys, offline entity markers, routes and submit/cancel actions intact.
+- Preserved the existing responsive form grid and sticky action bar; no global width changes or business-rule changes.
+- Added a focused feature regression to prevent these compact forms from drifting back to browser-default control styling.
+- This is a consistency correction, not a full visual acceptance. Purchasing and the longer Job/Quote editors remain on the broader form audit.
