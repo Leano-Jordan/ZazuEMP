@@ -634,17 +634,11 @@ class ZazuRestoreCommand extends Command
         ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
 
         $process->setTimeout(300);
-        $process->run();
+        ProcessFileStream::runToFile($process, $path, 'Could not create the pre-restore MySQL rollback snapshot:');
 
-        if (!$process->isSuccessful() || trim($process->getOutput()) === '') {
-            throw new \RuntimeException('Could not create the pre-restore MySQL rollback snapshot: '.$process->getErrorOutput());
-        }
-
-        File::put($path, $process->getOutput());
-
-        if (!is_file($path) || filesize($path) === 0
-            || ! app(PrivateStoragePermissions::class)->restrictFile($path)) {
-            throw new \RuntimeException('The pre-restore MySQL rollback snapshot is empty or could not be secured.');
+        if (! app(PrivateStoragePermissions::class)->restrictFile($path)) {
+            File::delete($path);
+            throw new \RuntimeException('The pre-restore MySQL rollback snapshot could not be secured.');
         }
     }
 
@@ -664,12 +658,7 @@ class ZazuRestoreCommand extends Command
         ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
 
         $process->setTimeout(300);
-        $process->setInput(File::get($path));
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new \RuntimeException('MySQL import failed: '.$process->getErrorOutput());
-        }
+        ProcessFileStream::runFromFile($process, $path, 'MySQL import failed:');
     }
 
     private function validateStagedDatabase(string $driver, string $work): bool
