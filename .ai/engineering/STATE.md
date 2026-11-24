@@ -1,6 +1,40 @@
-## Current execution checkpoint — 2026-11-24 (offline acceptance correction; Phase 1 owner sign-off retained)
+## Current execution checkpoint — 2026-11-24 (offline acceptance root-cause correction)
 
-**Current main head:** `d155a3078d3251c2df3cfd2853dbb75502018c9e` (latest application implementation: `3716d76444453540964f46bd2a944f9ea459386c`).
+**Current main head before this state update:** `4ebc07603cdef80c0a030b8c2b1ab122f6a57307`. **Application changes:** route selection/event handling `84e2b31aae7ecf88b6047e0d0487a4c420148ea9`; correct cached Dashboard content boundary and reconnect restoration `f459a6488ce368cf18e27bbe444d87c09b57114d`, `8908eba40f8ebbef2844d5c32b9cf2c2833f1804`; actual service-worker fallback regression `0c8fa7da558c4f93d30372959d490fcdc654ee39`; current PHP test formatting repair `86f443bf755a8a17b776a2dc0131d2d694de080b`.
+
+**Founder sign-off retained:** Phase 1 — connected operation on the physical Windows PC and linked Android phone, both using the same workspace — is **OWNER-VERIFIED PASS, completed physically multiple times by the Founder**. Do not repeat Phase 1, reinstall, or recreate the existing fictional records.
+
+**Phase 2 — offline acceptance remains OPEN and is the sole active priority.** Founder-observed physical failure: while PC host was stopped and phone remained on Wi-Fi, navigation showed the cached Dashboard plus offline collections together.
+
+**Deep root cause (confirmed in source):**
+1. The service worker returns cached `/dashboard` HTML for a failed/unprimed authenticated route while preserving the requested URL.
+2. The Dashboard page slot is rendered inside `.zazu-content`, not as a direct child of `main#main-content`. The prior hide selector therefore matched nothing; it could hide offline collections but left the actual Dashboard visible.
+3. `zazu:offline-state-updated` only called `render()`, so route isolation was not reapplied after local state changes.
+4. The initial route regression only manipulated `history.replaceState`; this was insufficient to prove service-worker fallback navigation.
+
+**Remediation now on main:**
+- Route state is reapplied on local workspace updates.
+- Offline route isolation hides every `.zazu-content` child except `[data-zazu-offline-workspace]`; reconnect restores the normal page content.
+- Supported URLs select one collection; unsupported URLs show the connection-required state.
+- Browser regression now checks the real service-worker fallback for unprimed `/suppliers` and unsupported `/calendar`, and asserts the Dashboard hero, overview and grid are hidden.
+- Existing exact cached routes `/customers`, `/work`, `/customers/create`, `/work/create` remain separately tested.
+- A stale static PHP assertion was updated to the actual route contract. Pint formatting failure was fixed rather than bypassed.
+- The unrelated broken founder-IP declaration link that blocked the Quality workflow was corrected without fabricating a declaration document.
+
+**CI evidence and boundaries:**
+- Zazu Quality passed on `84e2b31aae7ecf88b6047e0d0487a4c420148ea9` (docs validation, frontend build, performance budget, service-worker auth/cache-race tests, npm audit, formatting).
+- Laravel tests and coverage passed on `9afe196b951b381dc129432d9dcb75a08d7c198b`; PostgreSQL migration/recovery passed on that run.
+- A later Quality failure on `3275aea44e7fcb45c9effb7895a1d57a30291078` was only Pint single-quote formatting in the PHP static test; fixed in `86f443bf755a8a17b776a2dc0131d2d694de080b`.
+- New actual fallback E2E and shell-boundary assertions are on main after those earlier passing runs; exact-head CI is still required. SonarCloud skipped is not a pass.
+- Never infer physical Android or owner-PC acceptance from CI.
+
+**Next objective:** verify exact-head CI after the actual fallback tests and Pint fix. Resolve all failures. Then request one focused Android retest only: connect to the existing HTTPS origin, reload online once to receive the current app assets, stop PC host and Caddy while phone Wi-Fi remains on, open Dashboard, Customers and Suppliers, then Calendar. Confirm Suppliers shows only its local collection, the online Dashboard is absent, Calendar shows the unavailable message, and existing records/queues remain. After this route-isolation check, continue airplane-mode cold launch/restart, offline create/edit, attachment persistence and exactly-once reconnect. Preserve IndexedDB; do not clear site data. Keep owner-PC acceptance separate. No branches; work directly on main.
+
+---
+
+## Historical checkpoint — initial offline route correction (superseded 2026-11-24)
+
+**Historical main head at that checkpoint:** `d155a3078d3251c2df3cfd2853dbb75502018c9e`.
 
 **Founder acceptance correction:** Phase 1 — normal connected operation on the physical Windows PC and linked Android phone, both using the same workspace — is **OWNER-VERIFIED PASS, completed multiple times by the Founder** and reaffirmed on 2026-11-24. The populated fictional workspace and module-level connected use are already accepted. Do not request repeated connected setup, reinstall, or duplicate record creation. This does not close offline acceptance.
 
