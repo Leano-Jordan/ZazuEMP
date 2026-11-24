@@ -964,6 +964,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         let pushAttempts = 0;
         let firstServerResponse = null;
+        let firstResponseAborted = false;
         let retryServerResponse = null;
         await page.route('**/api/sync/push', async route => {
             pushAttempts += 1;
@@ -982,6 +983,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 // The real Laravel endpoint has already committed the mutation.
                 // Abort only the browser-facing response to simulate a lost ACK.
                 await route.abort('failed');
+                firstResponseAborted = true;
                 return;
             }
 
@@ -1000,6 +1002,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(firstServerResponse.httpStatus).toBe(200);
         expect(firstServerResponse.requestMutationId).toBe(mutationId);
         expect(firstServerResponse.recorded[0].id).toBe(mutationId);
+        await expect.poll(() => firstResponseAborted, { timeout: 5_000 }).toBe(true);
+        await expect.poll(() => page.evaluate(() => Boolean(window.ZazuOffline.getState().last_sync_error)))
+            .toBe(true);
 
         // The browser did not receive the applied response, so the queue must
         // still contain the original mutation identity and payload.
