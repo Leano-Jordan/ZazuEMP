@@ -62,7 +62,11 @@ This is a local snapshot, not a live view of another device or server. Fresh rec
 
 The service worker may return the cached Dashboard HTML shell for a requested authenticated route when the host is unavailable; it preserves the requested URL. The client must then render one route-specific offline view inside that shell. The Dashboard offline landing view is navigation-only and must not expand every local collection into one long page. Supported routes map to their corresponding local collection view. Routes without an implemented offline view must show an explicit connection-required message and must not expose unrelated collections.
 
-A physical run on 2026-11-24 exposed a regression against this contract: links fell back to the Dashboard shell and multiple offline sections appeared together. Route-isolation code and a browser regression have been committed to main; exact-head CI and renewed physical verification are still required. Do not mark offline navigation accepted until both are complete.
+A physical run on 2026-11-24 exposed a regression against this contract: links fell back to the Dashboard shell and multiple offline sections appeared together. Root cause: the cached Dashboard slot is nested in `.zazu-content`, but the earlier route isolation attempted to hide Dashboard sections as direct children of `main#main-content`; that selector did not match. Local workspace update events also did not reapply route selection.
+
+The correction isolates content at the actual `.zazu-content` boundary, preserves only the offline workspace shell, maps supported URLs to one local collection, presents a connection-required state for unsupported URLs, and restores Dashboard content when the origin is reachable. Browser regression coverage must include actual service-worker fallback navigation to an unprimed supported route and an unsupported route, with explicit assertions that the online Dashboard is hidden. History-only route manipulation is supplementary, not sufficient.
+
+Do not mark offline navigation accepted until exact-head CI and the Founder’s physical host-loss test both pass.
 
 ## 4. Online-only, deferred or conditional operations
 
