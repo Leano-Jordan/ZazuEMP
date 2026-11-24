@@ -2306,3 +2306,12 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Authorised staff sharing the approved workspace is an accepted architecture boundary. All users of that profile inherit the business-approved offline data and mutation capability; offline mutations are attributed to the approving owner and normal staff permissions are not re-checked per mutation.
 - Updated the threat model and V1 offline contract to distinguish this accepted staff-sharing model from unauthorised access to an unlocked profile. No user-scoped storage redesign is proposed.
 - Existing Settings copy already discloses owner approval, staff-permission boundary, owner attribution, revocation semantics and the fact that revocation does not remotely erase local data. Preserve these disclosures.
+
+
+## Business archive restore throttling feedback — 2026-11-24
+
+- Recovery source review confirmed the owner restore endpoint is limited to three requests per authenticated owner per ten minutes. The later SYS-002 response is the rate limiter, not evidence of the original encrypted archive failure.
+- Added route-specific handling for throttled business archive restore requests. The owner is returned to Data export & recovery with the retry delay and explicit wording that the blocked request did not enter restore processing or import data.
+- Preserved the security throttle; no limit was weakened. Added a feature regression covering the three permitted attempts and the fourth blocked request.
+- Updated docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md to distinguish a throttle response from the original archive failure.
+- The Founder’s previously failed physical archive remains untouched. No physical restore retry or live workspace mutation was performed. Exact-head CI is pending.
