@@ -2337,3 +2337,11 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Added tests/Unit/ProcessFileStreamTest.php covering a 4 MiB output stream, a 4 MiB streamed input with end-to-end SHA-256 validation, and failed-process partial-file cleanup plus bounded diagnostics.
 - Updated docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md with the streaming and diagnostic bounds.
 - **Verification pending:** exact-head Laravel/unit suite, formatting, PHPMD, browser acceptance, Windows package, PostgreSQL migration/recovery and security checks. No real installation backup/restore was run and no customer data was touched.
+
+
+## Recovery streaming static-analysis correction — 2026-11-24
+
+- PHPMD on candidate 1520e9a detected one new method complexity violation: ProcessFileStream::runToFile() scored 12 against the repository threshold of 10.
+- Refactored the stream helper into focused output-callback, process-result, failure-cleanup and non-empty-output methods. No PHPMD threshold or suppression was changed.
+- The original populated upgrade and rollback workflow on candidate 1520e9a passed, including backup creation, populated upgrade, rollback, migration reapplication and recovery verification. Windows installation build and encrypted/legacy business archive verification also passed on that candidate; Windows fresh-install PowerShell verification remained queued.
+- Full Laravel, formatting/quality, PHPMD rerun, security scan and final Windows fresh-install checks remain pending for the refactored head.
