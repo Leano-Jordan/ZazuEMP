@@ -74,3 +74,12 @@ The current `package.json` has no icon package dependency. The dashboard current
 - Replaced Unicode arrows on the business archive create/restore cards with consistent download/upload icons. Added lock and shield-check cues to the encryption/restore actions and download icons to CSV exports.
 - Added a focused feature regression covering icon usage and removal of the two ambiguous arrow glyphs.
 - Remaining: continue status and form-action migration in the highest-use workflows. This slice does not claim the full UI icon rollout is complete.
+
+
+## Work, Quotes and Customers icon migration — 2026-11-24
+
+- Added local Tabler state icons to Jobs and Quotes registers. Status text remains visible; icons reinforce confirmed/accepted, in-progress/sent, cancelled/declined/expired and neutral states rather than making colour carry the meaning alone.
+- Added consistent action icons to the Work register (edit, inspect and remove) and Customer directory (import, new customer, start work and open).
+- Extended the curated local icon component only; no icon package, remote asset, CDN, route, permission or workflow change.
+- Added a focused feature regression covering the three view surfaces and required local icon definitions.
+- This is a targeted visual communication slice. Finance and Purchasing remain in the next audit queue; full page-level spacing/width review remains separate.
