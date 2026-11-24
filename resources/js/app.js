@@ -2963,31 +2963,46 @@ function setupZazuOfflineDirectoryViews() {
         return lastOriginAvailable;
     };
 
+    // The service worker deliberately returns the cached dashboard shell for
+    // cold launches and unavailable-host navigations. Keep the requested URL,
+    // but render exactly one offline view for that route. Unsupported routes
+    // must never fall through to the dashboard with every local collection
+    // expanded underneath it.
     const offlineRouteViews = [
         [/^\/customers(?:\/|$)/, 'customers'],
         [/^\/work\/[^/]+\/(?:quotes)(?:\/|$)/, 'quotes'],
         [/^\/work\/[^/]+\/(?:costs|travel)(?:\/|$)/, 'costs'],
         [/^\/work(?:\/|$)/, 'jobs'],
         [/^\/quotes(?:\/|$)/, 'quotes'],
+        [/^\/capabilities(?:\/|$)/, 'catalogue'],
         [/^\/suppliers(?:\/|$)/, 'suppliers'],
         [/^\/inventory(?:\/|$)/, 'inventory_items'],
         [/^\/assets(?:\/|$)/, 'assets'],
         [/^\/purchasing(?:\/|$)/, 'purchase_orders'],
-        [/^\/finance\/expenses(?:\/|$)/, 'expenses'],
+        [/^\/finance\/(?:expenses)(?:\/|$)/, 'expenses'],
+        [/^\/finance\/(?:invoices|payments)(?:\/|$)/, 'invoices'],
         [/^\/finance(?:\/|$)/, 'invoices'],
     ];
 
     const applyOfflineRouteView = () => {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
         if (!workspace) return;
-        const route = offlineRouteViews.find(([pattern]) => pattern.test(window.location.pathname));
-        const activeView = route?.[1] || null;
+
+        const pathname = window.location.pathname.replace(/\/$/, '') || '/';
+        const route = offlineRouteViews.find(([pattern]) => pattern.test(pathname));
+        const activeView = pathname === '/dashboard'
+            ? 'overview'
+            : (route?.[1] || 'unavailable');
+
         workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => {
-            section.hidden = Boolean(activeView && section.dataset.zazuOfflineView !== activeView);
+            section.hidden = section.dataset.zazuOfflineView !== activeView;
         });
+        const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
+        if (unavailable) unavailable.hidden = activeView !== 'unavailable';
+
         document.querySelectorAll('main#main-content > .zazu-dash-hero, main#main-content > .zazu-dash-overview, main#main-content > .zazu-dash-grid')
-            .forEach(section => { section.hidden = Boolean(activeView); });
-        workspace.dataset.zazuOfflineActiveView = activeView || 'overview';
+            .forEach(section => { section.hidden = true; });
+        workspace.dataset.zazuOfflineActiveView = activeView;
     };
 
     const setupOriginAvailabilityMonitor = () => {
