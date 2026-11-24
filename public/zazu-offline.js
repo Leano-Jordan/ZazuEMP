@@ -107,6 +107,17 @@
         return JSON.stringify(left) === JSON.stringify(right);
     }
 
+    function replaceWorkspaceState(nextState) {
+        if (!state || typeof state !== 'object') {
+            state = cloneWorkspaceState(nextState);
+            return state;
+        }
+
+        for (const key of Object.keys(state)) delete state[key];
+        Object.assign(state, nextState);
+        return state;
+    }
+
     function workspaceRecordIdentity(record) {
         const identity = record?.local_id ?? record?.server_id ?? record?.id;
         return identity === null || identity === undefined || identity === ''
@@ -141,7 +152,7 @@
 
                 if (!hasStableIdentity) {
                     if (!sameWorkspaceValue(current, before) && !sameWorkspaceValue(current, after)) {
-                        throw new Error('This workspace changed in another tab. Refresh the workspace and retry your change.');
+                        throw new Error('This workspace changed in another tab (' + key + '). Refresh the workspace and retry your change.');
                     }
                     merged[key] = cloneWorkspaceState(after);
                     continue;
@@ -310,7 +321,7 @@
             };
             current.onerror = () => tx.abort();
             tx.oncomplete = () => {
-                state = mergedState;
+                replaceWorkspaceState(mergedState);
                 durableStateSnapshot = cloneWorkspaceState(mergedState);
                 sessionChannel?.postMessage({ type: 'workspace-updated' });
                 resolve();
@@ -1066,6 +1077,7 @@
             });
 
             state = blank();
+            durableStateSnapshot = cloneWorkspaceState(state);
             storageAvailable = true;
             if (broadcast) sessionChannel?.postMessage({ type: 'clear-session' });
         } catch (error) {
@@ -1472,7 +1484,7 @@
                 const nextState = await readState();
                 if (!nextState) return;
                 if ((nextState.sync?.token || null) !== (state?.sync?.token || null)) return;
-                state = nextState;
+                replaceWorkspaceState(nextState);
                 durableStateSnapshot = cloneWorkspaceState(nextState);
                 window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             }).catch(() => {
@@ -1486,6 +1498,7 @@
             sessionGeneration++;
             activeSyncController?.abort();
             state = blank();
+            durableStateSnapshot = cloneWorkspaceState(state);
             clearStoredWorkspace(false).catch(() => {
                 storageAvailable = false;
             });
@@ -1508,7 +1521,7 @@
                 return;
             }
 
-            state = nextState;
+            replaceWorkspaceState(nextState);
             durableStateSnapshot = cloneWorkspaceState(nextState);
             sessionCleared = false;
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
@@ -1673,7 +1686,7 @@
             currentState.onerror = () => tx.abort();
             queuedRequest.onerror = () => tx.abort();
             tx.oncomplete = () => {
-                state = stateToPersist;
+                replaceWorkspaceState(stateToPersist);
                 durableStateSnapshot = cloneWorkspaceState(stateToPersist);
                 sessionChannel?.postMessage({ type: 'workspace-updated' });
                 if (navigator.onLine) scheduleSyncRetry();
@@ -1690,7 +1703,7 @@
                     return;
                 }
                 if (mergeError) {
-                    state = cloneWorkspaceState(currentState.result || state || blank());
+                    replaceWorkspaceState(currentState.result || state || blank());
                     durableStateSnapshot = cloneWorkspaceState(state);
                     window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
                     reject(mergeError);
