@@ -2315,3 +2315,14 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Preserved the security throttle; no limit was weakened. Added a feature regression covering the three permitted attempts and the fourth blocked request.
 - Updated docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md to distinguish a throttle response from the original archive failure.
 - The Founder’s previously failed physical archive remains untouched. No physical restore retry or live workspace mutation was performed. Exact-head CI is pending.
+
+
+## Recovery throttle feedback — exact-head engineering verification — 2026-11-24
+
+- Code head: 18bc75b60f6b877fa8d29bea3ca82f16386e76e3 on main.
+- Added a route-specific response for the business archive restore throttle. The existing three-per-ten-minute owner limit is unchanged; a blocked request now returns to Data export & recovery with the Retry-After value and an explicit no-import assurance for that blocked attempt.
+- Added a regression for three permitted requests followed by the fourth blocked request.
+- Exact-head automated evidence: Laravel feature suite **758 passed / 1 skipped / 5,417 assertions**; PostgreSQL migration/recovery smoke **PASS**; coverage report **PASS**; Windows V1 package build, fresh-install verification and encrypted/legacy business-archive acceptance **PASS**; Zazu Quality (including incremental Pint formatting) **PASS**; PHPMD **PASS**; Director Health **PASS**; Push on main **PASS**.
+- SonarCloud was **SKIPPED**, not passed. Offline browser acceptance was still running when this checkpoint was written.
+- The earlier physical encrypted archive restore failure remains unresolved at its original stage. Later SYS-002/429 is now correctly identified as the rate limiter and must not be treated as the original cause. No restore was retried and no live business data or archive was modified.
+- Current next step: wait for the exact-head offline-browser job to finish, then continue the recovery scalability/integrity review. Founder-operated Windows restore and independent off-disk backup remain OPEN.
