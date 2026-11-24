@@ -1,3 +1,19 @@
+## Zazu Engine Director consolidation and commercial V1 mandate — 2026-11-24
+
+**Policy committed:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` is now the canonical binding product and delivery policy. **Zazu Engine Director (Jarvis)** is the single accountable role; discovery, architecture, implementation, security, QA, UX, performance, recovery and release are capabilities/procedures under that Director. Morpheus is retired as a separate identity. Existing skills remain procedures, not independent agents, backlogs or acceptance authorities.
+
+**Mandate locked:** commercial positioning (event & business operations; working promise “Run every job. Control every cost. Keep working.”), initial operator focus, preserve/improve/defer scope, directional competitor set (EventSync, CaterZen, HoneyBook), canonical 13-domain scorecard (baseline 46/65 = 71/100 as recorded in the 2026-11-23 audit), ordered V1 gates, strict evidence rules and 2026-11-30 controlled-pilot target. Target date is not permission to waive a gate. No new module expansion before release gates are closed.
+
+**Release gate order:** (0) current-head CI stabilisation; (1) supported offline continuity; (2) recovery/installation; (3) populated quote-to-profit reconciliation; (4) security, POPIA operations and ZAZU name clearance; (5) UX/accessibility, hardware performance and pilot operations. Android/PC physical acceptance, legal approval and commercial reconciliation remain separate from automated checks.
+
+**Current verified baseline at mandate creation:** application head `8f34da89f578d471e507cdfde3ca949fe19a4d3b` (2026-11-24). Push-on-main, Director Health and PHPMD passed; Laravel, Zazu Quality and Windows V1 Package failed; SonarCloud was skipped. Failure details and source are in the corresponding exact-head workflow runs. Do not report these as resolved or treat SonarCloud as passed. The policy-only documentation commits do not fix those failures; recheck current-main workflows before selecting the next engineering target.
+
+**Repository changes:** unified identity and routing in `.ai/engineering/00_DIRECTOR_ENGINE.md`; aligned `AGENTS.md`, `CLAUDE.md`, `README.md`, `.ai/engineering/README.md` and `memory.md`. All changes made directly on `main`; no branches created; no application source, database or production data changed.
+
+**Next active target:** Gate 0 — inspect the latest exact-main Laravel, Zazu Quality and Windows package failure logs, classify each root cause, then fix the smallest confirmed defect without weakening tests. Re-read current main SHA and workflow status first.
+
+---
+
 ## Offline supplier edit parity — implementation in progress — 2026-11-23
 
 **Implemented directly on `main`:**
