@@ -168,15 +168,12 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString("'circle-x' =>", $component);
         $this->assertStringContainsString("'eye' =>", $component);
         $this->assertStringContainsString("'trash' =>", $component);
-    }
 
-    public function test_finance_and_purchasing_use_local_semantic_status_icons(): void
-    {
         $finance = file_get_contents(resource_path('views/finance/index.blade.php'));
         $purchasing = file_get_contents(resource_path('views/purchasing/index.blade.php'));
-
-        $this->assertIsString($finance);
-        $this->assertIsString($purchasing);
+        $inventory = file_get_contents(resource_path('views/inventory/create.blade.php'));
+        $expense = file_get_contents(resource_path('views/finance/expense-create.blade.php'));
+        $payment = file_get_contents(resource_path('views/finance/payment-create.blade.php'));
 
         $this->assertStringContainsString('$invoiceStatusIcon', $finance);
         $this->assertStringContainsString('$expenseStatusIcon', $finance);
@@ -186,13 +183,6 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('<x-icon name="{{ $orderStatusIcon }}"', $purchasing);
         $this->assertStringContainsString("'received' => 'circle-check'", $purchasing);
         $this->assertStringContainsString("'cancelled' => 'circle-x'", $purchasing);
-    }
-
-    public function test_inventory_and_finance_compact_forms_use_shared_label_and_control_styles(): void
-    {
-        $inventory = file_get_contents(resource_path('views/inventory/create.blade.php'));
-        $expense = file_get_contents(resource_path('views/finance/expense-create.blade.php'));
-        $payment = file_get_contents(resource_path('views/finance/payment-create.blade.php'));
 
         foreach ([$inventory, $expense, $payment] as $view) {
             $this->assertIsString($view);
