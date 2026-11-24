@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -351,7 +352,7 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
                 ->assertSessionHasErrors('archive');
         }
 
-        $blocked = $this->post(route('exports.archive.restore'), [])
+        $this->post(route('exports.archive.restore'), [])
             ->assertRedirect(route('exports.index'))
             ->assertSessionHasErrors('archive');
 
@@ -361,5 +362,4 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         $this->assertStringContainsString('blocked before restore processing', $message);
         $this->assertStringContainsString('no data was imported', $message);
     }
-
 }
