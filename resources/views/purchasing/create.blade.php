@@ -33,7 +33,7 @@
 
             <div class="zazu-form-grid">
                 <label class="zazu-field">
-                    <span>Job (optional)</span>
+                    <span class="zazu-label">Job (optional)</span>
                     <select name="event_id" class="zazu-select">
                         <option value="">General purchase</option>
                         @foreach($events as $event)
@@ -46,7 +46,7 @@
                 </label>
 
                 <label class="zazu-field">
-                    <span>Supplier <span class="zazu-required">*</span></span>
+                    <span class="zazu-label">Supplier <span class="zazu-required">*</span></span>
                     <select name="supplier_id" required class="zazu-select">
                         <option value="">Choose supplier</option>
                         @foreach($suppliers as $supplier)
@@ -56,14 +56,14 @@
                 </label>
 
                 <label class="zazu-field">
-                    <span>Currency</span>
+                    <span class="zazu-label">Currency</span>
                     <input value="{{ $currency }}" class="zazu-input" readonly aria-describedby="purchase-currency-help">
                     <input type="hidden" name="currency" value="{{ $currency }}">
                     <span id="purchase-currency-help" class="zazu-field-help">Uses the active business currency.</span>
                 </label>
 
                 <label class="zazu-field">
-                    <span>Expected date</span>
+                    <span class="zazu-label">Expected date</span>
                     <input type="date" name="expected_at" value="{{ old('expected_at') }}" class="zazu-input">
                     <span class="zazu-field-help">Optional supplier delivery date.</span>
                 </label>
@@ -87,23 +87,23 @@
                             </div>
                             <div class="zazu-form-grid mt-3">
                                 <label class="zazu-field zazu-field-wide">
-                                    <span>Description <span class="zazu-required">*</span></span>
+                                    <span class="zazu-label">Description <span class="zazu-required">*</span></span>
                                     <input name="description[]" value="{{ $oldDescriptions[$i] ?? '' }}" class="zazu-input" required placeholder="e.g. 50 white banquet chairs">
                                 </label>
                                 <label class="zazu-field">
-                                    <span>Quantity <span class="zazu-required">*</span></span>
+                                    <span class="zazu-label">Quantity <span class="zazu-required">*</span></span>
                                     <input type="number" step="0.01" min="0.01" name="quantity[]" value="{{ $oldQuantities[$i] ?? '' }}" class="zazu-input" required inputmode="decimal" data-purchase-quantity>
                                 </label>
                                 <label class="zazu-field">
-                                    <span>Unit</span>
+                                    <span class="zazu-label">Unit</span>
                                     <input name="unit[]" value="{{ $oldUnits[$i] ?? 'unit' }}" class="zazu-input" placeholder="unit">
                                 </label>
                                 <label class="zazu-field">
-                                    <span>Unit price <span class="zazu-required">*</span></span>
+                                    <span class="zazu-label">Unit price <span class="zazu-required">*</span></span>
                                     <input type="number" step="0.01" min="0" name="unit_price[]" value="{{ $oldPrices[$i] ?? '' }}" class="zazu-input" required inputmode="decimal" data-purchase-price>
                                 </label>
                                 <label class="zazu-field zazu-field-wide">
-                                    <span>Catalogue item</span>
+                                    <span class="zazu-label">Catalogue item</span>
                                     <select name="capability_id[]" class="zazu-select">
                                         <option value="">Not linked</option>
                                         @foreach($catalogue as $item)
@@ -130,7 +130,7 @@
             </section>
 
             <label class="zazu-field mt-4">
-                <span>Notes</span>
+                <span class="zazu-label">Notes</span>
                 <textarea name="notes" rows="3" class="zazu-textarea">{{ old('notes') }}</textarea>
             </label>
 
@@ -149,23 +149,23 @@
             </div>
             <div class="zazu-form-grid mt-3">
                 <label class="zazu-field zazu-field-wide">
-                    <span>Description <span class="zazu-required">*</span></span>
+                    <span class="zazu-label">Description <span class="zazu-required">*</span></span>
                     <input name="description[]" class="zazu-input" required placeholder="e.g. 50 white banquet chairs">
                 </label>
                 <label class="zazu-field">
-                    <span>Quantity <span class="zazu-required">*</span></span>
+                    <span class="zazu-label">Quantity <span class="zazu-required">*</span></span>
                     <input type="number" step="0.01" min="0.01" name="quantity[]" class="zazu-input" required inputmode="decimal" data-purchase-quantity>
                 </label>
                 <label class="zazu-field">
-                    <span>Unit</span>
+                    <span class="zazu-label">Unit</span>
                     <input name="unit[]" value="unit" class="zazu-input" placeholder="unit">
                 </label>
                 <label class="zazu-field">
-                    <span>Unit price <span class="zazu-required">*</span></span>
+                    <span class="zazu-label">Unit price <span class="zazu-required">*</span></span>
                     <input type="number" step="0.01" min="0" name="unit_price[]" class="zazu-input" required inputmode="decimal" data-purchase-price>
                 </label>
                 <label class="zazu-field zazu-field-wide">
-                    <span>Catalogue item</span>
+                    <span class="zazu-label">Catalogue item</span>
                     <select name="capability_id[]" class="zazu-select">
                         <option value="">Not linked</option>
                         @foreach($catalogue as $item)
