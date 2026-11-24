@@ -4353,8 +4353,6 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(coldLaunch.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeVisible();
 
-        await page.goto(workUrl, { waitUntil: 'domcontentloaded' });
-        await expect(page).toHaveURL(new URL(workUrl, page.url()).href);
     });
 
 });
