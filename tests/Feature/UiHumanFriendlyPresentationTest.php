@@ -169,4 +169,22 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString("'eye' =>", $component);
         $this->assertStringContainsString("'trash' =>", $component);
     }
+
+    public function test_finance_and_purchasing_use_local_semantic_status_icons(): void
+    {
+        $finance = file_get_contents(resource_path('views/finance/index.blade.php'));
+        $purchasing = file_get_contents(resource_path('views/purchasing/index.blade.php'));
+
+        $this->assertIsString($finance);
+        $this->assertIsString($purchasing);
+
+        $this->assertStringContainsString('$invoiceStatusIcon', $finance);
+        $this->assertStringContainsString('$expenseStatusIcon', $finance);
+        $this->assertStringContainsString('<x-icon name="{{ $invoiceStatusIcon }}"', $finance);
+        $this->assertStringContainsString('<x-icon name="{{ $expenseStatusIcon }}"', $finance);
+        $this->assertStringContainsString('$orderStatusIcon', $purchasing);
+        $this->assertStringContainsString('<x-icon name="{{ $orderStatusIcon }}"', $purchasing);
+        $this->assertStringContainsString("'received' => 'circle-check'", $purchasing);
+        $this->assertStringContainsString("'cancelled' => 'circle-x'", $purchasing);
+    }
 }
