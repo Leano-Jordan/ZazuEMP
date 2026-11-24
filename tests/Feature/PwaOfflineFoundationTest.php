@@ -212,7 +212,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('workspace.dataset.zazuOfflineActiveView = activeView;', $app);
         $this->assertStringContainsString("window.addEventListener('popstate', applyOfflineRouteView);", $app);
         $this->assertStringContainsString("window.addEventListener('zazu:offline-state-updated', () => { applyOfflineRouteView(); render(); });", $app);
-        $this->assertStringContainsString(".zazu-content > :not([data-zazu-offline-workspace])", $app);
+        $this->assertStringContainsString('.zazu-content > :not([data-zazu-offline-workspace])', $app);
     }
 
     public function test_insecure_network_origins_explain_the_offline_installation_requirement(): void
