@@ -137,7 +137,6 @@
             'sync_authorization_required',
             'sync_registration_blocked',
             'sync_registration_consent',
-            'version',
         ]);
 
         for (const key of keys) {
@@ -146,6 +145,10 @@
             if (sameWorkspaceValue(before, after)) continue;
 
             const current = latest?.[key];
+            if (key === 'version') {
+                merged[key] = cloneWorkspaceState(after);
+                continue;
+            }
             if (allowSessionChange && sessionFields.has(key)) {
                 merged[key] = cloneWorkspaceState(after);
                 continue;

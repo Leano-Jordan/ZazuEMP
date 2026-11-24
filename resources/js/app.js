@@ -892,11 +892,11 @@ function setupZazuHelper() {
 
 
 function setupZazuOfflineWorkspaceProfile() {
-    const panel = document.querySelector('[data-zazu-workspace-profile]');
-    const businessId = Number(document.body?.dataset.zazuBusinessId || 0);
-    if (!panel || !Number.isSafeInteger(businessId) || businessId < 1) return;
-
     const render = () => {
+        const panel = document.querySelector('[data-zazu-workspace-profile]');
+        const businessId = Number(document.body?.dataset.zazuBusinessId || 0);
+        if (!panel || !Number.isSafeInteger(businessId) || businessId < 1) return;
+
         const state = window.ZazuOffline?.getState?.();
         if (!state || Number(state.business?.id || 0) !== businessId) return;
 
@@ -930,19 +930,10 @@ function setupZazuOfflineWorkspaceProfile() {
         }
     };
 
-    const bind = () => {
-        const offline = window.ZazuOffline;
-        if (offline?.ready && typeof offline.ready.then === 'function') {
-            offline.ready.then(render).catch(() => {});
-        }
-        render();
-    };
-
-    window.addEventListener('zazu:offline-ready', bind, { once: true });
+    window.addEventListener('zazu:offline-ready', render);
     window.addEventListener('zazu:offline-state-updated', render);
-    bind();
+    render();
 }
-
 
 const initializeZazuUi = () => {
     // Bind local profile rendering before optional UI initializers so a
