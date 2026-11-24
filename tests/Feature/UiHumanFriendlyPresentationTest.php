@@ -141,4 +141,32 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString('var(--zazu-warning-soft)', $css);
         $this->assertStringContainsString('var(--zazu-success-soft)', $css);
     }
+
+    public function test_work_quotes_and_customers_use_local_semantic_status_and_action_icons(): void
+    {
+        $work = file_get_contents(resource_path('views/work/index.blade.php'));
+        $quotes = file_get_contents(resource_path('views/quotes/index.blade.php'));
+        $customers = file_get_contents(resource_path('views/customers/index.blade.php'));
+        $component = file_get_contents(resource_path('views/components/icon.blade.php'));
+
+        $this->assertIsString($work);
+        $this->assertIsString($quotes);
+        $this->assertIsString($customers);
+        $this->assertIsString($component);
+
+        $this->assertStringContainsString('$statusIcon', $work);
+        $this->assertStringContainsString('<x-icon name="{{ $statusIcon }}"', $work);
+        $this->assertStringContainsString("'circle-check'", $work);
+        $this->assertStringContainsString("'clock'", $work);
+        $this->assertStringContainsString("'circle-x'", $work);
+        $this->assertStringContainsString('<x-icon name="{{ $quoteStatusIcon }}"', $quotes);
+        $this->assertStringContainsString('<x-icon name="upload"', $customers);
+        $this->assertStringContainsString('<x-icon name="briefcase"', $customers);
+        $this->assertStringContainsString('<x-icon name="eye"', $customers);
+        $this->assertStringContainsString('<x-icon name="trash"', $work);
+        $this->assertStringContainsString("'circle-check' =>", $component);
+        $this->assertStringContainsString("'circle-x' =>", $component);
+        $this->assertStringContainsString("'eye' =>", $component);
+        $this->assertStringContainsString("'trash' =>", $component);
+    }
 }
