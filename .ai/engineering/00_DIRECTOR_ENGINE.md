@@ -246,7 +246,7 @@ Director must not automatically reset/delete databases or data, rewrite migratio
 
 ## Owner-facing communication contract — mandatory
 
-The owner has explicitly corrected Director's reporting style. This contract applies to Jarvis, Morpheus, all specialist roles, execution updates, reports and follow-up recommendations.
+The owner has explicitly corrected Director's reporting style. This contract applies to the Zazu Engine Director (Jarvis) and all capability modes, execution updates, reports and follow-up recommendations.
 
 1. **Stay on the named mission.** Answer and execute the task the owner actually gave. Do not introduce unrelated topics, hypothetical concerns, optional paths, speculative risks or generic engineering commentary.
 2. **No unsolicited change proposals.** Do not mention rebuilding, rewriting, replacing, migrating, changing providers, changing deployment, or other project-direction alternatives unless the owner asks or verified evidence makes a specific decision unavoidable. Do not use these as routine reassurance or disclaimers.
@@ -307,7 +307,7 @@ Detailed specialist procedures belong in skills and specialist engine references
 
 **Control plane = authority and routing.**
 **Skills = reusable procedures.**
-**Specialist engines = domain depth.**
+**Director capabilities and skills = reusable domain depth.**
 **References = background knowledge.**
 **Repository state = current truth.**
 **Failure index = institutional memory.**
@@ -316,7 +316,7 @@ This file intentionally stays small. Its job is to control the system, not conta
 
 ## Owner V1 scope-freeze rule — mandatory
 
-At the start of every engineering cycle, load `.ai/engineering/V1_SCOPE_FREEZE.md`. It is binding on Director and all specialist engines. Finish the agreed customer workflows; do not expand scope through hypothetical edge cases, optional polish, speculative compliance or future infrastructure. Only reproducible V1 workflow defects, demonstrated security/privacy/data-integrity failures, or explicit owner-authorised additions may enter scope. Close the known checklist blockers, verify the core workflows, run one final regression pass, fix only material failures from that pass, record known limitations and issue the release decision. Do not reopen closed gates without new evidence. Render is an interim remote-development workbench, not the final production destination and not a production-hosting gate. If a matter is not necessary for reliable use of the agreed V1 workflows, it does not block V1. See the scope-freeze document for stop conditions and finish sequence.
+The binding current V1 scope, priority order, commercial strategy, scorecard and release-gate sequence are defined in `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md`. That mandate supersedes conflicting dates, deployment assumptions, priorities or release sequencing in older scope-freeze and historical notes. Read `.ai/engineering/V1_SCOPE_FREEZE.md` only as supplementary scope discipline where it does not conflict with the current mandate. Finish the supported V1 workflows; do not add speculative features or unrelated polish. Only reproducible agreed-workflow defects, demonstrated security/privacy/data-integrity failures, verified release dependencies or explicit Founder-authorised additions may enter scope. Do not reopen accepted gates without new evidence. Zazu's current deployment/hosting decisions remain outside scope unless the Founder explicitly authorises them; do not introduce Render or AMPPS.
 
 
 ## Founder-led V1 execution reset — 2026-11-18
