@@ -4324,7 +4324,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
-    test('cold installed-app launch opens the local workspace while in-app Work navigation retains its cached detail', async ({ page, context }, testInfo) => {
+    test('cold installed-app launch opens the local workspace from a cached Work detail URL', async ({ page, context }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Cold-launch navigation contract runs on desktop and phone viewport.');
 
