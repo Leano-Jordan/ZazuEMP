@@ -1,10 +1,12 @@
 ## Current execution checkpoint — 2026-11-24 (offline acceptance root-cause correction)
 
-**Current main head before this state update:** `4ebc07603cdef80c0a030b8c2b1ab122f6a57307`. **Application changes:** route selection/event handling `84e2b31aae7ecf88b6047e0d0487a4c420148ea9`; correct cached Dashboard content boundary and reconnect restoration `f459a6488ce368cf18e27bbe444d87c09b57114d`, `8908eba40f8ebbef2844d5c32b9cf2c2833f1804`; actual service-worker fallback regression `0c8fa7da558c4f93d30372959d490fcdc654ee39`; current PHP test formatting repair `86f443bf755a8a17b776a2dc0131d2d694de080b`.
+**Current main head:** `77db56121ccef906c84d4b98444d0f6f2916be81`. **Application changes:** route selection/event handling `84e2b31aae7ecf88b6047e0d0487a4c420148ea9`; correct cached Dashboard content boundary and reconnect restoration `f459a6488ce368cf18e27bbe444d87c09b57114d`, `8908eba40f8ebbef2844d5c32b9cf2c2833f1804`; actual service-worker fallback regression `0c8fa7da558c4f93d30372959d490fcdc654ee39`; current PHP test formatting repair `86f443bf755a8a17b776a2dc0131d2d694de080b`; CSS hidden-semantics fix `77db56121ccef906c84d4b98444d0f6f2916be81`.
 
 **Founder sign-off retained:** Phase 1 — connected operation on the physical Windows PC and linked Android phone, both using the same workspace — is **OWNER-VERIFIED PASS, completed physically multiple times by the Founder**. Do not repeat Phase 1, reinstall, or recreate the existing fictional records.
 
 **Phase 2 — offline acceptance remains OPEN and is the sole active priority.** Founder-observed physical failure: while PC host was stopped and phone remained on Wi-Fi, navigation showed the cached Dashboard plus offline collections together.
+
+**Additional root cause confirmed in CSS audit:** `resources/css/zazu-dashboard-authority.css` assigns `display: grid !important` to Dashboard hero, overview and grid. JavaScript setting `element.hidden = true` cannot reliably hide these elements when author CSS overrides the browser's native `[hidden] { display:none }` rule. This explains why the Dashboard could remain visible even after the route renderer selected an offline view. Added a global semantic `[hidden] { display:none !important }` rule in `resources/css/app.css`, so hidden state is respected consistently across all components. Existing route regression assertions for hidden hero/overview/grid now exercise this CSS contract.
 
 **Deep root cause (confirmed in source):**
 1. The service worker returns cached `/dashboard` HTML for a failed/unprimed authenticated route while preserving the requested URL.
@@ -25,7 +27,7 @@
 - Zazu Quality passed on `84e2b31aae7ecf88b6047e0d0487a4c420148ea9` (docs validation, frontend build, performance budget, service-worker auth/cache-race tests, npm audit, formatting).
 - Laravel tests and coverage passed on `9afe196b951b381dc129432d9dcb75a08d7c198b`; PostgreSQL migration/recovery passed on that run.
 - A later Quality failure on `3275aea44e7fcb45c9effb7895a1d57a30291078` was only Pint single-quote formatting in the PHP static test; fixed in `86f443bf755a8a17b776a2dc0131d2d694de080b`.
-- New actual fallback E2E and shell-boundary assertions are on main after those earlier passing runs; exact-head CI is still required. SonarCloud skipped is not a pass.
+- New actual fallback E2E and shell-boundary assertions are on main after those earlier passing runs; exact-head CI for `77db56121ccef906c84d4b98444d0f6f2916be81` is queued (Laravel `45418833392`, Quality `45418833510`, Windows package `45418833533`, Push-on-main `45418832828`). SonarCloud skipped is not a pass.
 - Never infer physical Android or owner-PC acceptance from CI.
 
 **Next objective:** verify exact-head CI after the actual fallback tests and Pint fix. Resolve all failures. Then request one focused Android retest only: connect to the existing HTTPS origin, reload online once to receive the current app assets, stop PC host and Caddy while phone Wi-Fi remains on, open Dashboard, Customers and Suppliers, then Calendar. Confirm Suppliers shows only its local collection, the online Dashboard is absent, Calendar shows the unavailable message, and existing records/queues remain. After this route-isolation check, continue airplane-mode cold launch/restart, offline create/edit, attachment persistence and exactly-once reconnect. Preserve IndexedDB; do not clear site data. Keep owner-PC acceptance separate. No branches; work directly on main.
