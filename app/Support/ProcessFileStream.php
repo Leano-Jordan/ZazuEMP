@@ -97,6 +97,7 @@ final class ProcessFileStream
         return $diagnostic;
     }
 
+    /** @param resource $stream */
     private static function writeAll($stream, string $chunk): void
     {
         $length = strlen($chunk);
