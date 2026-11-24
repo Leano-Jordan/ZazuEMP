@@ -2157,8 +2157,9 @@
         }
 
         // Finish any previous logout revocation before issuing a fresh token
-        // for this installation. Only the non-secret installation identity is
-        // retained across logout; bearer credentials never enter browser storage.
+        // for this installation. The pending-revocation marker retains only the
+        // non-secret installation identity; the trusted bearer remains in the
+        // business-scoped IndexedDB workspace until the device is revoked or cleared.
         if (readPendingDeviceRevocation()) {
             const revocation = await retryPendingDeviceRevocation();
             if (!revocation.ok) {
