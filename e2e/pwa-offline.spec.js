@@ -1042,8 +1042,9 @@ test.describe('Zazu installed PWA offline shell', () => {
             const data = await response.json();
             return {
                 status: response.status,
-                matchingCustomers: (data.customers || []).filter(customer => customer.name === name)
-                    .map(customer => customer.id),
+                matchingCustomers: (data.selected || [])
+                    .filter(item => item.type === 'customer' && item.record?.name === name)
+                    .map(item => item.server_id),
             };
         }, { name: customerName });
         expect(bootstrap.status).toBe(200);
