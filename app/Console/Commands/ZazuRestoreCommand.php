@@ -520,6 +520,7 @@ class ZazuRestoreCommand extends Command
             }
 
             $this->info('Zazu restore completed from '.$archive);
+
             return self::SUCCESS;
         } catch (\Throwable $exception) {
             $rollbackFailure = null;
@@ -750,5 +751,3 @@ class ZazuRestoreCommand extends Command
         return false;
     }
 }
-
-
