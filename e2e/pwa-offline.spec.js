@@ -4324,6 +4324,5 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
-;
 
 });
