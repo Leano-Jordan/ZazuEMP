@@ -187,6 +187,14 @@ class BusinessExportController extends Controller
                 $restoreStage,
                 $exception,
             );
+        } catch (\Throwable $exception) {
+            return $this->restoreUnexpectedFailure(
+                $request,
+                $business,
+                $validated['archive']->getSize(),
+                $restoreStage,
+                $exception,
+            );
         } finally {
             if (is_string($decryptedPath)) {
                 @unlink($decryptedPath);
@@ -248,6 +256,29 @@ class BusinessExportController extends Controller
         ]);
 
         return back()->withErrors(['archive' => $exception->getMessage().' Reference: '.$incidentId]);
+    }
+
+    private function restoreUnexpectedFailure(
+        Request $request,
+        Business $business,
+        int $uploadBytes,
+        string $restoreStage,
+        \Throwable $exception,
+    ): RedirectResponse {
+        $incidentId = (string) Str::uuid();
+        Log::error('Business archive restore failed unexpectedly.', [
+            'incident_id' => $incidentId,
+            'stage' => $restoreStage,
+            'business_id' => (int) $business->id,
+            'user_id' => (int) $request->user()->getAuthIdentifier(),
+            'upload_bytes' => $uploadBytes,
+            'exception_class' => $exception::class,
+            'exception_code' => (string) $exception->getCode(),
+        ]);
+
+        return back()->withErrors([
+            'archive' => 'Zazu could not complete this business archive restore. No imported workspace should be treated as restored. Reference: '.$incidentId,
+        ]);
     }
 
     private function restoreJsonFailure(
