@@ -4,6 +4,12 @@
 
 **Capability boundary:** see [Zazu V1 Offline Capability Contract](ZAZU_V1_OFFLINE_CAPABILITY_CONTRACT.md) before testing. It defines which actions are supported locally and which remain online-only or deferred.
 
+## Owner acceptance record
+
+**Phase 1 — connected PC and linked Android operation: OWNER-VERIFIED PASS.** The Founder confirms this phase has been physically completed multiple times, including shared-workspace use and the existing populated fictional business records. Do not repeat the connected setup or recreate those records.
+
+**Phase 2 — disconnected/offline operation: OPEN.** The latest physical host-loss attempt exposed a route presentation defect: navigation falls back to the cached Dashboard shell and shows multiple offline collections together. Engineering is correcting this before the next physical acceptance attempt. The steps below are the eventual Phase 2 procedure, not a request to repeat Phase 1.
+
 ## Why the old phone URL is not sufficient
 
 The LAN address `http://<PC-LAN-IP>:8000` is plain HTTP. Android Chrome does not treat an ordinary LAN IP over HTTP as a secure context, so Zazu cannot register its service worker there. A page that remains visible after the PC server stops is only the already-rendered page; it is not proof of offline navigation or local workflow support.
