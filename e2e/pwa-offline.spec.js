@@ -3233,15 +3233,31 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.goto('/settings', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
 
-        const mutationId = await page.evaluate(async () => {
+        const mutationIds = await page.evaluate(async () => {
             const state = window.ZazuOffline.getState();
+            state.invoices = [{
+                id: null,
+                local_id: 'expired-device-local-invoice',
+                status: 'issued',
+                total: '100.00',
+                paid_amount: '0.00',
+                balance: '100.00',
+                payments: [],
+                revision: 1,
+            }];
             state.sync = { token: 'expired-device-token-fixture', device: { id: 987699 } };
             await window.ZazuOffline.persist({ allowSessionChange: true });
-            const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
+            const customerMutation = await window.ZazuOffline.queueMutation('customer', 'create', {
                 local_id: 'expired-device-local-customer',
                 record: { name: 'Preserve while re-pairing' },
             });
-            return mutation.id;
+            const paymentMutation = await window.ZazuOffline.queueMutation('payment', 'create', {
+                local_id: 'expired-device-local-payment',
+                invoice_local_id: 'expired-device-local-invoice',
+                amount: '25.00',
+                type: 'payment',
+            });
+            return { customerMutationId: customerMutation.id, paymentMutationId: paymentMutation.id };
         });
 
         await page.route('**/api/sync/push', route => route.fulfill({
@@ -3262,7 +3278,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.error).toContain('no longer authorised to sync');
         expect(outcome.error).toContain('pair the device again');
         expect(outcome.recoveryRequired).toBe(true);
-        expect(outcome.pending).toContain(mutationId);
+        expect(outcome.pending).toContain(mutationIds.customerMutationId);
+        expect(outcome.pending).toContain(mutationIds.paymentMutationId);
         expect(outcome.tokenPresent).toBe(true);
         await expect(page.locator('[data-zazu-sync-recovery]')).toBeVisible();
         await expect(page.locator('[data-zazu-sync-recovery-message]')).toContainText('saved offline changes remain');
