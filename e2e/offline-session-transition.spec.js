@@ -75,6 +75,19 @@ test('offline logout retries trusted-device revocation after the next owner logi
     expect(storedMarker).not.toHaveProperty('token');
     expect(JSON.stringify(storedMarker)).not.toContain('logout-revocation-secret-token');
 
+    const exposedCredentialSurface = await page.evaluate(() => ({
+        localStorage: Array.from({ length: localStorage.length }, (_, index) => {
+            const key = localStorage.key(index);
+            return [key, localStorage.getItem(key)];
+        }),
+        sessionStorage: Array.from({ length: sessionStorage.length }, (_, index) => {
+            const key = sessionStorage.key(index);
+            return [key, sessionStorage.getItem(key)];
+        }),
+        url: window.location.href,
+    }));
+    expect(JSON.stringify(exposedCredentialSurface)).not.toContain('logout-revocation-secret-token');
+
     let retryAttempts = 0;
     await page.route('**/settings/sync/devices/revoke-installation', async route => {
         retryAttempts++;
