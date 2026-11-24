@@ -9,6 +9,7 @@ use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -240,6 +241,43 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         } finally {
             @unlink($legacyArchive);
         }
+    }
+
+    public function test_unexpected_restore_failure_is_logged_with_stage_and_safe_reference(): void
+    {
+        $business = Business::create([
+            'name' => 'Unexpected Restore Failure',
+            'slug' => 'unexpected-restore-failure',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($business);
+
+        $this->mock(BusinessArchiveService::class, function ($mock): void {
+            $mock->shouldReceive('restore')
+                ->once()
+                ->andThrow(new \Error('internal diagnostic detail must not reach the user'));
+        });
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Business archive restore failed unexpectedly.', \Mockery::on(
+                fn (array $context): bool => $context['stage'] === 'archive_validation_and_restore'
+                    && $context['business_id'] === (int) $business->id
+                    && $context['exception_class'] === \Error::class
+                    && ! array_key_exists('exception_message', $context)
+            ));
+
+        $response = $this->post(route('exports.archive.restore'), [
+            'archive' => UploadedFile::fake()->createWithContent('business.zip', "PK\x03\x04test"),
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('archive');
+        $error = session('errors')->getBag('default')->first('archive');
+        $this->assertStringContainsString('Zazu could not complete this business archive restore.', $error);
+        $this->assertStringContainsString('Reference:', $error);
+        $this->assertStringNotContainsString('internal diagnostic detail', $error);
     }
 
     public function test_restore_validation_rejection_returns_reference_without_flashing_passphrase(): void
