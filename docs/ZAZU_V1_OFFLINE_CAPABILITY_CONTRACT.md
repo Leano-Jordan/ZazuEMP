@@ -91,6 +91,7 @@ This is an explicit security review item for Gate 1 / Gate 4:
 - Review local sync-token exposure, XSS/content injection and shared-browser-profile risks.
 - Decide whether a device-local unlock/key-management design is justified without making offline recovery or cold launch fragile.
 - Never claim application-level encryption at rest until an implemented design and recovery-safe tests prove it.
+- docs/ZAZU_OFFLINE_STORAGE_THREAT_MODEL.md: verified local persistence, credential lifecycle, logout/revocation boundary, residual risks and V1 controls.
 
 ## 7. Evidence map
 
