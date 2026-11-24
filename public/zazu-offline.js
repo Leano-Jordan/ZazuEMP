@@ -1434,7 +1434,8 @@
                     nextState.local_dirty = pendingCount.result > 0;
                     stateStore.put(nextState, 'current');
                     tx.oncomplete = () => {
-                        state = nextState;
+                        replaceWorkspaceState(nextState);
+                        durableStateSnapshot = cloneWorkspaceState(nextState);
                         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
                         resolve();
                     };
@@ -1841,7 +1842,8 @@
 
             currentStateRequest.onerror = () => tx.abort();
             tx.oncomplete = () => {
-                state = nextState || state;
+                if (nextState) replaceWorkspaceState(nextState);
+                durableStateSnapshot = cloneWorkspaceState(state || blank());
                 resolve();
             };
             tx.onerror = () => reject(tx.error || new Error('Offline queue acknowledgement failed.'));
@@ -2048,7 +2050,7 @@
 
                 if (!persistedState || persistedState.sync?.token !== expectedToken) return;
 
-                state = persistedState;
+                replaceWorkspaceState(persistedState);
                 applyBootstrap(bootstrap);
                 tx.objectStore(STATE).put(state, 'current');
                 applied = true;
@@ -2069,7 +2071,10 @@
             pendingRequest.onerror = () => tx.abort();
             failedRequest.onerror = () => tx.abort();
             stateRequest.onerror = () => tx.abort();
-            tx.oncomplete = () => resolve(applied);
+            tx.oncomplete = () => {
+                if (applied) durableStateSnapshot = cloneWorkspaceState(state);
+                resolve(applied);
+            };
             tx.onerror = () => reject(tx.error || new Error('Offline bootstrap reconciliation failed.'));
             tx.onabort = () => reject(tx.error || new Error('Offline bootstrap reconciliation was aborted.'));
         });

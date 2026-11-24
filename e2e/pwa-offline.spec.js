@@ -182,7 +182,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(workspace).toBeVisible({ timeout: 15_000 });
         await expect(page.locator('.zazu-dash-hero')).toBeHidden();
         await expect(page.locator('.zazu-dash-overview')).toBeHidden();
-        await expect(page.locator('.zazu-dash-grid')).toBeHidden();
+        await expect(page.locator('.zazu-content > .zazu-dash-grid')).toBeHidden();
 
         const visitOfflinePath = async (path) => page.evaluate(pathname => {
             history.replaceState({}, '', pathname);
@@ -524,30 +524,45 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const workspace = page.locator('[data-zazu-offline-workspace]');
         await expect(workspace).toBeVisible();
-        for (const label of [
-            'Offline Supplier Proof',
-            'Offline Catering Service',
-            'Offline Stock Proof',
-            'Offline Marquee',
-            'PO-OFF-005',
-            'INV-OFF-006',
-            'Offline fuel expense',
-            'Offline venue cost',
-        ]) {
-            await expect(workspace.getByText(label, { exact: false }).first()).toBeVisible();
+
+        const routeExpectations = [
+            ['/suppliers', 'suppliers', 'Offline Supplier Proof'],
+            ['/capabilities', 'catalogue', 'Offline Catering Service'],
+            ['/inventory', 'inventory_items', 'Offline Stock Proof'],
+            ['/assets', 'assets', 'Offline Marquee'],
+            ['/purchasing', 'purchase_orders', 'PO-OFF-005'],
+            ['/finance/invoices', 'invoices', 'INV-OFF-006'],
+            ['/finance/expenses', 'expenses', 'Offline fuel expense'],
+            ['/work/730001/costs', 'costs', 'Offline venue cost'],
+        ];
+
+        for (const [path, view, label] of routeExpectations) {
+            const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+            expect(response?.ok(), path + ' must render through the cached offline shell').toBe(true);
+            await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', view);
+            const section = workspace.locator('[data-zazu-offline-view="' + view + '"]');
+            await expect(section).toBeVisible();
+            await expect(section.getByText(label, { exact: false }).first()).toBeVisible();
         }
 
-        await workspace.getByRole('button', { name: 'View saved details' }).first().click();
-        await expect(workspace.getByText('supplier@example.test', { exact: true })).toBeVisible();
-        await expect(workspace.getByText('Soshanguve')).toBeVisible();
-        await workspace.getByRole('button', { name: 'View saved details' }).nth(1).click();
-        await expect(workspace.getByText('Inactive', { exact: true })).toBeVisible();
+        await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
+        const supplierSection = workspace.locator('[data-zazu-offline-view="suppliers"]');
+        await supplierSection.getByRole('button', { name: 'View saved details' }).first().click();
+        await expect(supplierSection.getByText('supplier@example.test', { exact: true })).toBeVisible();
+        await expect(supplierSection.getByText('Soshanguve')).toBeVisible();
 
-        const stockSection = workspace.locator('[data-zazu-offline-collection="inventory_items"]');
+        await page.goto('/capabilities', { waitUntil: 'domcontentloaded' });
+        const catalogueSection = workspace.locator('[data-zazu-offline-view="catalogue"]');
+        await catalogueSection.getByRole('button', { name: 'View saved details' }).first().click();
+        await expect(catalogueSection.getByText('Inactive', { exact: true })).toBeVisible();
+
+        await page.goto('/inventory', { waitUntil: 'domcontentloaded' });
+        const stockSection = workspace.locator('[data-zazu-offline-view="inventory_items"]');
         await stockSection.getByRole('button', { name: 'View saved details' }).click();
         await expect(stockSection.getByText('Recent stock movements')).toBeVisible();
 
-        const invoiceSection = workspace.locator('[data-zazu-offline-collection="invoices"]');
+        await page.goto('/finance/invoices', { waitUntil: 'domcontentloaded' });
+        const invoiceSection = workspace.locator('[data-zazu-offline-view="invoices"]');
         await invoiceSection.getByRole('button', { name: 'View saved details' }).click();
         await expect(invoiceSection.getByText('EFT-01')).toBeVisible();
     });
@@ -3607,7 +3622,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             await expect(page.locator('[data-zazu-offline-view="suppliers"]')).toBeVisible();
             await expect(page.locator('.zazu-dash-hero')).toBeHidden();
             await expect(page.locator('.zazu-dash-overview')).toBeHidden();
-            await expect(page.locator('.zazu-dash-grid')).toBeHidden();
+            await expect(page.locator('.zazu-content > .zazu-dash-grid')).toBeHidden();
 
             const unsupportedFallback = await page.goto('/calendar', { waitUntil: 'domcontentloaded' });
             expect(unsupportedFallback?.ok()).toBe(true);
@@ -3752,7 +3767,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         // accepted locally, the same form must discover that local acceptance.
         await page.goto('/finance/invoices/create', { waitUntil: 'domcontentloaded' });
         await expect(page.locator('form[data-zazu-offline-entity="invoice"]')).toBeVisible();
-        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
 
         await context.setOffline(true);

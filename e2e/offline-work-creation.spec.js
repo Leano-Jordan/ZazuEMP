@@ -607,9 +607,9 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // The cached dashboard is the fallback for unprimed routes. It must expose
     // the IndexedDB working set instead of leaving the operator on a stale snapshot.
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
-    await expect(page.locator('[data-zazu-offline-workspace] [data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
-    await expect(page.locator('[data-zazu-offline-workspace] [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    const offlineWorkspace = page.locator('[data-zazu-offline-workspace]');
+    await expect(offlineWorkspace).toBeVisible();
+    await expect(offlineWorkspace).toHaveAttribute('data-zazu-offline-active-view', 'overview');
 
     // The device-local workspace must navigate into the cached customer and
     // Work directories and render the same IndexedDB records there.
