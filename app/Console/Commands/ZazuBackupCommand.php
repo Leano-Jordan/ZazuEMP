@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Support\BackupArchiveLimits;
 use App\Support\PrivateStoragePermissions;
 use App\Support\PostgresBackupSupport;
+use App\Support\ProcessFileStream;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
