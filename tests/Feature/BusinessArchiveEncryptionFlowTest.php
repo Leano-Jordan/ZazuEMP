@@ -277,16 +277,16 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
             ->andReturn(new class {
                 public function put(string $path, string $contents): bool
                 {
-                    throw new \\Error('internal diagnostic detail must not reach the user');
+                    throw new \Error('internal diagnostic detail must not reach the user');
                 }
             });
 
         Log::shouldReceive('error')
             ->once()
-            ->with('Business archive restore failed unexpectedly.', \\Mockery::on(
+            ->with('Business archive restore failed unexpectedly.', \Mockery::on(
                 fn (array $context): bool => $context['stage'] === 'archive_validation_and_restore'
                     && $context['business_id'] === (int) $target->id
-                    && $context['exception_class'] === \\Error::class
+                    && $context['exception_class'] === \Error::class
                     && ! array_key_exists('exception_message', $context)
             ));
 
