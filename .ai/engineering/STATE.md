@@ -2344,4 +2344,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - PHPMD on candidate 1520e9a detected one new method complexity violation: ProcessFileStream::runToFile() scored 12 against the repository threshold of 10.
 - Refactored the stream helper into focused output-callback, process-result, failure-cleanup and non-empty-output methods. No PHPMD threshold or suppression was changed.
 - The original populated upgrade and rollback workflow on candidate 1520e9a passed, including backup creation, populated upgrade, rollback, migration reapplication and recovery verification. Windows installation build and encrypted/legacy business archive verification also passed on that candidate; Windows fresh-install PowerShell verification remained queued.
-- Full Laravel, formatting/quality, PHPMD rerun, security scan and final Windows fresh-install checks remain pending for the refactored head.
+- PHPMD rerun passed on refactored head `2117a419`. Full Laravel/unit, formatting/quality, security scan, populated upgrade/rollback rerun and final Windows package/fresh-install checks remain pending.
+
+
+## Recovery stream PHPMD verification — 2026-11-24
+
+- Exact refactored code head: 2117a41994507ab50c06c7b5cd2f8da41a3aea7d.
+- PHPMD passed after the runToFile complexity refactor; no suppression or threshold changes.
+- Director Health passed on the same head.
+- The preceding candidate 1520e9a had already passed populated upgrade and rollback end-to-end (backup creation, populated upgrade, rollback, migration reapplication and recovery verification) and Windows encrypted/legacy business archive acceptance plus package build. Those checks are being rerun against 2117e's refactored helper.
+- Exact-head Laravel/unit suite, formatting/quality, Psalm, PostgreSQL smoke, browser acceptance, populated upgrade/rollback and Windows fresh-install remain in progress/queued. Do not treat these as passed until their exact-head results complete.
