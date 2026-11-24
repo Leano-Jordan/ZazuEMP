@@ -211,7 +211,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route?.[1] || 'unavailable'", $app);
         $this->assertStringContainsString('workspace.dataset.zazuOfflineActiveView = activeView;', $app);
         $this->assertStringContainsString("window.addEventListener('popstate', applyOfflineRouteView);", $app);
-        $this->assertStringContainsString("window.addEventListener('zazu:offline-state-updated', render);", $app);
+        $this->assertGreaterThanOrEqual(
+            2,
+            substr_count($app, "window.addEventListener('zazu:offline-state-updated', render);")
+        );
         $profileSetup = substr(
             $app,
             strpos($app, 'function setupZazuOfflineWorkspaceProfile()'),
