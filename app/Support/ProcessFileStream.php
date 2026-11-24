@@ -22,43 +22,64 @@ final class ProcessFileStream
         $diagnostic = '';
 
         try {
-            $process->run(static function (string $type, string $chunk) use ($process, $output, &$diagnostic): void {
-                if ($type === Process::OUT) {
-                    self::writeAll($output, $chunk);
-                    $process->clearOutput();
-
-                    return;
-                }
-
-                $diagnostic = self::appendTail($diagnostic, $chunk);
-                $process->clearErrorOutput();
-            });
-
-            if (!$process->isSuccessful()) {
-                throw new RuntimeException($failureMessage.($diagnostic !== '' ? ' '.$diagnostic : ''));
-            }
+            $process->run(self::outputCallback($process, $output, $diagnostic));
+            self::assertSuccessfulProcess($process, $failureMessage, $diagnostic);
 
             if (!fflush($output)) {
                 throw new RuntimeException('Could not flush the completed database dump to disk.');
             }
         } catch (\Throwable $exception) {
-            fclose($output);
-            if (is_file($path) && !unlink($path)) {
-                throw new RuntimeException($exception->getMessage().' The incomplete dump could not be removed.', 0, $exception);
-            }
-
-            throw $exception;
+            self::removeFailedOutput($output, $path, $exception);
         }
 
         fclose($output);
+        self::assertNonEmptyOutput($path, $failureMessage);
+    }
 
-        if (!is_file($path) || filesize($path) === 0) {
-            if (is_file($path)) {
-                unlink($path);
+    private static function outputCallback(Process $process, $output, string &$diagnostic): \Closure
+    {
+        return static function (string $type, string $chunk) use ($process, $output, &$diagnostic): void {
+            if ($type === Process::OUT) {
+                self::writeAll($output, $chunk);
+                $process->clearOutput();
+
+                return;
             }
 
-            throw new RuntimeException($failureMessage.' The database client returned an empty dump.');
+            $diagnostic = self::appendTail($diagnostic, $chunk);
+            $process->clearErrorOutput();
+        };
+    }
+
+    private static function assertSuccessfulProcess(Process $process, string $failureMessage, string $diagnostic): void
+    {
+        if (!$process->isSuccessful()) {
+            throw new RuntimeException($failureMessage.($diagnostic !== '' ? ' '.$diagnostic : ''));
         }
+    }
+
+    private static function removeFailedOutput($output, string $path, \Throwable $exception): never
+    {
+        fclose($output);
+
+        if (is_file($path) && !unlink($path)) {
+            throw new RuntimeException($exception->getMessage().' The incomplete dump could not be removed.', 0, $exception);
+        }
+
+        throw $exception;
+    }
+
+    private static function assertNonEmptyOutput(string $path, string $failureMessage): void
+    {
+        if (is_file($path) && filesize($path) > 0) {
+            return;
+        }
+
+        if (is_file($path)) {
+            unlink($path);
+        }
+
+        throw new RuntimeException($failureMessage.' The database client returned an empty dump.');
     }
 
     public static function runFromFile(Process $process, string $path, string $failureMessage): string
