@@ -301,5 +301,4 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         $this->assertStringContainsString('Restore request reference:', $error);
         $this->assertNull(session()->getOldInput('archive_password'));
     }
-
 }
