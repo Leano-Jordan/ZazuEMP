@@ -2354,3 +2354,12 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Director Health passed on the same head.
 - The preceding candidate 1520e9a had already passed populated upgrade and rollback end-to-end (backup creation, populated upgrade, rollback, migration reapplication and recovery verification) and Windows encrypted/legacy business archive acceptance plus package build. Those checks are being rerun against 2117e's refactored helper.
 - Exact-head Laravel/unit suite, formatting/quality, Psalm, PostgreSQL smoke, browser acceptance, populated upgrade/rollback and Windows fresh-install remain in progress/queued. Do not treat these as passed until their exact-head results complete.
+
+
+## Recovery streaming integration regression — root cause and correction — 2026-11-24
+
+- Exact-head Laravel/coverage execution on diagnostic candidate 04403cd confirmed both MySQL integration failures shared one cause: the two command classes referenced ProcessFileStream without importing App\\Support\\ProcessFileStream. PHP resolved the missing class under App\\Console\\Commands; no MySQL process was launched. The stream helper's own unit tests passed.
+- Added the missing explicit imports to ZazuBackupCommand and ZazuRestoreCommand. This is a wiring defect, not a failure of Symfony streaming or the fake executable fixtures.
+- Diagnostic assertions now surface Artisan command output and assert the MySQL invocation marker exists before reading it.
+- Applied Pint's import ordering and new-instance formatting to the recovery regression test after the first diagnostic run identified its style diff.
+- Re-run exact-head Laravel, coverage, quality/formatting, PHPMD, Psalm, Windows, PostgreSQL and browser acceptance on the corrected main head before accepting this implementation.
