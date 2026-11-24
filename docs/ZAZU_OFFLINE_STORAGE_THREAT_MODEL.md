@@ -1,6 +1,6 @@
 # Zazu Offline Storage & Trusted-Device Threat Model
 
-**Status:** Engineering assessment — controls mapped; device-level acceptance and policy decision remain OPEN.  
+**Status:** Engineering assessment complete; DEC-019 and V1 control boundaries documented. Automated credential-exposure regression strengthened; physical device hardening and policy-owner acceptance remain OPEN.  
 **Reviewed:** 2026-11-24  
 **Scope:** Current PWA offline workspace, IndexedDB persistence, trusted sync credential, service-worker caches and logout/revocation behaviour.  
 **Out of scope:** A claim of independent native-app sandboxing, application-level encryption, or physical Windows/Android hardening.
@@ -70,6 +70,13 @@ A passphrase-derived offline key could improve protection against copied profile
 5. Keep credentials out of localStorage, URLs, logs, analytics, exports and support diagnostics. The pending-revocation marker must remain non-secret.
 6. Maintain CSP, dependency/build integrity checks and regression coverage for untrusted content sinks. Any future third-party script requires a fresh threat review.
 7. Do not claim encrypted local storage, secure-enclave-backed key storage, or theft resistance until implemented and physically verified.
+
+
+## Regression evidence update — 2026-11-24
+
+- `e2e/offline-session-transition.spec.js` verifies that an unreachable logout queues only the non-secret installation identity for later owner-authenticated revocation. The regression now scans **all** `localStorage` and `sessionStorage` entries and the current URL to ensure the trusted bearer credential is not exposed there.
+- The bearer remains in the business-scoped IndexedDB workspace by design so already-approved offline operation can continue. This does not provide encryption or protection against same-origin script execution or access to an unlocked browser profile.
+- This is automated browser evidence only. It does not prove browser-profile encryption, OS account protection, device screen-lock configuration, or remote wipe. Those remain physical/operational acceptance items.
 
 ## Evidence reviewed
 
