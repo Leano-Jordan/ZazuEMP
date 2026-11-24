@@ -35,6 +35,15 @@
         @endif
 
         @forelse ($quotes as $quote)
+            @php
+                $quoteStatus = $quote->latestVersion?->status ?? $quote->status;
+                $quoteStatusIcon = match ($quoteStatus) {
+                    'accepted' => 'circle-check',
+                    'declined', 'expired' => 'circle-x',
+                    'sent' => 'clock',
+                    default => 'info-circle',
+                };
+            @endphp
             <a href="{{ route('quotes.show', $quote) }}" class="zazu-list-item zazu-quote-register-row grid grid-cols-[minmax(0,1fr)_auto_auto_auto]">
                 <div class="zazu-list-main">
                     <div class="flex flex-wrap items-center gap-2">
@@ -49,7 +58,7 @@
                     'declined', 'expired' => 'zazu-chip-danger',
                     'sent' => 'zazu-chip-info',
                     default => 'zazu-chip-neutral',
-                } }}">{{ ucfirst($quote->latestVersion?->status ?? $quote->status) }}</span></div>
+                } }}"><x-icon name="{{ $quoteStatusIcon }}" size="14" class="mr-1" />{{ ucfirst($quoteStatus) }}</span></div>
                 <div class="zazu-side-primary">{{ $quote->latestVersion ? $quote->latestVersion->total : '—' }}</div>
             </a>
         @empty
