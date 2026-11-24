@@ -3011,7 +3011,11 @@ function setupZazuOfflineDirectoryViews() {
         const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
         if (unavailable) unavailable.hidden = activeView !== 'unavailable';
 
-        document.querySelectorAll('main#main-content > .zazu-dash-hero, main#main-content > .zazu-dash-overview, main#main-content > .zazu-dash-grid')
+        // Dashboard slot content is nested inside .zazu-content, not a
+        // direct child of main#main-content. Hide every cached Dashboard slot
+        // sibling except the offline workspace itself; otherwise the online
+        // dashboard remains visible above/below the selected offline view.
+        document.querySelectorAll('.zazu-content > :not([data-zazu-offline-workspace])')
             .forEach(section => { section.hidden = true; });
         workspace.dataset.zazuOfflineActiveView = activeView;
     };
