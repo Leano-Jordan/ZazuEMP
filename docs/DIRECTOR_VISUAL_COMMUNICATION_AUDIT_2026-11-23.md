@@ -118,3 +118,5 @@ The current `package.json` has no icon package dependency. The dashboard current
 - Applied the shared `zazu-label` treatment to supplier/job/currency/date, line description/quantity/unit/price/catalogue and notes captions, including the dynamically added line template. Required markers, helper text, line-total feedback, field names, JS hooks, idempotency key, route and offline marker are unchanged.
 - Added focused regression assertions to the existing presentation test method; no new test class/method or business logic was introduced.
 - This closes only the purchasing-create label inconsistency. Quote and Job editor page-level layout, responsive rendering and physical visual acceptance remain open.
+
+- Verification note: the first exact-head quality run flagged one extra blank line at the end of the expanded presentation test. The test file was corrected to Pint's existing style; no production code or formatter rule was changed. The corrected commit is `717dea4e` and requires a fresh exact-head quality run.
