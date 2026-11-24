@@ -2205,3 +2205,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Updated docs/DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md.
 - This is one workflow slice. Remaining status/form icon migration and product-wide visual communication acceptance remain open; physical visual acceptance is not inferred.
 - Changes were committed directly to main. Exact-head Laravel, formatting, quality and browser checks must pass before acceptance.
+
+
+## Director visual communication implementation — Work, Quotes and Customers — 2026-11-24
+
+- Continued directly on `main` after verifying the preceding icon/recovery slice passed its exact-head Laravel, browser, quality, Windows fresh-install/archive and CodeQL gates.
+- Added semantic local Tabler icons beside Work and Quote status labels, preserving the existing status text and semantic chip classes.
+- Added compact action icons to Work and Customer directory actions. No button labels were removed and no action behaviour, route or permission changed.
+- Extended the curated Blade icon subset and added `test_work_quotes_and_customers_use_local_semantic_status_and_action_icons`.
+- Updated `docs/DIRECTOR_VISUAL_COMMUNICATION_AUDIT_2026-11-23.md` with the migration scope and remaining Finance/Purchasing audit.
+- **Verification pending:** exact-head Laravel, PHPMD/quality, browser acceptance, Windows package and CodeQL. Physical PC/Android acceptance and real-device performance captures remain separate.
