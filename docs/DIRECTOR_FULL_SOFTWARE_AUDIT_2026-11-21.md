@@ -1,5 +1,7 @@
 # Zazu EMP — Director Full Software Inspection & V1 Commercial Readiness Audit
 
+> **Current authority:** This dated audit is historical evidence. Current product strategy, commercial positioning, V1 scope, scorecard and release-gate order are governed by [Zazu Engine Director — Commercial V1 Mandate](ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md). Current implementation status is recorded in `.ai/engineering/STATE.md`; do not treat this audit's status snapshot as current.
+
 **Assessment date:** 2026-11-21  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main` (source of truth)  
