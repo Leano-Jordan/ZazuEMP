@@ -3,8 +3,8 @@
     <x-slot:heading>Customers</x-slot:heading>
     <x-slot:headerAction>
         <div class="flex gap-2">
-            <a href="{{ route('customers.import.create') }}" class="zazu-btn zazu-btn-secondary">Import</a>
-            <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary">New customer</a>
+            <a href="{{ route('customers.import.create') }}" class="zazu-btn zazu-btn-secondary"><x-icon name="upload" size="15" class="mr-1" />Import</a>
+            <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary"><x-icon name="plus" size="15" class="mr-1" />New customer</a>
         </div>
     </x-slot:headerAction>
 
@@ -54,8 +54,8 @@
                     <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
                 </div>
                 <div class="zazu-action-group zazu-customer-actions">
-                    <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-btn zazu-btn-secondary">Start work</a>
-                    <a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">Open</a>
+                    <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-btn zazu-btn-secondary"><x-icon name="briefcase" size="15" class="mr-1" />Start work</a>
+                    <a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost"><x-icon name="eye" size="15" class="mr-1" />Open</a>
                 </div>
             </div>
         @empty
