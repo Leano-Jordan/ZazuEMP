@@ -1,3 +1,19 @@
+## Current execution checkpoint — 2026-11-24 (Gate 0 closure and Gate 1 security boundary)
+
+**Current main head:** `ee4d4a263317fb8766c347b6c9a4c1921af948e1`.
+
+**Gate 0 — CLOSED (automated evidence only).** Exact-head commit `6f8e011e2b7ec1752f1ba3c1d11aa0845c947f06` completed Laravel (all four jobs: tests, coverage, offline browser acceptance, PostgreSQL migration/recovery), Zazu Quality, Hadolint and Push-on-main/CodeQL successfully. SonarCloud was skipped and is not a pass. The Laravel cold-launch test contract was corrected to assert the actual service-worker behaviour: the cached dashboard shell is returned for the original navigation URL without rewriting that URL. The offline workspace visibility and dashboard content assertions remain in place.
+
+**Gate 1 — ACTIVE: supported offline continuity and trusted-device boundary.** Reviewed `docs/ZAZU_OFFLINE_STORAGE_THREAT_MODEL.md` against the current client, service worker, sync controller and existing regressions. DEC-019 remains explicit: an owner-approved trusted device is a shared business workspace, not per-staff offline authentication. IndexedDB workspace, queue, attachments and bearer credential are not application-encrypted; business-specific database names are not a security boundary. Do not add superficial client-side encryption or compromise cold launch without a complete key/recovery design.
+
+**Implemented regression hardening on main:** `e2e/offline-session-transition.spec.js` now scans all localStorage/sessionStorage entries and the current URL after unreachable logout to ensure the bearer credential is not exposed there. `docs/ZAZU_OFFLINE_STORAGE_THREAT_MODEL.md` records this evidence and its limits. Commits: `fd833e2a0189bef51c0c6d9c5f15a3fb514058aa` (test), `ee4d4a263317fb8766c347b6c9a4c1921af948e1` (threat-model evidence).
+
+**Not accepted by automation:** physical Android and owner-PC device lock/storage encryption; fully disconnected cold launch/restart/reconnect on actual devices; loss/theft and offline-revocation operational drill; per-staff authorization while offline. These are not claimed complete.
+
+**Next single objective:** run exact-head CI for the credential-exposure regression; if green, continue Gate 1 by tracing and adversarially testing trusted-device revocation/re-pair transitions with queued financial mutations preserved. Keep physical device acceptance separately OPEN. No branch creation; all changes directly on `main`.
+
+---
+
 ## Current execution checkpoint — 2026-11-24
 
 **Current main head before this state update:** `c7988318830c47cbac830d6b549b0fd8772b6c6d` (offline capability contract, architecture and Android acceptance links, and local data-at-rest boundary).
