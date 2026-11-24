@@ -1,3 +1,25 @@
+## Current execution checkpoint — 2026-11-24 (offline acceptance correction; Phase 1 owner sign-off retained)
+
+**Current main head:** `28622a7d2cb5e7ee6354d6e07cebb62a94d28bb7`.
+
+**Founder acceptance correction:** Phase 1 — normal connected operation on the physical Windows PC and linked Android phone, both using the same workspace — is **OWNER-VERIFIED PASS, completed multiple times by the Founder** and reaffirmed on 2026-11-24. The populated fictional workspace and module-level connected use are already accepted. Do not request repeated connected setup, reinstall, or duplicate record creation. This does not close offline acceptance.
+
+**Phase 2 — offline acceptance remains OPEN and is the sole active engineering priority.** The Founder physically stopped the PC host while the phone remained on Wi-Fi and observed that navigation fell back to the cached Dashboard shell, with offline collections presented together as one long page. Treat this as a confirmed physical P1 usability/acceptance failure. Do not ask the Founder to repeat Phase 1 or repeat Phase 2 until the fix has passed exact-head automation.
+
+**Root cause confirmed in source:** the service worker intentionally returns the cached `/dashboard` shell for a failed authenticated navigation while preserving the requested URL. The client route renderer only recognised a subset of routes; unrecognised routes produced a null active view, which left the dashboard visible and all offline collection sections expanded. The Dashboard itself also had no distinct navigation-only offline overview state.
+
+**Implementation committed directly to main:**
+- `fa886fcb4c742543985abad7ded18b9b3ef368cd` — route-aware offline rendering; Dashboard overview shows no expanded collection; supported paths select exactly one collection; unsupported paths select an explicit unavailable state; mapped catalogue/capabilities, invoice/payment routes.
+- `67c4724706f554c809a21e6a67afafc4643ccae1` — explicit offline-unavailable panel in the cached dashboard shell.
+- `f3fb80cbd0008e8bfb321db4f1290e249638ee60` and `4eb64bc50dbf04436a26a9af0e2bbb1e7cecb300` — Playwright regression for dashboard overview, Customers, Services/Catalogue and unsupported Calendar routing; assertion selector correction.
+- Owner acceptance runbook, physical-device acceptance, Android offline procedure and offline capability contract updated in commits `d4fe907e`, `18dce966`, `c3925bad`, `28622a7d` to preserve Phase 1 sign-off and explicitly record the Phase 2 physical failure/current remediation.
+
+**Verification state:** code and regression are committed; exact-head CI has not yet been confirmed in this checkpoint. Do not claim the defect fixed or request another physical test until CI passes. Then perform one focused phone retest: stop PC host + Caddy while phone stays on Wi-Fi; verify Dashboard is a short navigation landing, Customers/Jobs/Quotes/etc show one relevant view, unsupported routes show a connection-required message, and no unrelated collections appear. Preserve all IndexedDB data and queues.
+
+**Next single objective:** verify exact-head CI for the offline route-isolation change, resolve any failures, then continue Phase 2 with host-loss, true airplane-mode cold launch/restart, local writes, attachment persistence and exactly-once reconnect. Keep owner-PC installed acceptance distinct. No branches; all changes directly on `main`. No other V1 gate work until this offline acceptance defect is closed.
+
+---
+
 ## Current execution checkpoint — 2026-11-24 (Gate 0 closure and Gate 1 security boundary)
 
 **Current main head:** `ee4d4a263317fb8766c347b6c9a4c1921af948e1`.
