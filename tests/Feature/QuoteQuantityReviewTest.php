@@ -45,7 +45,8 @@ class QuoteQuantityReviewTest extends TestCase
             ->assertSee('Quantity to quote')
             ->assertSee('Every line needs your attention.')
             ->assertSee('Do not leave this at one unless one is genuinely correct.')
-            ->assertSee('data-quote-line-total', false);
+            ->assertSee('data-quote-line-total', false)
+            ->assertDontSee('name="deposit_percent" min="0" max="100" step="0.01" required', false);
 
         $this->post(route('work.quotes.store', $event), [
             'currency' => 'ZAR',
@@ -65,10 +66,13 @@ class QuoteQuantityReviewTest extends TestCase
         $this->post(route('quotes.versions.store', $quote))->assertRedirect();
         $revision = $quote->refresh()->latestVersion()->firstOrFail();
 
+        $this->get(route('quotes.versions.edit', [$quote, $revision]))
+            ->assertOk()
+            ->assertDontSee('name="deposit_percent" min="0" max="100" step="0.01" required', false);
+
         $this->put(route('quotes.versions.update', [$quote, $revision]), [
             'quantity' => [$requirement->id => '150.00'],
             'unit_price' => [$requirement->id => '90.00'],
-            'deposit_percent' => '0.00',
         ])->assertRedirect(route('quotes.show', $quote));
 
         $revision->refresh()->load('items');
