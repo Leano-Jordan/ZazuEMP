@@ -2248,3 +2248,4 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Preserved routes, field names, validation markers, helper text, idempotency key, offline entity marker, add/remove line behaviour and total calculation.
 - Extended the existing `UiHumanFriendlyPresentationTest` method rather than adding another public test method, keeping the class within its PHPMD method-count limit.
 - **Verification pending:** exact-head Laravel, Zazu Quality, PHPMD, browser acceptance and Windows package checks. No visual or release acceptance claim until automated and physical evidence is available.
+- Verification note: first quality run on `0603fade` found a single Pint formatting issue (one extra blank line at test-class end). Corrected in `717dea4e`; no rules were relaxed. Fresh exact-head checks are pending.
