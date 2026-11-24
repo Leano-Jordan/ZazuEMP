@@ -13,7 +13,7 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await page.locator('[data-auth-submit]').click();
     await page.waitForURL(url => url.pathname !== '/login');
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/dashboard$/);
+        await expect(coldLaunch).toHaveURL((url) => new URL(url).pathname.endsWith('/dashboard'));
     await waitForOfflineRuntime(page);
 }
 
