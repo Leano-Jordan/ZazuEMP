@@ -2296,5 +2296,13 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Created docs/ZAZU_OFFLINE_STORAGE_THREAT_MODEL.md and linked it from docs/ZAZU_V1_OFFLINE_CAPABILITY_CONTRACT.md.
 - Corrected an inaccurate code comment that claimed bearer credentials never enter browser storage. It now distinguishes the non-secret localStorage revocation marker from the bearer retained in IndexedDB.
 - No superficial IndexedDB encryption was added: a key stored beside ciphertext would not defend against same-origin script execution and would complicate offline recovery. A passphrase/device-key design requires a complete recovery and cold-launch threat model first.
-- **Risk remains HIGH** for shared/unlocked profiles, device loss and same-origin script compromise. V1 must clearly distinguish Sign out from Remove this device and require private OS profiles, device lock and OS storage encryption in supported deployment guidance.
+- DEC-019 is an intentional shared business-device model, not per-staff offline isolation. Authorised staff may share the owner-approved workspace; normal staff permissions are not re-checked for each offline mutation. Unauthorised access to an unlocked trusted profile, device loss and same-origin script compromise remain HIGH risks. Preserve the existing Sign out/revoke disclosures and require business control, device lock and OS storage encryption in deployment guidance.
 - No application workflow or server credential semantics changed. Exact-head CI for the resulting commits must be checked. Physical Android and owner-PC hardening/acceptance remain OPEN.
+
+
+## DEC-019 alignment — offline storage threat model — 2026-11-24
+
+- Reconciled the new threat model against the existing DEC-019 decision and Settings disclosure: trusted offline devices are intentionally shared business-scoped workspaces, not per-staff offline identities.
+- Authorised staff sharing the approved workspace is an accepted architecture boundary. All users of that profile inherit the business-approved offline data and mutation capability; offline mutations are attributed to the approving owner and normal staff permissions are not re-checked per mutation.
+- Updated the threat model and V1 offline contract to distinguish this accepted staff-sharing model from unauthorised access to an unlocked profile. No user-scoped storage redesign is proposed.
+- Existing Settings copy already discloses owner approval, staff-permission boundary, owner attribution, revocation semantics and the fact that revocation does not remotely erase local data. Preserve these disclosures.
