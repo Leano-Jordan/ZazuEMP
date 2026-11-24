@@ -11,7 +11,9 @@ class ProcessFileStreamTest extends TestCase
     public function test_process_output_is_streamed_to_disk_without_truncation(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'zazu-stream-');
-        $this->assertNotFalse($path);
+        if (!is_string($path)) {
+            $this->fail('Could not allocate a temporary dump file.');
+        }
 
         try {
             $process = new Process([
@@ -35,6 +37,10 @@ class ProcessFileStreamTest extends TestCase
     public function test_process_input_is_streamed_from_file(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'zazu-stream-input-');
+        if (!is_string($path)) {
+            $this->fail('Could not allocate a temporary import file.');
+        }
+
         $payload = str_repeat('zazu-recovery-', 300000);
         $expectedHash = hash('sha256', $payload);
         file_put_contents($path, $payload);
@@ -62,6 +68,10 @@ class ProcessFileStreamTest extends TestCase
             '-r',
             'fwrite(STDOUT, "partial-dump"); fwrite(STDERR, str_repeat("E", 12000)); exit(7);',
         ]);
+        if (!is_string($path)) {
+            $this->fail('Could not allocate a temporary failure-test file.');
+        }
+
         $process->setTimeout(30);
 
         try {
