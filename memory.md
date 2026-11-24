@@ -17,6 +17,8 @@ Canonical branch: main only
 Context updated: 2026-11-22
 
 ## Owner V1 shipping mandate — binding
+**Canonical execution policy:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md`. It is the binding product strategy, commercial positioning, 13-domain scorecard, scope boundary, strict ordered release-gate contract and controlled-pilot target. The Zazu Engine Director (Jarvis) is the single accountable role; discovery, implementation, security, QA, UX, performance, recovery and release are capabilities under that role, not separate agents or authorities.
+
 Primary objective: get a working Zazu V1 into the hands of the first real businesses. V1 is a practical first release, not an enterprise-scale perfection exercise.
 - Build agreed V1 workflows; do not optimize for hypothetical scale before first-customer usability.
 - When acceptance criteria pass and are evidenced, award 5/5 and close the gate.
