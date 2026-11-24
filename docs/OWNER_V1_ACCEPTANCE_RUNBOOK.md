@@ -33,7 +33,11 @@ Phase 1 covers connected operation and shared-workspace use only. It does not im
 
 The Founder has physically stopped the PC host while the phone remained connected to Wi-Fi and observed that offline navigation still presents the cached Dashboard shell for other links, with the offline collections appearing together as one long page. This is a confirmed physical failure of the current offline experience, not a request to repeat Phase 1.
 
-Engineering is focused on correcting route-aware offline presentation and proving it with automated regression coverage before asking for another physical run. Phase 2 remains OPEN until the phone can open each supported offline area as a distinct view, unsupported areas clearly explain that a connection is required, local records remain intact, and disconnected/restart/reconnect behaviour is physically verified.
+Engineering investigation confirmed two connected causes. First, the service worker can return the cached Dashboard shell for an unprimed route while preserving the requested URL; the client must select the correct local view from that URL. Second, Dashboard content is nested under `.zazu-content`, so the previous attempt to hide Dashboard sections as direct children of `main#main-content` never hid the actual Dashboard. A local workspace update event also needed to reapply route selection.
+
+The implementation now isolates the requested offline collection at the actual `.zazu-content` boundary, restores normal content when the origin is reachable, and reapplies route selection after local workspace updates. Automated browser coverage is being expanded to exercise real service-worker fallback navigation for an unprimed supported route (`/suppliers`) and an unsupported route (`/calendar`), including assertions that the online Dashboard is hidden.
+
+Phase 2 remains OPEN until exact-head CI passes and the Founder confirms the physical phone behaviour. Host-loss, airplane-mode cold launch, restart persistence, offline writes, attachment round-trip and exactly-once reconnect remain distinct acceptance checks.
 
 ## Before testing
 
