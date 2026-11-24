@@ -2326,3 +2326,14 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - SonarCloud was **SKIPPED**, not passed. Offline browser acceptance was still running when this checkpoint was written.
 - The earlier physical encrypted archive restore failure remains unresolved at its original stage. Later SYS-002/429 is now correctly identified as the rate limiter and must not be treated as the original cause. No restore was retried and no live business data or archive was modified.
 - Current next step: wait for the exact-head offline-browser job to finish, then continue the recovery scalability/integrity review. Founder-operated Windows restore and independent off-disk backup remain OPEN.
+
+
+## Installation recovery scalability — bounded-memory SQL streaming — 2026-11-24
+
+- Found that MySQL and PostgreSQL backup and restore paths materialised entire SQL dumps through Symfony Process getOutput() and File::get()/setInput(string). This made memory consumption proportional to database dump size and could fail on modest Windows PCs or hosting workers well before the documented 2 GiB archive ceiling.
+- Added app/Support/ProcessFileStream.php using the pinned Symfony Process v8 callback and stream-resource APIs. Database client stdout now writes incrementally to private staging files; SQL import reads from a file stream. Output/error buffers are cleared as chunks are handled; diagnostic tails are bounded to 8 KiB.
+- Applied streaming to MySQL backup, MySQL pre-restore rollback snapshot, MySQL import, PostgreSQL backup, PostgreSQL pre-restore rollback snapshot (through shared support), and PostgreSQL import.
+- Failed dump processes remove partial output; empty output is rejected; existing timeouts, credential environment handling, private file permission checks, transaction/rollback semantics and archive size limits remain unchanged.
+- Added tests/Unit/ProcessFileStreamTest.php covering a 4 MiB output stream, a 4 MiB streamed input with end-to-end SHA-256 validation, and failed-process partial-file cleanup plus bounded diagnostics.
+- Updated docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md with the streaming and diagnostic bounds.
+- **Verification pending:** exact-head Laravel/unit suite, formatting, PHPMD, browser acceptance, Windows package, PostgreSQL migration/recovery and security checks. No real installation backup/restore was run and no customer data was touched.
