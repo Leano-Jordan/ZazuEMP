@@ -1,6 +1,8 @@
 # Zazu Android Offline Install & Acceptance
 
-**Purpose:** establish a real Android service-worker installation for local V1 acceptance. This is a development/test route only. It does not turn the Windows PC into a production host.\n\n**Capability boundary:** see [Zazu V1 Offline Capability Contract](ZAZU_V1_OFFLINE_CAPABILITY_CONTRACT.md) before testing. It defines which actions are supported locally and which remain online-only or deferred.
+**Purpose:** establish a real Android service-worker installation for local V1 acceptance. This is a development/test route only. It does not turn the Windows PC into a production host.
+
+**Capability boundary:** see [Zazu V1 Offline Capability Contract](ZAZU_V1_OFFLINE_CAPABILITY_CONTRACT.md) before testing. It defines which actions are supported locally and which remain online-only or deferred.
 
 ## Why the old phone URL is not sufficient
 
