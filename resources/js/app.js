@@ -2918,12 +2918,52 @@ function setupZazuOfflineDirectoryViews() {
         });
     };
 
+    const renderOfflineOverview = (state) => {
+        const collections = [
+            ['customers', 'Customers'],
+            ['jobs', 'Jobs'],
+            ['quotes', 'Quotes'],
+            ['suppliers', 'Suppliers'],
+            ['purchase_orders', 'Purchasing'],
+            ['inventory_items', 'Inventory'],
+            ['assets', 'Assets'],
+            ['invoices', 'Invoices'],
+            ['expenses', 'Expenses'],
+            ['costs', 'Event costs'],
+        ];
+        const total = collections.reduce((sum, [key]) => sum + (Array.isArray(state?.[key]) ? state[key].length : 0), 0);
+        const pending = collections.reduce((sum, [key]) => sum + (Array.isArray(state?.[key]) ? state[key].filter(record => record?.pending_sync === true || !(record?.server_id ?? record?.id)).length : 0), 0);
+        const conflicts = (state?.conflicts || []).filter(conflict => conflict?.status === 'open').length;
+        const values = {
+            records: total,
+            pending,
+            conflicts,
+            customers: Array.isArray(state?.customers) ? state.customers.length : 0,
+            jobs: Array.isArray(state?.jobs) ? state.jobs.length : 0,
+            quotes: Array.isArray(state?.quotes) ? state.quotes.length : 0,
+        };
+        Object.entries(values).forEach(([key, value]) => {
+            document.querySelectorAll('[data-zazu-offline-overview-count="' + key + '"]').forEach(node => {
+                node.textContent = String(value);
+            });
+        });
+        const status = document.querySelector('[data-zazu-offline-overview-status]');
+        if (status) {
+            status.textContent = conflicts > 0
+                ? conflicts + ' change' + (conflicts === 1 ? '' : 's') + ' need review'
+                : pending > 0
+                    ? pending + ' change' + (pending === 1 ? '' : 's') + ' waiting to sync'
+                    : 'Your saved workspace is ready on this device';
+        }
+    };
+
     const render = () => {
         const state = window.ZazuOffline.getState();
         renderCustomers(state);
         renderJobs(state);
         renderQuotes(state);
         renderOfflineCollections(state);
+        renderOfflineOverview(state);
         refreshOfflineWorkspaceVisibility(state);
         refreshLocalAttachmentLists();
     };
@@ -2984,6 +3024,27 @@ function setupZazuOfflineDirectoryViews() {
         // Keep the connected Dashboard and any pending local-record directory
         // unchanged while the origin is healthy. Route isolation applies only
         // when this cached shell is serving as the offline fallback.
+        document.body.classList.toggle('zazu-offline-mode', !lastOriginAvailable);
+        const syncOfflineNavigation = (enabled) => {
+            const supportedPath = pathname => pathname === '/dashboard' || offlineRouteViews.some(([pattern]) => pattern.test(pathname));
+            document.querySelectorAll('.zazu-nav-link').forEach(link => {
+                if (!enabled) {
+                    link.hidden = false;
+                    return;
+                }
+                try {
+                    const url = new URL(link.href, window.location.origin);
+                    link.hidden = url.origin !== window.location.origin || !supportedPath(url.pathname.replace(/\/$/, '') || '/');
+                } catch {
+                    link.hidden = true;
+                }
+            });
+            document.querySelectorAll('[data-zazu-nav-area]').forEach(area => {
+                area.hidden = enabled && ![...area.querySelectorAll('.zazu-nav-link')].some(link => !link.hidden);
+            });
+        };
+        syncOfflineNavigation(!lastOriginAvailable);
+
         if (lastOriginAvailable) {
             workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => { section.hidden = false; });
             const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
@@ -3035,6 +3096,7 @@ function setupZazuOfflineDirectoryViews() {
         action.className = 'zazu-origin-offline-action';
         action.href = '/dashboard';
         action.textContent = 'Open offline workspace';
+        action.hidden = window.location.pathname === '/dashboard';
         notice.append(message, action);
 
         const topbar = main.querySelector(':scope > .zazu-topbar');
@@ -3055,6 +3117,7 @@ function setupZazuOfflineDirectoryViews() {
             try {
                 lastOriginAvailable = navigator.onLine && await canReachZazuOrigin();
                 notice.hidden = lastOriginAvailable;
+                action.hidden = window.location.pathname === '/dashboard';
                 window.dispatchEvent(new CustomEvent('zazu:origin-availability', {
                     detail: { available: lastOriginAvailable },
                 }));
