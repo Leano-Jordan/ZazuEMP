@@ -2363,3 +2363,16 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Diagnostic assertions now surface Artisan command output and assert the MySQL invocation marker exists before reading it.
 - Applied Pint's import ordering and new-instance formatting to the recovery regression test after the first diagnostic run identified its style diff.
 - Re-run exact-head Laravel, coverage, quality/formatting, PHPMD, Psalm, Windows, PostgreSQL and browser acceptance on the corrected main head before accepting this implementation.
+
+
+## Bounded-memory installation recovery — exact-head verification — 2026-11-24
+
+- Exact application code head: fb4012b8df7f8a31e54b06b09f3db8a8a14f64eb.
+- Fixed the MySQL command integration regression by importing App\\Support\\ProcessFileStream in both ZazuBackupCommand and ZazuRestoreCommand. The prior failure was a missing class import; diagnostic output confirmed no fake MySQL process had been launched.
+- Full Laravel/Unit/Feature suite now passes: **761 passed, 1 skipped, 5,425 assertions**. ProcessFileStreamTest passed (4 MiB streamed output, 4 MiB streamed input verified by SHA-256, failed dump cleanup and bounded diagnostic). Both MySQL backup and partial-import rollback integration tests passed.
+- Exact-head PHPMD, Pint formatting, application quality, secret scan and Composer security audit passed.
+- PostgreSQL 16 migration, rollback/reapplication and real database backup/restore/private-file recovery passed.
+- Populated upgrade and rollback passed.
+- Windows package build and encrypted/legacy business archive verification passed. Windows fresh-install PowerShell verification and offline browser acceptance are still running; do not close those gates until complete.
+- Psalm passed on the prior candidate before the final formatting-only correction; Psalm is being rerun on the current head.
+- SonarCloud remains skipped by workflow configuration. No physical owner-PC recovery drill or independent off-host backup proof is claimed.
