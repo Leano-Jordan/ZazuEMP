@@ -54,6 +54,12 @@
                     default => 'zazu-chip-neutral',
                 };
                 $statusLabel = str_replace('_', ' ', ucfirst($event->status));
+                $statusIcon = match ($event->status) {
+                    'confirmed', 'completed' => 'circle-check',
+                    'in_progress' => 'clock',
+                    'cancelled' => 'circle-x',
+                    default => 'info-circle',
+                };
                 $contact = $event->eventDayContact?->name ?? $event->eventNightContact?->name ?? null;
                 $guestRequirement = $event->requirements->first(fn ($requirement) => in_array(strtolower((string) $requirement->unit), ['guest', 'guests'], true));
                 $formatMoney = static fn (string $amount): string => \App\Support\Money::formatCents(\App\Support\Money::toCents($amount));
@@ -76,14 +82,14 @@
                         <strong>{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}</strong>
                         <small>{{ $event->name }}</small>
                     </span>
-                    <span><span class="zazu-chip {{ $statusClass }}">{{ $statusLabel }}</span></span>
+                    <span><span class="zazu-chip {{ $statusClass }}"><x-icon name="{{ $statusIcon }}" size="14" class="mr-1" />{{ $statusLabel }}</span></span>
                 </button>
                 <div class="zazu-ops-actions">
-                    <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
-                    <button type="button" class="zazu-btn zazu-btn-ghost" data-zazu-inspector-open>View function sheet</button>
+                    <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost"><x-icon name="pencil" size="15" class="mr-1" />Edit</a>
+                    <button type="button" class="zazu-btn zazu-btn-ghost" data-zazu-inspector-open><x-icon name="eye" size="15" class="mr-1" />View function sheet</button>
                     <form method="POST" action="{{ route('work.destroy', $event) }}" data-zazu-confirm="Remove this work from active operations? Historical records will be retained." data-zazu-confirm-title="Remove work?">
                         @csrf @method('DELETE')
-                        <button type="submit" class="zazu-btn zazu-btn-ghost text-[var(--zazu-danger-ink)]">Remove</button>
+                        <button type="submit" class="zazu-btn zazu-btn-ghost text-[var(--zazu-danger-ink)]"><x-icon name="trash" size="15" class="mr-1" />Remove</button>
                     </form>
                 </div>
 
