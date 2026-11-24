@@ -48,7 +48,7 @@ Third-party material is excluded from this ownership claim and remains subject t
 
 ## Evidence and provenance
 
-A draft founder declaration is maintained at [docs/ZAZU_FOUNDER_IP_DECLARATION.md](docs/ZAZU_FOUNDER_IP_DECLARATION.md). A signed copy should be retained outside the public repository as part of the owner's provenance records.
+A founder declaration should be maintained and signed separately, with the executed copy retained outside the public repository as part of the owner's provenance records. No declaration file is currently maintained at the previously referenced repository path.
 
 
 This file is an evidence-preservation record, not a substitute for legal advice or a court finding.
