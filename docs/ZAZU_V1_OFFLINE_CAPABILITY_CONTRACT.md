@@ -87,7 +87,8 @@ Work attachments have a separate phone-local file workflow. The attachment bytes
 The current browser persistence path writes the business workspace, mutation queue and attachment blobs to IndexedDB. The inspected client persistence path does not add an application-level encryption layer before those writes. Protection therefore depends on the operating-system account/device controls, browser-profile protections and same-origin security boundary; this must not be described as encrypted local storage.
 
 This is an explicit security review item for Gate 1 / Gate 4:
-- Confirm supported Windows and Android device profiles have appropriate device lock and storage-encryption controls.
+- Preserve DEC-019: a trusted device is an owner-approved shared business workspace, not per-staff offline authentication; authorised staff using it inherit the approved offline capability.
+- Confirm supported Windows and Android device profiles have appropriate device lock and storage-encryption controls, and restrict physical access to authorised business personnel.
 - Review local sync-token exposure, XSS/content injection and shared-browser-profile risks.
 - Decide whether a device-local unlock/key-management design is justified without making offline recovery or cold launch fragile.
 - Never claim application-level encryption at rest until an implemented design and recovery-safe tests prove it.
