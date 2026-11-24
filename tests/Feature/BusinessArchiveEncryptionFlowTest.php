@@ -335,6 +335,7 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         $this->assertStringContainsString('Restore request reference:', $error);
         $this->assertNull(session()->getOldInput('archive_password'));
     }
+
     public function test_restore_rate_limit_returns_a_recovery_specific_message(): void
     {
         $business = Business::create([
