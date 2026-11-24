@@ -131,11 +131,14 @@ function shouldPreferOfflineShell(request, pathname) {
     // These authenticated routes contain real offline-capable forms or
     // job-specific controls. Preserve their exact cached HTML when it exists;
     // cachedAppPage still falls back to the dashboard shell when it does not.
+    // Preserve exact cached HTML only for forms explicitly supported offline.
+    // A cold launch from a Work detail URL must enter the local workspace shell,
+    // not strand the user on a stale server-rendered snapshot.
     const preserveExactRoute = [
         '/customers/create',
         '/work/create',
         '/finance/invoices/create',
-    ].includes(pathname) || /^\/work\/\d+$/.test(pathname);
+    ].includes(pathname);
 
     return !preserveExactRoute;
 }
