@@ -1,5 +1,7 @@
 # Zazu EMP — Director Widespread Engineering Audit
 
+> **Current authority:** This dated audit is historical evidence. Current product strategy, commercial positioning, V1 scope, scorecard and release-gate order are governed by [Zazu Engine Director — Commercial V1 Mandate](ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md). Current implementation status is recorded in `.ai/engineering/STATE.md`; do not treat this audit's status snapshot as current.
+
 **Date:** 2026-11-23  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Canonical branch:** `main` (no branches created)  
