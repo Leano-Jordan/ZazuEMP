@@ -2995,6 +2995,8 @@ function setupZazuOfflineDirectoryViews() {
             workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => { section.hidden = false; });
             const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
             if (unavailable) unavailable.hidden = true;
+            document.querySelectorAll('.zazu-content > :not([data-zazu-offline-workspace])')
+                .forEach(section => { section.hidden = false; });
             workspace.dataset.zazuOfflineActiveView = 'online';
             return;
         }
