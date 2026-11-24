@@ -317,6 +317,7 @@ test('transient attachment upload failures retry while the app remains online', 
             const uploadedEventId = Number(body.match(/name="event_id"\r\n\r\n([^\r\n]+)/)?.[1] || 0);
             if (!requests.key) requests.key = key;
             expect(key).toMatch(/^[0-9a-f-]{36}$/i);
+            expect(key).toBe(requests.key);
             expect(uploadedEventId).toBe(eventId);
             expect(body).toContain('retry-after-outage.txt');
 
