@@ -3027,7 +3027,7 @@ function setupZazuOfflineDirectoryViews() {
         document.body.classList.toggle('zazu-offline-mode', !lastOriginAvailable);
         const syncOfflineNavigation = (enabled) => {
             const supportedPath = pathname => pathname === '/dashboard' || offlineRouteViews.some(([pattern]) => pattern.test(pathname));
-            document.querySelectorAll('.zazu-nav-link').forEach(link => {
+            document.querySelectorAll('.zazu-nav-link, .zazu-section-tabs a').forEach(link => {
                 if (!enabled) {
                     link.hidden = false;
                     return;
@@ -3052,6 +3052,14 @@ function setupZazuOfflineDirectoryViews() {
             document.querySelectorAll('.zazu-content > :not([data-zazu-offline-workspace])')
                 .forEach(section => { section.hidden = false; });
             workspace.dataset.zazuOfflineActiveView = 'online';
+            const pageTitle = document.querySelector('.zazu-page-title');
+            if (pageTitle?.dataset.zazuOnlineTitle) {
+                pageTitle.textContent = pageTitle.dataset.zazuOnlineTitle;
+                delete pageTitle.dataset.zazuOnlineTitle;
+            }
+            document.querySelectorAll('.zazu-nav-link').forEach(link => {
+                link.classList.toggle('active', link.getAttribute('aria-current') === 'page');
+            });
             return;
         }
 
@@ -3060,6 +3068,32 @@ function setupZazuOfflineDirectoryViews() {
         const activeView = pathname === '/dashboard'
             ? 'overview'
             : (route?.[1] || 'unavailable');
+        const offlineTitles = {
+            overview: 'Offline workspace',
+            customers: 'Customers',
+            jobs: 'Jobs',
+            quotes: 'Quotes',
+            costs: 'Event costs',
+            catalogue: 'Services & catalogue',
+            suppliers: 'Suppliers',
+            inventory_items: 'Inventory',
+            assets: 'Assets',
+            purchase_orders: 'Purchasing',
+            invoices: 'Finance',
+            expenses: 'Expenses',
+            unavailable: 'Connection required',
+        };
+        const pageTitle = document.querySelector('.zazu-page-title');
+        if (pageTitle) {
+            if (!pageTitle.dataset.zazuOnlineTitle) pageTitle.dataset.zazuOnlineTitle = pageTitle.textContent.trim();
+            pageTitle.textContent = offlineTitles[activeView] || 'Offline workspace';
+        }
+        document.querySelectorAll('.zazu-nav-link').forEach(link => {
+            const selected = link.href === new URL(pathname, window.location.origin).href;
+            link.classList.toggle('active', selected);
+            if (selected) link.setAttribute('aria-current', 'page');
+            else link.removeAttribute('aria-current');
+        });
 
         workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => {
             section.hidden = section.dataset.zazuOfflineView !== activeView;
