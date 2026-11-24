@@ -52,6 +52,14 @@
 <section class="zazu-card zazu-list mt-5">
     <div class="zazu-card-header"><div><div class="zazu-eyebrow">Receivables</div><div class="zazu-card-title mt-1">Invoices</div></div><span class="zazu-section-count">{{ $invoices->total() }}</span></div>
     @forelse($invoices as $invoice)
+        @php
+            $invoiceStatusIcon = match (strtolower($invoice->status)) {
+                'paid', 'received', 'approved', 'completed' => 'circle-check',
+                'void', 'cancelled', 'canceled', 'rejected', 'declined', 'overdue' => 'circle-x',
+                'draft', 'sent', 'pending', 'partial', 'partially_paid', 'ordered' => 'clock',
+                default => 'info-circle',
+            };
+        @endphp
         <div class="zazu-list-item">
             <div class="zazu-list-main">
                 <div class="zazu-list-title">{{ $invoice->number }}</div>
@@ -61,7 +69,7 @@
                 <div class="zazu-side-primary" data-numeric="true">{{ $invoice->currency }} {{ $invoice->total }}</div>
                 <div class="zazu-list-meta" data-numeric="true">balance {{ $invoice->currency }} {{ $invoice->balance }}</div>
             </div>
-            <span class="zazu-chip zazu-chip-info">{{ ucfirst($invoice->status) }}</span>
+            <span class="zazu-chip zazu-chip-info"><x-icon name="{{ $invoiceStatusIcon }}" size="16" class="zazu-status-icon" />{{ ucfirst($invoice->status) }}</span>
             <a href="{{ route('finance.invoices.show', $invoice) }}" class="zazu-btn zazu-btn-ghost">Open</a>
         </div>
     @empty
@@ -90,8 +98,16 @@
     <div class="zazu-card zazu-list">
         <div class="zazu-card-header"><div class="zazu-card-title">Recent expenses</div></div>
         @forelse($expenses as $expense)
+            @php
+                $expenseStatusIcon = match (strtolower($expense->status)) {
+                    'paid', 'approved', 'reimbursed', 'completed' => 'circle-check',
+                    'rejected', 'declined', 'cancelled', 'canceled', 'void' => 'circle-x',
+                    'pending', 'draft', 'submitted', 'processing' => 'clock',
+                    default => 'info-circle',
+                };
+            @endphp
             <div class="zazu-list-item">
-                <div class="zazu-list-main"><div class="zazu-list-title">{{ $expense->description }}</div><div class="zazu-list-meta">{{ $expense->status }} · {{ $expense->expense_date->format('d M Y') }}</div></div>
+                <div class="zazu-list-main"><div class="zazu-list-title">{{ $expense->description }}</div><div class="zazu-list-meta"><x-icon name="{{ $expenseStatusIcon }}" size="16" class="zazu-status-icon" />{{ ucfirst($expense->status) }} · {{ $expense->expense_date->format('d M Y') }}</div></div>
                 <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $expense->currency }} {{ $expense->amount }}</div></div>
             </div>
         @empty
