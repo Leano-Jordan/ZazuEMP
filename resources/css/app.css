@@ -1,10 +1,10 @@
+@import 'tailwindcss';
+
 /* Preserve native hidden semantics across component styles that declare display
    with !important (notably the dashboard's layout-authority overrides). */
 [hidden] {
     display: none !important;
 }
-
-@import 'tailwindcss';
 
 @font-face {
     font-family: "Manrope Variable";
