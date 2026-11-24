@@ -125,11 +125,19 @@
             : String(identity);
     }
 
-    function mergeWorkspaceChanges(latest, baseline, proposed) {
+    function mergeWorkspaceChanges(latest, baseline, proposed, { allowSessionChange = false } = {}) {
         const merged = cloneWorkspaceState(latest || {});
         const beforeState = baseline || {};
         const proposedState = proposed || {};
         const keys = new Set([...Object.keys(beforeState), ...Object.keys(proposedState)]);
+
+        const sessionFields = new Set([
+            'sync',
+            'installation_id',
+            'sync_authorization_required',
+            'sync_registration_blocked',
+            'sync_registration_consent',
+        ]);
 
         for (const key of keys) {
             const before = beforeState[key];
@@ -137,6 +145,10 @@
             if (sameWorkspaceValue(before, after)) continue;
 
             const current = latest?.[key];
+            if (allowSessionChange && sessionFields.has(key)) {
+                merged[key] = cloneWorkspaceState(after);
+                continue;
+            }
             if (Array.isArray(before) && Array.isArray(after) && Array.isArray(current)) {
                 const beforeEntries = new Map();
                 const afterEntries = new Map();
@@ -206,7 +218,7 @@
             }
 
             if (!sameWorkspaceValue(current, before) && !sameWorkspaceValue(current, after)) {
-                throw new Error('This workspace changed in another tab. Refresh the workspace and retry your change.');
+                throw new Error('This workspace changed in another tab (' + key + '). Refresh the workspace and retry your change.');
             }
             merged[key] = cloneWorkspaceState(after);
         }
@@ -312,7 +324,7 @@
                 }
 
                 try {
-                    mergedState = mergeWorkspaceChanges(persistedState, baseline, stateToWrite);
+                    mergedState = mergeWorkspaceChanges(persistedState, baseline, stateToWrite, { allowSessionChange });
                     store.put(mergedState, 'current');
                 } catch (error) {
                     mergeError = error;

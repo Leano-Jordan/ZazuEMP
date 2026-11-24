@@ -59,10 +59,14 @@ test.describe('Zazu installed PWA offline shell', () => {
                 active_rentals: 2,
             };
             await window.ZazuOffline.persist();
+            if (window.ZazuOffline.getState().workspace_profile?.active_offerings !== 3) {
+                throw new Error('The offline workspace profile was not durably updated.');
+            }
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
         }, businessId);
 
-        await expect(panel.locator('[data-zazu-workspace-profile-count]')).toHaveText('3 active offerings');
+        await expect.poll(() => page.locator('[data-zazu-workspace-profile-count]').textContent())
+            .toBe('3 active offerings');
         await expect(panel.locator('[data-zazu-workspace-profile-focuses]')).toHaveText('Sound & DJ');
         await expect(panel.locator('[data-zazu-workspace-profile-categories]')).toHaveText('Sound & entertainment · Audio & entertainment');
 
