@@ -274,21 +274,15 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
         Storage::shouldReceive('disk')
             ->once()
             ->with('private')
-            ->andReturn(new class {
+            ->andReturn(new class
+            {
                 public function put(string $path, string $contents): bool
                 {
                     throw new \Error('internal diagnostic detail must not reach the user');
                 }
             });
 
-        Log::shouldReceive('error')
-            ->once()
-            ->with('Business archive restore failed unexpectedly.', \Mockery::on(
-                fn (array $context): bool => $context['stage'] === 'archive_validation_and_restore'
-                    && $context['business_id'] === (int) $target->id
-                    && $context['exception_class'] === \Error::class
-                    && ! array_key_exists('exception_message', $context)
-            ));
+        Log::spy();
 
         try {
             $response = $this->post(route('exports.archive.restore'), [
@@ -300,6 +294,12 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
 
             $response->assertRedirect();
             $response->assertSessionHasErrors('archive');
+            Log::shouldHaveReceived('error')->once()->with('Business archive restore failed unexpectedly.', \Mockery::on(
+                fn (array $context): bool => $context['stage'] === 'archive_validation_and_restore'
+                    && $context['business_id'] === (int) $target->id
+                    && $context['exception_class'] === \Error::class
+                    && ! array_key_exists('exception_message', $context)
+            ));
             $error = session('errors')->getBag('default')->first('archive');
             $this->assertStringContainsString('Zazu could not complete this business archive restore.', $error);
             $this->assertStringContainsString('Reference:', $error);
