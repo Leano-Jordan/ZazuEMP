@@ -4324,4 +4324,26 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
+    test('cold launch from a cached Work detail URL opens the local workspace when the host is unavailable', async ({ page, context }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Cold offline Work launch contract runs on desktop and phone viewport.');
+
+        await login(page);
+        await page.goto('/work', { waitUntil: 'domcontentloaded' });
+        const workLink = page.locator('a[href^="/work/"]:not([href="/work/create"])').first();
+        await expect(workLink).toBeVisible();
+        const workUrl = await workLink.getAttribute('href');
+        expect(workUrl).toMatch(new RegExp('^/work/[0-9]+$'));
+
+        await page.goto(workUrl, { waitUntil: 'domcontentloaded' });
+        await expect(page).toHaveURL(new URL(workUrl, page.url()).href);
+
+        await context.setOffline(true);
+        const coldLaunch = await context.newPage();
+        await coldLaunch.goto(new URL(workUrl, page.url()).href, { waitUntil: 'domcontentloaded' });
+        await expect(coldLaunch).toHaveURL(/\/dashboard$/);
+        await expect(coldLaunch.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeVisible();
+    });
+
 });
