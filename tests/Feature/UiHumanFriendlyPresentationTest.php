@@ -187,4 +187,25 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertStringContainsString("'received' => 'circle-check'", $purchasing);
         $this->assertStringContainsString("'cancelled' => 'circle-x'", $purchasing);
     }
+
+    public function test_inventory_and_finance_compact_forms_use_shared_label_and_control_styles(): void
+    {
+        $inventory = file_get_contents(resource_path('views/inventory/create.blade.php'));
+        $expense = file_get_contents(resource_path('views/finance/expense-create.blade.php'));
+        $payment = file_get_contents(resource_path('views/finance/payment-create.blade.php'));
+
+        foreach ([$inventory, $expense, $payment] as $view) {
+            $this->assertIsString($view);
+            $this->assertStringContainsString('class="zazu-label"', $view);
+            $this->assertStringContainsString('class="zazu-input"', $view);
+            $this->assertStringContainsString('class="zazu-select"', $view);
+            $this->assertStringContainsString('class="zazu-textarea"', $view);
+            $this->assertStringContainsString('class="zazu-actionbar zazu-actionbar-sticky"', $view);
+        }
+
+        $this->assertStringContainsString('data-zazu-offline-entity="inventory_item"', $inventory);
+        $this->assertStringContainsString('data-zazu-offline-entity="expense"', $expense);
+        $this->assertStringContainsString('data-zazu-offline-entity="payment"', $payment);
+    }
+
 }
