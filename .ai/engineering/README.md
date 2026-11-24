@@ -206,7 +206,7 @@ A higher test count with unchanged engineering risk does not constitute meaningf
 - `REGRESSION_LEDGER.md` — known failure patterns
 - `READINESS_REGISTER.md` — commercial-readiness gates
 - `TASK_PACKET.md` — cycle contract
-- specialist engine contracts
+- capability procedure contracts
 - `06_VERIFICATION_AND_QUALITY_ENGINE.md` — verification and failure classification
 - `../docs/ZAZU_TEST_AND_QUALITY_MATRIX.md` — current evidence map
 
@@ -266,13 +266,13 @@ A green test only closes the verification layer it actually exercised.
 
 ## SINGLE-ENTRY / SYNCHRONIZED ENGINE MODEL
 
-**Director/Morpheus is the sole entry point.**
+**Zazu Engine Director (Jarvis) is the sole accountable entry point.**
 
-Specialist engines do not operate as independent chatbots or maintain competing state.
+Director capabilities do not operate as independent chatbots or maintain competing state.
 
 Execution follows:
 
-`DIRECTOR → ROUTE → SPECIALIST → DIRECTOR → CHANGE → VERIFY → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD`
+`DIRECTOR → ROUTE → CAPABILITY → DIRECTOR → CHANGE → VERIFY → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD`
 
 Every engine consumes the same current state and returns evidence to Director.
 
@@ -317,7 +317,7 @@ Colour, typography, spacing and component geometry remain under one shared visua
 
 **Director/Morpheus is the sole entry point.**
 
-Specialist engines are synchronized capabilities under Director. They do not maintain competing state, acceptance authority or next-action queues.
+Capability procedures are synchronized capabilities under Director. They do not maintain competing state, acceptance authority or next-action queues.
 
 Execution:
 DIRECTOR → ROUTE → SPECIALIST → DIRECTOR → CHANGE → VERIFY → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD
@@ -349,7 +349,7 @@ One shared visual token authority remains mandatory.
 
 ## DIRECTOR DECISION DOCTRINE — ARCHITECTURE, CHURN AND SPRINT CONTROL
 
-The Director control plane now weighs findings before routing them to specialist engines. This prevents legitimate findings from becoming uncontrolled scope and prevents repeated local fixes from masquerading as architectural progress.
+The Director control plane now weighs findings before routing them to Director capabilities. This prevents legitimate findings from becoming uncontrolled scope and prevents repeated local fixes from masquerading as architectural progress.
 
 ### Finding classes
 
@@ -384,4 +384,4 @@ Once a target is active, unrelated enhancements are deferred. A new enhancement 
 
 Progress means reduced risk, established causality, satisfied acceptance criteria, removed release blockers, clarified architecture or materially stronger evidence. Commit count, test count and report count are not progress metrics by themselves.
 
-This doctrine is implemented inside Morpheus/Director. It does not create another engine, backlog or acceptance authority.
+This doctrine is implemented inside the single Zazu Engine Director. It does not create another role, backlog or acceptance authority.
