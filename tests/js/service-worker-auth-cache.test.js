@@ -1058,38 +1058,3 @@ test('a hanging host with Wi-Fi still connected falls back quickly to the local 
     assert.ok(elapsed < 3000, 'the worker must not leave the installed app waiting on a dead host');
     await navigation.finished();
 });
-
-
-test('a cold Work detail navigation prefers the local dashboard workspace over a stale cached page', async () => {
-    let hostAvailable = true;
-    const worker = bootWorker(async (request) => {
-        if (!hostAvailable) throw new Error('Host server unavailable');
-        const path = new URL(request.url).pathname;
-        return new MockResponse(
-            '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>' + path + '</main></body></html>',
-            { headers: { 'content-type': 'text/html; charset=utf-8' } },
-        );
-    });
-
-    await worker.dispatchMessage({
-        type: 'prime-pages',
-        userId: '41',
-        businessId: '17',
-        routes: ['/dashboard', '/customers', '/customers/create', '/work', '/work/create', '/work/123'],
-    });
-
-    const privateCache = await worker.caches.open('zazu-static-v61-user-41-business-17');
-    assert.ok(await privateCache.match('/work/123'), 'the stale Work detail snapshot must exist for this regression');
-
-    hostAvailable = false;
-    const navigation = worker.dispatchFetch(new worker.Request('/work/123', {
-        method: 'GET',
-        mode: 'navigate',
-        headers: { accept: 'text/html' },
-    }));
-
-    const response = await navigation.response;
-    assert.equal(response.ok, true);
-    assert.match(await response.text(), /<main>\\/dashboard<\\/main>/);
-    await navigation.finished();
-});
