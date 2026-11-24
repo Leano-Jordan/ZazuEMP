@@ -144,11 +144,12 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
         return Promise.all(pending).then(() => messages);
     }
 
-    function dispatchFetch(request) {
+    function dispatchFetch(request, clientId = 'existing-client') {
         const pending = [];
         let responsePromise;
         listeners.get('fetch')({
             request,
+            clientId,
             respondWith: (promise) => { responsePromise = Promise.resolve(promise); },
             waitUntil: (promise) => pending.push(Promise.resolve(promise)),
         });
@@ -1057,4 +1058,35 @@ test('a hanging host with Wi-Fi still connected falls back quickly to the local 
     assert.doesNotMatch(await response.text(), /Stale customer snapshot/);
     assert.ok(elapsed < 3000, 'the worker must not leave the installed app waiting on a dead host');
     await navigation.finished();
+});
+
+
+test('cold offline app launch prefers the local dashboard while in-app Work navigation preserves cached detail', async () => {
+    const worker = bootWorker(async () => { throw new Error('Host unavailable.'); });
+    const staticCache = await worker.caches.open('zazu-static-v61');
+    await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({
+        user_id: '41',
+        business_id: '17',
+    })));
+    const businessCache = await worker.caches.open('zazu-static-v61-user-41-business-17');
+    await businessCache.put('/dashboard', new MockResponse('<main>Offline dashboard</main>'));
+    await businessCache.put('/work/42', new MockResponse('<main>Offline Work detail with attachments</main>'));
+
+    const coldLaunch = worker.dispatchFetch(new worker.Request('/work/42', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }), '');
+    const coldResponse = await coldLaunch.response;
+    assert.equal(await coldResponse.text(), '<main>Offline dashboard</main>');
+    await coldLaunch.finished();
+
+    const inAppNavigation = worker.dispatchFetch(new worker.Request('/work/42', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }), 'active-zazu-client');
+    const inAppResponse = await inAppNavigation.response;
+    assert.equal(await inAppResponse.text(), '<main>Offline Work detail with attachments</main>');
+    await inAppNavigation.finished();
 });
