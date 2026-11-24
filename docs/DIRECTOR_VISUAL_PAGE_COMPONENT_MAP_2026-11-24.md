@@ -83,3 +83,8 @@ This map connects the 46-screen visual review to the real Blade/CSS implementati
 - [ ] Tests/build and rendered regression evidence recorded.
 
 Until the offline gate is closed, this map is prepared work, not permission to interrupt the active offline/security acceptance priority. Once authorised by the Director's release sequence, execute one page family at a time on main and record exact source/test/render evidence.
+
+
+## Founder direction — preserve and improve the existing interface (2026-11-24)
+
+This map is a guide to improving the current Zazu screens, not a blueprint for replacing them. Keep the existing page concepts, useful layouts, established identity, imagery and functional components. Refine their execution in place: hierarchy, spacing, proportions, typography, contrast, field/table readability, icon/status clarity and responsive composition. Do not imitate Advanced SystemCare or another product, impose a new generic SaaS aesthetic, or remove useful functionality for minimalism. Recommend replacement only when a specific usability or technical defect makes refinement insufficient, and document the reason before changing it.
