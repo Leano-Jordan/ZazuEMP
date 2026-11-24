@@ -135,7 +135,7 @@ function shouldPreferOfflineShell(request, pathname) {
         '/customers/create',
         '/work/create',
         '/finance/invoices/create',
-    ].includes(pathname) || /^\\/work\\/\\d+$/.test(pathname);
+    ].includes(pathname) || /^\/work\/\d+$/.test(pathname);
 
     return !preserveExactRoute;
 }
