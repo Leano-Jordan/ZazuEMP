@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
 
 class PostgresBackupSupport
@@ -24,15 +23,7 @@ class PostgresBackupSupport
         ], null, $connection['environment']);
 
         $process->setTimeout(600);
-        $process->run();
-
-        if (!$process->isSuccessful() || trim($process->getOutput()) === '') {
-            throw new \RuntimeException('PostgreSQL dump failed or returned empty SQL: '.$process->getErrorOutput());
-        }
-
-        if (File::put($path, $process->getOutput()) === false || !is_file($path) || filesize($path) === 0) {
-            throw new \RuntimeException('Could not write the PostgreSQL database snapshot.');
-        }
+        ProcessFileStream::runToFile($process, $path, 'PostgreSQL dump failed:');
     }
 
     public function restoreFromFile(string $path): void
@@ -53,12 +44,7 @@ class PostgresBackupSupport
         ], null, $connection['environment']);
 
         $process->setTimeout(600);
-        $process->setInput(File::get($path));
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new \RuntimeException('PostgreSQL import failed: '.$process->getErrorOutput());
-        }
+        ProcessFileStream::runFromFile($process, $path, 'PostgreSQL import failed:');
     }
 
     /**
