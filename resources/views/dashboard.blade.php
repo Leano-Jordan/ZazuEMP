@@ -284,6 +284,11 @@
         </nav>
         <span class="zazu-chip zazu-chip-neutral">Device local</span>
     </header>
+    <section class="zazu-dash-surface" data-zazu-offline-unavailable hidden aria-labelledby="zazu-offline-unavailable-title">
+        <h3 id="zazu-offline-unavailable-title" class="zazu-dash-panel-heading">This area needs a connection</h3>
+        <p class="zazu-card-description">This screen is not available offline yet. Your saved business records remain on this device. Reconnect to use this area, or return to the offline workspace.</p>
+        <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-secondary">Back to offline workspace</a>
+    </section>
     <div class="zazu-dash-grid">
         <section class="zazu-dash-surface" data-zazu-offline-view="customers" aria-label="Customers saved on this device">
             <h3 class="zazu-dash-panel-heading">Customers</h3>
