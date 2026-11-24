@@ -10,6 +10,14 @@
 
 **Phase 2 — disconnected/offline operation: OPEN.** The latest physical host-loss attempt exposed a route presentation defect: navigation falls back to the cached Dashboard shell and shows multiple offline collections together. Engineering is correcting this before the next physical acceptance attempt. The steps below are the eventual Phase 2 procedure, not a request to repeat Phase 1.
 
+## Offline shell route-isolation defect — 2026-11-24
+
+The Founder observed that host-loss navigation displayed the Dashboard together with all local collections. Source investigation found the Dashboard content is nested under `.zazu-content`; the previous code hid only elements incorrectly assumed to be direct children of `main#main-content`. Route selection also was not reapplied after local workspace update events.
+
+The correction hides all cached Dashboard slot content except the offline workspace itself, then shows only the collection matching the requested route. Unsupported routes show the explicit connection-required panel. On origin recovery, the cached content is restored. Browser acceptance must test actual service-worker fallback navigation for an unprimed supported route and an unsupported route, not only manipulate `history.replaceState`.
+
+**Retest rule:** do not repeat Phase 1. After exact-head CI passes, reconnect the phone to the existing HTTPS test origin, reload once online to receive the current release assets, then stop the PC host and Caddy while keeping Wi-Fi on. Verify Dashboard, Customers and one unprimed route such as Suppliers. Confirm the Dashboard hero/metrics/panels are absent on the Suppliers view. Open Calendar and confirm the connection-required panel appears without the Dashboard or unrelated collections. Preserve IndexedDB and all pending work.
+
 ## Why the old phone URL is not sufficient
 
 The LAN address `http://<PC-LAN-IP>:8000` is plain HTTP. Android Chrome does not treat an ordinary LAN IP over HTTP as a secure context, so Zazu cannot register its service worker there. A page that remains visible after the PC server stops is only the already-rendered page; it is not proof of offline navigation or local workflow support.
