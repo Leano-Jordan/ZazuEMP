@@ -1,7 +1,7 @@
 # Zazu V1 Offline Capability Contract
 
 **Status:** Engineering contract — automated behaviour mapped; physical Android and owner-PC acceptance remain OPEN.  
-**Source baseline:** `main` at `803c02c23a14347810ae51c3afbfa0e88c6f627e` (2026-11-24).  
+**Original contract baseline:** `main` at `803c02c23a14347810ae51c3afbfa0e88c6f627e` (2026-11-24). Current implementation and acceptance status are tracked in `.ai/engineering/STATE.md`.  
 **Purpose:** state exactly what an operator may expect when the Zazu host is unreachable. This contract is intentionally narrower than a promise that every screen or workflow is a standalone offline application.
 
 ## 1. Operating model
@@ -67,6 +67,26 @@ A physical run on 2026-11-24 exposed a regression against this contract: links f
 The correction isolates content at the actual `.zazu-content` boundary, preserves only the offline workspace shell, maps supported URLs to one local collection, presents a connection-required state for unsupported URLs, and restores Dashboard content when the origin is reachable. Browser regression coverage must include actual service-worker fallback navigation to an unprimed supported route and an unsupported route, with explicit assertions that the online Dashboard is hidden. History-only route manipulation is supplementary, not sufficient.
 
 Do not mark offline navigation accepted until exact-head CI and the Founder’s physical host-loss test both pass.
+
+The current cached-Dashboard fallback maps these route families to one device-local view:
+
+| Requested path | Offline view |
+|---|---|
+| `/dashboard` | Offline workspace navigation overview |
+| `/customers` | Customers |
+| `/work` and `/work/{id}` | Jobs |
+| `/work/{id}/quotes` and `/quotes` | Quotes |
+| `/work/{id}/costs` and `/work/{id}/travel` | Event costs |
+| `/capabilities` | Services and catalogue |
+| `/suppliers` | Suppliers |
+| `/inventory` | Inventory |
+| `/assets` | Assets |
+| `/purchasing` | Purchase orders |
+| `/finance` and `/finance/invoices` and `/finance/payments` | Invoices |
+| `/finance/expenses` | Expenses |
+| Any route without a mapped offline view | Connection-required message |
+
+The service worker separately preserves exact cached HTML for the currently supported offline creation routes (`/customers/create`, `/work/create`, `/finance/invoices/create`) and cached job detail routes. Those are full cached pages, not the Dashboard-shell collection fallback.
 
 ## 4. Online-only, deferred or conditional operations
 
