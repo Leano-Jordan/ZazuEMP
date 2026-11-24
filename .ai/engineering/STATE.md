@@ -2284,3 +2284,17 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Extended the existing `UiHumanFriendlyPresentationTest` method rather than adding another public test method, keeping the class within its PHPMD method-count limit.
 - **Verification pending:** exact-head Laravel, Zazu Quality, PHPMD, browser acceptance and Windows package checks. No visual or release acceptance claim until automated and physical evidence is available.
 - Verification note: first quality run on `0603fade` found a single Pint formatting issue (one extra blank line at test-class end). Corrected in `717dea4e`; no rules were relaxed. Fresh exact-head checks are pending.
+
+
+## Director security review — offline storage and trusted-device credential — 2026-11-24
+
+- Reviewed the current main implementation across public/zazu-offline.js, app/Http/Controllers/SyncController.php, app/Http/Middleware/AuthenticateSyncDevice.php, app/Models/SyncDevice.php, app/Http/Middleware/ApplySecurityHeaders.php, public/sw.js and logout handling in resources/js/app.js.
+- Confirmed the server stores only a SHA-256 hash of the random 64-character bearer token, validates active status/hash/expiry, refreshes a 180-day idle window on authenticated activity, and removes the hash on revocation. Sensitive API responses are marked no-store.
+- Confirmed the client stores the plaintext bearer in the business-scoped IndexedDB workspace alongside offline data. The pending-revocation localStorage marker itself contains only business ID, installation UUID and timestamp. The workspace and attachment blobs have no application-level encryption.
+- Confirmed successful web logout clears authenticated service-worker page caches but intentionally retains the IndexedDB workspace, queued work and sync credential. The UI warns that the trusted device remains and offline work is attributed to the approving owner. Logout is not device revocation.
+- Confirmed the nonce-based CSP blocks unsafe inline script/style paths, but cannot protect local data from malicious code already executing as trusted same-origin JavaScript. Business-scoped database names are not an access-control boundary.
+- Created docs/ZAZU_OFFLINE_STORAGE_THREAT_MODEL.md and linked it from docs/ZAZU_V1_OFFLINE_CAPABILITY_CONTRACT.md.
+- Corrected an inaccurate code comment that claimed bearer credentials never enter browser storage. It now distinguishes the non-secret localStorage revocation marker from the bearer retained in IndexedDB.
+- No superficial IndexedDB encryption was added: a key stored beside ciphertext would not defend against same-origin script execution and would complicate offline recovery. A passphrase/device-key design requires a complete recovery and cold-launch threat model first.
+- **Risk remains HIGH** for shared/unlocked profiles, device loss and same-origin script compromise. V1 must clearly distinguish Sign out from Remove this device and require private OS profiles, device lock and OS storage encryption in supported deployment guidance.
+- No application workflow or server credential semantics changed. Exact-head CI for the resulting commits must be checked. Physical Android and owner-PC hardening/acceptance remain OPEN.
