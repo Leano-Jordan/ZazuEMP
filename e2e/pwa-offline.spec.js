@@ -931,6 +931,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
         await login(page);
         await trustCurrentDevice(page);
+        await context.setOffline(true);
 
         const customerName = 'Lost response replay ' + Date.now().toString(36);
         const localId = await page.evaluate(async ({ name }) => {
