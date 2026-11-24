@@ -88,3 +88,16 @@ Until the offline gate is closed, this map is prepared work, not permission to i
 ## Founder direction — preserve and improve the existing interface (2026-11-24)
 
 This map is a guide to improving the current Zazu screens, not a blueprint for replacing them. Keep the existing page concepts, useful layouts, established identity, imagery and functional components. Refine their execution in place: hierarchy, spacing, proportions, typography, contrast, field/table readability, icon/status clarity and responsive composition. Do not imitate Advanced SystemCare or another product, impose a new generic SaaS aesthetic, or remove useful functionality for minimalism. Recommend replacement only when a specific usability or technical defect makes refinement insufficient, and document the reason before changing it.
+
+
+## Dashboard source inspection — implementation boundary (2026-11-24)
+
+Source inspected at dashboard Blade blob bc988e5b53ca7848b8a6edf8d9d9858e286c4bb1 and dashboard CSS blob ac1d1c47041f63cce15a4ae02101fc1eede68b30.
+
+The dashboard already has a clear product structure: setup/backup notices, greeting and business-capability hero, live metric links, quick actions, operational timeline, quote stages, priority actions and resource/health links. These should be refined in place, not replaced.
+
+**Important implementation boundary:** the same Blade view also contains the offline workspace, offline overview, unavailable state and individual local collections. Any dashboard CSS change must explicitly target the online dashboard components only, unless it is intentionally an offline-workspace change with dedicated offline regression coverage. Do not use broad .zazu-dash-surface, .zazu-dash-grid or shared shell selectors as a shortcut.
+
+The dedicated dashboard stylesheet is already substantial and contains accumulated late-file overrides and repeated !important declarations. Do not append another override patch. Before editing, identify the canonical existing selector block and consolidate the specific declarations there. Preserve the configured dashboard image and capability content, the current metric destinations, permission-aware conditional rendering, all offline hidden states and the offline route renderer contract.
+
+**First refinement slice after the active offline gate permits visual changes:** improve metric-card scanability and spacing, hero/capability image balance, and operational-panel heading rhythm using existing classes and the dashboard stylesheet's existing authority. No Blade restructuring is needed unless a specific accessibility defect is demonstrated. Validate desktop and narrow mobile layouts, both themes, and offline workspace visibility before calling the slice accepted.
