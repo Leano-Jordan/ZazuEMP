@@ -1003,6 +1003,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(firstServerResponse.requestMutationId).toBe(mutationId);
         expect(firstServerResponse.recorded[0].id).toBe(mutationId);
         await expect.poll(() => firstResponseAborted, { timeout: 5_000 }).toBe(true);
+        // Stop the one-second automatic retry window immediately. The page
+        // will restart offline, then reconnect only after the durable queue is
+        // confirmed to still contain the original mutation.
+        await context.setOffline(true);
         await expect.poll(() => page.evaluate(() => Boolean(window.ZazuOffline.getState().last_sync_error)))
             .toBe(true);
 
@@ -1010,7 +1014,6 @@ test.describe('Zazu installed PWA offline shell', () => {
         // still contain the original mutation identity and payload.
         await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length))
             .toBe(1);
-        await context.setOffline(true);
         await page.reload({ waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
 
