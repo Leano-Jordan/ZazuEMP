@@ -245,39 +245,72 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
 
     public function test_unexpected_restore_failure_is_logged_with_stage_and_safe_reference(): void
     {
-        $business = Business::create([
-            'name' => 'Unexpected Restore Failure',
-            'slug' => 'unexpected-restore-failure',
+        Storage::fake('private');
+        Storage::fake('public');
+
+        $source = Business::create([
+            'name' => 'Unexpected Restore Source',
+            'slug' => 'unexpected-restore-source',
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $this->signInAsOwner($business);
+        $sourcePath = 'profile-photos/customers/unexpected-restore-source.jpg';
+        Storage::disk('private')->put($sourcePath, 'private source image');
+        Customer::create([
+            'business_id' => $source->id,
+            'name' => 'Unexpected Restore Customer',
+            'profile_photo_path' => $sourcePath,
+        ]);
 
-        $this->mock(BusinessArchiveService::class, function ($mock): void {
-            $mock->shouldReceive('restore')
-                ->once()
-                ->andThrow(new \Error('internal diagnostic detail must not reach the user'));
-        });
+        $target = Business::create([
+            'name' => 'Unexpected Restore Target',
+            'slug' => 'unexpected-restore-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($target);
+
+        $archive = app(BusinessArchiveService::class)->download($source);
+        Storage::shouldReceive('disk')
+            ->once()
+            ->with('private')
+            ->andReturn(new class {
+                public function put(string $path, string $contents): bool
+                {
+                    throw new \\Error('internal diagnostic detail must not reach the user');
+                }
+            });
 
         Log::shouldReceive('error')
             ->once()
-            ->with('Business archive restore failed unexpectedly.', \Mockery::on(
+            ->with('Business archive restore failed unexpectedly.', \\Mockery::on(
                 fn (array $context): bool => $context['stage'] === 'archive_validation_and_restore'
-                    && $context['business_id'] === (int) $business->id
-                    && $context['exception_class'] === \Error::class
+                    && $context['business_id'] === (int) $target->id
+                    && $context['exception_class'] === \\Error::class
                     && ! array_key_exists('exception_message', $context)
             ));
 
-        $response = $this->post(route('exports.archive.restore'), [
-            'archive' => UploadedFile::fake()->createWithContent('business.zip', "PK\x03\x04test"),
-        ]);
+        try {
+            $response = $this->post(route('exports.archive.restore'), [
+                'archive' => UploadedFile::fake()->createWithContent(
+                    'business.zip',
+                    (string) file_get_contents($archive)
+                ),
+            ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('archive');
-        $error = session('errors')->getBag('default')->first('archive');
-        $this->assertStringContainsString('Zazu could not complete this business archive restore.', $error);
-        $this->assertStringContainsString('Reference:', $error);
-        $this->assertStringNotContainsString('internal diagnostic detail', $error);
+            $response->assertRedirect();
+            $response->assertSessionHasErrors('archive');
+            $error = session('errors')->getBag('default')->first('archive');
+            $this->assertStringContainsString('Zazu could not complete this business archive restore.', $error);
+            $this->assertStringContainsString('Reference:', $error);
+            $this->assertStringNotContainsString('internal diagnostic detail', $error);
+            $this->assertDatabaseMissing('customers', [
+                'business_id' => $target->id,
+                'name' => 'Unexpected Restore Customer',
+            ]);
+        } finally {
+            @unlink($archive);
+        }
     }
 
     public function test_restore_validation_rejection_returns_reference_without_flashing_passphrase(): void
