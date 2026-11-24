@@ -9,7 +9,7 @@
 
 Zazu's offline persistence is business-scoped, but it is not encrypted by the application. The local workspace, queued mutations, attachments and trusted sync bearer credential are available to scripts running in the Zazu origin and to anyone who can access the same unlocked browser profile. Business-specific database names provide separation by workspace; they are not an access-control or encryption boundary.
 
-**Risk rating: HIGH** for a shared, unattended or lost device/browser profile. This is a deployment and product-policy risk, not evidence that the server-side credential verifier is storing plaintext tokens.
+**Architecture decision DEC-019:** a trusted device is an owner-approved shared business workspace, not a per-staff offline identity. Sharing it among the business's authorised staff is intentional. However, every person with access to that trusted browser profile inherits the approved offline workspace and mutation capability; normal staff permissions are not re-checked for each offline mutation. Access by an unauthorised person is therefore a **HIGH** risk. This is an explicit trust-model constraint, not a newly discovered server-side credential-storage defect.
 
 ## Verified implementation facts
 
@@ -47,7 +47,8 @@ Zazu's offline persistence is business-scoped, but it is not encrypted by the ap
 
 | Threat | Likely impact | Current control | Residual risk |
 |---|---|---|---|
-| Another person uses the same unlocked OS/browser profile | Read business records, attachments and queued financial data; potentially use the trusted sync credential | Owner-approved device pairing; server-side revocation; business scoping | **High** — profile access is effectively trusted-device access |
+| Authorised business staff share the trusted OS/browser profile | They share the same approved business data and offline mutation capability; actions are attributed to the approving owner | DEC-019 explicitly permits an owner-approved shared business workspace and Settings discloses the permission boundary | **Accepted architecture limitation** — not per-staff isolation |
+| An unauthorised person uses the same unlocked OS/browser profile | Read business records, attachments and queued financial data; potentially use the trusted sync credential | Owner-approved device pairing; server-side revocation; business scoping | **High** — profile access is effectively trusted-device access |
 | Device/browser profile is copied or stolen while accessible | Local business data and bearer may be extracted | OS account/device controls are the main protection | **High** — application storage is not encrypted |
 | Same-origin XSS or compromised trusted script | Read IndexedDB and issue authenticated sync requests | Nonce CSP, no unsafe-inline, same-origin restrictions and server-side authorization | **High** — CSP reduces injection paths but cannot contain code already trusted by the origin |
 | Device is lost while offline | Owner cannot immediately revoke through the unavailable host | Revocation takes effect when server is reachable; local workspace remains available | **High until revocation reaches the server** |
@@ -62,9 +63,9 @@ A passphrase-derived offline key could improve protection against copied profile
 
 ## Required V1 controls and acceptance
 
-1. Treat a trusted offline device as a personal, owner-approved device. Do not share its OS account or browser profile.
-2. Require device-level screen lock and OS storage encryption in supported-device deployment guidance. Verify these separately on physical Android and Windows devices; CI cannot prove them.
-3. Make the distinction between **Sign out** (web session ends; local workspace and trusted-device credential remain) and **Remove this device** (owner revokes the trusted credential; local wipe is a separate explicit action) unmistakable in product language.
+1. Preserve DEC-019: a trusted device may be shared by the business's authorised staff, but it is a shared business workspace, not per-staff offline authentication. Repeat this boundary in onboarding and deployment guidance.
+2. Require the trusted device to remain under business control, with a device-level screen lock and OS storage encryption. Verify these separately on physical Android and Windows devices; CI cannot prove them.
+3. Preserve the current clear distinction between **Sign out** (web session ends; local workspace and trusted-device credential remain) and **Revoke access** (owner revokes the trusted credential; revocation does not remotely erase local data). Any local wipe must be a separate explicit action.
 4. Preserve the ability to revoke a lost device from another owner-authorized device. Test revocation while the target device is offline, then verify its next sync is rejected without silently deleting its local queue.
 5. Keep credentials out of localStorage, URLs, logs, analytics, exports and support diagnostics. The pending-revocation marker must remain non-secret.
 6. Maintain CSP, dependency/build integrity checks and regression coverage for untrusted content sinks. Any future third-party script requires a fresh threat review.
