@@ -205,10 +205,13 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("->allows('assets.view')", $dashboard);
         $this->assertStringContainsString("->allows('finance.view')", $dashboard);
         $this->assertStringNotContainsString("@can('customers.view')", $dashboard);
-        $this->assertStringContainsString('finance\/expenses', $app);
+        $this->assertStringContainsString('finance\\/(?:expenses)', $app);
         $this->assertStringContainsString('(?:costs|travel)', $app);
-        $this->assertStringContainsString('workspace.dataset.zazuOfflineActiveView = activeView || \'overview\';', $app);
-        $this->assertStringContainsString('window.addEventListener(\'popstate\', applyOfflineRouteView);', $app);
+        $this->assertStringContainsString("pathname === '/dashboard'", $app);
+        $this->assertStringContainsString("route?.[1] || 'unavailable'", $app);
+        $this->assertStringContainsString('workspace.dataset.zazuOfflineActiveView = activeView;', $app);
+        $this->assertStringContainsString("window.addEventListener('popstate', applyOfflineRouteView);", $app);
+        $this->assertStringContainsString("window.addEventListener('zazu:offline-state-updated', () => { applyOfflineRouteView(); render(); });", $app);
     }
 
     public function test_insecure_network_origins_explain_the_offline_installation_requirement(): void
