@@ -82,7 +82,17 @@ Work attachments have a separate phone-local file workflow. The attachment bytes
 6. Mutations are idempotent and ordered; updates use revision checks; conflicts remain explicit. Never silently discard, auto-overwrite or duplicate financial operations.
 7. Re-pairing must preserve the local workspace and pending queue until reconciliation is safe.
 
-## 6. Evidence map
+## 6. Local data-at-rest security boundary
+
+The current browser persistence path writes the business workspace, mutation queue and attachment blobs to IndexedDB. The inspected client persistence path does not add an application-level encryption layer before those writes. Protection therefore depends on the operating-system account/device controls, browser-profile protections and same-origin security boundary; this must not be described as encrypted local storage.
+
+This is an explicit security review item for Gate 1 / Gate 4:
+- Confirm supported Windows and Android device profiles have appropriate device lock and storage-encryption controls.
+- Review local sync-token exposure, XSS/content injection and shared-browser-profile risks.
+- Decide whether a device-local unlock/key-management design is justified without making offline recovery or cold launch fragile.
+- Never claim application-level encryption at rest until an implemented design and recovery-safe tests prove it.
+
+## 7. Evidence map
 
 Current regression coverage is in:
 
@@ -94,7 +104,7 @@ Current regression coverage is in:
 
 The exact-head CI at the source baseline is recorded separately in `.ai/engineering/STATE.md`. Automated Chromium/mobile-viewport tests are not physical Android acceptance.
 
-## 7. Acceptance still required
+## 8. Acceptance still required
 
 **Automated evidence:** exact-head CI for the baseline is green (Laravel, PostgreSQL migration/recovery, offline browser, Windows package, quality, PHPMD, secret/dependency scans and CodeQL; SonarCloud is skipped, not passed).
 
