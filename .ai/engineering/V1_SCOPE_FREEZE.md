@@ -1,8 +1,10 @@
 # Zazu EMP V1 — Scope Freeze and Finish Rule
 
+> **Current authority:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` is the canonical product, commercial, scorecard and release-gate mandate (effective 2026-11-24). This scope-freeze document is supplementary execution discipline only. Where its older finish sequence, date, or wording conflicts with the current mandate, the current mandate wins. The single accountable role is Zazu Engine Director (Jarvis); capability procedures are not separate agents.
+
 **Status:** OWNER-DIRECTED / ACTIVE — OFFLINE V1 WORK RESUMED 2026-11-17  
 **Effective:** 2026-11-12  
-**Authority:** Owner instruction; this file is binding on Director and all specialist agents.
+**Authority:** Owner instruction; this file is binding on Zazu Engine Director (Jarvis) and its capability procedures.
 
 ## Objective
 
