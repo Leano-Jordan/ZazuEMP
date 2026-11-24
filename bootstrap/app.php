@@ -55,11 +55,23 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (ThrottleRequestsException $exception, Request $request) {
-            if ($request->expectsJson() || $request->is('api/*') || ! $request->is('login')) {
+            if ($request->expectsJson() || $request->is('api/*')) {
                 return null;
             }
 
             $retryAfter = max(1, (int) ($exception->getHeaders()['Retry-After'] ?? 60));
+
+            if ($request->routeIs('exports.archive.restore')) {
+                return redirect()
+                    ->route('exports.index')
+                    ->withErrors([
+                        'archive' => "Too many restore attempts. Wait {$retryAfter} seconds before trying again. This attempt was blocked before restore processing; no data was imported.",
+                    ]);
+            }
+
+            if (! $request->is('login')) {
+                return null;
+            }
 
             return redirect()
                 ->route('landing', ['auth' => 'login'])
