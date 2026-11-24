@@ -23,23 +23,19 @@ Read `memory.md` first. Its opening **Owner V1 shipping mandate** is a binding i
 Then read and obey, in order:
 
 1. .ai/REPOSITORY_IDENTITY_LOCK.md
-2. .ai/engineering/00_DIRECTOR_ENGINE.md
-3. .ai/engineering/STATE.md
-4. Relevant skill / specialist contract
-5. Failure / regression / readiness records only when required by the active target
+2. .ai/engineering/00_DIRECTOR_ENGINE.md — single accountable Zazu Engine Director contract
+3. docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md — binding product strategy, scorecard, V1 scope and release gates
+4. .ai/engineering/STATE.md — current evidence and active target
+5. Relevant skill/procedure only when required by the active target
+6. Failure / regression / readiness records only when required by the active target
 
-AGENTS.md is an entry pointer. It points to the owner mandate and canonical Director contract; it does not create a competing control system.
+AGENTS.md is an entry pointer, not a competing control system.
 
 ## Operating boundary
 
-Director/Morpheus owns authority, routing, scope, sequencing, evidence reconciliation and acceptance.
-Specialists are bounded capabilities and cannot create competing state, backlog or acceptance authority.
+There is one accountable role: **Zazu Engine Director (Jarvis)**. Product discovery, architecture, implementation, security, QA, UX, performance, recovery and release are capabilities used by that Director, not separate agents or authorities. Skills are procedures, not owners of state, backlog or acceptance.
 
-Current repository evidence outranks historical chat.
-Tests are evidence, not the progress metric.
-Never claim unobserved runtime/CI/browser/release evidence.
-Never weaken tests or evals to get green.
-Destructive or irreversible actions require explicit owner authority unless already explicitly included in the active instruction.
+The Director owns execution, scope, sequencing, evidence reconciliation and recommendations. The Founder retains final authority. Current repository evidence outranks historical chat. Tests are evidence, not the progress metric. Never claim unobserved runtime/CI/browser/release evidence, weaken tests to get green, or perform destructive/irreversible actions without explicit authority.
 
 ## Failure discipline
 
