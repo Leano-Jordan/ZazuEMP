@@ -11,6 +11,18 @@ The Founder confirms Zazu EMP has been physically used on the PC and linked mobi
 
 This report does **not** certify the disconnected cold-launch/relaunch/reconnect flow, attachment round-trip, or a physical tablet test. Device model, OS/browser versions, deployed origin and exact release commit were not supplied with the screenshots. Keep those specific checks open; do not ask the Founder to repeat basic connected PC/mobile setup.
 
+## Phase 1 — connected physical operation
+
+**Status: OWNER-VERIFIED PASS — completed physically by the Founder multiple times; reaffirmed 2026-11-24.**
+
+The Founder has repeatedly exercised the actual Windows PC installation and linked Android phone while connected, confirmed both operate against the same Zazu EMP workspace, and confirmed the populated fictional business modules work in their respective areas. This is accepted evidence for connected PC/mobile operation and shared-workspace use. Do not request that this phase be repeated.
+
+## Phase 2 — offline physical acceptance
+
+**Status: OPEN — current physical failure observed.** With the PC host stopped and the phone still on Wi-Fi, navigation to other areas continues to receive the cached Dashboard shell; the offline collections are presented together rather than as distinct route-specific screens. The Founder has reported this directly on 2026-11-24. Engineering must correct and regression-test route-aware offline presentation before requesting another owner test.
+
+Phase 1 does not close Phase 2. Offline host-loss, airplane-mode cold launch, restart persistence, local mutations, attachment round-trip and exactly-once reconnect remain separate acceptance checks.
+
 ## Purpose
 
 Provide the controlled acceptance test for a real phone and real tablet before V1 release.
