@@ -2373,6 +2373,17 @@ Founder confirmed the previously pending checks passed after commit `60dbcc3`. T
 - Exact-head PHPMD, Pint formatting, application quality, secret scan and Composer security audit passed.
 - PostgreSQL 16 migration, rollback/reapplication and real database backup/restore/private-file recovery passed.
 - Populated upgrade and rollback passed.
-- Windows package build and encrypted/legacy business archive verification passed. Windows fresh-install PowerShell verification and offline browser acceptance are still running; do not close those gates until complete.
+- Windows package build and encrypted/legacy business archive verification passed. Windows fresh-install PowerShell verification **passed**. Offline browser acceptance is still running; do not close that gate until complete.
 - Psalm passed on the prior candidate before the final formatting-only correction; Psalm is being rerun on the current head.
 - SonarCloud remains skipped by workflow configuration. No physical owner-PC recovery drill or independent off-host backup proof is claimed.
+
+
+## Recovery streaming release checks — current checkpoint — 2026-11-24
+
+- Windows V1 candidate build, encrypted/legacy business archive verification and fresh-install PowerShell verification all passed on code candidate fb4012b8. Prerelease publication was skipped by workflow policy; no prerelease was published.
+- Exact-head Psalm security analysis passed on fb4012b8.
+- Exact-head Laravel suite: 761 passed, 1 skipped, 5,425 assertions.
+- Exact-head PostgreSQL 16 migration, rollback/reapplication, account/workspace registration and installation database/private-file backup/restore passed.
+- Exact-head coverage, Pint, application quality, secret scan, Composer security audit, PHPMD, Director Health, populated upgrade/rollback and push on main passed.
+- Offline browser acceptance remains in progress at this checkpoint. Physical Android offline acceptance, owner-PC recovery drill, original physical encrypted archive failure diagnosis, and independent off-host backup verification remain OPEN.
+- SonarCloud was skipped by workflow configuration and is not a pass.
