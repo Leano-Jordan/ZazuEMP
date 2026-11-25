@@ -278,10 +278,20 @@ final class BusinessArchiveService
             throw new RuntimeException('The business archive table-count manifest is invalid.');
         }
 
-        $expectedTables = array_keys($data);
-        $declaredTables = array_keys($declaredCounts);
-        $missingTables = array_diff($expectedTables, $declaredTables);
-        $extraTables = array_diff($declaredTables, $expectedTables);
+        $this->assertArchiveTableCountKeys($declaredCounts, $data, $isLegacyDataset);
+
+        foreach ($data as $table => $rows) {
+            $declaredCount = $this->declaredArchiveTableCount($table, $declaredCounts, $isLegacyDataset);
+            if (! is_int($declaredCount) || $declaredCount < 0 || $declaredCount !== count($rows)) {
+                throw new RuntimeException('The business archive record counts do not match its manifest.');
+            }
+        }
+    }
+
+    private function assertArchiveTableCountKeys(array $declaredCounts, array $data, bool $isLegacyDataset): void
+    {
+        $missingTables = array_diff(array_keys($data), array_keys($declaredCounts));
+        $extraTables = array_diff(array_keys($declaredCounts), array_keys($data));
 
         if ($isLegacyDataset) {
             // Older v1 archives predate invoice_number_sequences. That one
@@ -292,15 +302,15 @@ final class BusinessArchiveService
         if ($missingTables !== [] || $extraTables !== []) {
             throw new RuntimeException('The business archive table-count manifest does not match its dataset.');
         }
+    }
 
-        foreach ($data as $table => $rows) {
-            $declaredCount = $declaredCounts[$table]
-                ?? ($isLegacyDataset && $table === 'invoice_number_sequences' ? 0 : null);
-
-            if (! is_int($declaredCount) || $declaredCount < 0 || $declaredCount !== count($rows)) {
-                throw new RuntimeException('The business archive record counts do not match its manifest.');
-            }
+    private function declaredArchiveTableCount(string $table, array $declaredCounts, bool $isLegacyDataset): mixed
+    {
+        if (array_key_exists($table, $declaredCounts)) {
+            return $declaredCounts[$table];
         }
+
+        return $isLegacyDataset && $table === 'invoice_number_sequences' ? 0 : null;
     }
 
     private function validateArchiveTableRows(string $table, mixed $rows, int $sourceBusinessId): void
