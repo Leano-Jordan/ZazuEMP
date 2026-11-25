@@ -81,7 +81,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('responseUrl.pathname !== requestedUrl.pathname', $worker);
         $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
-        $this->assertStringContainsString('await offline.pair(code)', $app);
+        $this->assertStringNotContainsString('handleZazuPhonePairing', $app);
+        $this->assertStringNotContainsString('data-zazu-phone-pairing', $layout);
         $this->assertStringContainsString("'/customers/create'", $app);
         $this->assertStringContainsString("'/work/create'", $app);
         $this->assertStringContainsString('Offline workspace is not fully prepared.', $app);
