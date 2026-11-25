@@ -1,3 +1,16 @@
+## Current execution checkpoint — 2026-11-25 (unrequested pairing prompt and offline acceptance)
+
+**Repository:** `Leano-Jordan/ZazuEMP`, canonical branch `main`. No branches created.
+
+- Removed the 8-digit **Pair this phone** field from the shared app layout and removed its app-shell UI handler. It had been inserted into every authenticated app shell and was shown on mobile while the device was unpaired, which surfaced it on the Dashboard without Founder instruction.
+- Kept the existing owner-side Settings → Phone sync controls and server-side pairing authorization intact. Pairing remains outside the currently approved V1 scope; do not reintroduce a Dashboard prompt without explicit Founder approval.
+- Updated the offline foundation regression so the app shell must not render the pairing form or handler.
+- Investigated Laravel workflow `45463107421`: 68 browser journeys passed and six failed. The failure evidence shows stale expectations for the offline screen title, a redundant Dashboard notice link, duplicate Customers headings, and a quote-navigation click made before the offline transition was settled. Updated those assertions to reflect the actual UI and wait for the offline state before navigating.
+- Offline route titles are deliberate: Dashboard fallback is **Offline workspace**; a cached `/work/{id}` fallback selects the local **Jobs** view. These are not online Dashboard headings.
+- **Verification boundary:** changes are committed directly to `main`; exact-head Laravel/browser CI must pass before these checks are considered resolved. Physical Android host-loss, cold launch, restart and reconnect remain separately OPEN. Do not claim mobile offline acceptance from browser CI.
+
+---
+
 ## Current execution checkpoint — 2026-11-24 (offline acceptance root-cause correction)
 
 **Current main head:** `8d1c9e53848ee2130418656894706e3329c627e7`. **Application changes:** route selection/event handling `84e2b31aae7ecf88b6047e0d0487a4c420148ea9`; correct cached Dashboard content boundary and reconnect restoration `f459a6488ce368cf18e27bbe444d87c09b57114d`, `8908eba40f8ebbef2844d5c32b9cf2c2833f1804`; actual service-worker fallback regression `0c8fa7da558c4f93d30372959d490fcdc654ee39`; current PHP test formatting repair `86f443bf755a8a17b776a2dc0131d2d694de080b`; CSS hidden-semantics fix `77db56121ccef906c84d4b98444d0f6f2916be81`, with the rule correctly placed after the Tailwind import in `8d1c9e53848ee2130418656894706e3329c627e7`.
