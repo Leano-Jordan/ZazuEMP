@@ -8,7 +8,7 @@ Prevent recurring diagnosis and patch loops by treating failures as persistent e
 
 This file is the **domain contract** for the Failure Case / Loop-Breaking capability. Reusable procedure lives in `.agents/skills/failure-forensics/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
+The Zazu Engine Director (Jarvis) is the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
 ## Activation / scope
 

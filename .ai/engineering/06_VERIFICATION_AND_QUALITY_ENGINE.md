@@ -8,7 +8,7 @@ Establish evidence for correctness and classify failures before application corr
 
 This file is the **domain contract** for the Verification & Quality capability. Reusable procedure lives in `.agents/skills/verification/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
+The Zazu Engine Director (Jarvis) is the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
 ## Activation / scope
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The Failure Case Engine prevents Morpheus and specialist engines from repeatedly applying variations of the same unsuccessful diagnosis or patch.
+The Failure Case Engine prevents the Zazu Engine Director and its internal capabilities from repeatedly applying variations of the same unsuccessful diagnosis or patch.
 
 A failing check is a **case**, not a task.
 

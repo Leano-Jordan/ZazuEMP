@@ -8,7 +8,7 @@ Continuously improve the interface as one deliberate commercial product without 
 
 This file is the **domain contract** for the UI/UX Improvement capability. Reusable procedure lives in `.agents/skills/ui-recovery/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
+The Zazu Engine Director (Jarvis) is the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
 ## Activation / scope
 

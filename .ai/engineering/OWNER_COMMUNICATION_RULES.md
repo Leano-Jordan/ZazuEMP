@@ -1,7 +1,7 @@
 # Zazu EMP — Owner Communication Rules
 
 **Authority:** Owner instruction  
-**Applies to:** Director / Morpheus, Jarvis and every specialist capability  
+**Applies to:** Zazu Engine Director (Jarvis) and every internal capability  
 **Status:** Mandatory and persistent
 
 ## The rule
