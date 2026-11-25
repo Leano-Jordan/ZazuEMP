@@ -368,3 +368,12 @@ The Founder-supplied research report reviewed read-only main at cb7ab270 (2026-1
 - Keep role visibility explicit and consistent with the route's existing server-side authorization. Never weaken middleware to make a destination visible.
 - Keep record-scoped actions (for example, event costs, preparation, requirements, travel and attachments) discoverable from their parent record rather than promoting every nested action into global navigation.
 - Add regression coverage for both the presence of authorised destinations and the absence of owner-only destinations for other roles. Verify active navigation state on destination pages.
+
+
+## Director continuity and owner-test memory — mandatory
+
+Treat owner-reported physical observations as durable evidence in STATE.md and this contract. The 2026-11-26 Founder observation confirms that with the PC host OFF, the Android phone opens offline workspace pages and renders local business data; the offline-state banner is visible. The previous frozen-dashboard / all-sections-collapsed symptom is no longer the current reported behaviour. Current visible gaps: Settings navigation is absent and UI composition needs refinement.
+
+The active engineering direction is incremental completion of the existing offline workspace: route-appropriate navigation, route-specific real content, and visual refinement. Preserve the current UI identity and offline banner. Do not restart or replace the offline architecture.
+
+**Do not ask the Founder again** whether offline pages load, whether they contain local data, or whether the PC was off. Do not repeat connected PC/mobile setup. These facts are recorded. Ask for another owner test only when a distinct remaining physical acceptance criterion requires new evidence after engineering is ready; name that exact check and do not bundle already-completed checks into it. CI and source inspection must be used wherever they can establish the result without burdening the Founder.
