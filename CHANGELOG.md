@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-25 — Offline Dashboard navigation and pairing scope
+
+- Removed the unrequested phone pairing-code entry field from the shared app layout and removed its Dashboard/mobile form handler.
+- Kept phone pairing owner-controlled in Settings → Phone sync; the eight-digit code contract and server authorization were not removed.
+- Reused the Dashboard controller's business-scoped permission snapshot for the offline workspace navigation.
+- Corrected offline browser/feature-test contracts for the Jobs title and Settings-only pairing controls.
+- Exact-head verification on `95975c61215373b5796e1adcdfddd70370fc91b5`: Zazu Quality, Hadolint, PHPMD and Director Health passed; Laravel/browser, PostgreSQL and Windows package were still running at the last check. Physical Android acceptance remains open.
+
 ## 2026-11-25 — Dashboard pairing prompt removal and offline acceptance corrections
 
 - Removed the unsolicited 8-digit **Pair this phone** field from the shared app shell so it no longer appears on the Dashboard. The owner-side Phone sync controls and server-side pairing authorization remain unchanged; pairing is not being reopened as a V1 scope item.
