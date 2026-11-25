@@ -20,7 +20,8 @@ final class BusinessArchiveService
 {
     public function __construct(
         private readonly BusinessArchiveFileService $files,
-        private readonly BusinessArchiveFileCollector $fileCollector
+        private readonly BusinessArchiveFileCollector $fileCollector,
+        private readonly BusinessArchiveZipWriter $zipWriter
     ) {}
 
     private const VERSION = 1;
@@ -71,125 +72,26 @@ final class BusinessArchiveService
 
     public function download(Business $business): string
     {
-        $archivePath = tempnam(sys_get_temp_dir(), 'zazu-business-archive-');
-        if ($archivePath === false) {
-            throw new RuntimeException('Unable to create a temporary business archive.');
-        }
+        $data = $this->collectArchiveData($business);
+        $files = $this->fileCollector->collectFiles($business, $data);
 
-        $zip = new ZipArchive;
-        if ($zip->open($archivePath, ZipArchive::OVERWRITE) !== true) {
-            @unlink($archivePath);
-            throw new RuntimeException('Unable to open the business archive.');
-        }
-
-        try {
-            $data = [];
-            foreach ($this->definitions() as $table => $definition) {
-                $data[$table] = $this->rowsForBusiness($table, $definition, $business->id, $data);
-
-                if ($table === 'business_tax_profiles') {
-                    foreach ($data[$table] as &$profileRow) {
-                        $profileRow['tcs_pin'] = null;
-                    }
-                    unset($profileRow);
-                }
-            }
-
-            $files = $this->fileCollector->collectFiles($business, $data);
-            if (! $zip->addFromString('manifest.json', json_encode([
-                'format' => 'zazu-business-archive',
-                'version' => self::VERSION,
-                'created_at' => now()->toIso8601String(),
-                'source_business' => [
-                    'id' => (int) $business->id,
-                    'name' => $business->name,
-                    'currency' => $business->currency,
-                    'email' => $business->email,
-                    'phone' => $business->phone,
-                    'address' => $business->address,
-                    'website' => $business->website,
-                    'tax_number' => $business->tax_number,
-                    // The file manifest references these source paths so archive
-                    // validation can prove each branding payload belongs to this
-                    // business before restoring it to the authenticated media route.
-                    'logo_path' => $business->logo_path,
-                    'dashboard_image_path' => $business->dashboard_image_path,
-                    'wallpaper_path' => $business->wallpaper_path,
-                ],
-                'tables' => array_map('count', $data),
-                'files' => $files['manifest'],
-            ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT))) {
-                throw new RuntimeException('The business archive manifest could not be added to the ZIP file.');
-            }
-
-            if (! $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR))) {
-                throw new RuntimeException('The business archive records could not be added to the ZIP file.');
-            }
-
-            foreach ($files['sources'] as $entry => $sourcePath) {
-                if (! $zip->addFile($sourcePath, $entry)) {
-                    throw new RuntimeException('A business file could not be added to the archive.');
-                }
-            }
-        } catch (\Throwable $exception) {
-            $zip->close();
-            @unlink($archivePath);
-
-            throw $exception;
-        }
-
-        if (! $zip->close()) {
-            @unlink($archivePath);
-            throw new RuntimeException('The business archive could not be finalized.');
-        }
-
-        try {
-            $this->assertCompletedArchive($archivePath, $files['sources']);
-        } catch (\Throwable $exception) {
-            @unlink($archivePath);
-
-            throw $exception;
-        }
-
-        return $archivePath;
+        return $this->zipWriter->create($business, $data, $files);
     }
 
-    /**
-     * @param array<string,string> $sources
-     */
-    private function assertCompletedArchive(string $archivePath, array $sources): void
+    private function collectArchiveData(Business $business): array
     {
-        $zip = new ZipArchive;
-        if ($zip->open($archivePath, ZipArchive::CHECKCONS) !== true) {
-            throw new RuntimeException('The completed business archive failed ZIP integrity validation.');
+        $data = [];
+        foreach ($this->definitions() as $table => $definition) {
+            $data[$table] = $this->rowsForBusiness($table, $definition, $business->id, $data);
+            if ($table === 'business_tax_profiles') {
+                foreach ($data[$table] as &$profileRow) {
+                    $profileRow['tcs_pin'] = null;
+                }
+                unset($profileRow);
+            }
         }
 
-        try {
-            $expectedEntries = array_fill_keys(['manifest.json', 'data.json'], true);
-            foreach ($sources as $entry => $_sourcePath) {
-                $expectedEntries[$entry] = true;
-            }
-
-            if ($zip->numFiles !== count($expectedEntries)) {
-                throw new RuntimeException('The completed business archive has an incomplete entry set.');
-            }
-
-            foreach ($expectedEntries as $entry => $_expected) {
-                $stat = $zip->statName($entry);
-                if (! is_array($stat) || ! isset($stat['size'])) {
-                    throw new RuntimeException('The completed business archive is missing a required entry.');
-                }
-
-                if (isset($sources[$entry])) {
-                    $sourceBytes = filesize($sources[$entry]);
-                    if ($sourceBytes === false || (int) $stat['size'] !== $sourceBytes) {
-                        throw new RuntimeException('A business file was not completely added to the archive.');
-                    }
-                }
-            }
-        } finally {
-            $zip->close();
-        }
+        return $data;
     }
 
     /**

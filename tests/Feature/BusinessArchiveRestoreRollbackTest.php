@@ -70,6 +70,7 @@ class BusinessArchiveRestoreRollbackTest extends TestCase
             ->twice()
             ->andReturnUsing(function (string $path) use (&$writtenFiles): bool {
                 unset($writtenFiles[$path]);
+
                 return true;
             });
         Storage::shouldReceive('disk')

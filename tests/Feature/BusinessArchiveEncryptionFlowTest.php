@@ -273,13 +273,18 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
 
         $archive = app(BusinessArchiveService::class)->download($source);
         Storage::shouldReceive('disk')
-            ->once()
             ->with('private')
+            ->twice()
             ->andReturn(new class
             {
-                public function put(string $path, string $contents): bool
+                public function writeStream(string $path, $stream): bool
                 {
                     throw new \Error('internal diagnostic detail must not reach the user');
+                }
+
+                public function delete(string $path): bool
+                {
+                    return true;
                 }
             });
 

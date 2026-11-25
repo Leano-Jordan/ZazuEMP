@@ -97,7 +97,7 @@ Business-level export/restore is implemented separately through the owner-only E
 
 ## Confidentiality and storage protection
 
-**The two archive classes now have deliberately different protection models.** Installation-wide scheduled backups remain unattended ZIP files because startup/scheduled recovery must not depend on a human passphrase. Store their off-disk copies only on encrypted removable media or in an encrypted, access-controlled vault. New business `.zazu` exports are encrypted with XChaCha20-Poly1305 using a key derived from the owner-supplied passphrase with Argon2id; each chunk is authenticated and the archive is streamed so large workspaces are not loaded into memory.
+**The two archive classes now have deliberately different protection models.** Installation-wide scheduled backups remain unattended ZIP files because startup/scheduled recovery must not depend on a human passphrase. Store their off-disk copies only on encrypted removable media or in an encrypted, access-controlled vault. New business `.zazu` exports use XChaCha20-Poly1305 authenticated streaming with an Argon2id-derived key. Attachment payloads stream between local storage and ZIP entries; the record dataset (`data.json`) is still assembled and validated in memory, so the archive format is not fully constant-memory for very large record sets.
 
 The installation backup's SHA-256 manifest detects payload changes; it does not encrypt the data or authenticate who created the archive. Business V2 exports provide confidentiality and authenticated integrity through Sodium secretstream. The business archive's existing schema allowlists and tenant checks remain in force after decryption.
 
