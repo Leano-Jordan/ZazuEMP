@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-11-25 — Repository cleanup, event-management identity and offline navigation correction
+
+- Removed retired Render/Docker deployment files, the Docker-only Hadolint workflow, unused `public/offline-attachments.js`, generated placeholder tests, an obsolete Claude handover, and the vendor-media workflow that fetched third-party images and auto-committed them.
+- Simplified `.ai/engineering/STATE.md` from roughly 331 KB to a concise live evidence register; retained detailed failure cases, decisions and dated audits as historical records.
+- Reconciled product definition across README, product specification, Composer metadata, manifest, app footer and Director mandate: Zazu is an event management platform, with service types as configurable capabilities rather than a catering-only category.
+- Corrected stale operating guidance that still treated DB-001 as an active blocker and named Morpheus as the controlling engine; one accountable Director remains.
+- Fixed the Pint incremental workflow to ignore deleted PHP paths. Removed the CSS rule that hid the offline workspace's own navigation; browser and feature regressions now require Customers, Jobs and Quotes navigation to stay available offline.
+- Laravel run [45651931394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45651931394): **761 passed, 1 skipped, 5,443 assertions**; offline browser acceptance **93 passed**; PostgreSQL migration/recovery smoke and coverage passed.
+- Windows package run [45651931423](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45651931423): package build, encrypted/legacy archive tests and Windows PowerShell fresh-install/launcher check passed.
+- Current-main Zazu Quality [45653237320](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45653237320), Director Contract Lint [45653237123](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45653237123), and CodeQL [45653236491](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45653236491) passed. Psalm/PHPMD analysis steps ran, but their SARIF publication jobs failed; SonarCloud remains skipped. These are not independent penetration-test results.
+- Automated offline browser navigation is closed; physical Android Phase 2, the failed owner archive restore, intended-PC full recovery, commercial reconciliation, POPIA operations and ZAZU name clearance remain open.
+
 ## 2026-11-25 — Offline Dashboard navigation and pairing scope
 
 - Removed the unrequested phone pairing-code entry field from the shared app layout and removed its Dashboard/mobile form handler.

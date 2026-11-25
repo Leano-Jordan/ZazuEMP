@@ -1,5 +1,18 @@
 **Canonical policy:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` governs commercial positioning, V1 scope, formal scorecard, ordered release gates and the controlled-pilot target. This register is evidence/status, not a competing strategy document. Current-main evidence supersedes older dated checkpoints below.
 
+## Current engineering reconciliation — 2026-11-25
+
+**Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md). This reconciliation supersedes the Nov 23 checkpoints below for current status; they remain historical evidence.
+
+- Current main: `4c9658334c14b133420e5ad28663a111f33b2d7e`; latest application-source/test head: `f6a9b3c5fd6d09b14c42d469a504150402c40baa`.
+- Exact application/test run `45651931394`: Laravel **761 passed / 1 skipped / 5,443 assertions**; coverage, offline browser acceptance and PostgreSQL migration/recovery smoke all passed. Offline browser acceptance completed **93 journeys** with no failed or skipped journeys.
+- Exact Windows V1 package run `45651931423`: candidate build, encrypted and legacy business-archive tests, Windows PowerShell fresh install/launcher and automated installation backup recovery checks passed.
+- Current-main Zazu Quality `45653237320`, Director Contract Lint `45653237123` and CodeQL `45653236491` passed. Psalm analysis and PHPMD analysis executed, but their SARIF publishing jobs failed; SonarCloud remains skipped.
+- Offline navigation CSS regression is closed automatically: the offline workspace's Customers/Jobs/Quotes navigation is visible in offline mode. Physical Android cold launch/restart/reconnect remains open.
+- The encrypted business archive owner attempt on 2026-11-23 remains failed with the first failure stage unknown. Do not retry against live data or weaken the restore throttle. Automated encrypted/legacy archive tests do not close the owner restore gate.
+- Formal evidence-maturity baseline remains **71/100**; no uplift. V1 remains **NOT READY**. Open gates: physical Android Phase 2, successful owner archive restore, intended-PC installation recovery, populated quote-to-profit reconciliation, trusted-device shared-profile risk acceptance/hardening, POPIA operations and ZAZU name clearance.
+
+---
 ## Latest Director engineering evidence — 2026-11-23
 
 - CASE-ZAZU-0046 / ENG-JS-003 CLOSED: offline service metadata survives deferred image upload; image bytes are not queued.
