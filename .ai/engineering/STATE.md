@@ -78,3 +78,15 @@ Automated backup/restore, rollback, PostgreSQL recovery smoke, Windows packaging
 5. Prepare POPIA and ZAZU name-clearance decisions for Founder acceptance.
 
 Physical-device, owner-PC recovery, populated-business and legal/brand acceptance remain separate Founder gates. Continue source, test, documentation and CI work that does not require those actions.
+
+## Founder physical offline observation — 2026-11-26 (new evidence)
+
+The Founder reports that with the Zazu PC host OFF, the Android phone successfully opens offline workspace pages and those pages render locally available business data. This is a material improvement over the previously observed frozen last-online Dashboard / all-sections-on-one-page failure. The offline-state banner is visible and communicates that the server is unavailable, locally saved records remain on the device, and only supported offline screens are available. The Founder reports that the Settings navigation is absent and the rendered UI still needs refinement.
+
+**Evidence classification:** OWNER-OBSERVED PARTIAL PASS for phone-side offline route/page rendering with local data while the PC host is off. This is not a full offline acceptance pass. The PC being off is explicitly recorded; do not ask the Founder to repeat that condition or basic connected PC/mobile setup.
+
+**Remaining engineering work:** inspect and correct supported offline navigation (including the Settings destination where its functions are supported offline), verify route-specific page content rather than merely page shells, and refine visual composition without replacing the existing UI. Preserve the existing offline-state banner and its honest limitations. Continue to verify local persistence/restart, supported local mutations, attachment access and reconnect reconciliation through existing automated evidence and the remaining targeted physical checks.
+
+**Owner interaction rule:** treat this observation as durable acceptance evidence. Do not ask the Founder again whether offline pages load, whether they contain local data, or whether the PC was on. Ask for another physical check only when engineering has reached a new, specific acceptance step that cannot be established through source inspection or automation; state exactly what new evidence is needed and why. Never repeat a previously completed setup or test.
+
+**Gate status:** physical Android offline acceptance remains OPEN pending the remaining distinct checks; the prior all-pages-collapse/frozen-dashboard symptom is no longer the current owner-reported behaviour. UI/navigation refinement is now the active engineering target, not restarting the offline architecture.
