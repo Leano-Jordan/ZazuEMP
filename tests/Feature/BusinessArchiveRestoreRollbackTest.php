@@ -52,26 +52,29 @@ class BusinessArchiveRestoreRollbackTest extends TestCase
         $writtenFiles = [];
         $putCalls = 0;
         $privateDisk = \Mockery::mock();
-        $privateDisk->shouldReceive('put')
+        $privateDisk->shouldReceive('writeStream')
             ->twice()
-            ->andReturnUsing(function (string $path, string $bytes) use (&$writtenFiles, &$putCalls): bool {
+            ->andReturnUsing(function (string $path, $stream) use (&$writtenFiles, &$putCalls): bool {
                 $putCalls++;
-                if ($putCalls === 2) {
+                $bytes = stream_get_contents($stream);
+                if (! is_string($bytes)) {
                     return false;
                 }
 
+                // Simulate a storage adapter that leaves a partial file on failure.
                 $writtenFiles[$path] = $bytes;
-                return true;
+
+                return $putCalls !== 2;
             });
         $privateDisk->shouldReceive('delete')
-            ->once()
+            ->twice()
             ->andReturnUsing(function (string $path) use (&$writtenFiles): bool {
                 unset($writtenFiles[$path]);
                 return true;
             });
         Storage::shouldReceive('disk')
             ->with('private')
-            ->times(3)
+            ->times(4)
             ->andReturn($privateDisk);
 
         try {

@@ -19,7 +19,7 @@ final class BusinessArchiveFileCollector
         $this->collectDatasetFiles($data, $references);
         $this->collectAttachmentFiles($data, $references);
 
-        return $this->readFileContents($business, $data, $references);
+        return $this->resolveFileSources($business, $data, $references);
     }
 
     private function collectBusinessImages(Business $business, array &$references): void
@@ -108,16 +108,31 @@ final class BusinessArchiveFileCollector
         throw new RuntimeException("A referenced business file is missing: {$table}#{$id}.");
     }
 
-    private function readFileContents(Business $business, array $data, array $references): array
+    private function resolveFileSources(Business $business, array $data, array $references): array
     {
-        $contents = [];
+        $sources = [];
         foreach ($references as $reference) {
             $sourcePath = $reference['table'] === 'businesses'
                 ? $business->{$reference['column']}
-                : collect($data[$reference['table']])->firstWhere('id', $reference['id'])[$reference['column']];
-            $contents[$reference['entry']] = Storage::disk($reference['source_disk'])->get($sourcePath);
+                : (collect($data[$reference['table']])->firstWhere('id', $reference['id'])[$reference['column']] ?? null);
+
+            if (! is_string($sourcePath) || $sourcePath === '') {
+                throw new RuntimeException('A referenced business file path could not be resolved.');
+            }
+
+            $disk = Storage::disk($reference['source_disk']);
+            if (! $disk->exists($sourcePath)) {
+                throw new RuntimeException('A referenced business file is missing.');
+            }
+
+            $localPath = $disk->path($sourcePath);
+            if (! is_string($localPath) || ! is_file($localPath) || ! is_readable($localPath)) {
+                throw new RuntimeException('A referenced business file cannot be streamed into the archive.');
+            }
+
+            $sources[$reference['entry']] = $localPath;
         }
 
-        return ['manifest' => $references, 'contents' => $contents];
+        return ['manifest' => $references, 'sources' => $sources];
     }
 }

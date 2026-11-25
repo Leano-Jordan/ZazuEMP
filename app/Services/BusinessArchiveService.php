@@ -96,7 +96,7 @@ final class BusinessArchiveService
             }
 
             $files = $this->fileCollector->collectFiles($business, $data);
-            $zip->addFromString('manifest.json', json_encode([
+            if (! $zip->addFromString('manifest.json', json_encode([
                 'format' => 'zazu-business-archive',
                 'version' => self::VERSION,
                 'created_at' => now()->toIso8601String(),
@@ -118,16 +118,78 @@ final class BusinessArchiveService
                 ],
                 'tables' => array_map('count', $data),
                 'files' => $files['manifest'],
-            ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-            $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR));
-            foreach ($files['contents'] as $entry => $bytes) {
-                $zip->addFromString($entry, $bytes);
+            ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT))) {
+                throw new RuntimeException('The business archive manifest could not be added to the ZIP file.');
+            }
+
+            if (! $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR))) {
+                throw new RuntimeException('The business archive records could not be added to the ZIP file.');
+            }
+
+            foreach ($files['sources'] as $entry => $sourcePath) {
+                if (! $zip->addFile($sourcePath, $entry)) {
+                    throw new RuntimeException('A business file could not be added to the archive.');
+                }
+            }
+        } catch (\Throwable $exception) {
+            $zip->close();
+            @unlink($archivePath);
+
+            throw $exception;
+        }
+
+        if (! $zip->close()) {
+            @unlink($archivePath);
+            throw new RuntimeException('The business archive could not be finalized.');
+        }
+
+        try {
+            $this->assertCompletedArchive($archivePath, $files['sources']);
+        } catch (\Throwable $exception) {
+            @unlink($archivePath);
+
+            throw $exception;
+        }
+
+        return $archivePath;
+    }
+
+    /**
+     * @param array<string,string> $sources
+     */
+    private function assertCompletedArchive(string $archivePath, array $sources): void
+    {
+        $zip = new ZipArchive;
+        if ($zip->open($archivePath, ZipArchive::CHECKCONS) !== true) {
+            throw new RuntimeException('The completed business archive failed ZIP integrity validation.');
+        }
+
+        try {
+            $expectedEntries = array_fill_keys(['manifest.json', 'data.json'], true);
+            foreach ($sources as $entry => $_sourcePath) {
+                $expectedEntries[$entry] = true;
+            }
+
+            if ($zip->numFiles !== count($expectedEntries)) {
+                throw new RuntimeException('The completed business archive has an incomplete entry set.');
+            }
+
+            foreach ($expectedEntries as $entry => $_expected) {
+                $stat = $zip->statName($entry);
+                if (! is_array($stat) || ! isset($stat['size'])) {
+                    throw new RuntimeException('The completed business archive is missing a required entry.');
+                }
+
+                if (isset($sources[$entry])) {
+                    $sourceBytes = filesize($sources[$entry]);
+                    if ($sourceBytes === false || (int) $stat['size'] !== $sourceBytes) {
+                        throw new RuntimeException('A business file was not completely added to the archive.');
+                    }
+                }
             }
         } finally {
             $zip->close();
         }
-
-        return $archivePath;
     }
 
     /**
@@ -150,6 +212,7 @@ final class BusinessArchiveService
             throw new RuntimeException('The uploaded file is not a valid Zazu business archive.');
         }
 
+        $filePayloads = [];
         try {
             [$manifest, $data, $definitions] = $this->readArchiveEnvelope($zip);
             $filePayloads = $this->files->readArchiveFilePayloads($zip, $manifest, $data);
@@ -163,6 +226,9 @@ final class BusinessArchiveService
                 $afterRestore
             );
         } finally {
+            foreach ($filePayloads as $file) {
+                @unlink($file['staged_path']);
+            }
             $zip->close();
         }
     }
@@ -492,10 +558,22 @@ final class BusinessArchiveService
             // for the public disk; branding, customer photos, compliance files
             // and attachments must be private regardless of the source archive.
             $restoreDisk = $file['table'] === 'business_capabilities' ? 'public' : 'private';
-            if (! Storage::disk($restoreDisk)->put($path, $file['bytes'])) {
+            $source = @fopen($file['staged_path'], 'rb');
+            if ($source === false) {
+                throw new RuntimeException('Restore stopped: a staged business file could not be opened.');
+            }
+
+            // Register before writing so rollback also removes a partially written destination.
+            $createdFiles[] = ['disk' => $restoreDisk, 'path' => $path];
+            try {
+                $written = Storage::disk($restoreDisk)->writeStream($path, $source);
+            } finally {
+                fclose($source);
+            }
+
+            if (! $written) {
                 throw new RuntimeException('Restore stopped: a business file could not be written to its storage disk.');
             }
-            $createdFiles[] = ['disk' => $restoreDisk, 'path' => $path];
             DB::table($file['table'])->where('id', $newId)->update([
                 $file['column'] => $path,
                 ...($file['disk_column'] ? [$file['disk_column'] => 'private'] : []),

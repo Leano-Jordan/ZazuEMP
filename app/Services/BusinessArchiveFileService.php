@@ -11,6 +11,10 @@ use ZipArchive;
  */
 final class BusinessArchiveFileService
 {
+    private const MAX_STAGED_BYTES = 262144000;
+
+    private const STREAM_CHUNK_BYTES = 1048576;
+
     public function readArchiveFilePayloads(ZipArchive $zip, array $manifest, array $data): array
     {
         $allowedFileColumns = $this->allowedArchiveFileColumns();
@@ -19,11 +23,30 @@ final class BusinessArchiveFileService
         $this->assertArchivePathsHavePayloads($manifest, $data, $allowedFileColumns, $references);
 
         $filePayloads = [];
-        foreach ($manifest['files'] as $file) {
-            $filePayloads[] = $this->readArchiveFilePayload($zip, $file, $manifest, $data, $allowedFileColumns);
-        }
+        $totalStagedBytes = 0;
 
-        return $filePayloads;
+        try {
+            foreach ($manifest['files'] as $file) {
+                $payload = $this->readArchiveFilePayload(
+                    $zip,
+                    $file,
+                    $manifest,
+                    $data,
+                    $allowedFileColumns,
+                    self::MAX_STAGED_BYTES - $totalStagedBytes
+                );
+                $filePayloads[] = $payload;
+                $totalStagedBytes += $payload['payload_bytes'];
+            }
+
+            return $filePayloads;
+        } catch (\Throwable $exception) {
+            foreach ($filePayloads as $payload) {
+                @unlink($payload['staged_path']);
+            }
+
+            throw $exception;
+        }
     }
 
     private function assertArchivePayloadEntriesAreDeclared(ZipArchive $zip, array $manifest): void
@@ -119,8 +142,14 @@ final class BusinessArchiveFileService
         ]];
     }
 
-    private function readArchiveFilePayload(ZipArchive $zip, array $file, array $manifest, array $data, array $allowedColumns): array
-    {
+    private function readArchiveFilePayload(
+        ZipArchive $zip,
+        array $file,
+        array $manifest,
+        array $data,
+        array $allowedColumns,
+        int $remainingBytes
+    ): array {
         $table = (string) ($file['table'] ?? '');
         $column = (string) ($file['column'] ?? '');
         $entry = (string) ($file['entry'] ?? '');
@@ -135,12 +164,86 @@ final class BusinessArchiveFileService
             throw new RuntimeException('The archive contains an unsupported source storage disk.');
         }
 
-        $bytes = $zip->getFromName($entry);
-        if ($bytes === false) {
+        return $file + $this->stageZipEntry($zip, $entry, $remainingBytes);
+    }
+
+    /**
+     * @return array{staged_path:string,payload_bytes:int}
+     */
+    private function stageZipEntry(ZipArchive $zip, string $entry, int $remainingBytes): array
+    {
+        $source = $zip->getStream($entry);
+        if ($source === false) {
             throw new RuntimeException('A referenced business file is missing from the archive.');
         }
 
-        return $file + ['bytes' => $bytes];
+        $path = null;
+        $target = false;
+        try {
+            $path = tempnam(sys_get_temp_dir(), 'zazu-restore-file-');
+            if ($path === false || ! @chmod($path, 0600)) {
+                throw new RuntimeException('A private business-file staging file could not be created.');
+            }
+
+            $target = @fopen($path, 'wb');
+            if ($target === false) {
+                throw new RuntimeException('A private business-file staging file could not be opened.');
+            }
+
+            $bytes = 0;
+            while (! feof($source)) {
+                $chunk = fread($source, self::STREAM_CHUNK_BYTES);
+                if ($chunk === false) {
+                    throw new RuntimeException('A business file payload could not be read from the archive.');
+                }
+                if ($chunk === '') {
+                    if (feof($source)) {
+                        break;
+                    }
+
+                    throw new RuntimeException('A business file payload stream ended unexpectedly.');
+                }
+
+                $chunkBytes = strlen($chunk);
+                if ($chunkBytes > $remainingBytes - $bytes) {
+                    throw new RuntimeException('The business archive exceeds the 250 MB restore limit.');
+                }
+
+                $this->writeAll($target, $chunk);
+                $bytes += $chunkBytes;
+            }
+
+            if (! fflush($target)) {
+                throw new RuntimeException('A staged business file could not be finalized.');
+            }
+
+            return ['staged_path' => $path, 'payload_bytes' => $bytes];
+        } catch (\Throwable $exception) {
+            if (is_string($path)) {
+                @unlink($path);
+            }
+
+            throw $exception;
+        } finally {
+            fclose($source);
+            if (is_resource($target)) {
+                fclose($target);
+            }
+        }
+    }
+
+    /** @param resource $stream */
+    private function writeAll($stream, string $contents): void
+    {
+        $offset = 0;
+        $length = strlen($contents);
+        while ($offset < $length) {
+            $written = fwrite($stream, substr($contents, $offset));
+            if ($written === false || $written === 0) {
+                throw new RuntimeException('A staged business file could not be written.');
+            }
+            $offset += $written;
+        }
     }
 
     private function assertSafeArchiveFileReference(array $file, string $table, string $column, string $entry, array $allowedColumns): void
