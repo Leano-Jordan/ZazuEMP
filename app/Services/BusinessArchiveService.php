@@ -73,14 +73,6 @@ final class BusinessArchiveService
 
     public function download(Business $business): string
     {
-        $data = $this->collectArchiveData($business);
-        $files = $this->fileCollector->collectFiles($business, $data);
-
-        return $this->zipWriter->create($business, $data, $files);
-    }
-
-    private function collectArchiveData(Business $business): array
-    {
         $data = [];
         foreach ($this->definitions() as $table => $definition) {
             $data[$table] = $this->rowsForBusiness($table, $definition, $business->id, $data);
@@ -92,7 +84,9 @@ final class BusinessArchiveService
             }
         }
 
-        return $data;
+        $files = $this->fileCollector->collectFiles($business, $data);
+
+        return $this->zipWriter->create($business, $data, $files);
     }
 
     /**
