@@ -16,8 +16,8 @@ final class BusinessArchiveZipWriter
     private const MAX_ENTRIES = 5000;
 
     /**
-     * @param array<string,mixed> $data
-     * @param array{manifest:array,sources:array<string,string>} $files
+     * @param  array<string,mixed>  $data
+     * @param  array{manifest:array,sources:array<string,string>}  $files
      */
     public function create(Business $business, array $data, array $files): string
     {
@@ -98,7 +98,7 @@ final class BusinessArchiveZipWriter
     }
 
     /**
-     * @param array<string,string> $sources
+     * @param  array<string,string>  $sources
      */
     private function addFileEntries(ZipArchive $zip, array $sources): void
     {
@@ -110,7 +110,7 @@ final class BusinessArchiveZipWriter
     }
 
     /**
-     * @param array<string,string> $sources
+     * @param  array<string,string>  $sources
      */
     private function assertCompletedArchive(string $archivePath, array $sources): void
     {
@@ -128,7 +128,7 @@ final class BusinessArchiveZipWriter
     }
 
     /**
-     * @param array<string,string> $sources
+     * @param  array<string,string>  $sources
      */
     private function assertArchiveEntryCount(ZipArchive $zip, array $sources): void
     {
@@ -139,7 +139,7 @@ final class BusinessArchiveZipWriter
     }
 
     /**
-     * @param array<string,string> $sources
+     * @param  array<string,string>  $sources
      */
     private function assertArchiveEntries(ZipArchive $zip, array $sources): void
     {
@@ -171,7 +171,7 @@ final class BusinessArchiveZipWriter
     }
 
     /**
-     * @param array<string,string> $sources
+     * @param  array<string,string>  $sources
      */
     private function assertSourceFileSize(string $entry, int $archiveBytes, array $sources): void
     {

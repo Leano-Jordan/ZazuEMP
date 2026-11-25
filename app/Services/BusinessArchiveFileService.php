@@ -13,9 +13,7 @@ final class BusinessArchiveFileService
 {
     private const MAX_STAGED_BYTES = 262144000;
 
-    public function __construct(private readonly BusinessArchivePayloadStager $stager)
-    {
-    }
+    public function __construct(private readonly BusinessArchivePayloadStager $stager) {}
 
     public function readArchiveFilePayloads(ZipArchive $zip, array $manifest, array $data): array
     {
@@ -198,5 +196,4 @@ final class BusinessArchiveFileService
 
         return collect($data[$table] ?? [])->firstWhere('id', (int) ($file['id'] ?? 0))[$column] ?? null;
     }
-
 }
