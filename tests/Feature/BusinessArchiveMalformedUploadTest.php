@@ -97,5 +97,4 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'business_id' => $target->id,
         ]);
     }
-
 }
