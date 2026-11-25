@@ -8,7 +8,7 @@ Implement an approved Zazu change with minimal collateral impact and strong writ
 
 This file is the **domain contract** for the Builder capability. Reusable procedure lives in `.agents/skills/builder/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
+The Zazu Engine Director (Jarvis) is the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
 ## Activation / scope
 
