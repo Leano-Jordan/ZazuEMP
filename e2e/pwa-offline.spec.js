@@ -3747,7 +3747,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             for (const [path, heading] of [
                 ['/customers', 'Customers'],
                 ['/customers/create', 'New customer'],
-                ['/work', 'Event Operations'],
+                ['/work', 'Jobs'],
                 ['/work/create', 'New job'],
             ]) {
                 const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
