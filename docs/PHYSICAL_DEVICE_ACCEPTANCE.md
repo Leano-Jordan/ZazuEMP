@@ -19,11 +19,11 @@ The Founder has repeatedly exercised the actual Windows PC installation and link
 
 ## Phase 2 — offline physical acceptance
 
-**Status: OPEN — current physical failure observed; engineering remediation in progress.** With the PC host stopped and the phone still on Wi-Fi, navigation to other areas continues to receive the cached Dashboard shell; the online Dashboard and offline collections are presented together rather than as distinct route-specific screens.
+**Status: PARTIAL PASS — owner-observed phone offline page rendering; remaining acceptance OPEN.** On 2026-11-26 the Founder confirmed that the PC host was OFF and the Android phone opened offline workspace pages with locally available business data rendered. The offline-state banner appeared at the top and stated that the Zazu server was unavailable, locally saved records remained on the device, and only supported offline screens could be used. The previous frozen-last-online-dashboard / collapsed-all-pages symptom is therefore no longer the current reported behaviour.
 
-Source investigation found that the cached Dashboard slot is nested under `.zazu-content`, while the previous route-isolation selector incorrectly targeted direct children of `main#main-content`. It therefore failed to hide the Dashboard itself. A second defect meant local workspace update events did not reapply the active route. The implementation now targets the actual layout boundary and browser regression coverage exercises real unprimed-route fallback. Do not request another owner test until exact-head CI passes.
+The Founder also observed that Settings navigation is absent and the page UI still looks somewhat off. These are now explicit engineering findings: restore appropriate offline navigation, including Settings destinations only where supported; verify that each supported route renders its own actual content; and refine layout/spacing/typography while preserving the existing design and honest offline banner. Do not replace the interface or restart the offline architecture.
 
-Phase 1 does not close Phase 2. Offline host-loss, airplane-mode cold launch, restart persistence, local mutations, attachment round-trip and exactly-once reconnect remain separate acceptance checks.
+**Evidence boundary:** this is owner-observed proof of phone-side route/page rendering with local data while the PC host is off. It does not yet prove all offline routes, Settings functionality, local writes, airplane-mode cold launch, force-close/restart persistence, attachment round-trip, or exactly-once reconnect. Keep those distinct checks open. Do not ask the Founder to repeat the already-confirmed PC-off/local-data/page-rendering test or connected PC/mobile setup. Request a new physical check only after the relevant engineering work is complete and only for a specific remaining acceptance criterion.
 
 ## Purpose
 
