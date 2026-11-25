@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\Customer;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Tests\TestCase;
@@ -15,7 +16,7 @@ class BusinessArchiveRestoreRollbackTest extends TestCase
     use RefreshDatabase;
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
-    public function test_restore_rolls_back_rows_and_removes_written_files_after_a_mid_restore_write_failure(): void
+    public function test_restore_preserves_original_write_failure_and_continues_cleanup_after_delete_failure(): void
     {
         Storage::fake('private');
         Storage::fake('public');
@@ -51,6 +52,7 @@ class BusinessArchiveRestoreRollbackTest extends TestCase
 
         $writtenFiles = [];
         $putCalls = 0;
+        $deleteCalls = 0;
         $privateDisk = \Mockery::mock();
         $privateDisk->shouldReceive('writeStream')
             ->twice()
@@ -68,7 +70,12 @@ class BusinessArchiveRestoreRollbackTest extends TestCase
             });
         $privateDisk->shouldReceive('delete')
             ->twice()
-            ->andReturnUsing(function (string $path) use (&$writtenFiles): bool {
+            ->andReturnUsing(function (string $path) use (&$writtenFiles, &$deleteCalls): bool {
+                $deleteCalls++;
+                if ($deleteCalls === 1) {
+                    throw new RuntimeException('simulated storage cleanup failure');
+                }
+
                 unset($writtenFiles[$path]);
 
                 return true;
@@ -77,6 +84,8 @@ class BusinessArchiveRestoreRollbackTest extends TestCase
             ->with('private')
             ->times(4)
             ->andReturn($privateDisk);
+
+        Log::spy();
 
         try {
             try {
@@ -91,7 +100,15 @@ class BusinessArchiveRestoreRollbackTest extends TestCase
 
         $this->assertSame('Rollback Restore Target', $target->fresh()->name);
         $this->assertSame(0, Customer::query()->where('business_id', $target->id)->count());
-        $this->assertSame([], $writtenFiles);
+        $this->assertCount(1, $writtenFiles, 'The first delete was forced to fail, but cleanup must continue for the second file.');
         $this->assertSame(2, $putCalls);
+        $this->assertSame(2, $deleteCalls);
+        Log::shouldHaveReceived('error')->once()->with(
+            'Business archive rollback could not remove a partially restored file.',
+            \Mockery::on(fn (array $context): bool => $context['business_id'] === (int) $target->id
+                && $context['disk'] === 'private'
+                && $context['exception_class'] === RuntimeException::class
+                && ! array_key_exists('exception_message', $context))
+        );
     }
 }

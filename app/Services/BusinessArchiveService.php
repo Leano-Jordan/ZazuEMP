@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Business;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -377,10 +378,29 @@ final class BusinessArchiveService
 
             return $result;
         } catch (\Throwable $exception) {
-            foreach ($createdFiles as $file) {
-                Storage::disk($file['disk'])->delete($file['path']);
-            }
+            $this->cleanupRestoredFiles($createdFiles, (int) $target->id);
+
             throw $exception;
+        }
+    }
+
+    private function cleanupRestoredFiles(array $createdFiles, int $businessId): void
+    {
+        foreach ($createdFiles as $file) {
+            try {
+                if (Storage::disk($file['disk'])->delete($file['path'])) {
+                    continue;
+                }
+
+                throw new RuntimeException('A partially restored business file could not be removed.');
+            } catch (\Throwable $exception) {
+                Log::error('Business archive rollback could not remove a partially restored file.', [
+                    'business_id' => $businessId,
+                    'disk' => $file['disk'],
+                    'exception_class' => $exception::class,
+                    'exception_code' => (string) $exception->getCode(),
+                ]);
+            }
         }
     }
 
