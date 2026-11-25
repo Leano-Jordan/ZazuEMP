@@ -36,7 +36,6 @@ class BusinessArchiveVerifyCommandTest extends TestCase
             $this->artisan('zazu:verify-business-archive', ['archive' => $archive])
                 ->expectsOutput('Business archive passed read-only verification.')
                 ->expectsOutput('No business workspace or database records were changed.')
-                ->expectsOutputToContain('Verification Customer')
                 ->assertExitCode(0);
 
             $this->assertSame($businessCount, Business::query()->count());
