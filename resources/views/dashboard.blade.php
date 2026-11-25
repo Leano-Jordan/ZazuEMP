@@ -257,29 +257,29 @@
             <p class="zazu-card-description">Your locally saved business records. Changes stay on this device until Zazu reconnects.</p>
         </div>
         <nav class="zazu-action-group" aria-label="Offline workspace navigation">
-            @php($offlineWorkspacePermissions = app(\App\Support\PermissionService::class))
-            @if($offlineWorkspacePermissions->allows('customers.view'))
+            {{-- Reuse the dashboard's business-scoped permission snapshot for offline navigation. --}}
+            @if($workspaceTools['customers'])
                 <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Open customers</a>
             @endif
-            @if($offlineWorkspacePermissions->allows('work.view'))
+            @if($workspaceTools['work'])
                 <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Open work</a>
             @endif
-            @if($offlineWorkspacePermissions->allows('quotes.view'))
+            @if($workspaceTools['quotes'])
                 <a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-secondary">Quotes</a>
             @endif
-            @if($offlineWorkspacePermissions->allows('suppliers.view'))
+            @if($workspaceTools['suppliers'])
                 <a href="{{ route('suppliers.index') }}" class="zazu-btn zazu-btn-secondary">Suppliers</a>
             @endif
-            @if($offlineWorkspacePermissions->allows('purchasing.view'))
+            @if($workspaceTools['purchasing'])
                 <a href="{{ route('purchasing.index') }}" class="zazu-btn zazu-btn-secondary">Purchasing</a>
             @endif
-            @if($offlineWorkspacePermissions->allows('inventory.view'))
+            @if($workspaceTools['inventory'])
                 <a href="{{ route('inventory.index') }}" class="zazu-btn zazu-btn-secondary">Inventory</a>
             @endif
-            @if($offlineWorkspacePermissions->allows('assets.view'))
+            @if($workspaceTools['assets'])
                 <a href="{{ route('assets.index') }}" class="zazu-btn zazu-btn-secondary">Assets</a>
             @endif
-            @if($offlineWorkspacePermissions->allows('finance.view'))
+            @if($workspaceTools['finance'])
                 <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Finance</a>
             @endif
         </nav>
