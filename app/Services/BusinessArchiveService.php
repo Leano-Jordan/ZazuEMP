@@ -328,6 +328,7 @@ final class BusinessArchiveService
                 $parentIds = array_column($targetRows[$definition['parent']] ?? [], 'id');
                 if ($parentIds === []) {
                     $targetRows[$table] = [];
+
                     continue;
                 }
                 $query->whereIn($definition['parent_key'], $parentIds);
@@ -509,5 +510,4 @@ final class BusinessArchiveService
             DB::table('businesses')->where('id', $target->id)->update($safeProfile);
         }
     }
-
 }
