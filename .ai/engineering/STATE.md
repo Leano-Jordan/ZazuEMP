@@ -3,7 +3,7 @@
 **Last reconciled:** 2026-11-25
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
-**Latest runtime-verified application-source/test HEAD:** `f6a9b3c5fd6d09b14c42d469a504150402c40baa`
+**Latest application-source/test HEAD under exact-head acceptance:** `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d` (core Laravel tests, coverage and PostgreSQL smoke passed; offline browser job is still running)
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
@@ -28,14 +28,13 @@ The current Laravel modular monolith, event/job-centred records, business isolat
 
 ## Latest verified automated evidence
 
-- The latest runtime-verified application-source/test HEAD remains `f6a9b3c5fd6d09b14c42d469a504150402c40baa`; later commits update engineering controls and documentation, not application behaviour.
-- Laravel workflow 45651931394 on f6a9b3c: **761 passed, 1 skipped, 5,443 assertions**. All four jobs completed successfully: Laravel tests, coverage report, offline browser acceptance and PostgreSQL migration/recovery smoke.
-- Offline browser job 139338436940: **93 journeys passed**, no failed or skipped journeys reported. This closes the automated internal-navigation defect where CSS hid the offline workspace's own Customers/Jobs/Quotes navigation. It does not certify physical-device offline use.
-- Windows V1 package workflow 45651931423 on f6a9b3c: package build passed; encrypted and legacy business-archive checks passed; Windows PowerShell fresh-install/launcher check passed. Automated installation backup tests recovered SQLite and private media and verified empty-private-storage replacement. This is CI evidence, not the intended-PC owner recovery drill.
-- Zazu Quality run `45654839986`, Director Contract Lint run `45654840121`, and Rosscore Director Health run `45654840115` all passed on the current documentation/control-only main head at the time of that run.
-- CodeQL / Push-on-main run 45653236491 on current main completed successfully across Actions, JavaScript/TypeScript and Python.
-- Psalm analysis executed successfully on 41881d8, but its separate SARIF publishing job failed. PHPMD analysis executed on f6a9b3c, but its SARIF upload failed. Treat these as scan execution plus publishing failures—not green published security results. SonarCloud remains skipped, not passed.
-- The Pint incremental format gate was corrected to exclude deleted PHP paths (`--diff-filter=ACMRT`) after cleanup exposed that defect; Zazu Quality now passes.
+- Exact current source/test head: `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d`.
+- Laravel workflow `45700142579`: application tests **761 passed, 1 skipped, 5,445 assertions**; coverage report and PostgreSQL migration/recovery smoke passed. The offline browser job `139507818283` is still in progress, so the complete Laravel workflow is not yet a pass.
+- Latest completed offline browser baseline remains run `45651931394` on `f6a9b3c`: **93 journeys passed**, with no failed or skipped journeys. This previously closed the automated internal-navigation defect for offline Customers/Jobs/Quotes. The current-head offline suite must finish before claiming a newer result. Neither run certifies physical Android use.
+- Windows V1 package `45700142740` on current head: candidate build, encrypted and legacy business-archive checks, and Windows PowerShell fresh-install/launcher verification all passed. The automated Windows installation check is not the intended-PC owner recovery drill.
+- Current-head Zazu Quality `45700142698`, PHPMD `45700142645`, Psalm security scan `45700142619`, populated upgrade/rollback `45700142684`, Director Health `45700142739`, and Push-on-main `45700142312` passed. SonarCloud `45700142666` was skipped, not passed.
+- Business archive engineering now streams attachment payloads from local storage into ZIP entries and streams restored payloads through private 0600 temporary files before storage writes. Restore rollback registers destinations before streaming; cleanup continues after a delete failure while preserving the original restore exception. Failure logs now include safe runtime/upload/temp-storage diagnostics without passphrases, archive contents, paths or exception messages.
+- Automated encrypted/legacy archive and rollback tests pass on the current head, but synthetic fixtures do not reproduce the Founder's original archive or establish its first failing stage.
 
 ## Confirmed open findings and release gates
 

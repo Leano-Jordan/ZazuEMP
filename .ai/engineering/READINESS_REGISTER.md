@@ -2,14 +2,15 @@
 
 ## Current engineering reconciliation — 2026-11-25
 
-**Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md). This reconciliation supersedes the Nov 23 checkpoints below for current status; they remain historical evidence.
+**Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md). This reconciliation supersedes the dated checkpoints below for current status; they remain historical evidence.
 
-- Current main: `4c9658334c14b133420e5ad28663a111f33b2d7e`; latest application-source/test head: `f6a9b3c5fd6d09b14c42d469a504150402c40baa`.
-- Exact application/test run `45651931394`: Laravel **761 passed / 1 skipped / 5,443 assertions**; coverage, offline browser acceptance and PostgreSQL migration/recovery smoke all passed. Offline browser acceptance completed **93 journeys** with no failed or skipped journeys.
-- Exact Windows V1 package run `45651931423`: candidate build, encrypted and legacy business-archive tests, Windows PowerShell fresh install/launcher and automated installation backup recovery checks passed.
-- Current-main Zazu Quality `45653237320`, Director Contract Lint `45653237123` and CodeQL `45653236491` passed. Psalm analysis and PHPMD analysis executed, but their SARIF publishing jobs failed; SonarCloud remains skipped.
-- Offline navigation CSS regression is closed automatically: the offline workspace's Customers/Jobs/Quotes navigation is visible in offline mode. Physical Android cold launch/restart/reconnect remains open.
-- The encrypted business archive owner attempt on 2026-11-23 remains failed with the first failure stage unknown. Do not retry against live data or weaken the restore throttle. Automated encrypted/legacy archive tests do not close the owner restore gate.
+- Current `main`: `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d`.
+- Exact-head Laravel run `45700142579`: **761 passed / 1 skipped / 5,445 assertions**; coverage and PostgreSQL migration/recovery smoke passed. Offline browser job `139507818283` is still running; do not mark the complete workflow green yet.
+- Exact-head Windows package run `45700142740`: build, encrypted/legacy business archive verification and Windows PowerShell fresh install/launcher passed.
+- Exact-head Zazu Quality `45700142698`, PHPMD `45700142645`, Psalm `45700142619`, populated upgrade/rollback `45700142684`, Director Health `45700142739` and Push-on-main `45700142312` passed. SonarCloud `45700142666` was skipped.
+- Archive engineering hardening: attachment payloads are streamed into/out of ZIP archives with private temporary staging and a 250 MiB expanded-payload boundary; ZIP integrity is checked after export. Restore file rollback now removes partial stream writes, continues best-effort cleanup after individual deletion failures and preserves the original restore exception. Restore failure telemetry captures environment and upload diagnostics without secrets or archive contents.
+- The previous fully completed offline acceptance baseline remains `45651931394`: 93 journeys passed. The current-head offline suite must complete before updating that baseline. Physical Android cold launch/restart/reconnect remains open.
+- The encrypted business archive owner attempt on 2026-11-23 remains failed with the first failure stage unknown. Do not retry against live data or weaken the restore throttle. New streaming and diagnostics improvements are not proof that the original archive now restores.
 - Formal evidence-maturity baseline remains **71/100**; no uplift. V1 remains **NOT READY**. Open gates: physical Android Phase 2, successful owner archive restore, intended-PC installation recovery, populated quote-to-profit reconciliation, trusted-device shared-profile risk acceptance/hardening, POPIA operations and ZAZU name clearance.
 
 ---
