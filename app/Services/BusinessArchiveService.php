@@ -90,19 +90,6 @@ final class BusinessArchiveService
     }
 
     /**
-     * Restores into an existing, empty business workspace. IDs are remapped
-     * and every database foreign key is checked against the archive allowlist.
-     *
-     * @return array{tables:int,records:int,files:int}
-     */
-    /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
-    /**
-     * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
-     */
-    /**
      * Validate an archive without importing it or touching a business workspace.
      *
      * @param  null|callable(string):void  $onStage
@@ -155,8 +142,14 @@ final class BusinessArchiveService
     }
 
     /**
+     * Restores into an existing, empty business workspace. IDs are remapped
+     * and every database foreign key is checked against the archive allowlist.
+     *
      * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      * @param  null|callable(string):void  $onStage
+     * @return array{tables:int,records:int,files:int}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function restore(
         string $archivePath,
@@ -217,11 +210,11 @@ final class BusinessArchiveService
             throw new RuntimeException('The archive does not contain the complete supported business dataset.');
         }
 
-        $this->assertArchiveTableCounts($manifest['tables'] ?? null, $data, $isLegacyDataset);
-
         foreach ($definitions as $table => $_definition) {
             $this->validateArchiveTableRows($table, $data[$table], (int) $manifest['source_business']['id']);
         }
+
+        $this->assertArchiveTableCounts($manifest['tables'] ?? null, $data, $isLegacyDataset);
 
         return [$manifest, $data, $definitions];
     }
