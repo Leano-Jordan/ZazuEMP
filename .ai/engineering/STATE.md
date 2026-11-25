@@ -1,3 +1,20 @@
+## Current execution checkpoint — 2026-11-25 (offline navigation and pairing scope)
+
+**Repository:** `Leano-Jordan/ZazuEMP`; write target `main` only. **Current source head:** `95975c61215373b5796e1adcdfddd70370fc91b5`. No branches created.
+
+- Removed the unsolicited 8-digit **Pair this phone** field from the shared app shell and its mobile display/submission handler. It no longer appears on Dashboard or other shared-layout pages.
+- Preserved owner-controlled phone pairing in **Settings → Phone sync**. The Settings code generator, eight-digit validation, pairing endpoint and server authorization remain intact. The regression now explicitly requires pairing to remain in Settings and absent from Dashboard.
+- The offline Dashboard navigation now reuses the Dashboard controller's already-resolved, business-scoped `workspaceTools` permission snapshot. It no longer independently resolves permissions again inside the Blade partial.
+- Corrected the offline Work route title contract to **Jobs**. Browser acceptance still checks the real cached-shell route and local record view.
+- Investigated the preceding Laravel/browser failures: three Playwright failures (missing dashboard navigation links, stale `Event Operations` title expectation, and missing Quotes link) plus two static feature-test failures (outdated permission-source assertion and outdated expectation that pairing UI belongs on Dashboard). Updated the view and regression contracts; no tests were deleted or weakened.
+- Audited the active attachment path: business-scoped IndexedDB storage, durable multi-file queue, 20 MB per-file / 10-file batch limits, job-ID reconciliation, server idempotency/content verification, acknowledgement matching, retry after lost responses, and session-generation checks are implemented. Eleven browser journeys cover offline save/restart/reconnect, duplicate/lost acknowledgements, transient errors, local Work creation, cross-session races and re-pairing. This is source/test evidence, not physical Android acceptance.
+- Exact-source CI on `95975c6`: Zazu Quality, Hadolint, PHPMD and Director Health passed. Laravel (including offline browser acceptance and PostgreSQL smoke), Windows V1 package and Push-on-main were still running at the last status check. SonarCloud is skipped, not passed.
+- **Physical Android Phase 2 remains OPEN.** Automated Chromium and mobile viewport checks do not prove installed-phone host-loss, airplane-mode cold launch, force-close/restart, attachment access or exactly-once reconnect. Preserve IndexedDB; do not clear site data or repeat already accepted Phase 1 connected setup.
+
+**Next:** close exact-head Laravel/browser, PostgreSQL and Windows package verification. If green, run the single focused Android host-loss/route-isolation retest from `docs/ZAZU_ANDROID_OFFLINE_INSTALL_ACCEPTANCE.md`; then continue fully disconnected cold launch, local writes, attachment restart and reconnect reconciliation. No scope expansion.
+
+---
+
 ## Current execution checkpoint — 2026-11-25 (unrequested pairing prompt and offline acceptance)
 
 **Repository:** `Leano-Jordan/ZazuEMP`, canonical branch `main`. No branches created.
