@@ -574,7 +574,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const coldLaunchResponse = await coldLaunchPage.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     expect(coldLaunchResponse?.ok()).toBe(true);
     await coldLaunchPage.evaluate(() => window.ZazuOffline.ready);
-    await expect(coldLaunchPage.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Offline workspace');
     await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeVisible({ timeout: 8000 });
     await selectOfflineView(coldLaunchPage, '/customers');
     await expect(coldLaunchPage.locator('[data-zazu-offline-workspace] [data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
