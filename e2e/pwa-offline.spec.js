@@ -156,7 +156,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(notice).toBeVisible({ timeout: 15_000 });
         await expect(notice).toContainText('Zazu server is unavailable');
         await expect(notice).toContainText('Only supported offline screens can be used');
-        await expect(notice.getByRole('link', { name: 'Open offline workspace' })).toHaveAttribute('href', '/dashboard');
+        await expect(notice.getByRole('link', { name: 'Open offline workspace' })).toBeHidden();
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
 
         await page.locator('[data-zazu-helper-toggle]').click();
@@ -3691,7 +3691,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const offlineResponse = await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         expect(offlineResponse?.ok()).toBe(true);
-        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await expect(page.locator('.zazu-page-title')).toHaveText('Offline workspace');
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
         await expect(page.locator('.zazu-dash-hero')).toBeHidden();
@@ -3752,7 +3752,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             ]) {
                 const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
                 expect(response?.ok(), path + ' must be available from the authenticated offline cache').toBe(true);
-                await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+                await expect(page.locator('.zazu-page-title')).toHaveText(heading);
                 await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
             }
 
@@ -4549,7 +4549,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         }, { quoteLocalId, jobLocalId, customerLocalId });
 
         await context.setOffline(true);
-        await page.getByRole('region', { name: 'Offline workspace' }).getByRole('link', { name: 'Quotes', exact: true }).click();
+        await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
+        const offlineWorkspace = page.locator('[data-zazu-offline-workspace]');
+        const quotesLink = offlineWorkspace.getByRole('link', { name: 'Quotes', exact: true });
+        await expect(quotesLink).toBeVisible();
+        await quotesLink.click();
         const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'LOCAL-QUOTE-ACCEPT-001' });
         await expect(quoteRow).toBeVisible();
         await quoteRow.getByRole('button', { name: 'View offline' }).click();
@@ -4624,7 +4628,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await coldLaunch.goto(new URL(workUrl, page.url()).href, { waitUntil: 'domcontentloaded' });
         // The service worker returns the cached dashboard shell for this navigation without rewriting the browser URL.
         await expect(coldLaunch).toHaveURL(new URL(workUrl, page.url()).href);
-        await expect(coldLaunch.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await expect(coldLaunch.locator('.zazu-page-title')).toHaveText('Jobs');
         await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeVisible();
 
     });
