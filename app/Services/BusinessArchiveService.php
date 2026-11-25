@@ -109,6 +109,58 @@ final class BusinessArchiveService
      * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      */
     /**
+     * Validate an archive without importing it or touching a business workspace.
+     *
+     * @param  null|callable(string):void  $onStage
+     * @return array{format_version:int,business_name:string,tables:int,records:int,files:int,uncompressed_bytes:int}
+     */
+    public function verify(string $archivePath, ?callable $onStage = null): array
+    {
+        $this->reportRestoreStage($onStage, 'archive_open');
+        $zip = new ZipArchive;
+        if ($zip->open($archivePath, ZipArchive::RDONLY) !== true) {
+            throw new RuntimeException('The uploaded file is not a valid Zazu business archive.');
+        }
+
+        $filePayloads = [];
+        try {
+            $this->reportRestoreStage($onStage, 'archive_envelope_validation');
+            [$manifest, $data, $definitions] = $this->readArchiveEnvelope($zip);
+
+            $this->reportRestoreStage($onStage, 'attachment_payload_staging');
+            $filePayloads = $this->files->readArchiveFilePayloads($zip, $manifest, $data);
+
+            $uncompressedBytes = 0;
+            for ($index = 0; $index < $zip->numFiles; $index++) {
+                $stat = $zip->statIndex($index);
+                if (! is_array($stat) || ! isset($stat['size'])) {
+                    throw new RuntimeException('The business archive contains an invalid ZIP entry.');
+                }
+
+                $uncompressedBytes += (int) $stat['size'];
+            }
+
+            $this->reportRestoreStage($onStage, 'verified');
+
+            return [
+                'format_version' => (int) $manifest['version'],
+                'business_name' => is_string($manifest['source_business']['name'] ?? null)
+                    ? $manifest['source_business']['name']
+                    : 'Unnamed business',
+                'tables' => count($definitions),
+                'records' => array_sum(array_map('count', $data)),
+                'files' => count($filePayloads),
+                'uncompressed_bytes' => $uncompressedBytes,
+            ];
+        } finally {
+            foreach ($filePayloads as $file) {
+                @unlink($file['staged_path']);
+            }
+            $zip->close();
+        }
+    }
+
+    /**
      * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      * @param  null|callable(string):void  $onStage
      */
