@@ -62,7 +62,7 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
         shell: bash
         run: |
-          mapfile -t php_files < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- '*.php')
+          mapfile -t php_files < <(git diff --name-only --diff-filter=ACMRT "$BASE_SHA" "$HEAD_SHA" -- '*.php')
           if [ "${#php_files[@]}" -eq 0 ]; then
             echo "No PHP files changed; incremental Pint gate has nothing to check."
             exit 0
