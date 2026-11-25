@@ -197,7 +197,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('inventory.index')", $dashboard);
         $this->assertStringContainsString("route('finance.index')", $dashboard);
         foreach (['customers', 'work', 'quotes', 'suppliers', 'purchasing', 'inventory', 'assets', 'finance'] as $tool) {
-            $this->assertStringContainsString("$workspaceTools['".$tool."']", $dashboard);
+            $this->assertStringContainsString('$workspaceTools[\''.$tool.'\']', $dashboard);
         }
         $this->assertStringNotContainsString('offlineWorkspacePermissions', $dashboard);
         $this->assertStringNotContainsString("@can('customers.view')", $dashboard);
