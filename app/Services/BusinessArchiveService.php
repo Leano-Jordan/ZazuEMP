@@ -31,7 +31,7 @@ final class BusinessArchiveService
      * Parent scope is used only for tables without their own business_id.
      * The order is also the dependency order used during restore.
      *
-     * @return array<string, array{scope:string,parent?:string,foreign?:array<string,string>}>
+     * @return array<string, array{scope:'business'|'parent',parent?:string,parent_key?:string}>
      */
     private function definitions(): array
     {
@@ -86,12 +86,13 @@ final class BusinessArchiveService
             $data = [];
             foreach ($this->definitions() as $table => $definition) {
                 $data[$table] = $this->rowsForBusiness($table, $definition, $business->id, $data);
-            if ($table === 'business_tax_profiles') {
-                foreach ($data[$table] as &$profileRow) {
-                    $profileRow['tcs_pin'] = null;
+
+                if ($table === 'business_tax_profiles') {
+                    foreach ($data[$table] as &$profileRow) {
+                        $profileRow['tcs_pin'] = null;
+                    }
+                    unset($profileRow);
                 }
-                unset($profileRow);
-            }
             }
 
             $files = $this->fileCollector->collectFiles($business, $data);
