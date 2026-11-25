@@ -3,6 +3,7 @@
 **Last reconciled:** 2026-11-25
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
+**Current repository HEAD:** `1c8ae5dbbc3aeaee3c51152ecb6d3324114c1804` (documentation/control-only commit after the latest application verification)
 **Latest runtime-verified application-source/test HEAD:** `f6a9b3c5fd6d09b14c42d469a504150402c40baa`
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
@@ -28,11 +29,11 @@ The current Laravel modular monolith, event/job-centred records, business isolat
 
 ## Latest verified automated evidence
 
-- Current main is 4c965833. The latest application-source/test change is f6a9b3c; the commits after that are workflow/documentation control updates.
+- Current main is `1c8ae5dbbc3aeaee3c51152ecb6d3324114c1804`. The latest runtime-verified application-source/test HEAD remains `f6a9b3c5fd6d09b14c42d469a504150402c40baa`; later commits update engineering controls and documentation, not application behaviour.
 - Laravel workflow 45651931394 on f6a9b3c: **761 passed, 1 skipped, 5,443 assertions**. All four jobs completed successfully: Laravel tests, coverage report, offline browser acceptance and PostgreSQL migration/recovery smoke.
 - Offline browser job 139338436940: **93 journeys passed**, no failed or skipped journeys reported. This closes the automated internal-navigation defect where CSS hid the offline workspace's own Customers/Jobs/Quotes navigation. It does not certify physical-device offline use.
 - Windows V1 package workflow 45651931423 on f6a9b3c: package build passed; encrypted and legacy business-archive checks passed; Windows PowerShell fresh-install/launcher check passed. Automated installation backup tests recovered SQLite and private media and verified empty-private-storage replacement. This is CI evidence, not the intended-PC owner recovery drill.
-- Zazu Quality 45653237320 and Director Contract Lint 45653237123 passed on current main 4c965833. Director Health 45652437455 passed on 41881d8, whose application source was unchanged from f6a9b3c.
+- Zazu Quality run `45654839986`, Director Contract Lint run `45654840121`, and Rosscore Director Health run `45654840115` all passed on current main `1c8ae5d`.
 - CodeQL / Push-on-main run 45653236491 on current main completed successfully across Actions, JavaScript/TypeScript and Python.
 - Psalm analysis executed successfully on 41881d8, but its separate SARIF publishing job failed. PHPMD analysis executed on f6a9b3c, but its SARIF upload failed. Treat these as scan execution plus publishing failures—not green published security results. SonarCloud remains skipped, not passed.
 - The Pint incremental format gate was corrected to exclude deleted PHP paths (`--diff-filter=ACMRT`) after cleanup exposed that defect; Zazu Quality now passes.
