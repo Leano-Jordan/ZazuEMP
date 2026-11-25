@@ -109,11 +109,7 @@ class BusinessExportController extends Controller
             'stage' => 'request_validation',
             'business_id' => (int) $business->id,
             'user_id' => (int) $request->user()->getAuthIdentifier(),
-            'content_length' => (int) $request->server('CONTENT_LENGTH', 0),
-            'upload_error' => $uploadedFile?->getError(),
-            'upload_bytes' => $uploadedFile?->getSize(),
-            'upload_max_filesize' => (string) ini_get('upload_max_filesize'),
-            'post_max_size' => (string) ini_get('post_max_size'),
+            ...$this->restoreDiagnostics($request),
             'error_fields' => array_keys($exception->errors()),
         ]);
 
@@ -175,7 +171,6 @@ class BusinessExportController extends Controller
             return $this->restoreRuntimeFailure(
                 $request,
                 $business,
-                $validated['archive']->getSize(),
                 $restoreStage,
                 $exception,
             );
@@ -241,7 +236,6 @@ class BusinessExportController extends Controller
     private function restoreRuntimeFailure(
         Request $request,
         Business $business,
-        int $uploadBytes,
         string $restoreStage,
         RuntimeException $exception,
     ): RedirectResponse {
@@ -251,8 +245,9 @@ class BusinessExportController extends Controller
             'stage' => $restoreStage,
             'business_id' => (int) $business->id,
             'user_id' => (int) $request->user()->getAuthIdentifier(),
-            'upload_bytes' => $uploadBytes,
+            ...$this->restoreDiagnostics($request),
             'exception_class' => $exception::class,
+            'exception_code' => (string) $exception->getCode(),
         ]);
 
         return back()->withErrors(['archive' => $exception->getMessage().' Reference: '.$incidentId]);
@@ -261,7 +256,6 @@ class BusinessExportController extends Controller
     private function restoreUnexpectedFailure(
         Request $request,
         Business $business,
-        int $uploadBytes,
         string $restoreStage,
         \Throwable $exception,
     ): RedirectResponse {
@@ -271,7 +265,7 @@ class BusinessExportController extends Controller
             'stage' => $restoreStage,
             'business_id' => (int) $business->id,
             'user_id' => (int) $request->user()->getAuthIdentifier(),
-            'upload_bytes' => $uploadBytes,
+            ...$this->restoreDiagnostics($request),
             'exception_class' => $exception::class,
             'exception_code' => (string) $exception->getCode(),
         ]);
@@ -284,7 +278,6 @@ class BusinessExportController extends Controller
     private function restoreJsonFailure(
         Request $request,
         Business $business,
-        int $uploadBytes,
         string $restoreStage,
         \JsonException $exception,
     ): RedirectResponse {
@@ -294,13 +287,44 @@ class BusinessExportController extends Controller
             'stage' => $restoreStage,
             'business_id' => (int) $business->id,
             'user_id' => (int) $request->user()->getAuthIdentifier(),
-            'upload_bytes' => $uploadBytes,
+            ...$this->restoreDiagnostics($request),
             'exception_class' => $exception::class,
         ]);
 
         return back()->withErrors([
             'archive' => 'The uploaded archive is damaged or contains invalid data. Reference: '.$incidentId,
         ]);
+    }
+
+    /**
+     * Safe runtime context for diagnosing archive restore failures.
+     * Never records the passphrase, uploaded path, archive contents or exception message.
+     *
+     * @return array<string,int|string|bool|null>
+     */
+    private function restoreDiagnostics(Request $request): array
+    {
+        $uploadedFile = $request->file('archive');
+        $temporaryPath = $uploadedFile?->getRealPath();
+        $temporaryDirectory = is_string($temporaryPath) ? dirname($temporaryPath) : sys_get_temp_dir();
+        $freeBytes = @disk_free_space($temporaryDirectory);
+
+        return [
+            'content_length' => (int) $request->server('CONTENT_LENGTH', 0),
+            'upload_error' => $uploadedFile?->getError(),
+            'upload_bytes' => $uploadedFile?->getSize(),
+            'upload_max_filesize' => (string) ini_get('upload_max_filesize'),
+            'post_max_size' => (string) ini_get('post_max_size'),
+            'memory_limit' => (string) ini_get('memory_limit'),
+            'max_execution_time' => (string) ini_get('max_execution_time'),
+            'max_input_time' => (string) ini_get('max_input_time'),
+            'memory_usage_bytes' => memory_get_usage(true),
+            'peak_memory_usage_bytes' => memory_get_peak_usage(true),
+            'temporary_directory_writable' => is_writable($temporaryDirectory),
+            'temporary_directory_free_bytes' => is_int($freeBytes) || is_float($freeBytes) ? (int) $freeBytes : null,
+            'zip_extension_loaded' => extension_loaded('zip'),
+            'sodium_extension_loaded' => extension_loaded('sodium'),
+        ];
     }
 
     public function download(

@@ -304,7 +304,12 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
                 fn (array $context): bool => $context['stage'] === 'archive_validation_and_restore'
                     && $context['business_id'] === (int) $target->id
                     && $context['exception_class'] === \Error::class
+                    && is_string($context['memory_limit'])
+                    && is_bool($context['zip_extension_loaded'])
+                    && is_bool($context['sodium_extension_loaded'])
+                    && is_bool($context['temporary_directory_writable'])
                     && ! array_key_exists('exception_message', $context)
+                    && ! array_key_exists('archive_password', $context)
             ));
             $error = session('errors')->getBag('default')->first('archive');
             $this->assertStringContainsString('Zazu could not complete this business archive restore.', $error);
