@@ -386,26 +386,31 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('delete form.dataset.zazuSubmitting;', $app);
     }
 
-    public function test_phone_pairing_is_discoverable_and_uses_the_eight_digit_contract(): void
+    public function test_phone_pairing_remains_owner_controlled_in_settings_not_on_the_dashboard(): void
     {
         $this->signInAsOwner();
-        $response = $this->get('/dashboard');
 
-        $response->assertOk()
-            ->assertSee('data-zazu-phone-pairing', false)
-            ->assertSee('data-zazu-phone-pairing-form', false)
-            ->assertSee('data-zazu-phone-pairing-code', false)
-            ->assertSee('maxlength="8"', false)
-            ->assertSee('Pair this phone');
+        $dashboard = $this->get('/dashboard');
+        $dashboard->assertOk()
+            ->assertDontSee('data-zazu-phone-pairing', false)
+            ->assertDontSee('Pair this phone');
 
-        $app = File::get(resource_path('js/app.js'));
+        $settings = $this->get('/settings');
+        $settings->assertOk()
+            ->assertSee('data-zazu-generate-pairing', false)
+            ->assertSee('data-zazu-pairing-result', false)
+            ->assertSee('Generate phone pairing code');
+
         $client = File::get(public_path('zazu-offline.js'));
+        $settingsView = File::get(resource_path('views/settings/index.blade.php'));
+        $app = File::get(resource_path('js/app.js'));
         $worker = File::get(public_path('sw.js'));
 
         $this->assertStringContainsString('if (!/^\\d{8}$/.test(normalizedCode))', $client);
         $this->assertStringContainsString('pairing_code: normalizedCode', $client);
         $this->assertStringNotContainsString('slice(0, 6)', $client);
-        $this->assertStringContainsString('data-zazu-phone-pairing-submit', $app);
+        $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
+        $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
         $this->assertStringContainsString('zazu-static-v61', $worker);
     }
