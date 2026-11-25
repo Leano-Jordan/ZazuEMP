@@ -148,6 +148,7 @@ final class BusinessArchiveService
      * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      * @param  null|callable(string):void  $onStage
      * @return array{tables:int,records:int,files:int}
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
