@@ -214,13 +214,16 @@ final class BusinessArchiveService
         // Version-1 archives created before invoice sequences were added contain
         // the previous complete table set. Keep those archives restorable.
         $legacyTables = array_values(array_diff(array_keys($definitions), ['invoice_number_sequences']));
-        if (is_array($data) && array_keys($data) === $legacyTables) {
+        $isLegacyDataset = is_array($data) && array_keys($data) === $legacyTables;
+        if ($isLegacyDataset) {
             $data = array_replace(array_fill_keys(array_keys($definitions), []), $data);
         }
 
         if (! is_array($data) || array_keys($data) !== array_keys($definitions)) {
             throw new RuntimeException('The archive does not contain the complete supported business dataset.');
         }
+
+        $this->assertArchiveTableCounts($manifest['tables'] ?? null, $data, $isLegacyDataset);
 
         foreach ($definitions as $table => $_definition) {
             $this->validateArchiveTableRows($table, $data[$table], (int) $manifest['source_business']['id']);
@@ -267,6 +270,37 @@ final class BusinessArchiveService
         }
 
         return $manifest;
+    }
+
+    private function assertArchiveTableCounts(mixed $declaredCounts, array $data, bool $isLegacyDataset): void
+    {
+        if (! is_array($declaredCounts)) {
+            throw new RuntimeException('The business archive table-count manifest is invalid.');
+        }
+
+        $expectedTables = array_keys($data);
+        $declaredTables = array_keys($declaredCounts);
+        $missingTables = array_diff($expectedTables, $declaredTables);
+        $extraTables = array_diff($declaredTables, $expectedTables);
+
+        if ($isLegacyDataset) {
+            // Older v1 archives predate invoice_number_sequences. That one
+            // omitted table is reconstructed as an empty array above.
+            $missingTables = array_diff($missingTables, ['invoice_number_sequences']);
+        }
+
+        if ($missingTables !== [] || $extraTables !== []) {
+            throw new RuntimeException('The business archive table-count manifest does not match its dataset.');
+        }
+
+        foreach ($data as $table => $rows) {
+            $declaredCount = $declaredCounts[$table]
+                ?? ($isLegacyDataset && $table === 'invoice_number_sequences' ? 0 : null);
+
+            if (! is_int($declaredCount) || $declaredCount < 0 || $declaredCount !== count($rows)) {
+                throw new RuntimeException('The business archive record counts do not match its manifest.');
+            }
+        }
     }
 
     private function validateArchiveTableRows(string $table, mixed $rows, int $sourceBusinessId): void

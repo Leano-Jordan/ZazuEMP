@@ -6,6 +6,8 @@ use App\Models\Business;
 use App\Models\Customer;
 use App\Services\BusinessArchiveEncryptionService;
 use App\Services\BusinessArchiveService;
+use RuntimeException;
+use ZipArchive;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -38,6 +40,53 @@ class BusinessArchiveVerifyCommandTest extends TestCase
                 ->expectsOutput('No business workspace or database records were changed.')
                 ->assertExitCode(0);
 
+            $this->assertSame($businessCount, Business::query()->count());
+            $this->assertSame($customerCount, Customer::query()->count());
+        } finally {
+            @unlink($archive);
+        }
+    }
+
+    public function test_archive_verification_rejects_manifest_record_count_mismatch_without_importing_data(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+
+        $business = $this->createBusiness('verify-count-mismatch');
+        Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Counted Customer',
+        ]);
+
+        $service = app(BusinessArchiveService::class);
+        $archive = $service->download($business);
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($archive) === true);
+
+        $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        $manifest['tables']['customers']++;
+        $this->assertTrue($zip->deleteName('manifest.json'));
+        $this->assertTrue($zip->addFromString('manifest.json', json_encode($manifest, JSON_THROW_ON_ERROR)));
+        $this->assertTrue($zip->close());
+
+        $businessCount = Business::query()->count();
+        $customerCount = Customer::query()->count();
+        $stages = [];
+
+        try {
+            try {
+                $service->verify($archive, static function (string $stage) use (&$stages): void {
+                    $stages[] = $stage;
+                });
+                $this->fail('An archive with a false table record count must be rejected.');
+            } catch (RuntimeException $exception) {
+                $this->assertSame(
+                    'The business archive record counts do not match its manifest.',
+                    $exception->getMessage()
+                );
+            }
+
+            $this->assertSame(['archive_open', 'archive_envelope_validation'], $stages);
             $this->assertSame($businessCount, Business::query()->count());
             $this->assertSame($customerCount, Customer::query()->count());
         } finally {
