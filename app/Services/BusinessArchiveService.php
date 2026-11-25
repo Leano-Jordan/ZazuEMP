@@ -13,6 +13,7 @@ use ZipArchive;
 /**
  * Versioned tenant archive coordinator. Its explicit table and FK allowlists
  * intentionally centralise fail-closed restore rules for the supported schema.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 final class BusinessArchiveService
@@ -20,11 +21,10 @@ final class BusinessArchiveService
     public function __construct(
         private readonly BusinessArchiveFileService $files,
         private readonly BusinessArchiveFileCollector $fileCollector
-    )
-    {
-    }
+    ) {}
 
     private const VERSION = 1;
+
     private const MAX_UNCOMPRESSED_BYTES = 262144000;
 
     /**
@@ -76,7 +76,7 @@ final class BusinessArchiveService
             throw new RuntimeException('Unable to create a temporary business archive.');
         }
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($archivePath, ZipArchive::OVERWRITE) !== true) {
             @unlink($archivePath);
             throw new RuntimeException('Unable to open the business archive.');
@@ -141,11 +141,11 @@ final class BusinessArchiveService
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     /**
-     * @param null|callable(array{tables:int,records:int,files:int}):void $afterRestore
+     * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      */
     public function restore(string $archivePath, Business $target, ?callable $afterRestore = null): array
     {
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($archivePath) !== true) {
             throw new RuntimeException('The uploaded file is not a valid Zazu business archive.');
         }
@@ -170,7 +170,6 @@ final class BusinessArchiveService
     /**
      * @return array{0:array,1:array,2:array}
      */
-
     private function readArchiveEnvelope(ZipArchive $zip): array
     {
         $this->assertArchiveZipEntries($zip);
@@ -259,7 +258,7 @@ final class BusinessArchiveService
         }
         $this->assertArchiveRecordBusiness($table, $row, $sourceBusinessId);
         $rawId = $row['id'] ?? null;
-        if (! is_int($rawId) && !(is_string($rawId) && ctype_digit($rawId))) {
+        if (! is_int($rawId) && ! (is_string($rawId) && ctype_digit($rawId))) {
             throw new RuntimeException('The archive contains an invalid record identifier in '.$table.'.');
         }
         $recordId = (int) $rawId;
@@ -276,7 +275,7 @@ final class BusinessArchiveService
             return;
         }
         $businessId = $row['business_id'];
-        if ((! is_int($businessId) && !(is_string($businessId) && ctype_digit($businessId)))
+        if ((! is_int($businessId) && ! (is_string($businessId) && ctype_digit($businessId)))
             || (int) $businessId !== $sourceBusinessId) {
             throw new RuntimeException('The archive contains a record outside its declared source business in '.$table.'.');
         }
@@ -356,7 +355,7 @@ final class BusinessArchiveService
         if ($oldForeignId === null) {
             return null;
         }
-        if (! is_int($oldForeignId) && !(is_string($oldForeignId) && ctype_digit($oldForeignId))) {
+        if (! is_int($oldForeignId) && ! (is_string($oldForeignId) && ctype_digit($oldForeignId))) {
             throw new RuntimeException("Restore stopped: invalid foreign key value in {$table}.{$column}.");
         }
         if ((int) $oldForeignId < 1) {
@@ -377,7 +376,7 @@ final class BusinessArchiveService
     }
 
     /**
-     * @param null|callable(array{tables:int,records:int,files:int}):void $afterRestore
+     * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      * @return array{tables:int,records:int,files:int}
      */
     private function restoreRows(
