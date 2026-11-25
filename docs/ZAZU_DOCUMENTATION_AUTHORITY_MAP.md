@@ -25,12 +25,12 @@ This map prevents agents from treating historical notes, old status snapshots or
 
 ### Current product/release views
 - `docs/ZAZU_V1_STATUS.md` — historical implementation checkpoints; current V1/release position is maintained in `.ai/engineering/STATE.md` and `docs/V1_RELEASE_CHECKLIST.md`.
-- `docs/ZAZU_V1_SCORECARD_2026-11-04.md` — current evidence-maturity score against the V1 specification; snapshot only, not release certification.
+- `docs/ZAZU_V1_SCORECARD_2026-11-04.md` — historical 2026-11-04 score snapshot (60/100); the current evidence-maturity baseline is maintained in `.ai/engineering/STATE.md`, not this dated document.
 - `docs/ZAZU_DEVELOPMENT_CHECKLIST.md` — current gate map.
 - `docs/ZAZU_2027_HARDENING_SCORECARD.md` — evidence maturity and future-scale separation.
 - `docs/ZAZU_COMMERCIAL_LEGAL_REGISTER.md` — current legal/commercial control register.
 - `docs/ZAZU_PRIVACY_BASELINE.md` — privacy/security engineering baseline
-- `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md` — current source security findings, hardening changes and verification boundary.
+- `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md` — historical source security findings, hardening changes and verification boundary; inspect current source and current security runs before asserting status.
 - `docs/V1_RELEASE_CHECKLIST.md` — canonical V1 release-gate ledger, including the 2026-11-04 recovery authority correction.
 
 ### Compatibility entry point

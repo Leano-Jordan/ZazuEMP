@@ -1,16 +1,17 @@
 # Zazu EMP — Commercial Completion Backlog
 
-**Status:** Active — first customer-document sharing increment in progress  
+**Status:** Supporting commercial backlog — last reconciled 2026-11-18; not a live release-status register  
 **Canonical repository:** `Leano-Jordan/ZazuEMP`  
-**Branch:** `main`  
+**Canonical branch:** `main` only  
 **Owner authority:** Founder  
-**Last recorded:** 2026-11-18
+**Current state:** `.ai/engineering/STATE.md` and `docs/V1_RELEASE_CHECKLIST.md`  
+**Last detailed workstream review:** 2026-11-18
 
 This backlog captures the commercial workstreams requested by the owner. Recording them does not mean they are implemented, approved for immediate execution, or release-complete. Keep them visible in future Director status reports and release planning until each item has implementation and acceptance evidence.
 
-## Current release priority
+## Release-priority authority
 
-DB-001 remains the active release blocker: repeated database read/write failures have occurred on the real Windows installation. The leading stale-schema hypothesis is not yet proven. Preserve the existing diagnostic-first approach; do not treat the commercial backlog as permission to bypass this investigation.
+This backlog does not set the current release priority. Follow `.ai/engineering/STATE.md` and `docs/V1_RELEASE_CHECKLIST.md` for current evidence and sequencing. **DB-001 is closed as a historical, unreproduced, non-critical test-time anomaly** under the current `AGENTS.md` / Director contract. Do not reopen it, request diagnostics or treat it as a release blocker without reproducible recurrence on current `main` or materially new evidence. The separate encrypted business-archive restore and installation-recovery gates remain independent and open.
 
 ## Deferred commercial workstreams
 
@@ -26,7 +27,7 @@ DB-001 remains the active release blocker: repeated database read/write failures
 
 ### COM-02 — Payment links and payment reconciliation
 
-**Provider research snapshot — 2026-11-18 (recommendation only; provider selection remains with the owner):** Paystack is the leading V1 candidate. Its backend transaction-initialize API returns a hosted checkout URL and unique reference; the transaction-verify endpoint can confirm the final state. Published South African fees are 2.9% + R1 for local card transactions and 2% for EFT, excluding VAT, with no setup or monthly fees. Its webhook notifications require a publicly reachable endpoint, so the local-first V1 should verify outstanding references from the local server when connectivity returns rather than depend on an always-online webhook receiver. [Paystack transaction API](https://paystack.com/docs/api/transaction/) · [Paystack SA pricing](https://paystack.com/za/pricing) · [Paystack webhook requirements](https://paystack.com/docs/payments/webhooks/)
+**Historical provider research snapshot — 2026-11-18 (not a current recommendation; revalidate fees, APIs, webhook rules and local availability before use; provider selection remains with the owner):** Paystack is the leading V1 candidate. Its backend transaction-initialize API returns a hosted checkout URL and unique reference; the transaction-verify endpoint can confirm the final state. Published South African fees are 2.9% + R1 for local card transactions and 2% for EFT, excluding VAT, with no setup or monthly fees. Its webhook notifications require a publicly reachable endpoint, so the local-first V1 should verify outstanding references from the local server when connectivity returns rather than depend on an always-online webhook receiver. [Paystack transaction API](https://paystack.com/docs/api/transaction/) · [Paystack SA pricing](https://paystack.com/za/pricing) · [Paystack webhook requirements](https://paystack.com/docs/payments/webhooks/)
 
 Peach Payments is the strongest alternative if native payment-link management is the priority: its Payment Links API can generate, cancel and query links; it supports signed HMAC-SHA256 webhooks with retries for up to 30 days. Published SA Growth pricing lists 2.95% + R1.50 for local cards and 1.50% + R1.50 for Pay by Bank/Capitec Pay, excluding VAT. [Peach Payment Links API](https://developer.peachpayments.com/docs/payment-links-api) · [Peach webhook security and retries](https://developer.peachpayments.com/docs/payment-links-webhooks) · [Peach SA fees](https://www.peachpayments.com/fees/?country=za)
 
