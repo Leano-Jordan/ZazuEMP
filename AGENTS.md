@@ -9,7 +9,7 @@
 
 ## Owner mission — read first
 
-Read `memory.md` first. Its opening **Owner V1 shipping mandate** is a binding instruction: ship a practical, dependable V1 for first businesses; close acceptance-passed gates at 5/5; avoid perfectionism, speculative blockers, scope creep and repeated engineering loops; offline V1 engineering is explicitly resumed; work across local persistence, service worker, attachments, sync and PWA installation is authorized where it closes agreed V1 gaps. This is the operating objective for every session.
+Read the binding product and release mandate in `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md`, then the live evidence register in `.ai/engineering/STATE.md`. Ship a practical, dependable V1 for first businesses; close acceptance-passed gates without perfectionism, speculative blockers, scope creep or repeated loops. Offline V1 engineering is active: improve local persistence, the service worker, attachments, sync and installation only where they close evidenced V1 gaps. `memory.md` is a short bootstrap pointer, not a second mandate or status ledger.
 
 ## Known incident disposition — DB-001
 
