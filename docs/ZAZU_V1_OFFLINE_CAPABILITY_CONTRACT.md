@@ -149,3 +149,12 @@ The exact-head CI at the source baseline is recorded separately in `.ai/engineer
 **Owner PC:** OPEN. Verify the installed Windows package with the host stopped/restarted and confirm the offline workspace and queued records survive application/browser restart. This is separate from the Windows CI packaging smoke.
 
 **Product promise:** do not market all-screen or fully standalone offline operation. Current supported capability is the bounded list above. Expand only after each action has durable local persistence, restart survival, safe sync/replay and device acceptance evidence.
+
+
+## Founder-observed offline route milestone — 2026-11-26
+
+The Founder confirmed that the Android phone, with the Zazu PC host OFF, now opens offline workspace pages and renders locally stored business data. The visible offline banner correctly reports server unavailability, device-local saved records and the supported-screen limitation. This supersedes the earlier owner-reported symptom of a frozen last-online Dashboard with multiple offline sections collapsed together.
+
+The current known UI gaps are missing Settings navigation and visual/layout refinement. Engineering must improve the existing offline workspace in place: restore appropriate supported navigation, render the correct route-specific content, and refine the existing UI without redesigning or replacing it. Preserve the banner's truthful capability wording.
+
+This milestone is a partial physical observation, not full offline acceptance. It does not establish airplane-mode cold launch, local mutation persistence, force-close/restart survival, attachment round-trip, or reconnect reconciliation. Do not ask the Founder to repeat the PC-off test or confirm again that pages and local data load. Request only a new, specific physical acceptance check when the remaining engineering work is ready.
