@@ -2,8 +2,8 @@
 
 **Last reconciled:** 2026-11-25
 **Repository:** Leano-Jordan/ZazuEMP
-**Current main HEAD:** 4c9658334c14b133420e5ad28663a111f33b2d7e
-**Latest application-source/test HEAD:** f6a9b3c5fd6d09b14c42d469a504150402c40baa
+**Canonical branch / write target:** `main` only
+**Latest runtime-verified application-source/test HEAD:** `f6a9b3c5fd6d09b14c42d469a504150402c40baa`
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 

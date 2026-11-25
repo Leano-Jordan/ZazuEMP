@@ -2,6 +2,8 @@
 
 ## 2026-11-25 — Repository cleanup, event-management identity and offline navigation correction
 
+- Consolidated the Director identity across the remaining active capability contracts and owner-communication rules; marked DEC-002 superseded and removed the obsolete Morpheus command hierarchy.
+- Superseded DB-001-first instructions in the development checklist, commercial backlog and 2027 hardening log; clarified that the SaaS architecture note is a future reference, not a hosting mandate. Retained dated material for traceability.
 - Removed retired Render/Docker deployment files, the Docker-only Hadolint workflow, unused `public/offline-attachments.js`, generated placeholder tests, an obsolete Claude handover, and the vendor-media workflow that fetched third-party images and auto-committed them.
 - Simplified `.ai/engineering/STATE.md` from roughly 331 KB to a concise live evidence register; retained detailed failure cases, decisions and dated audits as historical records.
 - Reconciled product definition across README, product specification, Composer metadata, manifest, app footer and Director mandate: Zazu is an event management platform, with service types as configurable capabilities rather than a catering-only category.
