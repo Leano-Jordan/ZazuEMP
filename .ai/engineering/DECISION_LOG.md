@@ -19,11 +19,11 @@ Durable decisions governing the Zazu engineering system.
 **Reason:** Prevent wrong-project contamination.  
 **Status:** ACTIVE
 
-## DEC-002 — Morpheus control plane
+## DEC-002 — Historical control-plane decision (superseded)
 **Date:** 2026-09-28  
-**Decision:** Morpheus/Jarvis owns state, sequencing, routing and acceptance. Specialists perform bounded work.  
-**Reason:** Prevent competing authorities and uncontrolled scope.  
-**Status:** ACTIVE
+**Historical decision:** Morpheus/Jarvis owned state, sequencing, routing and acceptance. Specialists performed bounded work.  
+**Reason at the time:** Prevent competing authorities and uncontrolled scope.  
+**Status:** SUPERSEDED by the consolidated single-role Director model in `.ai/engineering/README.md`, `.ai/engineering/00_DIRECTOR_ENGINE.md` and the Commercial V1 Mandate. The Zazu Engine Director (Jarvis) is the sole accountable role; Morpheus is retired as a separate identity.
 
 ## DEC-003 — State-driven delivery
 **Date:** 2026-09-28  
@@ -114,7 +114,7 @@ Durable decisions governing the Zazu engineering system.
 
 **Reason:** Preserve the current product's simplicity and local-first reliability while preventing future SaaS migration from requiring a rewrite of business rules or historical data.
 
-**Authority:** Director/Morpheus remains the single entry point. The detailed contract is docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md.
+**Authority:** Zazu Engine Director (Jarvis) is the single entry point. The detailed architecture reference is docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md.
 
 **Status:** ACTIVE
 
@@ -174,7 +174,7 @@ Working commercial hypotheses:
 
 **Date:** 2026-10-04
 
-**Decision:** Morpheus/Director shall act as the decision gate above the existing specialist engines. Before meaningful work is authorised, findings are classified, weighed by impact/evidence/urgency/effort, checked for modification churn, assigned an explicit scope decision and assessed for release impact.
+**Decision:** The Zazu Engine Director (Jarvis) acts as the decision gate above the existing specialist engines. Before meaningful work is authorised, findings are classified, weighed by impact/evidence/urgency/effort, checked for modification churn, assigned an explicit scope decision and assessed for release impact.
 
 **Scope rule:** Discovery may change priority without automatically changing the active sprint. New enhancements enter an active target only when required by the target, required by a newly discovered security/data-integrity/release risk, exchanged for comparable in-scope work, or explicitly authorised by the owner.
 

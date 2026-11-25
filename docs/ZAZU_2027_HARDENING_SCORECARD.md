@@ -1,3 +1,5 @@
+> **Authority correction (2026-11-25):** This file is a dated hardening evidence log, not an active sprint or release-priority register. Its old “Next active target: DB-001” instruction is superseded by DEC-028 and the current Director contract. DB-001 is closed as historical/unreproduced; do not investigate it again without current reproducible evidence. Use `.ai/engineering/STATE.md` for current priorities and `docs/V1_RELEASE_CHECKLIST.md` for release gates. The current formal evidence-maturity baseline is 71/100; dated 77/100 material below is historical only.
+
 ## Formal score supersession — 2026-11-23
 
 The earlier `77/100` figure in this historical hardening log is not the canonical 13-domain V1 score and was not independently recalculated under that method. For formal V1 reporting, use `docs/ZAZU_V1_SCORECARD_2026-11-04.md`: **71/100 (46/65)**, reaffirmed on 2026-11-23. The 2026-11-23 Director audit records the current owner evidence, new defects/fixes and release gates. V1 remains **NOT READY**.
@@ -13,7 +15,7 @@ The earlier `77/100` figure in this historical hardening log is not the canonica
 - Laravel **679 passed / 1 skipped / 4,671 assertions**; Zazu Quality, PHPMD, Psalm, PostgreSQL recovery, populated upgrade/rollback and Windows fresh-install acceptance passed. Windows PowerShell 5.1 backup-runner metadata test [44988789562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44988789562) passed.
 - **Score disposition: 77/100 unchanged.** This closes a meaningful backup-observability defect but does not replace the owner-PC off-disk and full restore drill. V1 remains **NOT READY**.
 
-**Next active target (one-target WIP limit): DB-001 owner-installation evidence.** Run the read-only schema check and inspect reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4` on the actual installed PC before any correction. Do not run migrations or alter the database. Populated commercial quote-to-profit proof is priority 2.
+**Historical next-target instruction — SUPERSEDED:** The DB-001 owner-installation evidence task was closed by DEC-028 and must not be resumed absent reproducible recurrence. Commercial quote-to-profit proof and recovery tasks must be sequenced from current `.ai/engineering/STATE.md`, not this dated log.
 
 ---
 

@@ -1,8 +1,8 @@
 # ZAZU EMP — SaaS-READINESS ARCHITECTURE CONTRACT
 
 **Date:** 2026-10-02  
-**Authority:** Director / Morpheus  
-**Status:** ACTIVE  
+**Authority:** Zazu Engine Director (Jarvis)  
+**Status:** FUTURE ARCHITECTURE REFERENCE — not a current deployment or hosting mandate  
 **Scope:** Commercial SaaS readiness of the existing Zazu core without prematurely converting V1 into a distributed system.
 
 ## 1. Purpose
@@ -25,7 +25,7 @@ Those are separate product/infrastructure decisions.
 
 ## 2. Director remains the entry point
 
-All SaaS-readiness work begins at Director/Morpheus.
+Any future SaaS-readiness work begins under the Zazu Engine Director (Jarvis), subject to an explicit Founder-approved product/deployment decision.
 
 The control path remains:
 

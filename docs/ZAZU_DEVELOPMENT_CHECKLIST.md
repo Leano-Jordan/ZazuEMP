@@ -1,6 +1,6 @@
 # Zazu EMP — Commercial Engineering Gate Map
 
-This document is the current execution map. Dated implementation records remain historical evidence.
+This is a supporting engineering checklist and historical gate map, not a live release-status register. Some dated sections retain old UNVERIFIED / IN PROGRESS labels for the state at that time. Current priorities and evidence live in `.ai/engineering/STATE.md`; V1 acceptance is controlled by `docs/V1_RELEASE_CHECKLIST.md`.
 
 ## Focused Director workflow audit — 2026-10-20
 
@@ -167,7 +167,7 @@ These items are deliberately **later priorities**, not current release blockers 
 
 Do not work down this list mechanically.
 
-Morpheus selects the next target based on:
+The Zazu Engine Director (Jarvis) selects the next target based on:
 1. release risk;
 2. dependency order;
 3. evidence available;
