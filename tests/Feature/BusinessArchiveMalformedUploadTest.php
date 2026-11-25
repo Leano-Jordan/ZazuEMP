@@ -5,9 +5,9 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class BusinessArchiveMalformedUploadTest extends TestCase
@@ -19,7 +19,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         $this->signInAsOwner();
         $business = auth()->user()->businesses()->firstOrFail();
         $archivePath = tempnam(sys_get_temp_dir(), 'zazu-invalid-archive-');
-        $zip = new \ZipArchive();
+        $zip = new \ZipArchive;
         $this->assertTrue($zip->open($archivePath, \ZipArchive::OVERWRITE) === true);
         $zip->addFromString('manifest.json', '{invalid json');
         $zip->addFromString('data.json', '{}');
@@ -71,7 +71,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         $target->users()->attach(auth()->id(), ['role' => 'owner']);
 
         $archivePath = app(BusinessArchiveService::class)->download($source);
-        $zip = new \ZipArchive();
+        $zip = new \ZipArchive;
         $this->assertTrue($zip->open($archivePath) === true);
         $zip->addFromString('untrusted/readme.txt', 'This entry is not part of the Zazu archive contract.');
         $zip->close();
