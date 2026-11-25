@@ -8,11 +8,11 @@ use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
- * Collects tenant-owned files and packages their bytes for a business archive.
+ * Resolves tenant-owned file sources and builds business-archive file references.
  */
 final class BusinessArchiveFileCollector
 {
-    public function collectFiles(Business $business, array &$data): array
+    public function collectFiles(Business $business, array $data): array
     {
         $references = [];
         $this->collectBusinessImages($business, $references);

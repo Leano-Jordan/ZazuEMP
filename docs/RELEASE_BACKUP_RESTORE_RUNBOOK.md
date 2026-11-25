@@ -35,7 +35,7 @@ The owner-operated backup and full restore drill on the intended PC remains mand
 Before attempting a restore, the owner can validate an exported archive without importing records:
 
 ```powershell
-php artisan zazu:verify-business-archive "C:\\path\\to\\business.zazu"
+php artisan zazu:verify-business-archive "C:/path/to/business.zazu"
 ```
 
 For encrypted archives the command prompts for the passphrase without echoing it; do not pass the passphrase as a command-line option. It reports the failing stage (format detection, decryption, ZIP open, envelope/record validation or attachment payload staging), then removes decrypted and staged temporary files. A successful result proves the archive can be decrypted, parsed and its declared file payloads staged under the current installation's limits. It does **not** prove that a target workspace restore or database transaction will succeed. The command never creates, replaces or imports business records and is not a substitute for the controlled restore drill.
