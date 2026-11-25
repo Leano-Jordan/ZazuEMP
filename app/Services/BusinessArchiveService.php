@@ -108,8 +108,13 @@ final class BusinessArchiveService
     /**
      * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      */
-    public function restore(string $archivePath, Business $target, ?callable $afterRestore = null): array
-    {
+    public function restore(
+        string $archivePath,
+        Business $target,
+        ?callable $afterRestore = null,
+        ?callable $onStage = null
+    ): array {
+        $this->reportRestoreStage($onStage, 'archive_open');
         $zip = new ZipArchive;
         if ($zip->open($archivePath) !== true) {
             throw new RuntimeException('The uploaded file is not a valid Zazu business archive.');
@@ -117,7 +122,10 @@ final class BusinessArchiveService
 
         $filePayloads = [];
         try {
+            $this->reportRestoreStage($onStage, 'archive_envelope_validation');
             [$manifest, $data, $definitions] = $this->readArchiveEnvelope($zip);
+
+            $this->reportRestoreStage($onStage, 'attachment_payload_staging');
             $filePayloads = $this->files->readArchiveFilePayloads($zip, $manifest, $data);
 
             return $this->restoreRows(
@@ -126,7 +134,8 @@ final class BusinessArchiveService
                 $data,
                 $filePayloads,
                 $manifest['source_business'],
-                $afterRestore
+                $afterRestore,
+                $onStage
             );
         } finally {
             foreach ($filePayloads as $file) {
@@ -347,6 +356,7 @@ final class BusinessArchiveService
 
     /**
      * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
+     * @param  null|callable(string):void  $onStage
      * @return array{tables:int,records:int,files:int}
      */
     private function restoreRows(
@@ -355,7 +365,8 @@ final class BusinessArchiveService
         array $data,
         array $filePayloads,
         array $sourceProfile,
-        ?callable $afterRestore = null
+        ?callable $afterRestore = null,
+        ?callable $onStage = null
     ): array {
         $idMaps = [];
         $createdFiles = [];
@@ -363,17 +374,28 @@ final class BusinessArchiveService
         $result = ['tables' => count($definitions), 'records' => 0, 'files' => count($filePayloads)];
 
         try {
-            DB::transaction(function () use ($target, $definitions, $data, $filePayloads, $sourceProfile, $afterRestore, &$idMaps, &$createdFiles, &$records, &$result): void {
+            DB::transaction(function () use ($target, $definitions, $data, $filePayloads, $sourceProfile, $afterRestore, $onStage, &$idMaps, &$createdFiles, &$records, &$result): void {
                 DB::table('businesses')->where('id', $target->id)->lockForUpdate()->first();
+
+                $this->reportRestoreStage($onStage, 'target_workspace_validation');
                 $this->assertTargetIsEmpty($target, $definitions);
+
+                $this->reportRestoreStage($onStage, 'database_records');
                 $this->restoreArchiveTables($target, $definitions, $data, $idMaps, $records);
+
+                $this->reportRestoreStage($onStage, 'attachment_storage');
                 $this->restoreArchiveFiles($target, $filePayloads, $idMaps, $createdFiles);
+
+                $this->reportRestoreStage($onStage, 'business_profile');
                 $this->restoreBusinessProfile($target, $sourceProfile);
 
                 $result['records'] = $records;
                 if ($afterRestore !== null) {
+                    $this->reportRestoreStage($onStage, 'restore_audit_write');
                     $afterRestore($result);
                 }
+
+                $this->reportRestoreStage($onStage, 'database_transaction_commit');
             });
 
             return $result;
@@ -381,6 +403,13 @@ final class BusinessArchiveService
             $this->cleanupRestoredFiles($createdFiles, (int) $target->id);
 
             throw $exception;
+        }
+    }
+
+    private function reportRestoreStage(?callable $onStage, string $stage): void
+    {
+        if ($onStage !== null) {
+            $onStage($stage);
         }
     }
 

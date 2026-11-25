@@ -301,7 +301,7 @@ class BusinessArchiveEncryptionFlowTest extends TestCase
             $response->assertRedirect();
             $response->assertSessionHasErrors('archive');
             Log::shouldHaveReceived('error')->once()->with('Business archive restore failed unexpectedly.', \Mockery::on(
-                fn (array $context): bool => $context['stage'] === 'archive_validation_and_restore'
+                fn (array $context): bool => $context['stage'] === 'attachment_storage'
                     && $context['business_id'] === (int) $target->id
                     && $context['exception_class'] === \Error::class
                     && is_string($context['memory_limit'])

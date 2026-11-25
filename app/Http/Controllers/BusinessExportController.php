@@ -164,6 +164,9 @@ class BusinessExportController extends Controller
                         'files' => $result['files'],
                         'encrypted' => $encrypted,
                     ], (int) $business->id);
+                },
+                static function (string $stage) use (&$restoreStage): void {
+                    $restoreStage = $stage;
                 }
             );
         } catch (RuntimeException $exception) {
