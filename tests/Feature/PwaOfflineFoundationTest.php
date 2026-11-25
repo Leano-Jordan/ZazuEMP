@@ -221,6 +221,18 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-content > :not([data-zazu-offline-workspace])', $app);
     }
 
+    public function test_offline_workspace_navigation_remains_available_in_offline_mode(): void
+    {
+        $styles = File::get(resource_path('css/app.css'));
+
+        $this->assertStringNotContainsString(
+            '.zazu-offline-mode [aria-label="Offline workspace navigation"]',
+            $styles
+        );
+        $this->assertStringContainsString('.zazu-offline-mode .zazu-command-search', $styles);
+        $this->assertStringContainsString('.zazu-offline-mode .zazu-section-tabs', $styles);
+    }
+
     public function test_insecure_network_origins_explain_the_offline_installation_requirement(): void
     {
         $app = File::get(resource_path('js/app.js'));

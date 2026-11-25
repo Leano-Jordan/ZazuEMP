@@ -198,7 +198,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(1);
         await expect(workspace.locator('[data-zazu-offline-view="overview"]')).toBeVisible();
         await expect(workspace.locator('[data-zazu-offline-overview-count="records"]')).toHaveText(/\d+/);
-        await expect(workspace.locator('[aria-label="Offline workspace navigation"]')).toBeHidden();
+        const offlineNavigation = workspace.locator('[aria-label="Offline workspace navigation"]');
+        await expect(offlineNavigation).toBeVisible();
+        await expect(offlineNavigation.getByRole('link', { name: 'Open customers' })).toBeVisible();
+        await expect(offlineNavigation.getByRole('link', { name: 'Open work' })).toBeVisible();
+        await expect(offlineNavigation.getByRole('link', { name: 'Quotes', exact: true })).toBeVisible();
         await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
         await expect(page.locator('.zazu-page-title')).toHaveText('Offline workspace');
         await expect(page.locator('.zazu-command-search')).toBeHidden();

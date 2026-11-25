@@ -8735,7 +8735,6 @@ body.zazu-has-wallpaper .zazu-content {
 
 
 /* Offline mode is a deliberate workspace state, not an online dashboard overlay. */
-.zazu-offline-mode [aria-label="Offline workspace navigation"],
 .zazu-offline-mode .zazu-command-search,
 .zazu-offline-mode .zazu-section-tabs {
     display: none !important;
