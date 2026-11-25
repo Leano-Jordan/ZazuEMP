@@ -9,7 +9,7 @@ on:
       - 'bootstrap/**'
       - 'config/**'
       - 'database/**'
-      - 'docker/**'
+      - 'Dockerfile'
       - 'public/**'
       - 'resources/**'
       - 'routes/**'

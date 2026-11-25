@@ -5,13 +5,15 @@
 
 ## 1. Product Definition
 
-Zazu EMP is a business operations platform for event and catering businesses, managing the lifecycle from:
+Zazu EMP is an **event management platform** for planning, coordinating and carrying out events across different formats and scales. It is not catering software. The event is the central operational record; customers and participants, requirements, services, people, equipment, suppliers, schedules, documents and financial activity connect around that event.
 
-**Client → Event → Planning → Work → Resources → Purchasing → Costs → Finance → Completion**
+The intended event lifecycle is:
 
-Zazu replaces fragmented spreadsheets, paper processes and disconnected tools with one coherent operational system.
+**Client / Organiser → Event → Requirements & Plan → Services & Resources → Quote & Approval → Preparation & Coordination → Delivery → Payments & Actual Costs → Closeout**
 
-The product must remain practical for small businesses while supporting increasingly structured operations.
+A business configures the service capabilities it provides—such as catering, venue support, equipment hire, sound/AV, décor, baking, rentals or photography. These are examples of service capabilities, not the product category, a fixed event taxonomy or a limit on the events Zazu is intended to support. The long-term product direction is broad event management; V1 claims must stay within the workflows actually implemented and accepted.
+
+Zazu replaces fragmented spreadsheets, paper processes and disconnected tools with one coherent event-centred operational system. It must remain practical for small operators while supporting increasingly structured event delivery.
 
 ## 2. Product Principles
 
@@ -35,12 +37,14 @@ Zazu should guide users without constantly interrupting them.
 
 ## 3. Primary Users
 
-Zazu primarily serves:
-- Event management businesses
-- Catering businesses
-- Event service businesses
-- Food/event production businesses
-- Small and growing event businesses
+Zazu is designed for people and businesses responsible for planning or delivering events, including:
+- Independent event planners, organisers and coordinators
+- Event operations and production businesses
+- Venue and event-service operators
+- Businesses providing event services such as catering, equipment hire, sound/AV, décor, rentals, baking and photography
+- Small and growing operators coordinating multiple services for one event
+
+The initial commercial V1 is focused on owner-led event and event-service operators. This launch focus does not redefine Zazu as catering software.
 
 ## 4. Three Workspace Tiers and Experience Levels
 
@@ -368,7 +372,7 @@ The following are not automatic V1 requirements:
 - Large-scale third-party integrations
 - Advanced AI forecasting
 - Fully mature analytics/BI
-- Every conceivable catering workflow
+- Every conceivable specialist service workflow or every possible event format
 - Unlimited UI customisation
 - Enterprise-scale multi-company complexity unless required by the architecture
 
@@ -377,7 +381,7 @@ These remain potential post-V1 expansion.
 ## 21. V1 Finish Line
 
 V1 is ready when:
-- The core event/catering business lifecycle works coherently end-to-end.
+- The accepted V1 event lifecycle works coherently end-to-end across its supported capabilities.
 - The application feels like one professional product.
 - Basic users are not overwhelmed.
 - Advanced users can access necessary operational depth.
@@ -423,7 +427,7 @@ Every proposed feature should be classified as:
 
 ## 24. Product North Star
 
-Zazu should make running an event and catering business feel:
+Zazu should make planning and carrying out an event feel:
 
 **Clearer. More controlled. More connected. Less administrative. Less fragmented.**
 
