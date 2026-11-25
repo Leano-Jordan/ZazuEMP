@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-25 — Dashboard pairing prompt removal and offline acceptance corrections
+
+- Removed the unsolicited 8-digit **Pair this phone** field from the shared app shell so it no longer appears on the Dashboard. The owner-side Phone sync controls and server-side pairing authorization remain unchanged; pairing is not being reopened as a V1 scope item.
+- Removed the app-shell-only prompt handler and updated the feature contract to prevent the field from silently returning.
+- Corrected offline browser expectations to match the real route-specific screen: the offline Dashboard is titled **Offline workspace**, a cached Work detail URL resolves to the Jobs offline view, and the outage notice does not show a redundant Dashboard link when already on Dashboard.
+- Scoped the Customers heading assertion to the page title, avoiding collision with the Customers collection heading.
+- Made quote acceptance wait for the actual offline transition and visible Quotes navigation before clicking.
+- Exact-head CI is pending. These test-contract corrections do not certify physical Android offline acceptance.
+
 ## 2026-11-23 — Encrypted business archive V2
 
 - Added owner passphrase-protected business archive export and restore using streaming Sodium secretstream XChaCha20-Poly1305 with Argon2id key derivation.
