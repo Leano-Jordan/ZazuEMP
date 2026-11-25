@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\BusinessArchiveEncryptionService;
+use App\Services\BusinessArchiveEncryptionStream;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Tests\TestCase;
@@ -85,7 +86,7 @@ class BusinessArchiveEncryptionServiceTest extends TestCase
         try {
             $encrypted = $service->encryptFile($source, 'correct horse battery staple');
             $bytes = file_get_contents($encrypted);
-            $headerBytes = strlen(\App\Services\BusinessArchiveEncryptionStream::MAGIC)
+            $headerBytes = strlen(BusinessArchiveEncryptionStream::MAGIC)
                 + SODIUM_CRYPTO_PWHASH_SALTBYTES
                 + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES;
             file_put_contents($encrypted, substr((string) $bytes, 0, $headerBytes + 2));
@@ -132,5 +133,4 @@ class BusinessArchiveEncryptionServiceTest extends TestCase
             );
         }
     }
-
 }
