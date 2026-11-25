@@ -102,7 +102,6 @@ class BusinessExportController extends Controller
         ValidationException $exception,
     ): RedirectResponse {
         $incidentId = (string) Str::uuid();
-        $uploadedFile = $request->file('archive');
 
         Log::warning('Business archive restore request rejected before processing.', [
             'incident_id' => $incidentId,
@@ -306,13 +305,15 @@ class BusinessExportController extends Controller
     {
         $uploadedFile = $request->file('archive');
         $temporaryPath = $uploadedFile?->getRealPath();
-        $temporaryDirectory = is_string($temporaryPath) ? dirname($temporaryPath) : sys_get_temp_dir();
+        $temporaryDirectory = is_string($temporaryPath) && $temporaryPath !== '' ? dirname($temporaryPath) : sys_get_temp_dir();
         $freeBytes = @disk_free_space($temporaryDirectory);
+        $uploadBytes = $uploadedFile?->getSize();
 
         return [
             'content_length' => (int) $request->server('CONTENT_LENGTH', 0),
             'upload_error' => $uploadedFile?->getError(),
-            'upload_bytes' => $uploadedFile?->getSize(),
+            'upload_bytes' => is_int($uploadBytes) ? $uploadBytes : null,
+            'upload_file_readable' => is_string($temporaryPath) && is_readable($temporaryPath),
             'upload_max_filesize' => (string) ini_get('upload_max_filesize'),
             'post_max_size' => (string) ini_get('post_max_size'),
             'memory_limit' => (string) ini_get('memory_limit'),
