@@ -108,6 +108,10 @@ final class BusinessArchiveService
     /**
      * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
      */
+    /**
+     * @param  null|callable(array{tables:int,records:int,files:int}):void  $afterRestore
+     * @param  null|callable(string):void  $onStage
+     */
     public function restore(
         string $archivePath,
         Business $target,

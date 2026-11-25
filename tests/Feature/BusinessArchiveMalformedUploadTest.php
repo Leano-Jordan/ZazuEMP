@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
@@ -30,10 +31,19 @@ class BusinessArchiveMalformedUploadTest extends TestCase
                 (string) file_get_contents($archivePath)
             );
 
+            Log::spy();
             $response = $this->post(route('exports.archive.restore'), ['archive' => $upload]);
 
             $response->assertRedirect();
             $response->assertSessionHasErrors('archive');
+            Log::shouldHaveReceived('warning')->once()->with(
+                'Business archive restore failed while decoding archive data.',
+                \Mockery::on(fn (array $context): bool => $context['stage'] === 'archive_envelope_validation'
+                    && $context['business_id'] === (int) $business->id
+                    && is_string($context['memory_limit'])
+                    && ! array_key_exists('archive_password', $context)
+                    && ! array_key_exists('exception_message', $context))
+            );
             $error = session('errors')->first('archive');
             $this->assertStringStartsWith('The uploaded archive is damaged or contains invalid data.', $error);
             $this->assertStringContainsString('Reference: ', $error);
