@@ -1,3 +1,5 @@
+> **Authority notice (2026-11-25):** This file is retained as historical implementation evidence. It is not a live status register. For current source/CI evidence, open [`.ai/engineering/STATE.md`](../.ai/engineering/STATE.md); for ordered product scope and release policy, open [`ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md`](ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md).
+
 ## Director recovery integrity review — 2026-11-23
 
 - Identified that installation backup/restore staging had been created directly under `storage/app`, where default POSIX modes and inherited Windows permissions could expose temporary database dumps and private files.

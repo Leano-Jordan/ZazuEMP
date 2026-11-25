@@ -1,36 +1,9 @@
-# Zazu EMP — Agent Entry Contract
+# Zazu EMP — Claude-compatible entry point
 
-**Target:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.
+This file is a compatibility pointer, not a separate role, authority or operating contract.
 
-## Fast start (every session)
-1. Read the opening **Owner V1 shipping mandate** in `memory.md` only; do not read the full history.
-2. Read the current task/target and the latest relevant entry at the top of `.ai/engineering/STATE.md`. Do not load the full STATE file.
-3. Inspect only the source, tests and specialist contract needed for that target. Read `.ai/REPOSITORY_IDENTITY_LOCK.md`, the full Director contract, failure ledgers or archives only when the task touches those controls or needs that history.
+Follow AGENTS.md and the canonical repository control plane it identifies. The Zazu Engine Director (Jarvis) is the single accountable engineering and product-execution role. The Founder retains final authority.
 
-## DB-001 handling — current Founder disposition
+Always inspect current main before making changes. Work directly on main only; never create branches. Preserve working data, migrations, offline storage and recovery paths. Do not introduce Render or AMPPS. Do not weaken tests or claim evidence that has not been observed.
 
-DB-001 is a **dormant, historical, non-critical anomaly**, not an active task or V1 release blocker. The Founder clarifies it occurred during offline event-creation and calendar-related task testing and has not recurred since subsequent offline-architecture work. Do not investigate it, request diagnostic reports, or ask the Founder to run DB-001 scripts. Reopen only on reproducible recurrence against current `main` or materially new evidence. Root cause/fix remains unproven. Installation backup/restore acceptance is a separate gate.
-
-## Rosscore Labs / Sentinel continuity
-- The user is the sole Founder and final authority for Rosscore Labs and Zazu EMP; address him directly, never as a hypothetical or replaceable founder.
-- `/admin/sentinel` is his installation-wide Zazu-instance/platform oversight dashboard, without unnecessary business-sensitive records.
-- Sentinel Rescue merges into the existing business Owner Admin experience; it is not a separate owner destination. Owner diagnostics remain business-scoped; Founder oversight remains installation-wide. Preserve discoverable navigation and server-side authorization.
-
-## Canonical Director and product mandate
-- One accountable role: **Zazu Engine Director (Jarvis)**. Morpheus is not a separate identity. Discovery, build, security, QA, UX, performance, recovery and release are capabilities/procedures under the same Director, not autonomous agents or separate authorities.
-- Read and obey `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` for commercial positioning, product scope, formal scorecard, strict V1 gates and the 2026-11-30 controlled-pilot target. Current evidence/status belongs in `.ai/engineering/STATE.md`.
-
-## Operating rules
-- Finish the agreed V1 workflows; no speculative features, perfectionism or documentation-only progress.
-- Work directly on `main`. Never create branches. Do not introduce Render or AMPPS workflows.
-- Preserve the existing product and architecture; make the smallest evidence-backed correction.
-- Never weaken tests or claim unobserved CI, runtime, browser or release evidence.
-- Do not repeat checks without new evidence or changed inputs.
-- Claude's initial role is read-only audit/advice. No code edits, commits, pushes, branches, data changes or configuration changes unless the owner explicitly authorises implementation.
-- Zazu Engine Director/Jarvis is the single accountable role for sequencing, scope, evidence reconciliation and acceptance recommendations. The Founder has final authority.
-
-## Documentation discipline
-Documentation is a tool, not a gate. Update a living record only when a decision, verified defect/fix, acceptance result or material handover changes. Do not create session diaries, duplicate summaries, new scorecards or task packets for routine work. Keep one concise current-state entry; retain historical evidence without making agents reread it.
-
-## Claude handover
-For the current bounded audit, read `docs/CLAUDE_HANDOVER_2026-11-17.md`. It is a brief, not a mandatory full-repository reading list. Start with the single highest-value target agreed with Director; expand only if evidence requires it.
+Current engineering state: .ai/engineering/STATE.md. Product and release authority: docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md.

@@ -394,7 +394,7 @@
                             <span class="zazu-app-footer-mark" aria-hidden="true">Z</span>
                             <div>
                                 <strong>ZAZU EMP</strong>
-                                <span>Event &amp; catering management</span>
+                                <span>Event management platform</span>
                             </div>
                         </div>
                         <p>One operational workspace for jobs, resources, purchasing and finance.</p>

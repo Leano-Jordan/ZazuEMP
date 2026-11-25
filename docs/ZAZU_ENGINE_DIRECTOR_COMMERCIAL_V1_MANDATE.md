@@ -21,7 +21,7 @@ There is one accountable engineering and product-execution role: **Zazu Engine D
 
 ## 2. Mission and measurable outcome
 
-Deliver a dependable, commercially understandable Zazu V1 for first real businesses. The product is an event and service-business operations platform, initially focused on owner-operated event/catering businesses and adjacent operators combining services, rentals or equipment.
+Deliver a dependable, commercially understandable Zazu V1 for first real businesses. Zazu is an event management platform for planning, coordinating and carrying out events across different formats—not catering software. The event is the centre of the operating model; customer, requirements, service providers, resources, quotes, purchasing, preparation, delivery, documents, payments, actual costs and outcomes connect around it. Configurable business capabilities may represent catering, equipment hire, sound/AV, décor, baking, rentals, photography and other event services. Those service categories are use cases, not the product's identity or limit. The strategic product direction is broad event management; V1 claims must remain limited to the workflows and capability depth actually implemented and accepted.
 
 The V1 value proposition:
 
@@ -32,6 +32,8 @@ Zazu must connect the operational and financial lifecycle:
 `Business → Customer → Job/Event → Requirements → Quote → Acceptance → Invoice/Deposit → Purchasing/Preparation → Delivery/Completion → Payments → Actual Costs → Profit`
 
 The release objective is not feature-count growth. It is proof that a real operator can install, understand, use, recover and trust the supported product workflows.
+
+**Category boundary:** Zazu is not a catering product with extra modules. It is an event management platform. Business/service categories are configurable operating capabilities around a shared event lifecycle; they must never become the product identity, a hard-coded event-type boundary or a separate data model. The phrase “any event” expresses product direction, not a claim that every specialist event workflow is already shipped.
 
 ## 3. Product strategy — what to preserve, improve and defer
 
@@ -63,7 +65,7 @@ Do not turn a bounded V1 target into a redesign or rewrite. Preserve existing ar
 
 ## 4. Commercial position and competitive discipline
 
-Zazu competes in the event/catering and small service-business operations market. The relevant comparison set includes EventSync (closest South African operational competitor), CaterZen (catering workflow specialist) and HoneyBook (client journey/proposal/payment experience benchmark).
+Zazu competes in the event-management and event-operations market. Benchmark across event planning/coordination platforms, event-service operations tools and client workflow products. The current comparison set includes EventSync (South African event operations), CaterZen (catering workflow specialist) and HoneyBook (client journey/proposal/payment experience). CaterZen is one specialist reference—not a definition of Zazu's category. Recheck current official capabilities before making comparative claims.
 
 These are reference competitors, not templates to copy. Published capability comparisons and directional scores in dated research are hypotheses until rechecked against current official product documentation and hands-on trials. Never present inferred competitor limitations as verified absences.
 

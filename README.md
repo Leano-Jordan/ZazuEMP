@@ -1,6 +1,10 @@
 # Zazu – Event Management Platform (Zazu EMP)
 
-Zazu EMP is a proprietary event-management platform for small businesses operating across catering and event-related services, including catering, tents/chairs, sound/DJ, baking/cookies, decor, rentals, photography, camera hire and combinations of these services.
+Zazu EMP is an event management platform for planning, coordinating and delivering events across different formats and sizes. It connects event and customer records, requirements, service options, quotes, purchasing and preparation, invoices and payments, resources, attachments, costs and reporting in one operational workspace. Operators may configure capabilities for services such as catering, equipment hire, sound/AV, décor, baking, rentals and photography. Those are supported business use cases—not the product category or a limit on the kinds of events Zazu is intended to manage. Zazu is event management software, not catering software. The currently shipped workflows remain bounded by the capabilities documented in the V1 scope.
+
+## Product scope
+
+Zazu is built around the event—not around one type of supplier. It is intended to help plan, coordinate and carry out different event types through one connected event lifecycle. Service categories are configurable capabilities; they do not define or restrict the product category. Current shipping capability claims remain limited to the V1 workflows that have passed acceptance.
 
 ## Windows installation candidate
 

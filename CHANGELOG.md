@@ -6,7 +6,7 @@
 - Kept phone pairing owner-controlled in Settings → Phone sync; the eight-digit code contract and server authorization were not removed.
 - Reused the Dashboard controller's business-scoped permission snapshot for the offline workspace navigation.
 - Corrected offline browser/feature-test contracts for the Jobs title and Settings-only pairing controls.
-- Exact-head verification on `95975c61215373b5796e1adcdfddd70370fc91b5`: Zazu Quality, Hadolint, PHPMD and Director Health passed; Laravel/browser, PostgreSQL and Windows package were still running at the last check. Physical Android acceptance remains open.
+- Exact-source result on `95975c61215373b5796e1adcdfddd70370fc91b5`: Zazu Quality, Hadolint, PHPMD, Director Health, PostgreSQL migration/recovery smoke and Windows V1 package/fresh install passed. Laravel reported 762 passed / 1 skipped / 5,445 assertions but offline browser acceptance failed on missing Customers and Quotes navigation links. SonarCloud was skipped. The subsequent docs-only main commit `52f81df` passed Zazu Quality and Hadolint; this does not close the application browser failure or physical Android acceptance.
 
 ## 2026-11-25 — Dashboard pairing prompt removal and offline acceptance corrections
 
@@ -25,7 +25,6 @@
 - Kept installation-wide scheduled backups unattended and unencrypted; documented encrypted off-disk storage as an operator requirement. The runner verifies SHA-256 copy integrity but does not encrypt or attest secondary destination encryption.
 - Added multi-chunk, wrong-passphrase, tamper, legacy compatibility and controller flow regression coverage.
 
-## 2026-11-21 — Offline sync authorization and recovery hardening
 ## 2026-11-21 — Offline sync authorization and recovery hardening
 
 - The installed offline runtime now checks the Zazu host while Wi-Fi remains connected, surfaces a non-destructive outage notice and links to the cached local workspace.

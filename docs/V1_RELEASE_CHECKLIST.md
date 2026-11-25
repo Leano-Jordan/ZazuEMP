@@ -1,3 +1,5 @@
+> **Current acceptance authority (2026-11-25):** V1 is **NOT READY**. The live engineering status is [`.ai/engineering/STATE.md`](../.ai/engineering/STATE.md); the binding scope and release order are in [`ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md`](ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md). Historical dated checkpoints and test counts below are retained as evidence of their time and must not be read as current-head acceptance. Offline browser navigation, encrypted business-archive restore, physical Android Phase 2, installation recovery, commercial reconciliation, POPIA and name-clearance gates remain open as listed in the live state.
+
 ## Director acceptance ledger — 2026-11-23
 
 ## Director visual communication correction — 2026-11-23

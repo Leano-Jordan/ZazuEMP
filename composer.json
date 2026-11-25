@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "laravel/laravel",
     "type": "project",
-    "description": "Zazu EMP event and catering management platform.",
+    "description": "Zazu EMP event management platform for planning and operating events across service categories.",
     "keywords": ["laravel", "framework"],
     "license": "proprietary",
     "require": {

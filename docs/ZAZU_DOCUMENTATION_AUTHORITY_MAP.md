@@ -18,13 +18,13 @@ This map prevents agents from treating historical notes, old status snapshots or
 8. specialist engine contracts in `.ai/engineering/`
 
 ### Product/project context
-- `memory.md` — living project context and historical evidence; current control files above take precedence.
+- `memory.md` — short bootstrap only; current state belongs exclusively in `.ai/engineering/STATE.md`.
 - `docs/ZAZU_CHAT_CONTEXT.md` — compact chat bootstrap; not a substitute for current repository state.
 - `docs/PROJECT_GENESIS.md` — discovery/planning framework.
 - `docs/HUMAN_FIRST_DISCOVERY.md` — human-first discovery framework.
 
 ### Current product/release views
-- `docs/ZAZU_V1_STATUS.md` — current V1/release position.
+- `docs/ZAZU_V1_STATUS.md` — historical implementation checkpoints; current V1/release position is maintained in `.ai/engineering/STATE.md` and `docs/V1_RELEASE_CHECKLIST.md`.
 - `docs/ZAZU_V1_SCORECARD_2026-11-04.md` — current evidence-maturity score against the V1 specification; snapshot only, not release certification.
 - `docs/ZAZU_DEVELOPMENT_CHECKLIST.md` — current gate map.
 - `docs/ZAZU_2027_HARDENING_SCORECARD.md` — evidence maturity and future-scale separation.
