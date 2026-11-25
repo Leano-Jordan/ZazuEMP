@@ -177,7 +177,6 @@ class BusinessExportController extends Controller
             return $this->restoreJsonFailure(
                 $request,
                 $business,
-                $validated['archive']->getSize(),
                 $restoreStage,
                 $exception,
             );
@@ -185,7 +184,6 @@ class BusinessExportController extends Controller
             return $this->restoreUnexpectedFailure(
                 $request,
                 $business,
-                $validated['archive']->getSize(),
                 $restoreStage,
                 $exception,
             );
