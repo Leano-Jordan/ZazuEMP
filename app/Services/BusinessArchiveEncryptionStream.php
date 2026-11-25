@@ -155,10 +155,7 @@ final class BusinessArchiveEncryptionStream
     {
         $finalSeen = false;
         while (! $finalSeen) {
-            $lengthBytes = fread($source, 4);
-            if ($lengthBytes === false || strlen($lengthBytes) !== 4) {
-                throw new RuntimeException('The archive password is incorrect or the encrypted archive is damaged.');
-            }
+            $lengthBytes = $this->readExact($source, 4);
 
             $length = unpack('Nlength', $lengthBytes)['length'];
             if ($length < SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES

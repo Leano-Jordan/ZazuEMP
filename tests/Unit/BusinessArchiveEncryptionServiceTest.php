@@ -75,6 +75,35 @@ class BusinessArchiveEncryptionServiceTest extends TestCase
         }
     }
 
+    public function test_truncated_encrypted_chunk_length_is_rejected(): void
+    {
+        $service = app(BusinessArchiveEncryptionService::class);
+        $source = tempnam(sys_get_temp_dir(), 'zazu-encryption-source-');
+        file_put_contents($source, Str::random(2048));
+
+        $encrypted = null;
+        try {
+            $encrypted = $service->encryptFile($source, 'correct horse battery staple');
+            $bytes = file_get_contents($encrypted);
+            $headerBytes = strlen(\App\Services\BusinessArchiveEncryptionStream::MAGIC)
+                + SODIUM_CRYPTO_PWHASH_SALTBYTES
+                + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES;
+            file_put_contents($encrypted, substr((string) $bytes, 0, $headerBytes + 2));
+
+            try {
+                $service->decryptFile($encrypted, 'correct horse battery staple');
+                $this->fail('A truncated encrypted chunk-length header must be rejected.');
+            } catch (RuntimeException $exception) {
+                $this->assertSame('The encrypted business archive is truncated.', $exception->getMessage());
+            }
+        } finally {
+            @unlink($source);
+            if (is_string($encrypted)) {
+                @unlink($encrypted);
+            }
+        }
+    }
+
     public function test_plain_legacy_zip_is_detected_as_unencrypted_for_backward_compatibility(): void
     {
         $service = app(BusinessArchiveEncryptionService::class);
