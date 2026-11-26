@@ -124,11 +124,6 @@ final class BusinessArchiveService
             $this->reportRestoreStage($onStage, 'archive_envelope_validation');
             [$manifest, $data, $definitions] = $this->readArchiveEnvelope($zip);
 
-            // Reject an occupied destination before staging potentially large file
-            // payloads. restoreRows repeats this check under the business lock.
-            $this->reportRestoreStage($onStage, 'target_workspace_preflight');
-            $this->assertTargetIsEmpty($target, $definitions);
-
             $this->reportRestoreStage($onStage, 'attachment_payload_staging');
             $filePayloads = $this->files->readArchiveFilePayloads($zip, $manifest, $data);
 
@@ -205,6 +200,11 @@ final class BusinessArchiveService
         try {
             $this->reportRestoreStage($onStage, 'archive_envelope_validation');
             [$manifest, $data, $definitions] = $this->readArchiveEnvelope($zip);
+
+            // Reject an occupied destination before staging potentially large file
+            // payloads. restoreRows repeats this check under the business lock.
+            $this->reportRestoreStage($onStage, 'target_workspace_preflight');
+            $this->assertTargetIsEmpty($target, $definitions);
 
             $this->reportRestoreStage($onStage, 'attachment_payload_staging');
             $filePayloads = $this->files->readArchiveFilePayloads($zip, $manifest, $data);
