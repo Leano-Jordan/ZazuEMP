@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-26 — Public trust foundation and navigation reliability (acceptance pending)
+
+- Added public About, Security, Contact and What's New pages, plus clearly labelled Privacy and Terms pre-publication review copies. Linked the trust surface from the landing-page footer and a shared responsive public layout.
+- Public copy now identifies the Founder as the current individual owner/operator, describes Rosscore Labs as an unregistered future identity, identifies the Outlook contact as provisional, and avoids unsupported uptime, certification, company-registration and Information Officer claims.
+- Traced the collapsed-navigation Dashboard fallback to a service-worker route timeout of 1.8 seconds racing the application's 3-second origin-health probe. Increased the navigation window to 5 seconds and advanced the static worker cache to v64.
+- Added slow-but-healthy destination regression coverage, collapsed desktop rail Playwright coverage, public trust route/content tests and route-integrity assertions.
+- **Acceptance pending:** current-head Laravel, Zazu Quality, service-worker and browser checks must pass. Founder-device navigation and visual verification are not yet claimed. Privacy and Terms remain non-effective review copies.
+
 ## 2026-11-26 — Adversarial authentication hardening
 
 - Replaced eight-digit phone pairing codes with 12-digit one-time codes stored as an application-key-derived HMAC digest in a unique indexed column. Provisioning now locks and checks only the matching device instead of scanning and password-hashing every pending pairing; the endpoint limit is 10 attempts per minute per source IP.
