@@ -7695,6 +7695,14 @@ body.zazu-inspector-open { overflow:hidden; }
     min-width: 0;
 }
 
+.zazu-nav-icon,
+.zazu-sidebar .zazu-icon {
+    width: 23px;
+    height: 23px;
+    flex: 0 0 23px;
+    stroke-width: 1.9;
+}
+
 .zazu-nav-area-chevron {
     color: var(--zazu-sidebar-label);
     font-size: 18px;
