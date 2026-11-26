@@ -13,12 +13,15 @@ final class BusinessArchiveFileService
 {
     private const MAX_STAGED_BYTES = 262144000;
 
-    public function __construct(private readonly BusinessArchivePayloadStager $stager) {}
+    public function __construct(
+        private readonly BusinessArchivePayloadStager $stager,
+        private readonly BusinessArchiveFileManifestValidator $manifestValidator
+    ) {}
 
     public function readArchiveFilePayloads(ZipArchive $zip, array $manifest, array $data): array
     {
         $allowedFileColumns = $this->allowedArchiveFileColumns();
-        $references = $this->validateArchiveFileManifest($manifest);
+        $references = $this->manifestValidator->validate($manifest);
         $this->assertArchivePayloadEntriesAreDeclared($zip, $manifest);
         $this->assertArchivePathsHavePayloads($manifest, $data, $allowedFileColumns, $references);
 
@@ -81,54 +84,6 @@ final class BusinessArchiveFileService
             'compliance_documents' => ['storage_path'],
             'event_attachments' => ['path'],
         ];
-    }
-
-    private function validateArchiveFileManifest(array $manifest): array
-    {
-        if (! is_array($manifest['files'] ?? null)) {
-            throw new RuntimeException('The business archive file manifest is invalid.');
-        }
-
-        if (! array_is_list($manifest['files'])) {
-            throw new RuntimeException('The business archive file manifest must be a list.');
-        }
-
-        $references = [];
-        $entries = [];
-        $allowedKeys = ['table', 'id', 'column', 'disk_column', 'source_disk', 'entry', 'original_name'];
-        foreach ($manifest['files'] as $file) {
-            if (! is_array($file)) {
-                throw new RuntimeException('The archive contains an invalid business file reference.');
-            }
-            if (array_key_exists('bytes', $file)) {
-                throw new RuntimeException('The archive file manifest must not contain inline payload bytes.');
-            }
-            if (array_diff(array_keys($file), $allowedKeys) !== []) {
-                throw new RuntimeException('The archive contains an invalid business file reference.');
-            }
-            $id = $file['id'] ?? null;
-            if (! is_string($file['table'] ?? null)
-                || ! is_string($file['column'] ?? null)
-                || ! is_string($file['entry'] ?? null)
-                || ! is_string($file['source_disk'] ?? null)
-                || (! is_int($id) && ! (is_string($id) && ctype_digit($id)))
-                || (int) $id < 1
-                || (array_key_exists('original_name', $file) && ! is_string($file['original_name']))) {
-                throw new RuntimeException('The archive contains an invalid business file reference.');
-            }
-            $key = implode(':', [$file['table'], (string) (int) $id, $file['column']]);
-            $entry = $file['entry'];
-            if (isset($references[$key])) {
-                throw new RuntimeException('The archive contains a duplicate business file reference.');
-            }
-            if ($entry === '' || isset($entries[$entry])) {
-                throw new RuntimeException('The archive contains a duplicate or invalid file payload entry.');
-            }
-            $references[$key] = true;
-            $entries[$entry] = true;
-        }
-
-        return $references;
     }
 
     private function assertArchivePathsHavePayloads(array $manifest, array $data, array $allowedColumns, array $references): void
