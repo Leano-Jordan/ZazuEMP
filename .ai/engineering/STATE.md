@@ -106,7 +106,7 @@ The Founder supplied two further Android screenshots (09:48 and 09:49) showing t
 - `20e313ef1ade96071ceee45c9afa26e56bc20e3a` — add offline-only scope classes to the existing Blade shell.
 - `66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9` — extend the offline browser contract to assert the heading and navigation align full-width and stack correctly at 390×844.
 
-This is **IMPLEMENTED IN SOURCE and AUTOMATED-BROWSER-VERIFIED** on `76868dce` (75 Chromium offline/browser journeys passed, including 390×844 header geometry and the atomic acknowledgement guard; the separate mobile suite passed 11 tests, plus mobile host-outage and phone-local attachment checks). No post-fix Android screenshot or physical visual acceptance is claimed. The subsequent `4a5bedf` commit only makes the test failure-injection boundary more deterministic; its current-head rerun is still in progress.
+This is **IMPLEMENTED IN SOURCE and AUTOMATED-BROWSER-VERIFIED** on exact checkpoint `4a5bedfc` (75 Chromium offline/browser journeys passed, including 390×844 header geometry and the atomic acknowledgement guard; the separate mobile suite passed 11 tests, plus mobile host-outage and phone-local attachment checks). No post-fix Android screenshot or physical visual acceptance is claimed.
 
 **Settings navigation boundary:** source inspection confirms the offline route allowlist in `resources/js/app.js` includes only route families with an implemented local view. `/settings` is not mapped, so its unsupported sidebar destination and the otherwise-empty System group are hidden while disconnected. Pairing, owner administration and server-backed business settings remain online-only under the current contract. Do not restore a generic Settings link merely to make it visible; only expose a specific Settings function after its local data/behaviour is implemented and tested. The shell theme toggle remains independently available.
 
@@ -118,14 +118,14 @@ A source-level transaction audit found that server acknowledgement previously re
 
 **Correction:** `public/zazu-offline.js` now reads the persisted workspace and queue and commits queue acknowledgement/removal, canonical identity/revision reconciliation, related-record reconciliation, conflict persistence, `pending_sync` flags and `local_dirty` in one `[QUEUE, STATE]` read/write transaction. If the transaction aborts, IndexedDB rolls back both stores; if it commits, the queue and workspace state move together. The server's idempotency key remains the safe retry boundary.
 
-**Evidence on exact checkpoint `76868dce`:**
+**Evidence on exact checkpoint `4a5bedfc`:**
 - Laravel: **765 passed, 1 skipped, 5,471 assertions**.
 - Offline browser acceptance: **75 passed** across the desktop offline suites, including the 390×844 layout assertion and acknowledgement failure-injection contract.
 - Separate mobile offline Work/visual suite: **11 passed**; mobile stopped-host check: **1 passed**; phone-local attachment journey: **1 passed**.
 - PostgreSQL migration/recovery smoke: **1 passed**.
 - PHPMD, static analysis, Windows installation build, encrypted/legacy archive verification and fresh Windows installation: PASS.
 - Zazu Quality application/formatting/secret-scan jobs: PASS; Composer security audit remains FAILED on five Symfony advisories (CVE-2026-133743, CVE-2026-133746, CVE-2026-133751, CVE-2026-133754, CVE-2026-133755). SonarCloud is skipped, not passed.
-- The latest `main` commit `4a5bedf` changes only the test's failure-injection timing and is awaiting its own exact-head Laravel/browser rerun.
+- The `4a5bedf` test-only commit arms the failure-injection boundary when the mocked push reaches the server boundary; exact-head Laravel and browser rerun PASS.
 
 This is automated transaction-level evidence, not a simulated physical power-cut/restart test and not full reconnect acceptance. Physical local-write/restart/reconnect checks remain open.
 
