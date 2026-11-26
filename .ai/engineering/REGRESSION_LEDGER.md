@@ -320,7 +320,7 @@ A server-accepted mutation must never disappear from the local queue before its 
 
 ## REG-034 — Offline workspace must disclose browser-managed storage retention state
 
-IndexedDB and Cache Storage commits do not guarantee that browser-managed origin storage will never be evicted. Best-effort storage is the browser default; origin persistence and quota are not currently requested/reported by Zazu.
+IndexedDB and Cache Storage commits do not guarantee that browser-managed origin storage will never be evicted. Best-effort storage is the browser default. Zazu now requests persistent storage only on explicit user action and reports status/quota, but the exact-head and physical acceptance are still pending.
 
 **Control:**
 - Detect \`navigator.storage.persisted()\` and request \`persist()\` at a deliberate trusted-device/pairing action where supported.
@@ -329,4 +329,4 @@ IndexedDB and Cache Storage commits do not guarantee that browser-managed origin
 - Never auto-delete business data, queued mutations or attachments to make space.
 - Explain that users can still explicitly clear site data; persistent storage is not a replacement for export/import or recovery.
 
-**Status:** OPEN — CASE-ZAZU-0052 / ENG-DATA-007. Source audit confirms the API and quota visibility are absent. No eviction incident is alleged. Browser tests and physical Android acceptance are required after implementation.
+**Status:** IMPLEMENTED IN SOURCE — CASE-ZAZU-0052 / ENG-DATA-007. Browser tests now cover grant/denial/unsupported, 90% quota warning and quota-error feedback; exact-head CI and physical Android acceptance are pending. No eviction incident is alleged.
