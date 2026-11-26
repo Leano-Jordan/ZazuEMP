@@ -7689,6 +7689,9 @@ body.zazu-inspector-open { overflow:hidden; }
 }
 
 .zazu-nav-area-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
     min-width: 0;
 }
 
@@ -8799,7 +8802,6 @@ body.zazu-has-wallpaper .zazu-content {
 .zazu-nav-hierarchical { overflow: visible; }
 .zazu-nav-hierarchy { gap: 5px; }
 .zazu-nav-area-trigger { min-height: 43px; }
-.zazu-nav-area-title { display: inline-flex; align-items: center; gap: 11px; }
 .zazu-nav-flyout { max-height: min(72vh, 620px); overflow-y: auto; overscroll-behavior: contain; }
 .zazu-sidebar { overflow: visible; }
 .zazu-sidebar .zazu-sidebar-footer { flex: 0 0 auto; }
