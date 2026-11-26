@@ -184,7 +184,7 @@ final class BusinessArchiveService
     ): array {
         $this->reportRestoreStage($onStage, 'archive_open');
         $zip = new ZipArchive;
-        $status = $zip->open($archivePath);
+        $status = $zip->open($archivePath, ZipArchive::RDONLY);
         if ($status !== true) {
             $description = match ($status) {
                 ZipArchive::ER_EXISTS => 'file already exists',
