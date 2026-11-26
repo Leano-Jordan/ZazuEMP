@@ -115,3 +115,11 @@ The evidence is now more than a generic same-name search:
 
 This makes **Zazu / Zazu EMP a high-priority clearance item before commercial launch**. It still does not establish infringement or determine registration rights; only the official register and appropriate professional clearance can do that.
 
+
+## Founder naming decision — 2026-11-26
+
+The Founder has not selected ZAZU as the final product name. The decision to retain or rename remains OPEN. The Founder intends South African protection and international expansion, but is prioritising product stability and has not authorised a paid search, legal engagement, filing or other brand-registration spend. No ZAZU domain, social account, logo registration or trade-mark application has been secured by the Founder.
+
+Keep the name provisional, preserve a fallback naming option, and do not make clearance or registration claims. The descriptor **Event & Business Operations** and promise **Run every job. Control every cost. Keep working.** remain working positioning only.
+
+See [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
