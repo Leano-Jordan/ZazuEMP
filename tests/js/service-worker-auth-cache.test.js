@@ -933,7 +933,7 @@ test('an installed app navigation serves the authenticated cached page without a
     assert.equal(new URL(worker.fetchCalls[0].url).pathname, '/dashboard');
 });
 
-test('failed top-level navigation falls back to the local dashboard instead of stale route HTML', async () => {
+test('failed in-app navigation preserves the exact cached destination instead of resetting to the dashboard', async () => {
     const worker = bootWorker(async () => {
         throw new Error('Host unavailable during navigation.');
     });
@@ -961,13 +961,13 @@ test('failed top-level navigation falls back to the local dashboard instead of s
     const response = await navigation.response;
     assert.equal(response.ok, true);
     const html = await response.text();
-    assert.match(html, /Local dashboard shell/);
-    assert.doesNotMatch(html, /Stale server-rendered customer snapshot/);
+    assert.match(html, /Stale server-rendered customer snapshot/);
+    assert.doesNotMatch(html, /Local dashboard shell/);
     await navigation.finished();
 });
 
 
-test('offline forms and cached Work detail preserve their exact route while other routes prefer the dashboard', async () => {
+test('offline in-app navigation preserves every exact cached destination while cold launches prefer the dashboard', async () => {
     const worker = bootWorker(async () => { throw new Error('Host unavailable.'); });
     const staticCache = await worker.caches.open('zazu-static-v64');
     await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({
@@ -1007,13 +1007,14 @@ test('offline forms and cached Work detail preserve their exact route while othe
     assert.match(await staleResponse.text(), /Offline dashboard/, 'query-variant Work routes must use the safe shell');
     await staleRoute.finished();
 
+    await businessCache.put('/work', new MockResponse('<main>Cached Work directory</main>'));
     const directory = worker.dispatchFetch(new worker.Request('/work', {
         method: 'GET',
         mode: 'navigate',
         headers: { accept: 'text/html' },
     }));
     const directoryResponse = await directory.response;
-    assert.match(await directoryResponse.text(), /Offline dashboard/);
+    assert.match(await directoryResponse.text(), /Cached Work directory/);
     await directory.finished();
 });
 
