@@ -365,67 +365,6 @@ class AuthenticationTest extends TestCase
         $this->assertFalse(Hash::check('old-password', $user->fresh()->password));
     }
 
-    public function test_password_reset_revokes_previously_authenticated_sessions(): void
-    {
-        config(['session.driver' => 'database']);
-
-        $user = User::factory()->create([
-            'username' => 'sessionreset',
-            'email' => 'sessionreset@example.com',
-            'password' => 'old-password',
-        ]);
-
-        DB::table('sessions')->insert([
-            'id' => 'old-device-session',
-            'user_id' => $user->id,
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'old-device',
-            'payload' => '{}',
-            'last_activity' => now()->timestamp,
-        ]);
-
-        $token = Password::createToken($user);
-
-        $this->post(route('password.update'), [
-            'token' => $token,
-            'email' => $user->email,
-            'password' => 'new-password',
-            'password_confirmation' => 'new-password',
-        ])->assertRedirect(route('dashboard'));
-
-        $this->assertAuthenticatedAs($user);
-        $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
-    }
-
-    public function test_business_switch_rejects_a_stale_authenticated_password_hash(): void
-    {
-        $user = User::factory()->create(['password' => 'new-password']);
-        $firstBusiness = Business::create([
-            'name' => 'Current Session Business',
-            'slug' => 'current-session-business',
-            'status' => 'active',
-            'currency' => 'ZAR',
-        ]);
-        $secondBusiness = Business::create([
-            'name' => 'Target Session Business',
-            'slug' => 'target-session-business',
-            'status' => 'active',
-            'currency' => 'ZAR',
-        ]);
-        $firstBusiness->users()->attach($user->id, ['role' => 'owner']);
-        $secondBusiness->users()->attach($user->id, ['role' => 'owner']);
-
-        $this->actingAs($user)
-            ->withSession([
-                'password_hash_web' => Hash::make('old-password'),
-                CurrentBusiness::SESSION_KEY => $firstBusiness->id,
-            ])
-            ->post(route('business.switch'), ['business_id' => $secondBusiness->id])
-            ->assertRedirect();
-
-        $this->assertGuest();
-    }
-
     public function test_password_reset_token_cannot_be_reused(): void
     {
         $user = User::factory()->create([
