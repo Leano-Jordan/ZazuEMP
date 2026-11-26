@@ -9,7 +9,7 @@
 
 The current architecture has several sound controls: session ID regeneration at login and registration, session invalidation on logout, auth.session middleware on the main authenticated workspace, one-use expiring pairing codes stored as application-key-derived HMAC digests in a unique indexed column, random device bearer tokens stored server-side as SHA-256 hashes, device active/expiry checks, operation-level device revalidation, business-scoped sync queries, and explicit offline queue preservation across web logout and workspace switching.
 
-That is not sufficient evidence to call the system hardened. The offline credential is deliberately stored unencrypted in business-scoped IndexedDB, so the unlocked browser profile and same-origin JavaScript remain trusted. Pairing protection is currently an IP-based 30-per-minute limit on the public provisioning endpoint; distributed guessing and expensive candidate scanning need adversarial validation. Account/session transition races and owner-removal semantics need targeted tests.
+That is not sufficient evidence to call the system hardened. The offline credential is deliberately stored unencrypted in business-scoped IndexedDB, so the unlocked browser profile and same-origin JavaScript remain trusted. Pairing now uses a 12-digit one-time code, an indexed APP_KEY-derived HMAC digest, a single-row locked lookup and a 10-per-minute IP limit; distributed guessing and concurrent provisioning still need adversarial validation. Account/session transition races and owner-removal semantics also need targeted tests.
 
 No exploit against a live system was attempted. No production data was accessed or changed.
 
@@ -23,13 +23,13 @@ No exploit against a live system was attempted. No production data was accessed 
 - Password reset rotates the remember token, logs the user in on a regenerated session, deletes other database-backed sessions, invokes logoutOtherDevices, and revokes trusted devices for currently owned businesses.
 - Session defaults: database driver, 120-minute lifetime, HttpOnly cookie, SameSite=Lax, Secure in production by default. SESSION_ENCRYPT defaults false; this concerns server-side session storage, not whether the browser cookie is encrypted by Laravel's cookie middleware.
 - Main workspace routes use auth, auth.session, and business.context.
+- The business.switch route is inside the auth/auth.session route group. A regression test now verifies a stale password-hash session cannot switch the selected business.
 
 ### Open adversarial checks
 
 - Reuse a pre-authentication session ID after login/registration and prove it cannot authenticate.
 - Race two login/logout/password-reset requests sharing the old session; prove stale writes cannot resurrect an authenticated session or overwrite the selected business context.
 - Test password reset against concurrent authenticated requests and remembered-device cookies.
-- Review the business.switch route separately: it is in an auth group, not the auth.session group. Establish whether stale password-hash sessions can still mutate the selected business context and whether this is only a harmless context write or a meaningful bypass.
 - Test session cookie attributes under actual production HTTPS/reverse-proxy configuration, not only config defaults.
 
 ## 2. Credential leakage through browser storage, XSS and backups
@@ -61,6 +61,7 @@ No exploit against a live system was attempted. No production data was accessed 
 - Only an HMAC-SHA256 digest derived from `APP_KEY` with a Zazu-specific purpose string is stored in a dedicated, unique indexed column; the raw code is returned once to the owner.
 - Provisioning endpoint is public by design and has an IP-based `throttle:10,1` limiter.
 - Provisioning performs a direct indexed lookup for the exact digest, locks only the matching device, checks expiry, then clears the digest and expiry while activating the device in the same database transaction. A consumed code is therefore not reusable after successful provisioning.
+- Regression tests cover 12-digit issuance, digest-only persistence, one-code-to-one-device lookup, one-use consumption, expiry cleanup and the 10-attempt per-IP limiter.
 - Pairing and sync API responses receive no-store/private cache headers.
 - Successful pairing returns a 64-character random bearer; only SHA-256 hash is stored.
 
@@ -74,7 +75,7 @@ The previous all-pending-device scan and per-candidate password-hash work have b
 - Test expired, malformed, reused and revoked pairing attempts.
 - Measure provisioning cost with realistic pending-device counts and invalid guesses.
 - Establish whether multiple source IPs can guess a live code within its validity window at a practical rate.
-- Regression tests now cover 12-digit issuance, digest-only persistence, one-code-to-one-device lookup, one-use consumption, expiry cleanup and the 10-attempt per-IP limiter. Still verify unique-digest collision behaviour under concurrent code generation and confirm an attacker cannot pair against the wrong business when several businesses have active pairing codes.
+- Still verify unique-digest collision behaviour under concurrent code generation and confirm an attacker cannot pair against the wrong business when several businesses have active pairing codes.
 - Evaluate layered controls that do not lock out legitimate phone pairing: short-lived pairing identifier, attempt accounting, global/service-level abuse controls, bounded pending candidates and owner-visible pairing alerts.
 
 ## 4. Cross-business token substitution and stale-token replay
