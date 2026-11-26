@@ -64,6 +64,7 @@ class PasswordResetTrustedDeviceTest extends TestCase
             'pairing_code_hash' => 'pending-code-hash',
             'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
         ]);
+        $pendingDevice->forceFill(['pairing_code_digest' => str_repeat('a', 64)])->save();
         $secondOwnedDevice = $makeDevice($secondOwnedBusiness, 'Second owner device', 'active', [
             'sync_token_hash' => hash('sha256', 'second-owner-token'),
         ]);
