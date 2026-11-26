@@ -384,6 +384,18 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('$this->applyBoundedWorkingSet($query, Supplier::class, $business, $includedIds', $bootstrapBuilder);
         $this->assertStringContainsString('/api/sync/acknowledge', $client);
         $this->assertStringContainsString("status: 'failed'", $client);
+        $this->assertOfflineMutationAcknowledgementIsAtomic($client);
+        $this->assertStringContainsString('crypto.randomUUID()', $client);
+        $this->assertStringContainsString('Local offline state write was aborted.', $client);
+        $this->assertStringContainsString('Offline queue acknowledgement was aborted.', $client);
+        $app = File::get(resource_path('js/app.js'));
+        $this->assertStringContainsString('data-zazu-offline-save-error', $app);
+        $this->assertStringContainsString('Check the offline queue before trying again.', $app);
+        $this->assertStringContainsString('delete form.dataset.zazuSubmitting;', $app);
+    }
+
+    private function assertOfflineMutationAcknowledgementIsAtomic(string $client): void
+    {
         $pushStart = strpos($client, 'async function push()');
         $pullStart = strpos($client, 'async function applyBootstrapIfQueueClean', $pushStart);
         $this->assertNotFalse($pushStart);
@@ -397,17 +409,13 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("stateStore.put(nextState, 'current');", $acknowledgement);
         $this->assertStringContainsString('const remainingMutations = [...queueById.values()]', $acknowledgement);
         $this->assertStringContainsString('nextState.local_dirty = remainingMutations.length > 0;', $acknowledgement);
-        $this->assertFalse(str_contains($acknowledgement, 'await writeState();'), 'Acknowledgement state must not depend on a second state-only transaction.');
+        $this->assertFalse(
+            str_contains($acknowledgement, 'await writeState();'),
+            'Acknowledgement state must not depend on a second state-only transaction.',
+        );
         $this->assertStringContainsString('sameRecordStillPending', $acknowledgement);
         $this->assertStringContainsString('if (record?.pending_sync === true) record.pending_sync = false;', $acknowledgement);
         $this->assertStringContainsString('remote.conflict_id', $acknowledgement);
-        $this->assertStringContainsString('crypto.randomUUID()', $client);
-        $this->assertStringContainsString('Local offline state write was aborted.', $client);
-        $this->assertStringContainsString('Offline queue acknowledgement was aborted.', $client);
-        $app = File::get(resource_path('js/app.js'));
-        $this->assertStringContainsString('data-zazu-offline-save-error', $app);
-        $this->assertStringContainsString('Check the offline queue before trying again.', $app);
-        $this->assertStringContainsString('delete form.dataset.zazuSubmitting;', $app);
     }
 
     public function test_phone_pairing_remains_owner_controlled_in_settings_not_on_the_dashboard(): void
