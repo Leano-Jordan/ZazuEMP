@@ -109,7 +109,8 @@ class BusinessSettingsController extends Controller
             && $device->token_expires_at === null
             && ! array_key_exists('sync_token_hash', $metadata)
             && ! array_key_exists('pairing_code_hash', $metadata)
-            && ! array_key_exists('pairing_expires_at', $metadata);
+            && ! array_key_exists('pairing_expires_at', $metadata)
+            && $device->pairing_code_digest === null;
 
         $this->revokeSyncDeviceRecord($device, $business, 'offline_logout_retry');
 
@@ -135,7 +136,8 @@ class BusinessSettingsController extends Controller
             $needsCleanup = $lockedDevice->token_expires_at !== null
                 || array_key_exists('sync_token_hash', $metadata)
                 || array_key_exists('pairing_code_hash', $metadata)
-                || array_key_exists('pairing_expires_at', $metadata);
+                || array_key_exists('pairing_expires_at', $metadata)
+                || $lockedDevice->pairing_code_digest !== null;
 
             if (! $needsAudit && ! $needsCleanup) {
                 return;
@@ -147,6 +149,7 @@ class BusinessSettingsController extends Controller
                 'status' => 'revoked',
                 'revoked_at' => $lockedDevice->revoked_at ?? now(),
                 'token_expires_at' => null,
+                'pairing_code_digest' => null,
                 'metadata' => $metadata,
             ])->save();
 
