@@ -4,7 +4,8 @@
    Mobile shell navigation is owned by zazu-mobile-refinement.css.
 */
 
-/* Sidebar shell must not clip footer-owned account popovers. Keep only the navigation region scrollable. */
+/* The sidebar and navigation remain unclipped so contextual panels can extend
+   beyond the rail. Mobile uses one drawer-level scroll region when required. */
 .zazu-sidebar {
     position: sticky;
     z-index: 40;
@@ -19,15 +20,6 @@
     position: relative;
     flex: 0 0 auto;
     overflow: visible;
-}
-
-/* Desktop hierarchical flyouts must be allowed to cross the sidebar edge.
-   Mobile switches back to a bounded scroll region because its flyouts are inline. */
-@media (max-width: 850px) {
-    .zazu-nav {
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
 }
 
 .zazu-app-footer {
