@@ -222,5 +222,4 @@ class PasswordResetController extends Controller
             'reason' => 'owner_password_reset',
         ], $business->id));
     }
-
 }
