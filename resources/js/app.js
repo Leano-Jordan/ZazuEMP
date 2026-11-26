@@ -3002,7 +3002,13 @@ function setupZazuOfflineDirectoryViews() {
                                 ? 'This browser does not support persistent storage requests.'
                                 : result.error || 'The browser could not confirm storage protection.';
                     statusNode.textContent = message;
-                    renderOfflineStorageProtection().catch(() => {});
+                    const usage = formatOfflineStorageBytes(result.usage);
+                    const quota = formatOfflineStorageBytes(result.quota);
+                    usageNode.textContent = usage && quota
+                        ? 'Using ' + usage + ' of an estimated ' + quota + ' browser storage.'
+                        : 'Storage usage information is not available in this browser.';
+                    requestButton.hidden = result.status === 'granted' || !result.requestSupported;
+                    requestButton.disabled = false;
                 }).catch(() => {
                     if (!panel.isConnected) return;
                     statusNode.textContent = 'The browser could not confirm storage protection.';
