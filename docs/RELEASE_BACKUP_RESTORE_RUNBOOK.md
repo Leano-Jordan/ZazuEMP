@@ -332,3 +332,9 @@ The file manifest now:
 Regression coverage injects those fields into a valid archive and verifies that validation rejects the archive without deleting or changing a sentinel file. Another regression proves that an occupied destination is rejected before attachment staging and that the existing target records remain unchanged.
 
 **Verification boundary:** these corrections are committed to main; do not mark the module accepted until exact-head Laravel, formatting, PHPMD, Windows encrypted/legacy archive, and recovery checks pass. The founder's separate real-world restore attempt remains an independent acceptance test.
+
+### Restore into a new workspace under the same owner account
+
+The Export business data restore form offers an explicit option to create a new business workspace for the archive. This is the safe route when the currently selected account workspace is populated (including the seeded demo scenario). It creates a fresh active business, attaches the authenticated owner, restores the archive into that empty destination, and switches the session to the restored workspace after success. The original selected business is left untouched.
+
+If restore fails, the newly created empty destination is deleted after the archive service has rolled back imported database rows and staged files. A failed restore must not leave a misleading empty workspace behind. The existing-target mode remains available for an already-created empty, unpaired workspace.
