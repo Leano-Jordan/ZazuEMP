@@ -175,6 +175,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.setTimeout(25_000);
         test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Offline route rendering contract runs on desktop and phone viewport.');
 
+        await page.setViewportSize({ width: 390, height: 844 });
         await page.route('**/up', route => route.fulfill({
             status: 503,
             contentType: 'text/plain',
@@ -203,6 +204,23 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(offlineNavigation.getByRole('link', { name: 'Open customers' })).toBeVisible();
         await expect(offlineNavigation.getByRole('link', { name: 'Open work' })).toBeVisible();
         await expect(offlineNavigation.getByRole('link', { name: 'Quotes', exact: true })).toBeVisible();
+
+        const offlineHeaderGeometry = await workspace.locator('.zazu-offline-workspace-head').evaluate(header => {
+            const intro = header.querySelector(':scope > .zazu-dash-panel-heading')?.getBoundingClientRect();
+            const navigation = header.querySelector(':scope > [aria-label="Offline workspace navigation"]')?.getBoundingClientRect();
+            return {
+                intro: intro ? { x: intro.x, y: intro.y, width: intro.width, height: intro.height } : null,
+                navigation: navigation ? { x: navigation.x, y: navigation.y, width: navigation.width, height: navigation.height } : null,
+            };
+        });
+        expect(offlineHeaderGeometry.intro).not.toBeNull();
+        expect(offlineHeaderGeometry.navigation).not.toBeNull();
+        expect(offlineHeaderGeometry.navigation.y).toBeGreaterThanOrEqual(
+            offlineHeaderGeometry.intro.y + offlineHeaderGeometry.intro.height
+        );
+        expect(Math.abs(offlineHeaderGeometry.navigation.x - offlineHeaderGeometry.intro.x)).toBeLessThanOrEqual(2);
+        expect(Math.abs(offlineHeaderGeometry.navigation.width - offlineHeaderGeometry.intro.width)).toBeLessThanOrEqual(2);
+
         await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
         await expect(page.locator('.zazu-page-title')).toHaveText('Offline workspace');
         await expect(page.locator('.zazu-command-search')).toBeHidden();
