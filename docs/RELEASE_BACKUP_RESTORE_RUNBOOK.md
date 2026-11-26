@@ -338,3 +338,7 @@ Regression coverage injects those fields into a valid archive and verifies that 
 The Export business data restore form offers an explicit option to create a new business workspace for the archive. This is the safe route when the currently selected account workspace is populated (including the seeded demo scenario). It creates a fresh active business, attaches the authenticated owner, restores the archive into that empty destination, and switches the session to the restored workspace after success. The original selected business is left untouched.
 
 If restore fails, the newly created empty destination is deleted after the archive service has rolled back imported database rows and staged files. A failed restore must not leave a misleading empty workspace behind. The existing-target mode remains available for an already-created empty, unpaired workspace.
+
+### Restored media compatibility
+
+Restore now preserves only the safe, table-appropriate original extension for known image/document formats; unsupported or missing extensions fall back to .bin. This matters because business branding and customer-profile media are served as files whose browser MIME type is inferred from the stored extension, while catalogue images are served as public static assets. Regression coverage asserts that a restored PNG remains .png and a restored text attachment remains .txt. Never trust an archive-supplied extension outside the per-table allowlist.
