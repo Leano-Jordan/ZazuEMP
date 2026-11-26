@@ -121,3 +121,12 @@ Current Zazu has business-scoped records, private media and audit/security found
 - [ ] request log location secured;
 - [ ] response templates reviewed;
 - [ ] legal response-time rules and the applicable POPIA/PAIA request route confirmed for the deployment;
+
+
+## Founder decision update — 2026-11-26
+
+The Founder is the sole current owner/operator and has not registered an Information Officer. The Founder is the proposed IO for the current individual operation, subject to confirmation of the correct registration route and completion of registration. No Deputy Information Officer is currently appointed because the operation is solo. Do not publish a claim of registration or treat the internal incident/request owner field as proof of registration.
+
+A dedicated privacy mailbox is approved in principle but is not yet created. Until then, `rosscorelabs@outlook.com` remains provisional and must be monitored/tested before publication. The current application does not have a self-service data-subject request portal; do not claim one exists.
+
+See [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
