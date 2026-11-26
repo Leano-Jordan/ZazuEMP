@@ -6,9 +6,9 @@ use App\Models\Business;
 use App\Models\BusinessTaxProfile;
 use App\Models\SyncDevice;
 use App\Models\TaxRate;
-use App\Support\CurrentBusiness;
-use App\Support\BusinessEntitlement;
 use App\Support\Audit;
+use App\Support\BusinessEntitlement;
+use App\Support\CurrentBusiness;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -42,8 +42,6 @@ class BusinessSettingsController extends Controller
             'hasTcsPin' => filled($business->taxProfile?->getRawOriginal('tcs_pin')),
         ]);
     }
-
-
 
     public function reapproveSyncDevice(Request $request, SyncDevice $device): RedirectResponse
     {
