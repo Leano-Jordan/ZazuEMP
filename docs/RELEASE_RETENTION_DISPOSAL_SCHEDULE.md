@@ -87,3 +87,19 @@ Current repository evidence indicates there is no general-purpose retention sche
 - CIPC company records: https://www.cipc.co.za/?page_id=15683
 
 Last reviewed: 2026-11-10.
+
+
+## Founder request and proposal status — 2026-11-26
+
+The Founder has asked the Director to propose a practical schedule. This document is the working recommendation, **not yet approved by the Founder and not legal/accounting advice**. The proposal is retained as follows:
+
+- Account/profile and workspace administration: 30-day export/retrieval opportunity, then delete or de-identify within 90 days after closure unless lawful retention, dispute, security investigation or legal hold applies.
+- Customer/contact and event/job operational records: retain only while needed for the customer's documented business purpose and applicable obligations; no blanket seven-year retention for all records.
+- Quotes, invoices, payments and tax-relevant records: customer remains responsible for the applicable recordkeeping period. Apply common five-year tax and seven-year Companies Act periods only to records and circumstances to which those rules actually apply.
+- Support/security logs: proposed 24-month baseline, subject to necessity review and minimisation.
+- Backups: proposed rolling 30-day retention, only once the actual backup architecture can enforce and verify it.
+- Attachments/media: retain while needed; remove from active/private storage when no longer needed and expire backup copies under the approved schedule, subject to lawful holds.
+
+**Approval required:** Founder approval after legal/accounting review. **Implementation required:** test export, closure, database/private-media deletion, backup expiry and legal-hold handling. Do not claim automated enforcement or promise deletion until implemented and verified.
+
+This proposal is designed around the current product scope and the fact that local/offline customers control their own devices and backups. A service provider cannot promise remote deletion from a customer's local device or independent backup.
