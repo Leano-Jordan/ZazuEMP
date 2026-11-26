@@ -942,21 +942,6 @@ overflow: hidden;
 white-space: nowrap;
 }
 
-.zazu-nav-arrow {
-margin-left: auto;
-    color: var(--zazu-sidebar-label);
-    font-size: 10px;
-    opacity: 0;
-    transform: translateX(-3px);
-    transition: opacity 130ms ease, transform 130ms ease;
-}
-
-.zazu-nav-link:hover .zazu-nav-arrow,
-.zazu-nav-link.active .zazu-nav-arrow {
-opacity: .9;
-    transform: translateX(0);
-}
-
 :where(.zazu-page-header,.zazu-command-band,.zazu-command-shell,.zazu-dashboard-command) {
 min-width: 0;
 }
@@ -1022,11 +1007,7 @@ width: 100%;
 }
 }
 
-@media (prefers-reduced-motion: reduce) {
-.zazu-nav-arrow {
-transition: none;
-}
-}
+
 
 .zazu-dash-setup {
 display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:14px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--zazu-blue-vivid) 18%,var(--zazu-card-border));border-radius:12px;background:linear-gradient(100deg,var(--zazu-card-bg),var(--zazu-blue-soft));box-shadow:var(--zazu-card-shadow)
