@@ -28,6 +28,7 @@ class SyncDevice extends Model
         'last_seen_at',
         'token_expires_at',
         'revoked_at',
+        'pairing_code_digest',
         'metadata',
     ];
 
@@ -64,6 +65,16 @@ class SyncDevice extends Model
     public function isActive(): bool
     {
         return $this->status === 'active' && $this->revoked_at === null;
+    }
+
+    public static function pairingCodeDigest(string $code): string
+    {
+        $key = (string) config('app.key');
+        if ($key === '') {
+            throw new \LogicException('The application key must be configured before issuing phone pairing codes.');
+        }
+        $pairingKey = hash_hmac('sha256', 'zazu-sync-pairing-v1', $key, true);
+        return hash_hmac('sha256', $code, $pairingKey);
     }
 
     public function refreshTokenActivity(string $tokenHash): bool
