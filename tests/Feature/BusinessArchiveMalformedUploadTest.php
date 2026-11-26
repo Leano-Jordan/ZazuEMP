@@ -285,7 +285,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
 
             $this->assertSame(
                 (int) $restoredWorkspace->id,
-                app(\\App\\Support\\CurrentBusiness::class)->id(auth()->user())
+                app(\App\Support\CurrentBusiness::class)->id(auth()->user())
             );
             $this->assertDatabaseHas('customers', [
                 'business_id' => $restoredWorkspace->id,
