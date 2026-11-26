@@ -192,6 +192,56 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         }
     }
 
+    public function test_populated_workspace_restore_error_is_visible_and_actionable(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+        $this->signInAsOwner();
+        $target = auth()->user()->businesses()->firstOrFail();
+        Customer::create([
+            'business_id' => $target->id,
+            'name' => 'Existing Demo Workspace Customer',
+        ]);
+
+        $source = Business::create([
+            'name' => 'Rosscore Archive Source',
+            'slug' => 'rosscore-archive-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        Customer::create([
+            'business_id' => $source->id,
+            'name' => 'Rosscore Archive Customer',
+        ]);
+        $archivePath = app(BusinessArchiveService::class)->download($source);
+
+        try {
+            $response = $this->from(route('exports.index'))->followingRedirects()->post(
+                route('exports.archive.restore'),
+                [
+                    'archive' => UploadedFile::fake()->createWithContent(
+                        'rosscore-business.zazu',
+                        (string) file_get_contents($archivePath)
+                    ),
+                ]
+            );
+
+            $response->assertOk();
+            $response->assertSee('already contains business records');
+            $response->assertSee('zazu-field-error', false);
+            $this->assertDatabaseMissing('customers', [
+                'business_id' => $target->id,
+                'name' => 'Rosscore Archive Customer',
+            ]);
+            $this->assertDatabaseHas('customers', [
+                'business_id' => $target->id,
+                'name' => 'Existing Demo Workspace Customer',
+            ]);
+        } finally {
+            @unlink($archivePath);
+        }
+    }
+
     public function test_non_zip_upload_reports_the_specific_libzip_failure_code(): void
     {
         $this->signInAsOwner();
