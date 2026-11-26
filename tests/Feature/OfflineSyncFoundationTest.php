@@ -2407,6 +2407,16 @@ class OfflineSyncFoundationTest extends TestCase
                 'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
             ],
         ]);
+        $otherCode = '913527406182';
+        $otherDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'pending',
+            'pairing_code_digest' => SyncDevice::pairingCodeDigest($otherCode),
+            'metadata' => [
+                'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
+            ],
+        ]);
 
         $controller = app(SyncController::class);
         $makeRequest = fn () => Request::create('/api/sync/provision', 'POST', [
@@ -2425,6 +2435,8 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('active', $pairedDevice->status);
         $this->assertNull($pairedDevice->pairing_code_digest);
         $this->assertArrayNotHasKey('pairing_code_hash', $pairedDevice->metadata ?? []);
+        $this->assertSame('pending', $otherDevice->fresh()->status);
+        $this->assertSame(SyncDevice::pairingCodeDigest($otherCode), $otherDevice->fresh()->pairing_code_digest);
         $this->assertSame(
             $pairedAt->copy()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS)->timestamp,
             $pairedDevice->token_expires_at->timestamp,
@@ -2982,6 +2994,21 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('pending', $device->fresh()->status);
         $this->assertNull($device->fresh()->pairing_code_digest);
         $this->assertNull($device->fresh()->metadata['sync_token_hash'] ?? null);
+    }
+
+    public function test_phone_provisioning_is_limited_to_ten_attempts_per_source_ip_per_minute(): void
+    {
+        $ip = '203.0.113.'.random_int(1, 254);
+
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $this->withServerVariables(['REMOTE_ADDR' => $ip])
+                ->postJson('/api/sync/provision', ['pairing_code' => '000000000000'])
+                ->assertUnprocessable();
+        }
+
+        $this->withServerVariables(['REMOTE_ADDR' => $ip])
+            ->postJson('/api/sync/provision', ['pairing_code' => '000000000000'])
+            ->assertTooManyRequests();
     }
 
     private function assertPurchaseOrderDeliveryReconcilesOnSecondDevice(SyncDevice $receivingDevice, PurchaseOrder $order): void
