@@ -68,3 +68,12 @@ Zazu's business isolation and role-based access controls are technical safeguard
 - [ ] authorised decision-maker named;
 - [ ] response/appeal process reviewed;
 - [ ] final legal review completed where required.
+
+
+## Founder decision update — 2026-11-26
+
+The Founder is currently the sole individual owner/operator and has not registered an Information Officer. The Founder is the proposed IO for the current solo operation, subject to confirming applicability and completing the formal registration process. No Deputy Information Officer is appointed. The dedicated privacy contact mailbox is approved in principle but not yet created; `rosscorelabs@outlook.com` remains provisional.
+
+Do not describe Rosscore Labs as incorporated or as the current responsible party. PAIA applicability, the correct responsible party, registration and publication requirements must be confirmed against the actual individual/business structure before release.
+
+See [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
