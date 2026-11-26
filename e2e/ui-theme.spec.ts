@@ -165,6 +165,9 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(page.locator('body')).toHaveClass(/zazu-sidebar-collapsed/);
         await expect(sidebar).toHaveCSS('width', '76px');
         await expect(heading).toBeVisible();
+        await expect(work).toHaveCSS('position', 'relative');
+        await expect.poll(() => panel.evaluate((node) => getComputedStyle(node).overflowY)).toBe('visible');
+        await expect.poll(() => panel.evaluate((node) => getComputedStyle(node).maxHeight)).toBe('none');
 
         // The active Work group starts open. Close and reopen it to prove that
         // the rail trigger controls its contextual panel without changing route.
@@ -285,8 +288,12 @@ test.describe('Zazu UI theme and navigation', () => {
         await desktop.setViewportSize({ width: 1365, height: 900 });
         await login(desktop);
         const workArea = desktop.locator('[data-zazu-nav-area]').filter({ has: desktop.getByRole('button', { name: 'Work', exact: true }) });
+        const desktopNav = desktop.locator('.zazu-sidebar .zazu-nav');
+        const workPanel = workArea.locator('.zazu-nav-flyout');
         await expect(workArea).toHaveClass(/is-open/);
-        await expect(workArea.locator('.zazu-nav-flyout')).toBeVisible();
+        await expect(workPanel).toBeVisible();
+        await expect.poll(() => desktopNav.evaluate((node) => getComputedStyle(node).overflowY)).toBe('visible');
+        await expect.poll(() => workPanel.evaluate((node) => getComputedStyle(node).overflowY)).toBe('visible');
         const navIcon = workArea.locator('.zazu-nav-icon');
         await expect.poll(() => navIcon.evaluate((node) => Math.round(node.getBoundingClientRect().width))).toBeGreaterThanOrEqual(22);
         await desktop.getByRole('button', { name: 'Sales' }).hover();
@@ -300,6 +307,10 @@ test.describe('Zazu UI theme and navigation', () => {
         });
         const mobile = await mobileContext.newPage();
         await login(mobile);
+        const mobileNav = mobile.locator('.zazu-sidebar .zazu-nav');
+        const mobileSidebar = mobile.locator('.zazu-sidebar');
+        await expect.poll(() => mobileNav.evaluate((node) => getComputedStyle(node).overflowY)).toBe('visible');
+        await expect.poll(() => mobileSidebar.evaluate((node) => getComputedStyle(node).overflowY)).toBe('auto');
         await mobile.goto('/calendar');
         const monthGrid = mobile.locator('.zazu-calendar-grid-scroll > .zazu-calendar-grid');
         await expect(monthGrid).toBeVisible();
