@@ -158,3 +158,15 @@ The Founder confirmed that the Android phone, with the Zazu PC host OFF, now ope
 The current known UI gaps are missing Settings navigation and visual/layout refinement. Engineering must improve the existing offline workspace in place: restore appropriate supported navigation, render the correct route-specific content, and refine the existing UI without redesigning or replacing it. Preserve the banner's truthful capability wording.
 
 This milestone is a partial physical observation, not full offline acceptance. It does not establish airplane-mode cold launch, local mutation persistence, force-close/restart survival, attachment round-trip, or reconnect reconciliation. Do not ask the Founder to repeat the PC-off test or confirm again that pages and local data load. Request only a new, specific physical acceptance check when the remaining engineering work is ready.
+
+## Mobile launchpad composition and Settings boundary — 2026-11-26
+
+The Founder’s later Android screenshots (09:48 and 09:49) show the offline server-unavailable state and device counters of 13 saved records, 0 waiting to sync and 0 needing attention. They also expose a mobile composition defect: the offline workspace title/description are squeezed into a narrow column beside the full-height module navigation.
+
+Source inspection traced this to the interaction between the shared flex header and the responsive `.zazu-action-group { width: 100%; }` rule. The earlier navigation-visibility correction made the links visible but did not provide a separate mobile header layout. The offline workspace now has a scoped responsive grid in `resources/css/zazu-dashboard-authority.css`, with the title first, module actions below it and the device-local status last. On normal phone widths the actions use two columns; very narrow screens use one. The markup scoping is in `resources/views/dashboard.blade.php`.
+
+The browser contract now measures the heading and navigation rectangles at 390×844 and asserts that the navigation sits below the heading with matching left/right edges. Changes are on `main` at CSS commit `52152f2`, Blade commit `20e313e` and test commit `66f7392`. Treat this as implemented but not accepted until exact-head offline browser CI is green and the rendered/physical layout is reviewed.
+
+**Settings is intentionally outside the current offline route allowlist.** `resources/js/app.js` exposes only routes with implemented offline views. Since `/settings` is not mapped, the unsupported Settings link and its empty navigation group are hidden while disconnected; pairing, owner administration and server-backed business settings remain online-only. Do not expose a generic Settings route or imply it works offline. Add a destination only when a particular settings function has a real local implementation and explicit regression coverage. The shell theme control remains separate from the Settings route.
+
+This screenshot review does not expand offline scope or close physical acceptance. It does not prove local-write persistence, cold launch with all radios disabled, force-close/restart, attachment round-trip or reconnect reconciliation.
