@@ -1094,6 +1094,119 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(pushAttempts).toBe(2);
     });
 
+    test('commits server identity, queue removal and clean local state in one acknowledgement transaction', async ({ page, context }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'IndexedDB acknowledgement transaction contract runs once.');
+
+        await login(page);
+        await trustCurrentDevice(page);
+        await context.setOffline(true);
+
+        const localId = await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const localId = crypto.randomUUID();
+            const nextState = structuredClone(window.ZazuOffline.getState());
+            nextState.customers.push({
+                local_id: localId,
+                server_id: null,
+                name: 'Atomic acknowledgement customer',
+                contact_name: 'Atomic Test Contact',
+                revision: 1,
+                pending_sync: true,
+            });
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: localId,
+                record: {
+                    name: 'Atomic acknowledgement customer',
+                    contact_name: 'Atomic Test Contact',
+                },
+            }, nextState);
+            return localId;
+        });
+        const queued = await page.evaluate(() => window.ZazuOffline.pending());
+        expect(queued).toHaveLength(1);
+
+        let pushAttempts = 0;
+        await page.route('**/api/sync/push', async route => {
+            pushAttempts += 1;
+            const mutation = route.request().postDataJSON().mutations[0];
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    recorded: [{
+                        id: mutation.id,
+                        status: 'applied',
+                        sequence: 1,
+                        identity: {
+                            entity_type: 'customer',
+                            local_id: localId,
+                            server_id: 990051,
+                            revision: 1,
+                        },
+                    }],
+                }),
+            });
+        });
+        await page.route('**/api/sync/pull**', route => route.fulfill({
+            status: 503,
+            contentType: 'application/json',
+            body: JSON.stringify({ message: 'No remote delivery required for this transaction test.' }),
+        }));
+        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+            status: 503,
+            contentType: 'application/json',
+            body: JSON.stringify({ message: 'No bootstrap required for this transaction test.' }),
+        }));
+        await page.route('**/api/sync/attachments', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ attachments: [] }),
+        }));
+
+        await page.evaluate(() => {
+            const boundary = { armed: true, blocked: false };
+            window.__ZAZU_ACK_BOUNDARY = boundary;
+            const originalTransaction = IDBDatabase.prototype.transaction;
+            IDBDatabase.prototype.transaction = function (storeNames, mode, options) {
+                const names = Array.isArray(storeNames) ? storeNames : [storeNames];
+                if (boundary.armed && mode === 'readwrite'
+                    && names.length === 1 && names[0] === 'state') {
+                    boundary.armed = false;
+                    boundary.blocked = true;
+                    throw new DOMException('Injected failure for a separate post-acknowledgement state write.', 'QuotaExceededError');
+                }
+                return originalTransaction.call(this, storeNames, mode, options);
+            };
+        });
+
+        await context.setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(() => pushAttempts).toBe(1);
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length))
+            .toBe(0);
+
+        const reconciled = await page.evaluate(async id => {
+            const record = window.ZazuOffline.getState().customers.find(item => item.local_id === id);
+            return {
+                record: record ? {
+                    serverId: record.server_id ?? record.id ?? null,
+                    pendingSync: record.pending_sync === true,
+                } : null,
+                localDirty: window.ZazuOffline.getState().local_dirty === true,
+                pending: await window.ZazuOffline.pending(),
+                boundary: window.__ZAZU_ACK_BOUNDARY,
+            };
+        }, localId);
+
+        expect(reconciled.record).not.toBeNull();
+        expect(reconciled.record.serverId).toBe(990051);
+        expect(reconciled.record.pendingSync).toBe(false);
+        expect(reconciled.localDirty).toBe(false);
+        expect(reconciled.pending).toHaveLength(0);
+        expect(reconciled.boundary).toEqual({ armed: true, blocked: false });
+    });
+
     test('automatically retries pending mutations when the host returns after the reconnect event', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Reconnect retry contract runs once.');
