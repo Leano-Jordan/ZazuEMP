@@ -8881,3 +8881,13 @@ body.zazu-sidebar-collapsed .zazu-nav-hierarchy > .zazu-nav-area:last-child > .z
 body.zazu-sidebar-collapsed .zazu-nav-flyout-heading {
     display: block;
 }
+
+/* Collapsed rail flyouts must paint above neighbouring navigation groups.
+   The open group owns the stacking layer; links remain native destinations. */
+body.zazu-sidebar-collapsed .zazu-nav-area.is-open {
+    z-index: 190;
+}
+body.zazu-sidebar-collapsed .zazu-nav-area.is-open > .zazu-nav-flyout {
+    z-index: 200;
+    pointer-events: auto;
+}
