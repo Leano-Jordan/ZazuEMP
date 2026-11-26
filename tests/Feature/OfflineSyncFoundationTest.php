@@ -2435,6 +2435,8 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('active', $pairedDevice->status);
         $this->assertNull($pairedDevice->pairing_code_digest);
         $this->assertArrayNotHasKey('pairing_code_hash', $pairedDevice->metadata ?? []);
+        $this->assertArrayNotHasKey('metadata', $pairedDevice->toArray());
+        $this->assertArrayNotHasKey('pairing_code_digest', $pairedDevice->toArray());
         $this->assertSame('pending', $otherDevice->fresh()->status);
         $this->assertSame(SyncDevice::pairingCodeDigest($otherCode), $otherDevice->fresh()->pairing_code_digest);
         $this->assertSame(
