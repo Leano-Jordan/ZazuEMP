@@ -512,7 +512,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
 
         await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        const trustSection = page.locator('[data-zazu-current-device-trust]');
         const trustButton = page.getByRole('button', { name: 'Trust this device for offline sync' });
+        await expect(trustSection).toContainText('anyone who can open that profile can use its offline workspace');
+        await expect(trustSection).toContainText('staff permissions are not re-checked for each offline mutation');
         await expect(trustButton).toBeVisible();
         await trustButton.click();
 
