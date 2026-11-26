@@ -127,18 +127,12 @@ async function dynamicCache() {
 
 function shouldPreferOfflineShell(request, pathname, coldLaunch = false) {
     if (request.mode !== 'navigate') return false;
-    if (coldLaunch) return true;
 
-    // These authenticated routes contain real offline-capable forms or
-    // job-specific controls. Preserve their exact cached HTML when an
-    // existing Zazu page navigates within the workspace.
-    const preserveExactRoute = [
-        '/customers/create',
-        '/work/create',
-        '/finance/invoices/create',
-    ].includes(pathname) || /^\/work\/\d+$/.test(pathname);
-
-    return !preserveExactRoute;
+    // Only a cold app launch should deliberately open the dashboard shell.
+    // In-app navigation must prefer the exact destination from the active
+    // business cache when the host is offline or temporarily unreachable;
+    // otherwise destinations silently land on the dashboard and lose intent.
+    return coldLaunch;
 }
 
 async function cachedAppPage(request, preferShell = false) {
