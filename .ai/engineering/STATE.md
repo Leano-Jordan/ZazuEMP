@@ -168,3 +168,19 @@ Three Laravel acceptance failures were traced to navigation integration: accessi
 ## Navigation presentation refinement — 2026-11-26
 
 Expanded desktop submenu presentation is inline/indented; collapsed desktop uses anchored contextual panels. Mobile/tablet retain inline drawer accordions. One semantic nav tree and shared parent trigger logic serve all viewports. Browser regression now covers collapsed desktop click-through and confirms parent activation does not navigate.
+
+## Navigation hardening follow-through — 2026-11-26
+
+The navigation state machine and stylesheet ownership have been tightened without changing destinations or permission gates:
+
+- Removed the duplicate `setupZazuSidebarCollapse()` startup call; added a PHPUnit guard so the initializer remains registered exactly once.
+- Removed the competing `:focus-within` visibility rule. A submenu is visible only while its parent has `is-open`, matching `aria-expanded`.
+- Escape now captures the open parent trigger before closing the group, then restores focus to that trigger.
+- Collapsed desktop flyouts are positioned relative to their own group; the final group opens upward. Flyouts have no max-height or nested scroll region.
+- Desktop navigation has no internal scroll container. On touch layouts, the drawer is the single overflow container; the nav list and its inline submenu are not independently scrollable.
+- Moved shared navigation geometry and typography out of `zazu-final-visual-sweep.css` and back to canonical `app.css` ownership. Regression coverage now guards against reintroducing generic navigation selectors in the visual extension layer.
+- Browser acceptance covers collapsed-panel visibility, anchored positioning, no parent-route navigation, no nested scroll, Escape focus restoration, and mobile drawer scroll ownership.
+
+### CI evidence and remaining independent failures
+
+The original `e87bca6` run failed Laravel because `.zazu-nav-flyout-heading` had two base declarations where the canonical-selector test requires one. That duplicate has been removed. The same original run also reported independent PHPMD findings (two complexity-threshold methods and one test class over the method-count threshold) and offline-browser acceptance failures around device trust and the hidden sync-recovery alert. Those are not navigation regressions and remain separate work items. Exact-head CI for the current navigation changes must finish before acceptance is marked green.
