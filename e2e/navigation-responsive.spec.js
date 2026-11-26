@@ -19,6 +19,9 @@ test('desktop navigation groups open without navigating; destinations navigate d
 
     const work = page.locator('[data-zazu-nav-area]').filter({ has: page.getByRole('button', { name: /Work/ }) });
     const workTrigger = work.getByRole('button', { name: /Work/ });
+    await expect(workTrigger).toHaveAttribute('aria-expanded', 'true');
+    await workTrigger.click();
+    await expect(workTrigger).toHaveAttribute('aria-expanded', 'false');
     await workTrigger.click();
     await expect(workTrigger).toHaveAttribute('aria-expanded', 'true');
     await expect(work.getByRole('link', { name: 'Jobs' })).toBeVisible();
@@ -33,6 +36,8 @@ test('mobile and tablet navigation use tap-controlled groups and preserve destin
     await login(page);
 
     for (const viewport of [{ width: 390, height: 844 }, { width: 810, height: 1080 }]) {
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await page.setViewportSize(viewport);
         const menu = page.locator('[data-mobile-sidebar-toggle]');
         await menu.click();
