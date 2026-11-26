@@ -14,7 +14,7 @@ class SidebarNavigationPresentationTest extends TestCase
         $this->assertIsString($layout);
         $this->assertIsString($visualCss);
         $this->assertStringContainsString('class="zazu-user-identity zazu-footer-workspace"', $layout);
-        $this->assertStringContainsString('class="zazu-user-kicker zazu-footer-workspace-label">WORKSPACE</span>', $layout);
+        $this->assertStringContainsString('class="zazu-user-kicker zazu-footer-workspace-label">Signed in</span>', $layout);
         $this->assertStringNotContainsString('<div class="zazu-footer-workspace">', $layout);
         $this->assertStringContainsString('.zazu-sidebar .zazu-workspace-profile {', $visualCss);
         $this->assertStringContainsString('.zazu-sidebar .zazu-user-trigger {', $visualCss);
