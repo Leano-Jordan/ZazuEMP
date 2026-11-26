@@ -99,9 +99,7 @@ final class BusinessArchiveService
     {
         $this->reportRestoreStage($onStage, 'archive_open');
         $zip = new ZipArchive;
-        if ($zip->open($archivePath, ZipArchive::RDONLY) !== true) {
-            throw new RuntimeException('The uploaded file is not a valid Zazu business archive.');
-        }
+        $this->openArchiveOrFail($zip, $archivePath, ZipArchive::RDONLY);
 
         $filePayloads = [];
         try {
@@ -160,9 +158,7 @@ final class BusinessArchiveService
     ): array {
         $this->reportRestoreStage($onStage, 'archive_open');
         $zip = new ZipArchive;
-        if ($zip->open($archivePath) !== true) {
-            throw new RuntimeException('The uploaded file is not a valid Zazu business archive.');
-        }
+        $this->openArchiveOrFail($zip, $archivePath);
 
         $filePayloads = [];
         try {
@@ -187,6 +183,36 @@ final class BusinessArchiveService
             }
             $zip->close();
         }
+    }
+
+    /**
+     * Preserve libzip's concrete failure so operators can distinguish a bad
+     * archive from filesystem, truncation, memory or runtime failures.
+     */
+    private function openArchiveOrFail(ZipArchive $zip, string $archivePath, int $flags = 0): void
+    {
+        $status = $zip->open($archivePath, $flags);
+        if ($status === true) {
+            return;
+        }
+
+        $description = match ($status) {
+            ZipArchive::ER_EXISTS => 'file already exists',
+            ZipArchive::ER_INCONS => 'archive is inconsistent',
+            ZipArchive::ER_INVAL => 'invalid archive argument',
+            ZipArchive::ER_MEMORY => 'memory allocation failed',
+            ZipArchive::ER_NOENT => 'archive file does not exist',
+            ZipArchive::ER_NOZIP => 'file is not a ZIP archive',
+            ZipArchive::ER_OPEN => 'archive file could not be opened',
+            ZipArchive::ER_READ => 'archive read failed',
+            ZipArchive::ER_SEEK => 'archive seek failed',
+            default => 'unclassified libzip failure',
+        };
+
+        throw new RuntimeException(
+            sprintf('Zazu could not open the business archive (libzip status %d: %s).', $status, $description),
+            is_int($status) ? $status : 0
+        );
     }
 
     /**
