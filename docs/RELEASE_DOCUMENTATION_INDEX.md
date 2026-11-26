@@ -74,3 +74,18 @@ A document is not release-complete merely because this repository contains the f
 - Proposed limits for verification: Basic 5 active events / 250 MB / one owner; Advanced up to 3 users / 2 GB hosted storage, with expanded operational modules. These are proposals, not verified entitlements.
 - Public service area approved as **Pretoria North, Gauteng, South Africa**. Do not publish the residential street address or represent the area as a registered office.
 - Initial hosted operating budget recommendation: **R450–R500/month**, based on current xneelo server estimate plus a provisional independent-backup/overhead allowance. Actual backup vendor pricing remains unconfirmed.
+
+
+## Founder decisions reconciled — 2026-11-26
+
+The current authoritative owner decisions are recorded in [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
+
+- Current owner/operator is the Founder personally; Rosscore Labs is not registered and is not the current owner/provider.
+- The Founder works alone. No employees, co-founders or contractors are involved.
+- Zazu is not launching commercially; product stability is the priority. A controlled, non-commercial test with close trusted members is acceptable when authorised.
+- Intended V1 data scope and excluded sensitive categories are documented in the Founder decision record.
+- No production hosting or third-party processing providers are provisioned/selected. Hosted and local/offline remain intended directions, not an active deployment commitment.
+- Information Officer registration is not complete. The Founder is the proposed IO for the current solo operation; formal registration route/status must be verified.
+- Dedicated privacy mailbox approved in principle but not created; Outlook remains provisional contact.
+- Retention schedule is a proposal requested by the Founder, not yet approved or enforced.
+- ZAZU is not approved as the final product name. South African protection and international expansion are intended, but no registration spend is authorised now.
