@@ -1006,7 +1006,6 @@ function setupZazuAuthContextGuard() {
         businessId: currentBusinessId,
     });
 
-    window.addEventListener('pagehide', () => channel.close(), { once: true });
 }
 
 const initializeZazuUi = () => {
