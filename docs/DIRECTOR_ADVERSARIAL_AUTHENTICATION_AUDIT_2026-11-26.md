@@ -99,7 +99,7 @@ The previous all-pending-device scan and per-candidate password-hash work have b
 
 ### Verified controls
 
-- Password reset changes password and remember token, invalidates other database sessions, calls logoutOtherDevices, and revokes all sync devices/pairings in businesses where the user currently has the owner role.
+- Password reset now commits the password and remember-token update together with revocation of all sync devices/pairings in businesses where the user currently has the owner role; other database sessions are invalidated and logoutOtherDevices is called after the reset transaction succeeds.
 - Device revocation locks the target row, removes bearer/pairing hashes and expiry, marks it revoked and audits the change.
 - Sensitive sync operations lock/revalidate device state so revocation and protected operations serialize.
 - The inspected route/controller tree did not expose a dedicated business-member removal endpoint. Owner removal semantics therefore cannot be certified from this pass; if membership removal is implemented elsewhere or introduced later, it must atomically revoke affected approvals/devices or explicitly preserve business-owned trusted-device access under a documented policy.
