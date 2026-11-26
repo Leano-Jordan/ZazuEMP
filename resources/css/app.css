@@ -7774,7 +7774,7 @@ body.zazu-inspector-open { overflow:hidden; }
 
 @media (max-width: 850px) {
     .zazu-nav-hierarchical {
-        overflow-y: auto;
+        overflow: visible;
     }
 
     .zazu-nav-flyout {
