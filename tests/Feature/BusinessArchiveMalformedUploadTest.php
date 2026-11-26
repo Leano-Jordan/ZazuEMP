@@ -163,9 +163,11 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        Customer::create([
+        DB::table('customers')->insert([
             'business_id' => $target->id,
             'name' => 'Existing Target Customer',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
         $archivePath = app(BusinessArchiveService::class)->download($source);
         $stages = [];
@@ -213,9 +215,11 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        Customer::create([
+        DB::table('customers')->insert([
             'business_id' => $source->id,
             'name' => 'Rosscore Archive Customer',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
         $archivePath = app(BusinessArchiveService::class)->download($source);
 
@@ -263,9 +267,11 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        Customer::create([
+        DB::table('customers')->insert([
             'business_id' => $source->id,
             'name' => 'Imported Rosscore Customer',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
         $archivePath = app(BusinessArchiveService::class)->download($source);
 
