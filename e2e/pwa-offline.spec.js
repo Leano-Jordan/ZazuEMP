@@ -43,20 +43,18 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'StorageManager permission contract runs once.');
 
         await login(page);
-        await page.evaluate(async () => {
-            await window.ZazuOffline.ready;
-            const state = window.ZazuOffline.getState();
-            state.local_dirty = true;
-            await window.ZazuOffline.persist();
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
 
-            window.__zazuPersistRequestCount = 0;
+        const settingsPanel = page.locator('[data-zazu-offline-storage]');
+        await expect(settingsPanel).toBeVisible();
+        await page.evaluate(() => {
             Object.defineProperty(navigator, 'storage', {
                 configurable: true,
                 value: {
                     persisted: async () => false,
                     estimate: async () => ({ usage: 95 * 1024 * 1024, quota: 100 * 1024 * 1024 }),
                     persist: () => {
-                        window.__zazuPersistRequestCount += 1;
+                        window.__zazuPersistRequestCount = (window.__zazuPersistRequestCount || 0) + 1;
                         return Promise.resolve(false);
                     },
                 },
@@ -64,11 +62,9 @@ test.describe('Zazu installed PWA offline shell', () => {
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
         });
 
-        const workspace = page.locator('[data-zazu-offline-workspace]');
-        await expect(workspace).toBeVisible();
-        const status = workspace.locator('[data-zazu-offline-storage-status]');
-        const usage = workspace.locator('[data-zazu-offline-storage-usage]');
-        const request = workspace.locator('[data-zazu-offline-storage-request]');
+        const status = settingsPanel.locator('[data-zazu-offline-storage-status]');
+        const usage = settingsPanel.locator('[data-zazu-offline-storage-usage]');
+        const request = settingsPanel.locator('[data-zazu-offline-storage-request]');
 
         await expect(status).toContainText('Persistent storage has not been granted');
         await expect(usage).toHaveText('Using 95.0 MB of an estimated 100 MB browser storage. Storage is nearing estimated capacity. Free device space without clearing Zazu site data before adding large attachments.');
@@ -105,6 +101,19 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
         await expect(status).toHaveText('This browser does not support persistent storage requests.');
         await expect(request).toBeHidden();
+
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.local_dirty = true;
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        });
+        const offlineWorkspace = page.locator('[data-zazu-offline-workspace]');
+        await expect(offlineWorkspace).toBeVisible();
+        await expect(offlineWorkspace.locator('[data-zazu-offline-storage-status]'))
+            .toHaveText('This browser does not support persistent storage requests.');
     });
 
     test('surfaces quota failures without pretending the offline change was saved', async ({ page }, testInfo) => {
