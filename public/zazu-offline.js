@@ -2363,8 +2363,8 @@
 
     async function pair(pairingCode) {
         const normalizedCode = String(pairingCode ?? '').replace(/\D/g, '');
-        if (!/^\d{8}$/.test(normalizedCode)) {
-            throw new Error('Enter the complete 8-digit phone pairing code.');
+        if (!/^\d{12}$/.test(normalizedCode)) {
+            throw new Error('Enter the complete 12-digit phone pairing code.');
         }
 
         const response = await fetch('/api/sync/provision', {
