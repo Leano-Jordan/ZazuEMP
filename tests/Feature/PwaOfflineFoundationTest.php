@@ -439,7 +439,7 @@ class PwaOfflineFoundationTest extends TestCase
         $app = File::get(resource_path('js/app.js'));
         $worker = File::get(public_path('sw.js'));
 
-        $this->assertStringContainsString('if (!/^\\d{8}$/.test(normalizedCode))', $client);
+        $this->assertStringContainsString('if (!/^\\d{12}$/.test(normalizedCode))', $client);
         $this->assertStringContainsString('pairing_code: normalizedCode', $client);
         $this->assertStringContainsString('/^\\d{12}$/', $client);
         $this->assertStringNotContainsString('slice(0, 6)', $client);
