@@ -7746,7 +7746,7 @@ body.zazu-inspector-open { overflow:hidden; }
 
 .zazu-nav-flyout-links {
     display: grid;
-    gap: 1px;
+    gap: 2px;
 }
 
 .zazu-nav-flyout .zazu-nav-link {
@@ -8862,7 +8862,6 @@ body.zazu-sidebar-collapsed .zazu-nav-flyout {
    second scrolling region or large empty space from closed panels. */
 .zazu-nav-area-trigger { min-height: 42px; }
 .zazu-nav-hierarchy { gap: 3px; }
-.zazu-nav-flyout-links { gap: 2px; }
 @media (max-width: 850px) {
     .zazu-nav-flyout .zazu-nav-link { min-height: 40px; }
 }
