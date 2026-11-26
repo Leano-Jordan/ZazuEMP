@@ -118,7 +118,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         $this->assertNotFalse($sentinelPath);
         file_put_contents($sentinelPath, 'sentinel must survive');
 
-        $zip = new \\ZipArchive;
+        $zip = new \ZipArchive;
         $this->assertTrue($zip->open($archivePath) === true);
         $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
         $manifest['files'][0]['staged_path'] = $sentinelPath;
@@ -131,7 +131,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->verify($archivePath);
                 $this->fail('Untrusted manifest fields must not override server staging metadata.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('invalid business file reference', $exception->getMessage());
             }
 
@@ -157,7 +157,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'profile_photo_path' => $sourcePath,
         ]);
 
-        $target = \\App\\Models\\Business::create([
+        $target = \App\Models\Business::create([
             'name' => 'Occupied Restore Target',
             'slug' => 'occupied-restore-target',
             'status' => 'active',
@@ -177,7 +177,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
                     }
                 );
                 $this->fail('Restore must not import into a populated workspace.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('already contains business records', $exception->getMessage());
             }
 
