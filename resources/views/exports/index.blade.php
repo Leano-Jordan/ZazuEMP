@@ -62,7 +62,7 @@
             <article class="zazu-export-action zazu-export-restore">
                 <div class="zazu-export-action-icon" aria-hidden="true"><x-icon name="upload" size="21" /></div>
                 <h3>Restore an archive</h3>
-                <p>Restore into a newly created, empty, unpaired workspace. Populated demo workspaces are not valid destinations; existing records and offline sync state are never overwritten or merged.</p>
+                <p>Restore into an empty, unpaired workspace. You can use an existing empty workspace or create a separate one under this account. Populated workspaces are never overwritten or merged.</p>
                 <form method="POST" action="{{ route('exports.archive.restore') }}" enctype="multipart/form-data" class="zazu-export-form">
                     @csrf
                     <div class="zazu-field">
@@ -81,6 +81,10 @@
                             <p class="zazu-field-error text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+                    <label class="flex items-start gap-2 text-sm">
+                        <input type="checkbox" name="restore_as_new_workspace" value="1" class="mt-1">
+                        <span><strong>Create a new business workspace for this archive.</strong> Keeps the current demo/business workspace and its records unchanged. The restored business will be added to this account.</span>
+                    </label>
                     <button type="submit" class="zazu-btn zazu-btn-secondary"><x-icon name="shield-check" size="16" class="mr-2" /> Validate &amp; restore</button>
                 </form>
             </article>
