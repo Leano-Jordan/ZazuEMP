@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-26 — Adversarial authentication hardening
+
+- Replaced eight-digit phone pairing codes with 12-digit one-time codes stored as an application-key-derived HMAC digest in a unique indexed column. Provisioning now locks and checks only the matching device instead of scanning and password-hashing every pending pairing; the endpoint limit is 10 attempts per minute per source IP.
+- Pairing digests are invalidated when devices are revoked or an owner resets their password. The offline client validates the new code length, and the service-worker cache advances to v63 so installed clients fetch the updated contract.
+- Eight-digit pairing codes generated before this update must be regenerated; the updated provisioning endpoint accepts only the 12-digit format.
+
+
 ## 2026-11-26 — Offline reliability hardening and Symfony security refresh
 
 - Corrected the offline workspace mobile header: title/description now stack above the permission-filtered module actions instead of being compressed beside a full-width navigation group. Added 390×844 geometry coverage while preserving the existing dashboard design.
