@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-11-26 — Offline reliability hardening and Symfony security refresh
+
+- Corrected the offline workspace mobile header: title/description now stack above the permission-filtered module actions instead of being compressed beside a full-width navigation group. Added 390×844 geometry coverage while preserving the existing dashboard design.
+- Made server-accepted offline mutation reconciliation atomic across the IndexedDB queue and workspace state. Queue acknowledgement, server identity/revision, related record state, conflict state, `pending_sync` and `local_dirty` now commit in one transaction. Added a failure-injection browser test for the former split-transaction crash window.
+- Added browser storage-retention visibility in Settings and the offline workspace: explicit user-initiated persistent-storage request, persisted-state reporting, usage/quota estimate and near-capacity warning. Quota failures now reject the local save explicitly and surface a visible warning; no business records, attachments or queued work are automatically deleted.
+- Advanced the service-worker static cache from v61 to v62 and updated migration tests so installed clients receive the new offline client while authenticated workspace caches are preserved.
+- Updated the affected Symfony lock entries to 7.4.24. Zazu Quality on [current candidate `8477f06`](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45787226126) passed application checks, formatting, secret scan and Composer security audit. This resolves the earlier five Symfony advisory findings without a Composer audit exception.
+- Laravel exact-head run [`45787226043`](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45787226043): **765 passed / 1 skipped / 5,471 assertions**; coverage and PostgreSQL migration/recovery smoke passed. The full exact-head offline browser/mobile suite is still running at this entry and remains an acceptance gate.
+- No physical Android visual, cold-launch, restart or reconnect pass is claimed. V1 remains NOT READY; formal score remains 71/100.
+
 ## 2026-11-25 — Repository cleanup, event-management identity and offline navigation correction
 
 - Consolidated the Director identity across the remaining active capability contracts and owner-communication rules; marked DEC-002 superseded and removed the obsolete Morpheus command hierarchy.
