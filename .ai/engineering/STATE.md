@@ -3,8 +3,7 @@
 **Last reconciled:** 2026-11-26
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
-**Latest verified application/test checkpoint:** `76868dce36756bb90146bc03ce7daad1c01caa0f` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, coverage, PostgreSQL, PHPMD, browser, Windows package/recovery and code-analysis results recorded below).  
-**Latest application/test candidate:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (test-only adjustment that arms the acknowledgement failure guard at the mocked server boundary; exact-head rerun is in progress). Subsequent commits on `main` in this batch update the living engineering records only.
+**Latest verified application/test checkpoint:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, offline browser/mobile, PostgreSQL and code-analysis rerun passed). Subsequent commits on `main` in this batch update the living engineering records only.
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
@@ -111,7 +110,7 @@ This is **IMPLEMENTED IN SOURCE and AUTOMATED-BROWSER-VERIFIED** on `76868dce` (
 
 **Settings navigation boundary:** source inspection confirms the offline route allowlist in `resources/js/app.js` includes only route families with an implemented local view. `/settings` is not mapped, so its unsupported sidebar destination and the otherwise-empty System group are hidden while disconnected. Pairing, owner administration and server-backed business settings remain online-only under the current contract. Do not restore a generic Settings link merely to make it visible; only expose a specific Settings function after its local data/behaviour is implemented and tested. The shell theme toggle remains independently available.
 
-**Owner-test rule:** do not ask the Founder to repeat the already-established offline page/data/host condition. After the latest test-only rerun completes, the only new physical confirmation to request is the corrected offline launchpad layout at phone width while the server remains unavailable. Persistence, airplane-mode cold launch, restart, attachments and reconnect remain separate open checks.
+**Owner-test rule:** do not ask the Founder to repeat the already-established offline page/data/host condition. The only new physical confirmation to request is the corrected offline launchpad layout at phone width while the server remains unavailable. Persistence, airplane-mode cold launch, restart, attachments and reconnect remain separate open checks.
 
 ## Offline mutation acknowledgement crash-consistency — 2026-11-26
 
@@ -129,6 +128,9 @@ A source-level transaction audit found that server acknowledgement previously re
 - The latest `main` commit `4a5bedf` changes only the test's failure-injection timing and is awaiting its own exact-head Laravel/browser rerun.
 
 This is automated transaction-level evidence, not a simulated physical power-cut/restart test and not full reconnect acceptance. Physical local-write/restart/reconnect checks remain open.
+
+
+- Exact current application/test checkpoint `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` — Laravel run `45782481596`: **765 passed, 1 skipped, 5,471 assertions**; coverage PASS; PostgreSQL migration/recovery smoke PASS; offline browser acceptance **75 passed**; separate mobile Work/visual **11 passed**, stopped-host **1 passed**, phone-local attachment journey **1 passed**. Push-on-main static analysis PASS. Zazu Quality `45782481630`: application, formatting and secret-scan PASS; Composer security audit FAILED on the five Symfony advisories already listed. SonarCloud remains skipped. The test-only guard timing refinement is included in this exact-head passing result.
 
 ## Browser-managed local storage retention — OPEN
 
