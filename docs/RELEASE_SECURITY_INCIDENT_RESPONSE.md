@@ -146,3 +146,12 @@ An incident may be closed only when:
 - [ ] incident record location secured;
 - [ ] backup/restore procedure linked and tested;
 - [ ] notification assessment reviewed legally where required.
+
+
+## Founder decision update — 2026-11-26
+
+The Founder is the sole current owner/operator and has not registered an Information Officer. The Founder is the proposed IO for the current individual operation, subject to confirmation of the correct registration route and completion of registration. No Deputy Information Officer is currently appointed. The dedicated privacy mailbox is approved in principle but not yet created; `rosscorelabs@outlook.com` remains the provisional incident-reporting contact and must be monitored/tested before publication.
+
+Do not represent Rosscore Labs as incorporated or as the current operator. No production hosting or external incident/support provider has been provisioned for Zazu. A private non-commercial test is not a commercial launch, but any real personal-information processing must still be handled lawfully. The Information Regulator notification route remains separate from the customer contact mailbox.
+
+See [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
