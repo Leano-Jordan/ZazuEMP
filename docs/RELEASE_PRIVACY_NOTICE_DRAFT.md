@@ -122,3 +122,14 @@ Record the notice version and effective date whenever processing purposes, infor
 - [ ] data-subject request channel tested;
 - [ ] incident escalation channel tested;
 - [ ] legal review completed where required.
+
+
+## Founder decision update — 2026-11-26
+
+The Founder confirms the intended V1 data scope is business/workspace and staff account details; customer names/contact details; event addresses, dates, requirements and operational notes; quotes, invoices and payment records; and documents, receipts, photographs and attachments. Identity-document numbers, bank-account details, children's information and medical/sensitive information are not intended V1 data categories. Because free text and uploaded files can contain unexpected information, the notice and UI must not imply such information is impossible to enter; data-minimisation guidance remains necessary.
+
+The Founder is the current individual owner/operator. Rosscore Labs is not registered and is not the current provider. No Zazu production hosting or third-party service provider has been provisioned/selected. Hosted and local/offline remain intended deployment directions, but the actual deployment and providers must be confirmed before this notice is finalised.
+
+The Founder has not registered an Information Officer. The Founder is the proposed IO for the current solo operation, subject to confirming the registration route. A dedicated privacy mailbox is approved in principle but not yet created; `rosscorelabs@outlook.com` remains provisional. This draft must not be published until the responsible-party/operator arrangement, actual deployment, contacts and legal review are complete.
+
+See [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
