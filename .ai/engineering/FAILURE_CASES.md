@@ -921,7 +921,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0050
 
-**Status:** FIXED IN SOURCE — exact-head offline browser CI and post-fix physical visual acceptance pending.
+**Status:** FIXED IN SOURCE — exact-head offline browser acceptance PASS; post-fix physical visual acceptance pending.
 
 **Engineering diagnostic code:** ENG-CSS-005  
 **Class:** F1/F2 — application responsive-layout defect plus missing geometry in the browser verification contract.  
@@ -943,6 +943,6 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Independent navigation finding:** The offline route allowlist in resources/js/app.js intentionally excludes /settings. Unsupported navigation links and now-empty navigation groups are hidden while offline. Device pairing, owner administration and server-backed business settings remain online-only. Do not reintroduce Settings as an offline link without a specific supported local feature and tests.
 
-**Evidence:** Founder screenshots received 2026-11-26 show 13 saved records, 0 waiting to sync and 0 conflicts, plus the layout defect. Current-head Laravel run 45779103238 passed 765 tests / 1 skipped / 5,464 assertions, coverage and PostgreSQL smoke passed; offline-browser acceptance was still in progress at last check. Zazu Quality run 45779103388 passed application, formatting and secret-scan jobs but failed its independent Composer security audit on five Symfony advisories. No post-fix Android screenshot or rendered visual acceptance has been observed.
+**Evidence:** Founder screenshots received 2026-11-26 show 13 saved records, 0 waiting to sync and 0 conflicts, plus the layout defect. Exact-head Laravel run 45779103238 passed 765 tests / 1 skipped / 5,464 assertions; coverage and PostgreSQL smoke passed. Offline-browser run 45779103238 completed PASS: 74 Chromium offline journeys passed, including the 390×844 geometry assertion, plus 11 mobile-viewport checks, the mobile stopped-host check and phone-local attachment round-trip. Zazu Quality run 45779103388 passed application, formatting and secret-scan jobs but failed its independent Composer security audit on five Symfony advisories. Zazu Quality run 45779103388 passed application, formatting and secret-scan jobs but failed its independent Composer security audit on five Symfony advisories. No post-fix Android screenshot or rendered visual acceptance has been observed.
 
 **Rejected approaches:** Do not hide offline navigation again, widen the entire shared Dashboard header, remove links to satisfy the screenshot, or treat source assertions/green PHP tests as visual acceptance. Keep the correction isolated to the offline shell.
