@@ -13,8 +13,9 @@
 
 - Added public About, Security, Contact and What's New pages, plus clearly labelled Privacy and Terms pre-publication review copies. Linked the trust surface from the landing-page footer and a shared responsive public layout.
 - Public copy now identifies the Founder as the current individual owner/operator, describes Rosscore Labs as an unregistered future identity, identifies the Outlook contact as provisional, and avoids unsupported uptime, certification, company-registration and Information Officer claims.
-- Traced the collapsed-navigation Dashboard fallback to a service-worker route timeout of 1.8 seconds racing the application's 3-second origin-health probe. Increased the navigation window to 5 seconds and advanced the static worker cache to v64.
-- Added slow-but-healthy destination regression coverage, collapsed desktop rail Playwright coverage, public trust route/content tests and route-integrity assertions.
+- Traced the collapsed-navigation Dashboard fallback first to a 1.8-second service-worker timeout racing the application's 3-second origin-health probe; increased the navigation window to 5 seconds and advanced the static worker cache to v64.
+- Found a second, broader fallback-policy defect: almost every in-app navigation preferred the cached Dashboard over its exact route when offline or on request failure. Changed the policy so only cold launches prefer Dashboard; in-app navigations now prefer the exact active-business cached destination.
+- Added worker regressions for exact-route fallback across ordinary destinations, cold-launch Dashboard preference, slow-but-healthy destinations, and collapsed desktop rail Playwright coverage, alongside public trust route/content tests and route-integrity assertions.
 - **Acceptance pending:** current-head Laravel, Zazu Quality, service-worker and browser checks must pass. Founder-device navigation and visual verification are not yet claimed. Privacy and Terms remain non-effective review copies.
 
 ## 2026-11-26 — Adversarial authentication hardening
