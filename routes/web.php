@@ -99,6 +99,13 @@ Route::get('/', function (Request $request) {
     return view('landing', compact('telemetry', 'isAuthenticated', 'hasActiveWorkspace', 'business', 'landingImages'));
 })->name('landing');
 
+Route::view('/about', 'public.about')->name('public.about');
+Route::view('/security', 'public.security')->name('public.security');
+Route::view('/contact', 'public.contact')->name('public.contact');
+Route::view('/whats-new', 'public.whats-new')->name('public.whats-new');
+Route::view('/privacy', 'public.privacy')->name('public.privacy');
+Route::view('/terms', 'public.terms')->name('public.terms');
+
 Route::middleware('signed')->group(function () {
     Route::get('/invoices/{invoice}/view', [PublicInvoiceController::class, 'show'])->middleware('throttle:quote.public')->name('finance.invoices.public');
     Route::get('/payments/{payment}/receipt', [PublicPaymentReceiptController::class, 'show'])->middleware('throttle:quote.public')->name('finance.payments.receipt');
