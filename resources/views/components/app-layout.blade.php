@@ -96,25 +96,25 @@
                     <div class="zazu-nav-area {{ request()->routeIs('capabilities.*','quotes.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('capabilities.*','quotes.*') ? 'true' : 'false' }}" aria-label="Sales" title="Sales" aria-controls="zazu-nav-sales"><span class="zazu-nav-area-title"><x-icon name="receipt" size="18" class="zazu-nav-icon" /><span> Sales</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-sales" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">Sales</div><div class="zazu-nav-flyout-links">
-                            @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" class="zazu-nav-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Services &amp; prices</a>@endif
+                            @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" class="zazu-nav-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if(request()->routeIs('capabilities.*')) aria-current="page" @endif>Services &amp; prices</a>@endif
                             @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" class="zazu-nav-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}" @if(request()->routeIs('quotes.*')) aria-current="page" @endif>Quotes</a>@endif
                         </div></div>
                     </div>
                     <div class="zazu-nav-area {{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'true' : 'false' }}" aria-label="Resources" title="Resources" aria-controls="zazu-nav-resources"><span class="zazu-nav-area-title"><x-icon name="package" size="18" class="zazu-nav-icon" /><span> Resources</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-resources" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">Resources</div><div class="zazu-nav-flyout-links">
-                            @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}">Purchasing</a>@endif
-                            @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" class="zazu-nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">Suppliers</a>@endif
-                            @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" class="zazu-nav-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}">Inventory</a>@endif
-                            @if($can('assets.view'))<a href="{{ route('assets.index') }}" class="zazu-nav-link {{ request()->routeIs('assets.*') ? 'active' : '' }}">Assets</a>@endif
+                            @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}" @if(request()->routeIs('purchasing.*')) aria-current="page" @endif>Purchasing</a>@endif
+                            @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" class="zazu-nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" @if(request()->routeIs('suppliers.*')) aria-current="page" @endif>Suppliers</a>@endif
+                            @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" class="zazu-nav-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}" @if(request()->routeIs('inventory.*')) aria-current="page" @endif>Inventory</a>@endif
+                            @if($can('assets.view'))<a href="{{ route('assets.index') }}" class="zazu-nav-link {{ request()->routeIs('assets.*') ? 'active' : '' }}" @if(request()->routeIs('assets.*')) aria-current="page" @endif>Assets</a>@endif
                         </div></div>
                     </div>
                     <div class="zazu-nav-area {{ request()->routeIs('finance.*','search.*','reports.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('finance.*','search.*','reports.*') ? 'true' : 'false' }}" aria-label="Finance" title="Finance" aria-controls="zazu-nav-money"><span class="zazu-nav-area-title"><x-icon name="wallet" size="18" class="zazu-nav-icon" /><span> Finance</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-money" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">Finance</div><div class="zazu-nav-flyout-links">
-                            @if($can('finance.view'))<a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}">Finance</a>@endif
-                            <a href="{{ route('search.index') }}" class="zazu-nav-link {{ request()->routeIs('search.*') ? 'active' : '' }}">Advanced Search</a>
-                            @if($can('reports.view'))<a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">Reports</a>@endif
+                            @if($can('finance.view'))<a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}" @if(request()->routeIs('finance.*')) aria-current="page" @endif>Finance</a>@endif
+                            <a href="{{ route('search.index') }}" class="zazu-nav-link {{ request()->routeIs('search.*') ? 'active' : '' }}" @if(request()->routeIs('search.*')) aria-current="page" @endif>Advanced Search</a>
+                            @if($can('reports.view'))<a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" @if(request()->routeIs('reports.*')) aria-current="page" @endif>Reports</a>@endif
                         </div></div>
                     </div>
                     @endif
@@ -123,16 +123,16 @@
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*','exports.*') ? 'true' : 'false' }}" aria-label="System" title="System" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title"><x-icon name="settings" size="18" class="zazu-nav-icon" /><span> System</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">System</div><div class="zazu-nav-flyout-links">
                             @if($isOwner)
-                                <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">Owner Admin</a>
-                                <a href="{{ route('exports.index') }}" class="zazu-nav-link {{ request()->routeIs('exports.*') ? 'active' : '' }}">Data export &amp; recovery</a>
-                                <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.index') ? 'active' : '' }}">Settings</a>
-                                <a href="{{ route('settings.compliance') }}" class="zazu-nav-link {{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a>
-                                <a href="{{ route('settings.audit') }}" class="zazu-nav-link {{ request()->routeIs('settings.audit') ? 'active' : '' }}">Activity audit</a>
-                                <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
+                                <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}" @if(request()->routeIs('owner.dashboard')) aria-current="page" @endif>Owner Admin</a>
+                                <a href="{{ route('exports.index') }}" class="zazu-nav-link {{ request()->routeIs('exports.*') ? 'active' : '' }}" @if(request()->routeIs('exports.*')) aria-current="page" @endif>Data export &amp; recovery</a>
+                                <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.index') ? 'active' : '' }}" @if(request()->routeIs('settings.index')) aria-current="page" @endif>Settings</a>
+                                <a href="{{ route('settings.compliance') }}" class="zazu-nav-link {{ request()->routeIs('settings.compliance*') ? 'active' : '' }}" @if(request()->routeIs('settings.compliance*')) aria-current="page" @endif>Compliance</a>
+                                <a href="{{ route('settings.audit') }}" class="zazu-nav-link {{ request()->routeIs('settings.audit') ? 'active' : '' }}" @if(request()->routeIs('settings.audit')) aria-current="page" @endif>Activity audit</a>
+                                <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}" @if(request()->routeIs('onboarding.*')) aria-current="page" @endif>Setup</a>
                             @endif
                             @if($isPlatformAdmin)
-                                <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel','admin.sentinel.*') ? 'active' : '' }}">Founder Control Centre</a>
-                                <a href="{{ route('admin.landing.settings') }}" class="zazu-nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">Platform</a>
+                                <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel','admin.sentinel.*') ? 'active' : '' }}" @if(request()->routeIs('admin.sentinel','admin.sentinel.*')) aria-current="page" @endif>Founder Control Centre</a>
+                                <a href="{{ route('admin.landing.settings') }}" class="zazu-nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}" @if(request()->routeIs('admin.landing.*')) aria-current="page" @endif>Platform</a>
                             @endif
                         </div></div>
                     </div>
