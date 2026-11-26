@@ -690,7 +690,7 @@
                     throw new Error(result.message || 'Could not generate a pairing code.');
                 }
 
-                pairingResult.textContent = '12-digit code: ' + result.pairing_code + ' · expires  + new Date(result.expires_at).toLocaleTimeString();
+                pairingResult.textContent = '12-digit code: ' + result.pairing_code + ' · expires ' + new Date(result.expires_at).toLocaleTimeString();
             } catch (error) {
                 pairingResult.textContent = error.message || 'Could not generate a pairing code.';
             } finally {
