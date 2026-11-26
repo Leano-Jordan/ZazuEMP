@@ -4,7 +4,7 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest verified application/test checkpoint:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, offline browser/mobile, PostgreSQL and code-analysis rerun passed).  
-**Current application/test candidate:** `8477f065d947375d0fc81c99b04efb313d0299c2` (storage persistence status/request, quota warning and fail-closed write handling, Settings + offline workspace UI, service-worker cache v62, and browser coverage; exact-head Laravel/offline browser validation is in progress).
+**Current application/test candidate:** `3931ace2affab8bd95b76cb02cbc44081bad894d` (12-digit indexed HMAC phone pairing, pairing credential invalidation, offline client v63, and updated authentication/offline regression fixtures; exact-head CI validation is queued).
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
