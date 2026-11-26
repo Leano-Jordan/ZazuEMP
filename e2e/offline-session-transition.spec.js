@@ -313,6 +313,33 @@ test('workspace switching submits the selected business and preserves each busin
     expect(restoredFirstCache.length).toBeGreaterThan(0);
 });
 
+test('sibling browser tabs follow the active authenticated identity', async ({ page }, testInfo) => {
+    test.setTimeout(60_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Cross-tab session transition runs once.');
+
+    await login(page);
+    const firstUser = Number(await page.locator('body').getAttribute('data-zazu-user-id'));
+    expect(firstUser).toBeGreaterThan(0);
+
+    const sibling = await page.context().newPage();
+    await sibling.goto('/dashboard', { waitUntil: 'load' });
+    await expect(sibling.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(sibling.locator('body')).toHaveAttribute('data-zazu-user-id', String(firstUser));
+
+    await page.goto('/');
+    await page.locator('form[action$="/logout"]').evaluate(form => form.requestSubmit());
+    await expect(page.locator('body')).not.toHaveAttribute('data-zazu-user-id', String(firstUser));
+
+    await login(page, MANAGER_EMAIL, ROLE_PASSWORD);
+    const secondUser = Number(await page.locator('body').getAttribute('data-zazu-user-id'));
+    expect(secondUser).toBeGreaterThan(0);
+    expect(secondUser).not.toBe(firstUser);
+
+    await expect.poll(() => sibling.locator('body').getAttribute('data-zazu-user-id')).toBe(String(secondUser));
+    await expect(sibling.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await sibling.close();
+});
+
 test('expired web session requires sign-in without erasing the trusted offline workspace', async ({ page }, testInfo) => {
     test.setTimeout(45_000);
     test.skip(testInfo.project.name !== 'chromium', 'Expired-session preservation runs once; responsive navigation is covered separately.');
