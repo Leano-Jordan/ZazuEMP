@@ -166,8 +166,15 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(sidebar).toHaveCSS('width', '76px');
         await expect(heading).toBeVisible();
         await expect(work).toHaveCSS('position', 'relative');
+        await expect(panel).toHaveCSS('position', 'absolute');
         await expect.poll(() => panel.evaluate((node) => getComputedStyle(node).overflowY)).toBe('visible');
         await expect.poll(() => panel.evaluate((node) => getComputedStyle(node).maxHeight)).toBe('none');
+        const panelAnchorGap = await panel.evaluate((node) => {
+            const panelRect = node.getBoundingClientRect();
+            const parentRect = node.parentElement.getBoundingClientRect();
+            return panelRect.left - parentRect.right;
+        });
+        expect(panelAnchorGap).toBeGreaterThanOrEqual(0);
 
         // The active Work group starts open. Close and reopen it to prove that
         // the rail trigger controls its contextual panel without changing route.
