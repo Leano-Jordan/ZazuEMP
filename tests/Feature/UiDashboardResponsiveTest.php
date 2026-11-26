@@ -74,7 +74,9 @@ class UiDashboardResponsiveTest extends TestCase
         $this->assertStringContainsString('@media (max-width: 850px)', $appCss);
         $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $appCss);
         $this->assertStringContainsString('.zazu-nav-area-chevron {', $appCss);
-        $this->assertStringContainsString('overflow-y: auto;', $responsiveCss);
+        $this->assertStringContainsString(".zazu-nav {\n    overflow: visible;\n}", $responsiveCss);
+        $this->assertStringNotContainsString('overflow-y: auto;', $responsiveCss);
+        $this->assertStringContainsString('overflow-y: auto;', $mobileCss);
         $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-sidebar {', $mobileCss);
         $this->assertStringContainsString(".zazu-nav-area.is-open > .zazu-nav-flyout {\n        display: block;\n        pointer-events: auto;", $appCss);
         $this->assertStringContainsString('min-height: 44px;', $mobileCss);
