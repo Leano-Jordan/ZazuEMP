@@ -974,3 +974,26 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Evidence on exact checkpoint `4a5bedfc`:** Laravel **765 passed / 1 skipped / 5,471 assertions**; desktop offline/browser acceptance **75 passed**; mobile offline Work/visual suite **11 passed**; mobile host-outage **1 passed**; phone-local attachment **1 passed**; PostgreSQL migration/recovery smoke **1 passed**. PHPMD, static analysis, Windows build, encrypted/legacy archive verification and fresh install passed on the same application source at `76868dce`; the final `4a5bedf` commit only refines test-injection timing. Zazu Quality application/formatting/secret-scan passed; Composer security audit failed independently on five Symfony advisories. This automated evidence does not claim a physical power-cut test or close restart/reconnect acceptance.
 
 **Rejected approaches:** Never mark the queue row deleted first and rely on a later state write. Do not retry with a new mutation UUID after an uncertain server response; preserve the original idempotency identity. Do not call the browser test a physical power-cut test.
+
+### CASE-ZAZU-0052
+
+**Status:** OPEN — browser-managed storage-retention hardening not implemented. No browser-eviction/data-loss incident has been reported; this is a verified architecture gap.
+
+**Engineering diagnostic code:** ENG-DATA-007  
+**Class:** F1/F7 — local-data durability boundary / browser platform dependency.  
+**First identified:** 2026-11-26  
+**Target:** \`public/zazu-offline.js\` IndexedDB workspace and phone-attachment databases; service-worker Cache Storage and offline-shell reporting.
+
+**Failure fingerprint:** Zazu has committed locally saved business records and/or pending mutations → browser origin remains in best-effort storage mode → storage pressure/browser policy evicts the origin bucket, or the user clears site data → IndexedDB and service-worker caches are removed → the device cannot reopen its prior offline workspace until it reconnects and restores data.
+
+**Expected:** Zazu should inspect current storage persistence state where supported, request persistent origin storage at an appropriate trusted-device/pairing interaction, record whether the browser grants it, estimate current usage/quota, and communicate the actual protection state and capacity limitations. A declined/unsupported persistence request must not block offline work. Users must be warned that explicitly clearing site data still deletes local data; business export/import and full installation recovery remain separate safeguards.
+
+**Actual source finding:** the application uses IndexedDB for the local workspace/queue/attachments and Cache Storage for service-worker assets, but a full source search found no \`navigator.storage.persist()\`, \`navigator.storage.persisted()\` or \`navigator.storage.estimate()\` calls and no UI reporting a persistence grant or origin storage quota. IndexedDB transactions are atomic, but do not themselves protect the origin bucket from browser-managed eviction.
+
+**External platform basis:** MDN documents browser-managed origin storage as best-effort by default, with persistent storage available through \`StorageManager.persist()\`; storage estimates are available through \`StorageManager.estimate()\`. Persistence is not a defence against deliberate user deletion. Sources: [MDN storage quotas and eviction criteria](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria), [MDN StorageManager](https://developer.mozilla.org/en-US/docs/Web/API/StorageManager), and [MDN Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API).
+
+**Required engineering:** implement a permission-safe persistence request associated with a deliberate pairing/trusted-device action; inspect the status on later launches; expose granted, not granted, unsupported or unknown without implying certainty; estimate usage/quota and handle quota errors with explicit user feedback; do not delete old business data automatically to free space. Add browser regression tests for granted/denied/unsupported outcomes and capacity-warning behaviour. Validate on the actual supported Android browser/PWA path.
+
+**Acceptance evidence required:** automated browser coverage for all API outcomes; real phone check that status is displayed accurately; force-close/restart with normal browser data retention; explicit manual site-data clearing must be documented as destructive; export/import and installation recovery remain separate. Do not claim this case is closed merely because a storage persistence request returns true.
+
+**Rejected approaches:** do not silently fire a persistence prompt without user context; do not block local work if the browser declines; do not claim IndexedDB is permanent; do not auto-clear attachments, mutation queue or business records to recover quota.
