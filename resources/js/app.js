@@ -666,15 +666,33 @@ const setupZazuHierarchicalNavigation = () => {
         if (event.key !== 'Escape') return;
 
         // The mobile drawer owns Escape for events originating inside its DOM.
-        // Its earlier listener closes the drawer and restores focus to the drawer toggle.
+        // Its handler closes the drawer and restores focus to the drawer toggle.
         if (window.matchMedia('(max-width: 850px)').matches
             && event.target instanceof Element
             && event.target.closest('[data-mobile-sidebar]')) return;
 
-        // Capture the active control before closing the group updates aria-expanded.
-        const activeTrigger = document.querySelector('[data-zazu-nav-trigger][aria-expanded="true"]');
+        // Restore focus to the group that contained the focused destination.
+        // This avoids selecting an unrelated expanded group when multiple
+        // navigation shells are present (for example, responsive layouts).
+        const focusedArea = event.target instanceof Element
+            ? event.target.closest('[data-zazu-nav-area]')
+            : null;
+        const activeArea = focusedArea?.classList.contains('is-open')
+            ? focusedArea
+            : areas.find((area) => area.classList.contains('is-open'));
+        const activeTrigger = activeArea?.querySelector('[data-zazu-nav-trigger]');
+
         closeOthers(null);
-        activeTrigger?.focus();
+
+        // Defer focus until the collapsed flyout has completed its close/layout
+        // update and all other Escape handlers have finished.
+        if (activeTrigger) {
+            window.requestAnimationFrame(() => {
+                if (activeTrigger.isConnected && !activeTrigger.disabled) {
+                    activeTrigger.focus({ preventScroll: true });
+                }
+            });
+        }
     });
 
 };
