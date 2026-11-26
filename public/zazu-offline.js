@@ -56,6 +56,7 @@
         failure.name = quotaExceeded ? 'QuotaExceededError' : (error?.name || 'StorageError');
 
         if (quotaExceeded) {
+            storageAvailable = false;
             window.dispatchEvent(new CustomEvent('zazu:offline-storage-error', {
                 detail: { category: 'quota', message },
             }));
@@ -328,9 +329,20 @@
         const stateToWrite = state;
         const expectedToken = stateToWrite?.sync?.token || null;
         const baseline = durableStateSnapshot || cloneWorkspaceState(stateToWrite || blank());
-        const db = await openDb();
+        let db;
+        try {
+            db = await openDb();
+        } catch (error) {
+            throw localStorageWriteError(error, 'Local offline storage could not be opened; this change was not saved.');
+        }
         return new Promise((resolve, reject) => {
-            const tx = db.transaction(STATE, 'readwrite');
+            let tx;
+            try {
+                tx = db.transaction(STATE, 'readwrite');
+            } catch (error) {
+                reject(localStorageWriteError(error, 'Local offline state transaction could not start; this change was not saved.'));
+                return;
+            }
             const store = tx.objectStore(STATE);
             const current = store.get('current');
             let sessionMismatch = false;
@@ -691,13 +703,24 @@
             last_error: null,
         }));
 
-        const db = await openAttachmentDb();
+        let db;
+        try {
+            db = await openAttachmentDb();
+        } catch (error) {
+            throw localStorageWriteError(error, 'Local attachment storage could not be opened; these files were not saved.');
+        }
         try {
             if (sessionCleared || sessionGeneration !== queueSessionGeneration) {
                 throw new Error('The device session changed before these attachments could be saved. Reload Zazu and try again.');
             }
             await new Promise((resolve, reject) => {
-                const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                let tx;
+                try {
+                    tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                } catch (error) {
+                    reject(localStorageWriteError(error, 'The attachment batch transaction could not start; these files were not saved.'));
+                    return;
+                }
                 if (sessionCleared || sessionGeneration !== queueSessionGeneration) {
                     tx.abort();
                     reject(new Error('The device session changed before these attachments could be saved. Reload Zazu and try again.'));
@@ -1640,7 +1663,7 @@
             db = await openDb();
         } catch (error) {
             storageAvailable = false;
-            throw new Error('Local offline storage is unavailable; this change was not saved.');
+            throw localStorageWriteError(error, 'Local offline storage is unavailable; this change was not saved.');
         }
 
         if (sessionCleared) {
@@ -1648,7 +1671,14 @@
         }
 
         return new Promise((resolve, reject) => {
-            const tx = db.transaction([STATE, QUEUE], 'readwrite');
+            let tx;
+            try {
+                tx = db.transaction([STATE, QUEUE], 'readwrite');
+            } catch (error) {
+                storageAvailable = false;
+                reject(localStorageWriteError(error, 'Local offline queue transaction could not start; this change was not saved.'));
+                return;
+            }
             const stateStore = tx.objectStore(STATE);
             const queueStore = tx.objectStore(QUEUE);
             const currentState = stateStore.get('current');
