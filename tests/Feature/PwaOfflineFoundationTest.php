@@ -123,7 +123,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertMatchesRegularExpression("/const CACHE_NAME = 'zazu-static-v\\d+';/", $worker);
         $this->assertStringContainsString("const OFFLINE_SHELL = '/dashboard';", $worker);
         $this->assertStringContainsString('const timeout = setTimeout(() => controller.abort(), timeoutMs);', $worker);
-        $this->assertStringContainsString('async function fetchWithTimeout(request, timeoutMs = 1800)', $worker);
+        $this->assertStringContainsString('async function fetchWithTimeout(request, timeoutMs = 5000)', $worker);
         $this->assertStringContainsString('fetchWithTimeout(request)', $worker);
         $this->assertStringContainsString('OFFLINE_SHELL,', $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
@@ -188,7 +188,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('|| /^\\/work\\/\\d+$/.test(pathname)', $worker);
         $this->assertSame(3, substr_count($worker, 'cachedAppPage(request, preferOfflineShell)'));
         $this->assertStringContainsString("const preferOfflineShell = shouldPreferOfflineShell(request, url.pathname, event.clientId === '');", $worker);
-        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v63\';', $worker);
+        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v64\';', $worker);
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
             $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $dashboard);
         }
@@ -446,7 +446,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
         $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString('zazu-static-v63', $worker);
+        $this->assertStringContainsString('zazu-static-v64', $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
