@@ -136,3 +136,14 @@ Navigation must minimise hunting, scrolling and prior knowledge while preserving
 - Removed a duplicate mobile active-group display override. The server-rendered active group already carries `is-open`, so the fallback was redundant and could disagree with the client accordion state.
 - Added Playwright coverage for desktop flyouts, mobile drawer toggling, tablet touch navigation, non-navigation on group-trigger taps, and correct destination navigation.
 - Desktop, tablet and phone are separate acceptance targets. The current branch checks were green before this change; this new interaction change remains pending its own CI run and must not be called verified until then.
+
+
+## 2026-11-26 — Laravel regression repair after navigation/pairing work
+
+The failed Laravel run exposed three actionable regressions and one security boundary defect:
+
+1. `business.switch` was outside the `auth.session` middleware group. The stale-password-hash regression test correctly caught that the session could remain authenticated after its password hash became stale. The route is now moved into the authenticated-session group.
+2. The mobile server-rendered active-group fallback was removed while the Blade markup still emits `is-active`. Restore the mobile `is-active` fallback so the active destination remains reachable before JavaScript initialises.
+3. The phone-pairing regression test still asserted the old eight-digit client validation despite separately asserting the new 12-digit contract. Update it to assert 12 digits consistently.
+
+The failed run reported 764 passing, 3 failing and 1 skipped. These fixes are source changes only until the next exact-head Laravel and browser CI runs complete.
