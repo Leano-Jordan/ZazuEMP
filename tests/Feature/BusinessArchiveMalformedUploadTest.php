@@ -242,6 +242,68 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         }
     }
 
+    public function test_archive_can_restore_into_a_new_workspace_without_mutating_the_demo_workspace(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+        $this->signInAsOwner();
+        $originalWorkspace = auth()->user()->businesses()->firstOrFail();
+        Customer::create([
+            'business_id' => $originalWorkspace->id,
+            'name' => 'Demo Data Must Remain',
+        ]);
+
+        $source = Business::create([
+            'name' => 'Rosscore Archive Source',
+            'slug' => 'rosscore-new-workspace-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        Customer::create([
+            'business_id' => $source->id,
+            'name' => 'Imported Rosscore Customer',
+        ]);
+        $archivePath = app(BusinessArchiveService::class)->download($source);
+
+        try {
+            $response = $this->from(route('exports.index'))->followingRedirects()->post(
+                route('exports.archive.restore'),
+                [
+                    'archive' => UploadedFile::fake()->createWithContent(
+                        'rosscore-business.zazu',
+                        (string) file_get_contents($archivePath)
+                    ),
+                    'restore_as_new_workspace' => '1',
+                ]
+            );
+
+            $response->assertOk();
+            $response->assertSee('Business archive restored:');
+            $restoredWorkspace = auth()->user()->businesses()
+                ->where('businesses.name', 'Rosscore Archive Source')
+                ->firstOrFail();
+
+            $this->assertSame(
+                (int) $restoredWorkspace->id,
+                app(\\App\\Support\\CurrentBusiness::class)->id(auth()->user())
+            );
+            $this->assertDatabaseHas('customers', [
+                'business_id' => $restoredWorkspace->id,
+                'name' => 'Imported Rosscore Customer',
+            ]);
+            $this->assertDatabaseHas('customers', [
+                'business_id' => $originalWorkspace->id,
+                'name' => 'Demo Data Must Remain',
+            ]);
+            $this->assertDatabaseMissing('customers', [
+                'business_id' => $originalWorkspace->id,
+                'name' => 'Imported Rosscore Customer',
+            ]);
+        } finally {
+            @unlink($archivePath);
+        }
+    }
+
     public function test_non_zip_upload_reports_the_specific_libzip_failure_code(): void
     {
         $this->signInAsOwner();
