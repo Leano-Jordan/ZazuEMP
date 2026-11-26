@@ -1129,6 +1129,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.route('**/api/sync/push', async route => {
             pushAttempts += 1;
             const mutation = route.request().postDataJSON().mutations[0];
+            // Arm only after the push reaches the server boundary. Earlier
+            // setup or unrelated UI writes are outside this assertion.
+            await page.evaluate(() => {
+                window.__ZAZU_ACK_BOUNDARY.armed = true;
+            });
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -1164,7 +1169,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         }));
 
         await page.evaluate(() => {
-            const boundary = { armed: true, blocked: false };
+            const boundary = { armed: false, blocked: false };
             window.__ZAZU_ACK_BOUNDARY = boundary;
             const originalTransaction = IDBDatabase.prototype.transaction;
             IDBDatabase.prototype.transaction = function (storeNames, mode, options) {
