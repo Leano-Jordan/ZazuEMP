@@ -54,15 +54,17 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Pass the local PHP scan-directory override into Laravel's child dev-server process.
+     * Pass the local PHP runtime overrides into Laravel's child dev-server process.
      *
      * Laravel filters inherited environment variables on Windows; without this allowlist
      * entry, PHP_INI_SCAN_DIR set by the Zazu launcher reaches Artisan but not the web server.
      */
     private function registerLocalPhpIniPassthrough(): void
     {
-        if (! in_array('PHP_INI_SCAN_DIR', ServeCommand::$passthroughVariables, true)) {
-            ServeCommand::$passthroughVariables[] = 'PHP_INI_SCAN_DIR';
+        foreach (['PHP_INI_SCAN_DIR', 'SESSION_SECURE_COOKIE'] as $variable) {
+            if (! in_array($variable, ServeCommand::$passthroughVariables, true)) {
+                ServeCommand::$passthroughVariables[] = $variable;
+            }
         }
     }
 
