@@ -310,6 +310,7 @@
                 <strong data-zazu-offline-storage-status>Checking browser storage protection…</strong>
                 <span data-zazu-offline-storage-usage></span>
                 <p class="zazu-card-description">Persistent storage can reduce automatic browser cleanup. It cannot prevent someone from clearing this browser's site data.</p>
+                <p class="zazu-field-help" data-zazu-offline-storage-error hidden role="alert"></p>
                 <button type="button" class="zazu-btn zazu-btn-secondary mt-2" data-zazu-offline-storage-request hidden>Request storage protection</button>
             </div>
         </article>
