@@ -997,3 +997,25 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Acceptance evidence required:** automated browser coverage for all API outcomes; real phone check that status is displayed accurately; force-close/restart with normal browser data retention; explicit manual site-data clearing must be documented as destructive; export/import and installation recovery remain separate. Do not claim this case is closed merely because a storage persistence request returns true.
 
 **Rejected approaches:** do not silently fire a persistence prompt without user context; do not block local work if the browser declines; do not claim IndexedDB is permanent; do not auto-clear attachments, mutation queue or business records to recover quota.
+
+### CASE-ZAZU-0053
+
+**Status:** CLOSED — exact-head session-transition regressions and Laravel feature suite passed on `e564ec24`.
+
+**Engineering diagnostic code:** ENG-AUTH-004  
+**Class:** F7 — authentication/session lifecycle hardening; no session-fixation bypass was established.  
+**First identified:** 2026-11-26  
+**Target:** `app/Http/Controllers/AuthController.php`, `app/Http/Controllers/PasswordResetController.php`, `tests/Feature/AuthenticationSessionSecurityTest.php`.
+
+**Failure fingerprint:** A user completes login, registration or password reset → Laravel rotates the session identifier → the previous database-backed anonymous session row remains until normal expiry/garbage collection because the default `regenerate()` uses non-destructive migration.
+
+**Root cause:** Laravel 13.43.0's `Store::regenerate()` defaults to `destroy=false`. The new session ID prevents the old guest session from becoming the authenticated session, but the old row and its pre-authentication payload remain stored.
+
+**Correction:** Successful login, registration and password reset now call `regenerate(true)`, which removes the previous session row while preserving the existing session payload and flash messages.
+
+**Regression controls:** The feature tests reuse the actual encrypted session cookie from the initial GET when submitting the transition request. They verify that the old session row is deleted, the replacement session belongs to the authenticated user, login/registration flash state survives, password reset invalidates existing database sessions, and business switching rejects a stale authenticated password hash. This cookie hand-off is intentional; Laravel's feature-test client does not automatically carry a response cookie into the next request.
+
+**Verification:** Exact source head `e564ec24bb47839d264029dfeb86cd7f78b08615`: Laravel **771 passed / 1 skipped / 5,549 assertions**; coverage, PostgreSQL migration/rollback/backup/restore, 78 desktop offline journeys, 11 mobile Work journeys, quote confirmation, host-outage and phone-local attachment tests passed. Zazu Quality, PHPMD, Director Health and Windows installation/archive verification passed. SonarCloud skipped; Psalm was not rerun on this head.
+
+**Scope:** This removes stale anonymous session rows at account transitions. It does not replace the separate logout/session revocation, trusted-device token revocation or DEC-019 shared-browser-profile controls.
+
