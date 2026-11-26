@@ -45,6 +45,25 @@
         sync_registration_consent: false,
     });
 
+    function localStorageWriteError(error, fallbackMessage) {
+        const quotaExceeded = error?.name === 'QuotaExceededError'
+            || error?.code === 22
+            || error?.code === 1014;
+        const message = quotaExceeded
+            ? 'This device is low on browser storage. Zazu could not save this change. The failed transaction was not committed and existing saved records were not deliberately removed. Do not clear this browser site data; reconnect and arrange a business backup before adding more files.'
+            : (error?.message || fallbackMessage);
+        const failure = new Error(message);
+        failure.name = quotaExceeded ? 'QuotaExceededError' : (error?.name || 'StorageError');
+
+        if (quotaExceeded) {
+            window.dispatchEvent(new CustomEvent('zazu:offline-storage-error', {
+                detail: { category: 'quota', message },
+            }));
+        }
+
+        return failure;
+    }
+
     let dbPromise = null;
     let sessionCleared = false;
     let sessionGeneration = 0;
@@ -342,10 +361,10 @@
                 sessionChannel?.postMessage({ type: 'workspace-updated' });
                 resolve();
             };
-            tx.onerror = () => reject(mergeError || tx.error || new Error('Local offline state write failed.'));
+            tx.onerror = () => reject(mergeError || localStorageWriteError(tx.error, 'Local offline state write failed; this change was not saved.'));
             tx.onabort = () => reject(sessionMismatch
                 ? new Error('The offline device session changed before local state could be saved.')
-                : (mergeError || tx.error || new Error('Local offline state write was aborted.')));
+                : localStorageWriteError(tx.error, 'Local offline state write was aborted; this change was not saved.'));
         });
     }
 
@@ -693,8 +712,8 @@
                     }
                     resolve();
                 };
-                tx.onerror = () => reject(tx.error || new Error('The complete attachment batch could not be saved.'));
-                tx.onabort = () => reject(tx.error || new Error('The attachment batch save was aborted.'));
+                tx.onerror = () => reject(localStorageWriteError(tx.error, 'The complete attachment batch could not be saved.'));
+                tx.onabort = () => reject(localStorageWriteError(tx.error, 'The attachment batch save was aborted.'));
             });
         } finally {
             db.close();
@@ -1712,7 +1731,7 @@
             tx.onerror = () => {
                 if (sessionMismatch || mergeError) return;
                 storageAvailable = false;
-                reject(tx.error || new Error('Local offline queue transaction failed.'));
+                reject(localStorageWriteError(tx.error, 'Local offline queue transaction failed; this change was not saved.'));
             };
             tx.onabort = () => {
                 if (sessionMismatch) {
@@ -1727,7 +1746,7 @@
                     return;
                 }
                 storageAvailable = false;
-                reject(tx.error || new Error('Local offline queue transaction was aborted.'));
+                reject(localStorageWriteError(tx.error, 'Local offline queue transaction was aborted; this change was not saved.'));
             };
         });
     }
