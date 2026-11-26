@@ -1,9 +1,10 @@
 # Zazu EMP — Current Engineering State
 
-**Last reconciled:** 2026-11-25
+**Last reconciled:** 2026-11-26
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
-**Latest application-source/test HEAD under exact-head acceptance:** `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d` (core Laravel tests, coverage and PostgreSQL smoke passed; offline browser job is still running)
+**Previous application acceptance checkpoint:** `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d` (earlier Laravel, coverage and PostgreSQL evidence; it is not the current UI candidate).  
+**Current main candidate:** `66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9` (offline workspace responsive-header correction; current-head CI reconciliation is recorded below).
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
@@ -28,7 +29,10 @@ The current Laravel modular monolith, event/job-centred records, business isolat
 
 ## Latest verified automated evidence
 
-- Exact current source/test head: `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d`.
+- Previous exact-head source/test baseline: `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d`.
+- Current candidate `66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9` (2026-11-26): Laravel workflow `45779103238` — **765 passed, 1 skipped, 5,464 assertions**; coverage report PASS; PostgreSQL migration/recovery smoke PASS. The offline browser acceptance job was still in progress at the latest check, so the new 390px offline-header geometry assertion is not yet a CI pass.
+- Current Zazu Quality workflow `45779103388`: application checks PASS (npm dependency audit, docs validation, production frontend build, compressed asset budgets and service-worker authentication-cache tests), formatting PASS and secret scan PASS. The separate Composer security-audit job FAILED on five Symfony advisories; see the open security item below. SonarCloud remains skipped, not passed.
+- Current CodeQL push workflow `45779103097`: Actions, JavaScript/TypeScript and Python analysis jobs PASS.
 - Laravel workflow `45700142579`: application tests **761 passed, 1 skipped, 5,445 assertions**; coverage report and PostgreSQL migration/recovery smoke passed. The offline browser job `139507818283` is still in progress, so the complete Laravel workflow is not yet a pass.
 - Latest completed offline browser baseline remains run `45651931394` on `f6a9b3c`: **93 journeys passed**, with no failed or skipped journeys. This previously closed the automated internal-navigation defect for offline Customers/Jobs/Quotes. The current-head offline suite must finish before claiming a newer result. Neither run certifies physical Android use.
 - Windows V1 package `45700142740` on current head: candidate build, encrypted and legacy business-archive checks, and Windows PowerShell fresh-install/launcher verification all passed. The automated Windows installation check is not the intended-PC owner recovery drill.
@@ -57,6 +61,7 @@ Automated backup/restore, rollback, PostgreSQL recovery smoke, Windows packaging
 - DEC-019 remains a documented **HIGH** trusted-device shared-profile risk: anyone with access to an owner-approved shared browser profile can inherit its approved offline workspace/mutation capability. Do not claim per-staff offline identity on that trust model.
 - Populated quote-to-payment-to-actual-cost/profit reconciliation remains open.
 - POPIA operational controls and ZAZU name clearance remain open.
+- **New dependency-security finding — OPEN:** Composer audit on candidate `66f7392` reports five Symfony advisories. Locked packages: `symfony/http-kernel v7.4.23`, `symfony/routing v7.4.23`, and `symfony/mailer v8.0.15`. Reported CVEs: CVE-2026-133743; CVE-2026-133746; CVE-2026-133751; CVE-2026-133754; CVE-2026-133755. The Zazu Quality Composer audit therefore remains FAILED even though its other listed checks passed. Resolve through a supported Composer dependency update and full regression; do not suppress advisories or count the quality workflow as green.
 - PHPMD/Psalm SARIF publication still fails; analysis steps ran, but do not claim published results. SonarCloud is skipped.
 - No independent penetration test has been completed; automated scanners and source review are not a penetration test.
 
@@ -90,3 +95,20 @@ The Founder reports that with the Zazu PC host OFF, the Android phone successful
 **Owner interaction rule:** treat this observation as durable acceptance evidence. Do not ask the Founder again whether offline pages load, whether they contain local data, or whether the PC was on. Ask for another physical check only when engineering has reached a new, specific acceptance step that cannot be established through source inspection or automation; state exactly what new evidence is needed and why. Never repeat a previously completed setup or test.
 
 **Gate status:** physical Android offline acceptance remains OPEN pending the remaining distinct checks; the prior all-pages-collapse/frozen-dashboard symptom is no longer the current owner-reported behaviour. UI/navigation refinement is now the active engineering target, not restarting the offline architecture.
+
+## Founder mobile screenshot review and responsive-header regression — 2026-11-26
+
+The Founder supplied two further Android screenshots (09:48 and 09:49) showing the current offline workspace. Visible local-state counters are **13 saved records, 0 waiting to sync and 0 needing attention**. The offline-state banner remains visible. The launchpad heading and description are compressed into a narrow left column while the eight module navigation actions occupy the right side of the same header, creating excessive vertical height and poor readability.
+
+**Confirmed source mechanism:** the offline-navigation correction at `f6a9b3c5` made the permission-filtered module links visible again, but the offline header still inherited the shared flex-row composition. The generic `.zazu-action-group` becomes `width: 100%` at mobile breakpoints while its parent header remains a flex row, allowing the navigation to consume the row and shrink the heading. The earlier browser contract asserted navigation visibility but did not measure mobile heading/navigation geometry.
+
+**Implemented correction on main:**
+- `52152f2f6770a10377c59d28cdc376fa8baa76d3` — add an offline-only responsive grid to the existing dashboard authority stylesheet; phone layout stacks introduction, two-column module actions and status, with one-column actions on very narrow screens.
+- `20e313ef1ade96071ceee45c9afa26e56bc20e3a` — add offline-only scope classes to the existing Blade shell.
+- `66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9` — extend the offline browser contract to assert the heading and navigation align full-width and stack correctly at 390×844.
+
+This is **IMPLEMENTED IN SOURCE**, not yet rendered/CI-verified at this reconciliation. The current-head offline browser workflow is still running. No post-fix Android screenshot or visual acceptance is claimed.
+
+**Settings navigation boundary:** source inspection confirms the offline route allowlist in `resources/js/app.js` includes only route families with an implemented local view. `/settings` is not mapped, so its unsupported sidebar destination and the otherwise-empty System group are hidden while disconnected. Pairing, owner administration and server-backed business settings remain online-only under the current contract. Do not restore a generic Settings link merely to make it visible; only expose a specific Settings function after its local data/behaviour is implemented and tested. The shell theme toggle remains independently available.
+
+**Owner-test rule:** do not ask the Founder to repeat the already-established offline page/data/host condition. After current-head browser CI passes, request only one new physical confirmation: the corrected offline launchpad layout at phone width while the server remains unavailable. Persistence, airplane-mode cold launch, restart, attachments and reconnect remain separate open checks.
