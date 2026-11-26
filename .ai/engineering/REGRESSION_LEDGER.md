@@ -301,4 +301,4 @@ When offline navigation links are visible again, the offline launchpad header mu
 - The offline browser contract must check actual heading/navigation geometry at 390×844: navigation starts below the introduction and aligns to its left/right content edges. Link visibility alone is insufficient.
 - Any future offline-navigation visibility change must include responsive geometry coverage; do not regress to a flex row with a full-width child.
 
-**Status:** FIXED IN SOURCE on main (52152f2, 20e313e, 66f7392). Exact-head offline browser acceptance and post-fix physical visual review remain pending; this is not yet visually accepted.
+**Status:** AUTOMATED-BROWSER-VERIFIED on main (52152f2, 20e313e, 66f7392): 74 Chromium offline journeys passed, including the 390×844 heading/navigation geometry assertion; 11 mobile viewport checks, the mobile host-outage check and phone-local attachment journey also passed. Physical Android visual review remains open.
