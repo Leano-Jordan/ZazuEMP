@@ -4,7 +4,7 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest verified application/test checkpoint:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, offline browser/mobile, PostgreSQL and code-analysis rerun passed).  
-**Current unverified application candidate:** `3b6b404a7db36b10b631b079c74a3207da97b7de` (browser storage persistence status/request, quota warning and error handling, Settings + offline workspace UI, service-worker cache v62, and regression coverage). Exact-head CI is pending; do not treat the storage slice as accepted yet.
+**Current application/test candidate:** `8477f065d947375d0fc81c99b04efb313d0299c2` (storage persistence status/request, quota warning and fail-closed write handling, Settings + offline workspace UI, service-worker cache v62, and browser coverage; exact-head Laravel/offline browser validation is in progress).
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
@@ -29,17 +29,20 @@ The current Laravel modular monolith, event/job-centred records, business isolat
 
 ## Latest verified automated evidence
 
-- Previous exact-head source/test baseline: `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d`.
-- Current candidate `66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9` (2026-11-26): Laravel workflow `45779103238` — **765 passed, 1 skipped, 5,464 assertions**; coverage report PASS; PostgreSQL migration/recovery smoke PASS. Exact-head offline browser acceptance subsequently completed PASS: 74 Chromium offline journeys passed; 11 mobile-viewport checks passed; the separate mobile stopped-host check passed; and the mobile phone-local attachment round-trip passed. The new 390×844 offline-header geometry assertion ran inside the 74-test offline suite. This is browser evidence, not a physical Android visual sign-off.
-- Current Zazu Quality workflow `45779103388`: application checks PASS (npm dependency audit, docs validation, production frontend build, compressed asset budgets and service-worker authentication-cache tests), formatting PASS and secret scan PASS. The separate Composer security-audit job FAILED on five Symfony advisories; see the open security item below. SonarCloud remains skipped, not passed.
-- Current CodeQL push workflow `45779103097`: Actions, JavaScript/TypeScript and Python analysis jobs PASS.
-- Laravel workflow `45700142579`: application tests **761 passed, 1 skipped, 5,445 assertions**; coverage report and PostgreSQL migration/recovery smoke passed. The offline browser job `139507818283` is still in progress, so the complete Laravel workflow is not yet a pass.
-- Latest completed offline browser baseline remains run `45651931394` on `f6a9b3c`: **93 journeys passed**, with no failed or skipped journeys. This previously closed the automated internal-navigation defect for offline Customers/Jobs/Quotes. Neither browser run certifies physical Android use. The latest exact-head result is recorded above.
-- Windows V1 package `45700142740` on current head: candidate build, encrypted and legacy business-archive checks, and Windows PowerShell fresh-install/launcher verification all passed. The automated Windows installation check is not the intended-PC owner recovery drill.
-- Current-head Zazu Quality `45700142698`, PHPMD `45700142645`, Psalm security scan `45700142619`, populated upgrade/rollback `45700142684`, Director Health `45700142739`, and Push-on-main `45700142312` passed. SonarCloud `45700142666` was skipped, not passed.
-- Business archive engineering now streams attachment payloads from local storage into ZIP entries and streams restored payloads through private 0600 temporary files before storage writes. Restore rollback registers destinations before streaming; cleanup continues after a delete failure while preserving the original restore exception. Failure logs now include safe runtime/upload/temp-storage diagnostics without passphrases, archive contents, paths or exception messages.
-- Automated encrypted/legacy archive and rollback tests pass on the current head, but synthetic fixtures do not reproduce the Founder's original archive or establish its first failing stage.
+- **Last fully verified offline architecture checkpoint:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` — Laravel **765 passed / 1 skipped / 5,471 assertions**; coverage PASS; PostgreSQL migration/recovery PASS; desktop offline browser **75 passed**; mobile offline Work/visual **11 passed**; mobile stopped-host **1 passed**; phone-local attachment **1 passed**. The mobile header geometry and atomic acknowledgement transaction guards are included.
+- **Current source candidate:** `8477f065d947375d0fc81c99b04efb313d0299c2`. The storage-protection slice adds explicit `StorageManager.persist()` request, persisted-state/quota reporting, a 90%-capacity warning, explicit `QuotaExceededError` “not saved” feedback, Settings and offline-workspace status panels, and service-worker cache v62 migration. The latest change after the first test run only re-applies the browser API mock in the new Dashboard document.
+- **Latest current-head Laravel workflow:** `45787226043` — Laravel tests and coverage are PASS (**765 passed / 1 skipped / 5,471 assertions**); PostgreSQL migration/rollback/reapplication/registration/backup/restore smoke PASS. The offline browser job is still in progress and is the remaining gate for this candidate.
+- **Storage browser test iteration:** predecessor `8cfd530` completed **76 passed / 1 failed**. The single failure was test-fixture-only: the test mocked `navigator.storage` on Settings, navigated to Dashboard (a new document), then expected the mock to persist. Commit `8477f06` re-applies the mock on Dashboard before asserting the offline panel. Do not count the storage E2E as accepted until run `45787226043` finishes green.
+- **Current Zazu Quality:** run `45787226126` on exact candidate `8477f06` — application PASS, formatting PASS, secret scan PASS, **Composer security audit PASS**. This is the quality workflow that closes the previous Symfony advisory blocker.
+- **Dependency security correction:** commit `43e69e623aafb43e1159e8a0664d729764575844` updates the affected Symfony lock entries to **7.4.24**. Zazu Quality run `45787154093` and current-head run `45787226126` both report Composer audit PASS. No advisory suppression was added.
+- **Static/security/build evidence on the same application source (candidate `43e69e6`; later commits are test-only):** PHPMD `45787154030` PASS; Psalm security scan and SARIF publication `45787153999` PASS; Push-on-main CodeQL `45787226691` on current candidate PASS; Windows V1 package, encrypted/legacy archive verification and fresh install `45787153987` PASS; populated upgrade/rollback `45787154081` PASS; Director Health `45787154036` PASS.
+- SonarCloud `45787226116` is skipped, not passed.
+- None of these automated results constitutes physical Android visual, cold-launch, restart or reconnect acceptance.
 
+## Previous evidence retained as historical
+
+Earlier exact-head runs on commits `66f7392`, `f6a9b3c` and `a3ec152` remain useful historical checkpoints. Their counts and run IDs are not the current acceptance result. The 13 Nov / 21 Nov / 22 Nov full audits are preserved as dated snapshots and must not be read as current-head status.
+ 
 ## Confirmed open findings and release gates
 
 ### 1. Physical Android offline acceptance — OPEN
@@ -61,7 +64,7 @@ Automated backup/restore, rollback, PostgreSQL recovery smoke, Windows packaging
 - DEC-019 remains a documented **HIGH** trusted-device shared-profile risk: anyone with access to an owner-approved shared browser profile can inherit its approved offline workspace/mutation capability. Do not claim per-staff offline identity on that trust model.
 - Populated quote-to-payment-to-actual-cost/profit reconciliation remains open.
 - POPIA operational controls and ZAZU name clearance remain open.
-- **New dependency-security finding — OPEN:** Composer audit on candidate `66f7392` reports five Symfony advisories. Locked packages: `symfony/http-kernel v7.4.23`, `symfony/routing v7.4.23`, and `symfony/mailer v8.0.15`. Reported CVEs: CVE-2026-133743; CVE-2026-133746; CVE-2026-133751; CVE-2026-133754; CVE-2026-133755. The Zazu Quality Composer audit therefore remains FAILED even though its other listed checks passed. Resolve through a supported Composer dependency update and full regression; do not suppress advisories or count the quality workflow as green.
+- **Symfony dependency security — RESOLVED:** the five advisories previously reported against Symfony 7.4.23 / 8.0.15 were addressed by lockfile update commit `43e69e6` to Symfony **7.4.24**. Composer security audit passed in Zazu Quality runs `45787154093` and `45787226126`; no advisory exception or suppression was added.
 - PHPMD/Psalm SARIF publication still fails; analysis steps ran, but do not claim published results. SonarCloud is skipped.
 - No independent penetration test has been completed; automated scanners and source review are not a penetration test.
 
