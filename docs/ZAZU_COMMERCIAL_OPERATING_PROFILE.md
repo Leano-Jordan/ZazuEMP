@@ -146,3 +146,17 @@ Last updated: 2026-11-10.
 The commercial experience has three canonical tiers: **Basic**, **Intermediate** and **Advanced**. These map directly to the existing `basic`, `intermediate` and `advanced` experience-level identifiers. Basic is the permanent free continuity tier. The 30-day trial exposes Advanced and falls back to Basic Free at expiry. Intermediate is a genuine middle commercial tier, not merely a cosmetic preference.
 
 The exact Intermediate/Advanced feature allocation, quotas and public prices are not yet approved. The earlier two-tier packaging and suggestion to add a separate Team tier are superseded by this three-tier direction. Do not publish or enforce guessed feature limits. The confirmed R99/month figure remains an initial paid-subscription target only; it is not assigned to a specific tier by this note. Existing customer data and data export remain available regardless of tier or expiry.
+
+
+## Founder decision update — 2026-11-26 (authoritative)
+
+See [Founder Legal and Brand Decisions](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md). This update supersedes any older assumption that Rosscore Labs is the current operator or owner.
+
+- Current owner/operator: Founder personally, as an individual solo operator. Rosscore Labs is not registered and does not own Zazu yet. Any future transfer requires a separate written instrument after the company is properly established.
+- The Founder currently works alone; no staff, co-founders or contractors are involved.
+- Zazu is not launching commercially. Product stability is the priority. A controlled non-commercial test with close trusted members is acceptable when authorised; prefer synthetic data. Real personal information still triggers applicable duties.
+- Intended data scope is business/staff account details, customer contact details, event/job details and notes, quotes/invoices/payment records, and documents/receipts/photos/attachments. Identity numbers, bank-account details, children's information and medical/sensitive information are not intended V1 data categories.
+- No Zazu production hosting, cloud storage, analytics, payment, messaging, monitoring or external support provider has been provisioned/configured. Hosted and local/offline remain strategic deployment directions; actual first deployment and providers are undecided. xneelo remains an unselected shortlist only.
+- Dedicated privacy mailbox approved in principle but not created; address/domain remains TBD. Existing `rosscorelabs@outlook.com` remains provisional contact pending a dedicated channel and monitoring test.
+- The Founder has requested a retention proposal; the existing retention schedule remains provisional and unapproved pending legal/accounting review.
+- Do not publish pricing, deployment, provider, support or compliance claims from this working profile as final launch terms.
