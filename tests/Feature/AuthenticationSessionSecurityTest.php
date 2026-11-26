@@ -167,17 +167,17 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertNotSame($preRegistrationCookie->getValue(), $registeredCookie->getValue());
 
         $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
-            ->get(route('onboarding.catalogue'))
+            ->get(route('dashboard'))
             ->assertOk();
 
         $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
-            ->get(route('onboarding.catalogue'))
+            ->get(route('dashboard'))
             ->assertRedirect(route('login'));
 
         $this->assertGuest();
 
         $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
-            ->get(route('onboarding.catalogue'))
+            ->get(route('dashboard'))
             ->assertOk();
     }
 
