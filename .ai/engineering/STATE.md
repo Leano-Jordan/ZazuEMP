@@ -188,3 +188,21 @@ The original `e87bca6` run failed Laravel because `.zazu-nav-flyout-heading` had
 ### Browser CI follow-up — 2026-11-26
 
 The first stylesheet-ownership cleanup run passed Laravel tests and coverage but caught a navigation icon regression in the browser acceptance step: the rendered nav icon measured 16px against the 22px minimum. Restored 23px icon sizing in canonical `app.css` (collapsed rail remains 22px). The Laravel workflow now explicitly runs the collapsed desktop rail and mobile drawer keyboard-focus tests alongside the expanded navigation/mobile calendar check. The exact-head rerun is in progress; do not mark browser acceptance green until it completes.
+
+
+## Founder legal and brand decisions — 2026-11-26 (authoritative)
+
+Current owner decisions are recorded in [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](../../docs/FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md). This record supersedes conflicting assumptions in older working drafts.
+
+- **Ownership:** Founder personally owns Zazu EMP and its current IP until further notice. Rosscore Labs is not registered and is not the current owner/operator. A later transfer requires a separate written instrument after the company is properly established.
+- **People:** Founder is the only person involved; no employees, co-founders or contractors.
+- **Launch:** no commercial launch now. Product stability is the priority. A controlled non-commercial pilot with close trusted members is acceptable when specifically authorised. Prefer synthetic data; real personal information still triggers applicable duties.
+- **Data scope:** business/workspace and staff account details; customer contact details; event addresses/dates/requirements/notes; quotes, invoices and payment records; documents, receipts, photographs and attachments. Identity numbers, bank-account details, children's information and medical/sensitive information are not intended V1 categories.
+- **Providers/deployment:** no Zazu production hosting or third-party processing provider has been provisioned/selected. Hosted and local/offline remain intended product directions; actual first deployment and vendors are undecided. xneelo is a shortlist only.
+- **Information Officer:** Founder has not registered an IO. Founder is proposed IO for the current individual operation, subject to confirming the correct registration route. No deputy is appointed. Never claim registration.
+- **Privacy contact:** dedicated privacy mailbox approved in principle but not created; `rosscorelabs@outlook.com` remains provisional and must be monitored/tested before publication.
+- **Retention:** Founder requested a proposal. `docs/RELEASE_RETENTION_DISPOSAL_SCHEDULE.md` is provisional, not approved and not technically enforced.
+- **Brand:** Founder personally intends to own brand rights for now. ZAZU is not approved as the final product name. Descriptor and promise remain working positioning only. South African protection with international expansion intent; no domain/social/logo/trade-mark filing has been secured and no registration spend is authorised now. Keep a fallback name.
+- **Open:** final product name; Rosscore incorporation and IP transfer; IO registration; privacy mailbox; deployment/provider selection; final retention approval; legal/accounting review; trade-mark classes/territories and any filing; commercial launch decision.
+
+Product stability remains the immediate priority. Do not ask the Founder to repeat these decisions; consult the decision record first. Legal/brand work remains a pre-commercial-release gate and must not expand V1 scope.
