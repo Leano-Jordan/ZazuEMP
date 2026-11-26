@@ -193,4 +193,6 @@ Zazu currently stores local workspace and attachment data in IndexedDB and servi
 
 Browser-managed origin storage is best-effort by default and may be evicted under storage pressure; a persistent-storage grant reduces automatic eviction but does not prevent the user from explicitly clearing site data. See [MDN: storage quotas and eviction criteria](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria) and [MDN: StorageManager](https://developer.mozilla.org/en-US/docs/Web/API/StorageManager).
 
+**Tracked as:** CASE-ZAZU-0052 / ENG-DATA-007. No eviction incident is reported; this is a known platform durability gap.
+
 **Open requirement:** request persistence at an appropriate trusted-device/pairing interaction where supported; report whether the grant was obtained; monitor usage/quota and surface capacity/storage failures; handle unavailable or declined requests honestly without blocking supported offline work. Do not market browser storage as infallible or treat persistence grants as a replacement for business export/import and full recovery.
