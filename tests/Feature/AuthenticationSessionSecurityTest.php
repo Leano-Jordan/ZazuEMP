@@ -115,37 +115,38 @@ class AuthenticationSessionSecurityTest extends TestCase
         $business->users()->attach($user->id, ['role' => 'owner']);
 
         $preAuthResponse = $this->get(route('landing'))->assertOk();
-        $preAuthCookie = $preAuthResponse->getCookie(config('session.cookie'));
+        $preAuthCookie = $preAuthResponse->getCookie(config('session.cookie'), false);
         $this->assertNotNull($preAuthCookie);
-        $preAuthSessionId = $preAuthCookie->getValue();
+        $preAuthSessionId = $preAuthResponse->getCookie(config('session.cookie'))->getValue();
         $this->assertDatabaseHas('sessions', ['id' => $preAuthSessionId]);
 
-        $loginResponse = $this->withCookie(config('session.cookie'), $preAuthCookie->getValue())
+        $loginResponse = $this->withUnencryptedCookies([config('session.cookie') => $preAuthCookie->getValue()])
             ->post(route('login.store'), [
                 'identifier' => $user->username,
                 'password' => 'password123',
             ])
             ->assertRedirect(route('dashboard'));
 
-        $authenticatedCookie = $loginResponse->getCookie(config('session.cookie'));
+        $authenticatedCookie = $loginResponse->getCookie(config('session.cookie'), false);
+        $authenticatedSessionId = $loginResponse->getCookie(config('session.cookie'))->getValue();
         $this->assertNotNull($authenticatedCookie);
-        $this->assertNotSame($preAuthCookie->getValue(), $authenticatedCookie->getValue());
+        $this->assertNotSame($preAuthSessionId, $authenticatedSessionId);
         $this->assertDatabaseMissing('sessions', ['id' => $preAuthSessionId]);
 
         $this->resetHttpSessionState();
-        $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
+        $this->withUnencryptedCookies([config('session.cookie') => $authenticatedCookie->getValue()])
             ->get(route('dashboard'))
             ->assertOk();
 
         $this->resetHttpSessionState();
-        $this->withCookie(config('session.cookie'), $preAuthCookie->getValue())
+        $this->withUnencryptedCookies([config('session.cookie') => $preAuthCookie->getValue()])
             ->get(route('dashboard'))
             ->assertRedirect(route('login'));
 
         $this->assertGuest();
 
         $this->resetHttpSessionState();
-        $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
+        $this->withUnencryptedCookies([config('session.cookie') => $authenticatedCookie->getValue()])
             ->get(route('dashboard'))
             ->assertOk();
     }
@@ -155,9 +156,9 @@ class AuthenticationSessionSecurityTest extends TestCase
         config(['session.driver' => 'database']);
 
         $preRegistrationResponse = $this->get(route('landing'))->assertOk();
-        $preRegistrationCookie = $preRegistrationResponse->getCookie(config('session.cookie'));
+        $preRegistrationCookie = $preRegistrationResponse->getCookie(config('session.cookie'), false);
         $this->assertNotNull($preRegistrationCookie);
-        $preRegistrationSessionId = $preRegistrationCookie->getValue();
+        $preRegistrationSessionId = $preRegistrationResponse->getCookie(config('session.cookie'))->getValue();
         $this->assertDatabaseHas('sessions', ['id' => $preRegistrationSessionId]);
 
         $registrationResponse = $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
@@ -171,13 +172,14 @@ class AuthenticationSessionSecurityTest extends TestCase
             ])
             ->assertRedirect(route('onboarding.catalogue'));
 
-        $registeredCookie = $registrationResponse->getCookie(config('session.cookie'));
+        $registeredCookie = $registrationResponse->getCookie(config('session.cookie'), false);
+        $registeredSessionId = $registrationResponse->getCookie(config('session.cookie'))->getValue();
         $this->assertNotNull($registeredCookie);
-        $this->assertNotSame($preRegistrationCookie->getValue(), $registeredCookie->getValue());
+        $this->assertNotSame($preRegistrationSessionId, $registeredSessionId);
         $this->assertDatabaseMissing('sessions', ['id' => $preRegistrationSessionId]);
 
         $this->resetHttpSessionState();
-        $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
+        $this->withUnencryptedCookies([config('session.cookie') => $registeredCookie->getValue()])
             ->get(route('dashboard'));
         $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
 
@@ -189,7 +191,7 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertGuest();
 
         $this->resetHttpSessionState();
-        $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
+        $this->withUnencryptedCookies([config('session.cookie') => $registeredCookie->getValue()])
             ->get(route('dashboard'));
         $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
     }
