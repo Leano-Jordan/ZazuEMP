@@ -15,7 +15,8 @@
 - Public copy now identifies the Founder as the current individual owner/operator, describes Rosscore Labs as an unregistered future identity, identifies the Outlook contact as provisional, and avoids unsupported uptime, certification, company-registration and Information Officer claims.
 - Traced the collapsed-navigation Dashboard fallback first to a 1.8-second service-worker timeout racing the application's 3-second origin-health probe; increased the navigation window to 5 seconds and advanced the static worker cache to v64.
 - Found a second, broader fallback-policy defect: almost every in-app navigation preferred the cached Dashboard over its exact route when offline or on request failure. Changed the policy so only cold launches prefer Dashboard; in-app navigations now prefer the exact active-business cached destination.
-- Added worker regressions for exact-route fallback across ordinary destinations, cold-launch Dashboard preference, slow-but-healthy destinations, and collapsed desktop rail Playwright coverage, alongside public trust route/content tests and route-integrity assertions.
+- Added worker regressions for exact-route fallback across ordinary destinations, cold-launch Dashboard preference, slow-but-healthy destinations, hanging-host timeout behaviour, and collapsed desktop rail Playwright coverage, alongside public trust route/content tests and route-integrity assertions.
+- The first run exposed one obsolete hanging-host assertion that still expected Dashboard. Updated it to require the exact cached in-app destination after the bounded 5-second wait; this is the intended offline-first navigation contract.
 - **Acceptance pending:** current-head Laravel, Zazu Quality, service-worker and browser checks must pass. Founder-device navigation and visual verification are not yet claimed. Privacy and Terms remain non-effective review copies.
 
 ## 2026-11-26 — Adversarial authentication hardening
