@@ -39,6 +39,74 @@ async function trustCurrentDevice(page) {
 }
 
 test.describe('Zazu installed PWA offline shell', () => {
+    test('reports browser storage retention and requests persistence only after explicit action', async ({ page }, testInfo) => {
+        test.skip(testInfo.project.name !== 'chromium', 'StorageManager permission contract runs once.');
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.local_dirty = true;
+            await window.ZazuOffline.persist();
+
+            window.__zazuPersistRequestCount = 0;
+            Object.defineProperty(navigator, 'storage', {
+                configurable: true,
+                value: {
+                    persisted: async () => false,
+                    estimate: async () => ({ usage: 2 * 1024 * 1024, quota: 100 * 1024 * 1024 }),
+                    persist: () => {
+                        window.__zazuPersistRequestCount += 1;
+                        return Promise.resolve(false);
+                    },
+                },
+            });
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        });
+
+        const workspace = page.locator('[data-zazu-offline-workspace]');
+        await expect(workspace).toBeVisible();
+        const status = workspace.locator('[data-zazu-offline-storage-status]');
+        const usage = workspace.locator('[data-zazu-offline-storage-usage]');
+        const request = workspace.locator('[data-zazu-offline-storage-request]');
+
+        await expect(status).toContainText('Persistent storage has not been granted');
+        await expect(usage).toHaveText('Using 2.00 MB of an estimated 100 MB browser storage.');
+        await expect(request).toBeVisible();
+
+        await request.click();
+        await expect(status).toContainText('The browser did not grant persistent storage');
+        await expect.poll(() => page.evaluate(() => window.__zazuPersistRequestCount)).toBe(1);
+        await expect(request).toBeEnabled();
+
+        await page.evaluate(() => {
+            Object.defineProperty(navigator, 'storage', {
+                configurable: true,
+                value: {
+                    persisted: async () => true,
+                    estimate: async () => ({ usage: 3 * 1024 * 1024, quota: 100 * 1024 * 1024 }),
+                    persist: async () => true,
+                },
+            });
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        });
+        await expect(status).toHaveText('Persistent storage is enabled for this browser.');
+        await expect(usage).toContainText('Using 3.00 MB');
+        await expect(request).toBeHidden();
+
+        await page.evaluate(() => {
+            Object.defineProperty(navigator, 'storage', {
+                configurable: true,
+                value: {
+                    estimate: async () => ({ usage: 1024, quota: 2048 }),
+                },
+            });
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        });
+        await expect(status).toHaveText('This browser does not support persistent storage requests.');
+        await expect(request).toBeHidden();
+    });
+
     test('refreshes the business-mix panel from the matching local profile while disconnected', async ({ page, context }, testInfo) => {
         test.skip(testInfo.project.name !== 'chromium', 'Local workspace profile presentation contract runs once.');
 
