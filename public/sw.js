@@ -125,7 +125,7 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
-function shouldPreferOfflineShell(request, pathname, coldLaunch = false) {
+function shouldPreferOfflineShell(request, coldLaunch = false) {
     if (request.mode !== 'navigate') return false;
 
     // Only a cold app launch should deliberately open the dashboard shell.
@@ -578,7 +578,7 @@ self.addEventListener('fetch', (event) => {
     const requestGeneration = activeUserGeneration;
     // A top-level navigation with no initiating client is a cold app launch
     // (for example, opening the installed Zazu icon while the host is down).
-    const preferOfflineShell = shouldPreferOfflineShell(request, url.pathname, event.clientId === '');
+    const preferOfflineShell = shouldPreferOfflineShell(request, event.clientId === '');
     const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
     const isAppPage = request.method === 'GET'
         && url.origin === self.location.origin
