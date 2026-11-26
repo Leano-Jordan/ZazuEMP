@@ -124,48 +124,64 @@ class BusinessSettingsController extends Controller
     private function revokeSyncDeviceRecord(SyncDevice $device, Business $business, ?string $reason = null): void
     {
         DB::transaction(function () use ($device, $business, $reason): void {
-            $lockedDevice = SyncDevice::query()
-                ->whereKey($device->getKey())
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            abort_unless((int) $lockedDevice->business_id === (int) $business->id, 404);
-
-            $metadata = $lockedDevice->metadata ?? [];
-            $needsAudit = $lockedDevice->status !== 'revoked' || $lockedDevice->revoked_at === null;
-            $needsCleanup = $lockedDevice->token_expires_at !== null
-                || array_key_exists('sync_token_hash', $metadata)
-                || array_key_exists('pairing_code_hash', $metadata)
-                || array_key_exists('pairing_expires_at', $metadata)
-                || $lockedDevice->pairing_code_digest !== null;
-
-            if (! $needsAudit && ! $needsCleanup) {
-                return;
-            }
-
-            unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
-
-            $lockedDevice->forceFill([
-                'status' => 'revoked',
-                'revoked_at' => $lockedDevice->revoked_at ?? now(),
-                'token_expires_at' => null,
-                'pairing_code_digest' => null,
-                'metadata' => $metadata,
-            ])->save();
-
-            if ($needsAudit) {
-                $auditContext = [
-                    'device_id' => (int) $lockedDevice->id,
-                    'device_name' => $lockedDevice->device_name,
-                    'device_type' => $lockedDevice->device_type,
-                ];
-                if ($reason !== null) {
-                    $auditContext['reason'] = $reason;
-                }
-
-                Audit::record('sync.device.revoked', $business, $auditContext, $business->id);
-            }
+            $this->revokeSyncDeviceRecordInsideTransaction($device, $business, $reason);
         });
+    }
+
+    private function revokeSyncDeviceRecordInsideTransaction(SyncDevice $device, Business $business, ?string $reason): void
+    {
+        $lockedDevice = SyncDevice::query()
+            ->whereKey($device->getKey())
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        abort_unless((int) $lockedDevice->business_id === (int) $business->id, 404);
+
+        $metadata = $lockedDevice->metadata ?? [];
+        $needsAudit = $lockedDevice->status !== 'revoked' || $lockedDevice->revoked_at === null;
+        $needsCleanup = $this->syncDeviceHasRevocableCredentials($lockedDevice, $metadata);
+
+        if (! $needsAudit && ! $needsCleanup) {
+            return;
+        }
+
+        unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
+
+        $lockedDevice->forceFill([
+            'status' => 'revoked',
+            'revoked_at' => $lockedDevice->revoked_at ?? now(),
+            'token_expires_at' => null,
+            'pairing_code_digest' => null,
+            'metadata' => $metadata,
+        ])->save();
+
+        if ($needsAudit) {
+            $this->recordSyncDeviceRevocationAudit($lockedDevice, $business, $reason);
+        }
+    }
+
+    private function syncDeviceHasRevocableCredentials(SyncDevice $device, array $metadata): bool
+    {
+        return $device->token_expires_at !== null
+            || array_key_exists('sync_token_hash', $metadata)
+            || array_key_exists('pairing_code_hash', $metadata)
+            || array_key_exists('pairing_expires_at', $metadata)
+            || $device->pairing_code_digest !== null;
+    }
+
+    private function recordSyncDeviceRevocationAudit(SyncDevice $device, Business $business, ?string $reason): void
+    {
+        $auditContext = [
+            'device_id' => (int) $device->id,
+            'device_name' => $device->device_name,
+            'device_type' => $device->device_type,
+        ];
+
+        if ($reason !== null) {
+            $auditContext['reason'] = $reason;
+        }
+
+        Audit::record('sync.device.revoked', $business, $auditContext, $business->id);
     }
 
     /**
