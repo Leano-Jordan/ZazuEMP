@@ -219,3 +219,16 @@ Owner-facing execution reports must state:
 - **NEXT:** one highest-priority target.
 
 Never report intention as progress, skipped checks as passed, or a pilot target as a guaranteed release.
+
+
+## Founder legal/brand decisions — 2026-11-26
+
+The binding Founder decisions are recorded in [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md). They supersede older assumptions in historical working drafts.
+
+- Current ownership remains with the Founder personally. Rosscore Labs is not registered and does not own or operate Zazu yet. No transfer is implied; a later transfer requires a separate written instrument.
+- The Founder is the sole operator and has not registered an Information Officer. Do not claim registration or publish legal-compliance claims.
+- Zazu is not launching commercially now. Product stability comes first. A controlled non-commercial test with close trusted members is acceptable when authorised; use synthetic data where practical.
+- No Zazu production hosting or third-party processing provider has been provisioned or selected. Hosted and local/offline remain intended deployment directions; actual deployment and vendor inventory must be confirmed before personal information is processed in a hosted environment.
+- The Founder has requested a retention proposal; the schedule remains provisional and requires approval, legal/accounting review and technical enforcement.
+- The Founder has not approved ZAZU as the final product name. No filing, paid clearance, or substantial brand spend is authorised now. South African protection with international expansion intent remains the strategic direction.
+- Product stability is the immediate priority. Legal/privacy and brand gates remain pre-commercial-release requirements; they do not authorise speculative V1 scope expansion.
