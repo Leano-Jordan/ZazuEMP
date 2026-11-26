@@ -2518,6 +2518,82 @@
         return true;
     }
 
+    async function getStorageProtectionStatus() {
+        const manager = navigator.storage;
+        if (!manager) {
+            return {
+                status: 'unsupported',
+                requestSupported: false,
+                usage: null,
+                quota: null,
+            };
+        }
+
+        let persisted = null;
+        let usage = null;
+        let quota = null;
+
+        if (typeof manager.persisted === 'function') {
+            try {
+                persisted = await manager.persisted();
+            } catch {
+                persisted = null;
+            }
+        }
+
+        if (typeof manager.estimate === 'function') {
+            try {
+                const estimate = await manager.estimate();
+                usage = Number.isFinite(estimate?.usage) ? estimate.usage : null;
+                quota = Number.isFinite(estimate?.quota) ? estimate.quota : null;
+            } catch {
+                usage = null;
+                quota = null;
+            }
+        }
+
+        const requestSupported = typeof manager.persist === 'function';
+        const status = persisted === true
+            ? 'granted'
+            : requestSupported
+                ? (persisted === false ? 'not_granted' : 'unknown')
+                : 'unsupported';
+
+        return { status, requestSupported, usage, quota };
+    }
+
+    function requestStorageProtection() {
+        const manager = navigator.storage;
+        if (!manager || typeof manager.persist !== 'function') {
+            return getStorageProtectionStatus().then(status => ({
+                ...status,
+                requestResult: 'unsupported',
+            }));
+        }
+
+        // Call persist() before the first await so a trusted button activation
+        // is still available in browsers that require user activation.
+        let request;
+        try {
+            request = manager.persist();
+        } catch (error) {
+            return getStorageProtectionStatus().then(status => ({
+                ...status,
+                requestResult: 'error',
+                error: error?.message || 'The browser storage request failed.',
+            }));
+        }
+
+        return Promise.resolve(request).then(async granted => ({
+            ...await getStorageProtectionStatus(),
+            requestResult: granted === true ? 'granted' : 'denied',
+        })).catch(async error => ({
+            ...await getStorageProtectionStatus(),
+            requestResult: 'error',
+            error: error?.message || 'The browser storage request failed.',
+        }));
+    }
+
     async function boot() {
         try {
             state = (await readState()) || blank();
@@ -2579,6 +2655,8 @@
         syncAttachments,
         pair,
         registerPrimaryDevice,
+        getStorageProtectionStatus,
+        requestStorageProtection,
         sync,
         assessLogout,
         clearLocalSession,
