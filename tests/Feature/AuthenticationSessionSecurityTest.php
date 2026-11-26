@@ -32,18 +32,21 @@ class AuthenticationSessionSecurityTest extends TestCase
         ]);
         $business->users()->attach($user->id, ['role' => 'owner']);
 
-        $this->withSession(['pre_authentication_marker' => 'must-not-survive-login'])
+        $preAuthenticationResponse = $this->withSession(['pre_authentication_marker' => 'must-not-survive-login'])
             ->get(route('landing'))
             ->assertOk();
+        $preAuthenticationCookie = $preAuthenticationResponse->getCookie(config('session.cookie'));
+        $this->assertNotNull($preAuthenticationCookie);
 
         $preAuthenticationSessionId = app('session')->driver()->getId();
         $this->assertNotEmpty($preAuthenticationSessionId);
         $this->assertDatabaseHas('sessions', ['id' => $preAuthenticationSessionId]);
 
-        $this->post(route('login.store'), [
-            'identifier' => 'sessionrotation',
-            'password' => 'password123',
-        ])
+        $this->withCookie(config('session.cookie'), $preAuthenticationCookie->getValue())
+            ->post(route('login.store'), [
+                'identifier' => 'sessionrotation',
+                'password' => 'password123',
+            ])
             ->assertRedirect(route('dashboard'))
             ->assertSessionHas('auth_modal', 'login');
 
@@ -60,22 +63,25 @@ class AuthenticationSessionSecurityTest extends TestCase
     {
         config(['session.driver' => 'database']);
 
-        $this->withSession(['pre_registration_marker' => 'must-not-survive-registration'])
+        $preRegistrationResponse = $this->withSession(['pre_registration_marker' => 'must-not-survive-registration'])
             ->get(route('landing'))
             ->assertOk();
+        $preRegistrationCookie = $preRegistrationResponse->getCookie(config('session.cookie'));
+        $this->assertNotNull($preRegistrationCookie);
 
         $preRegistrationSessionId = app('session')->driver()->getId();
         $this->assertNotEmpty($preRegistrationSessionId);
         $this->assertDatabaseHas('sessions', ['id' => $preRegistrationSessionId]);
 
-        $this->post(route('register.store'), [
-            'name' => 'Session Registration Owner',
-            'username' => 'sessionregister',
-            'business_name' => 'Session Registration Business',
-            'email' => 'sessionregister@example.com',
-            'password' => 'registration-password',
-            'password_confirmation' => 'registration-password',
-        ])
+        $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
+            ->post(route('register.store'), [
+                'name' => 'Session Registration Owner',
+                'username' => 'sessionregister',
+                'business_name' => 'Session Registration Business',
+                'email' => 'sessionregister@example.com',
+                'password' => 'registration-password',
+                'password_confirmation' => 'registration-password',
+            ])
             ->assertRedirect(route('onboarding.catalogue'))
             ->assertSessionHas('auth_modal', 'register');
 
@@ -111,19 +117,22 @@ class AuthenticationSessionSecurityTest extends TestCase
 
         $token = Password::createToken($user);
 
-        $this->withSession(['pre_reset_marker' => 'must-not-survive-password-reset'])
+        $preResetResponse = $this->withSession(['pre_reset_marker' => 'must-not-survive-password-reset'])
             ->get(route('landing'))
             ->assertOk();
+        $preResetCookie = $preResetResponse->getCookie(config('session.cookie'));
+        $this->assertNotNull($preResetCookie);
         $preResetSessionId = app('session')->driver()->getId();
         $this->assertNotEmpty($preResetSessionId);
         $this->assertDatabaseHas('sessions', ['id' => $preResetSessionId]);
 
-        $this->post(route('password.update'), [
-            'token' => $token,
-            'email' => $user->email,
-            'password' => 'new-password',
-            'password_confirmation' => 'new-password',
-        ])->assertRedirect(route('dashboard'));
+        $this->withCookie(config('session.cookie'), $preResetCookie->getValue())
+            ->post(route('password.update'), [
+                'token' => $token,
+                'email' => $user->email,
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])->assertRedirect(route('dashboard'));
 
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
