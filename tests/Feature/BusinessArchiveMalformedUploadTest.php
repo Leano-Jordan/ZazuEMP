@@ -97,4 +97,32 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'business_id' => $target->id,
         ]);
     }
+    public function test_non_zip_upload_reports_the_specific_libzip_failure_code(): void
+    {
+        $this->signInAsOwner();
+        $business = auth()->user()->businesses()->firstOrFail();
+        Log::spy();
+
+        $response = $this->post(route('exports.archive.restore'), [
+            'archive' => UploadedFile::fake()->createWithContent(
+                'not-a-zip.zazu',
+                'This is not a ZIP archive.'
+            ),
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('archive');
+        $message = session('errors')->getBag('default')->first('archive');
+
+        $this->assertStringContainsString('libzip status '.\\ZipArchive::ER_NOZIP, $message);
+        $this->assertStringContainsString('file is not a ZIP archive', $message);
+        Log::shouldHaveReceived('warning')->once()->with(
+            'Business archive restore failed.',
+            \\Mockery::on(fn (array $context): bool => $context['stage'] === 'archive_open'
+                && $context['exception_code'] === (string) \\ZipArchive::ER_NOZIP
+                && $context['business_id'] === (int) $business->id)
+        );
+        $this->assertDatabaseCount('customers', 0);
+    }
+
 }
