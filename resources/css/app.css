@@ -7736,6 +7736,7 @@ body.zazu-inspector-open { overflow:hidden; }
 }
 
 .zazu-nav-flyout-heading {
+    display: none;
     padding: 5px 10px 8px;
     color: var(--zazu-sidebar-label);
     font-size: var(--zazu-font-size-meta);
@@ -7750,9 +7751,8 @@ body.zazu-inspector-open { overflow:hidden; }
 }
 
 .zazu-nav-flyout .zazu-nav-link {
-    min-height: 36px;
-    padding-block: 8px;
     min-height: 42px;
+    padding-block: 8px;
     padding-inline: 11px;
     border: 0;
     border-radius: 8px;
@@ -8867,15 +8867,8 @@ body.zazu-sidebar-collapsed .zazu-nav-flyout {
 }
 
 
-/* The rail's popover carries its own context; expanded navigation already
-   communicates that context in the parent row. */
-.zazu-nav-flyout-heading { display: none; }
+/* Collapsed rail panels need a visible heading because their parent
+   navigation label is icon-only. Expanded navigation already has its label. */
 body.zazu-sidebar-collapsed .zazu-nav-flyout-heading {
     display: block;
-    padding: 5px 10px 9px;
-    color: var(--zazu-sidebar-label);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .1em;
-    text-transform: uppercase;
 }
