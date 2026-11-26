@@ -50,7 +50,8 @@ class PublicTrustSurfaceTest extends TestCase
             ->assertOk()
             ->assertSee('Isaac Junior Lehlogonolo Maluleka')
             ->assertSee('Rosscore Labs is the intended future business identity')
-            ->assertSee('not yet registered');
+            ->assertSee('not yet registered')
+            ->assertSee('Name clearance and any trade-mark filing remain unresolved');
     }
 
     public function test_landing_page_links_to_the_public_trust_surface(): void
