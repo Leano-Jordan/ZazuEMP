@@ -11,10 +11,12 @@ class UiDashboardResponsiveTest extends TestCase
         $appCss = file_get_contents(resource_path('css/app.css'));
         $responsiveCss = file_get_contents(resource_path('css/zazu-responsive-theme.css'));
         $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+        $extensionCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertIsString($appCss);
         $this->assertIsString($responsiveCss);
         $this->assertIsString($mobileCss);
+        $this->assertIsString($extensionCss);
 
         $canonicalSelectors = [
             '.zazu-nav-stack',
@@ -77,6 +79,9 @@ class UiDashboardResponsiveTest extends TestCase
         $this->assertStringContainsString(".zazu-nav {\n    overflow: visible;\n}", $responsiveCss);
         $this->assertStringNotContainsString('overflow-y: auto;', $responsiveCss);
         $this->assertStringContainsString('overflow-y: auto;', $mobileCss);
+        $this->assertStringNotContainsString('.zazu-nav-flyout {', $extensionCss);
+        $this->assertStringNotContainsString('.zazu-nav-area-trigger', $extensionCss);
+        $this->assertStringNotContainsString('.zazu-nav-link,', $extensionCss);
         $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-sidebar {', $mobileCss);
         $this->assertStringContainsString(".zazu-nav-area.is-open > .zazu-nav-flyout {\n        display: block;\n        pointer-events: auto;", $appCss);
         $this->assertStringContainsString('min-height: 44px;', $mobileCss);
