@@ -124,7 +124,7 @@ class BusinessArchiveTest extends TestCase
                 $service->restore($archive, $target);
                 $this->fail('A non-empty workspace must never accept an archive restore.');
             } catch (\RuntimeException $exception) {
-                $this->assertStringContainsString('workspace is not empty', $exception->getMessage());
+                $this->assertStringContainsString('already contains business records', $exception->getMessage());
             }
         } finally {
             @unlink($archive);
