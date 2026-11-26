@@ -426,7 +426,7 @@ final class BusinessArchiveService
         ] as $syncTable) {
             if (Schema::hasTable($syncTable)
                 && DB::table($syncTable)->where('business_id', $target->id)->exists()) {
-                throw new RuntimeException('Restore stopped: this workspace still has offline device or sync state. Choose a clean, unpaired workspace; existing sync history is never overwritten.');
+                throw new RuntimeException('Restore stopped: this workspace still has offline sync state or an unpaired device record. Choose a clean workspace; existing sync history is never overwritten.');
             }
         }
 
