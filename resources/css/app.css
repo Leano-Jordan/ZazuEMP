@@ -8778,3 +8778,62 @@ body.zazu-has-wallpaper .zazu-content {
 @media (max-width: 420px) {
     .zazu-offline-overview { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* Director navigation model: compact rail + anchored contextual panels. */
+.zazu-sidebar-collapse-toggle {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    display: inline-grid;
+    place-items: center;
+    margin-left: auto;
+    border: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 22%, transparent);
+    border-radius: 8px;
+    background: var(--zazu-sidebar-surface);
+    color: var(--zazu-sidebar-ink);
+    font-size: 21px;
+    line-height: 1;
+    cursor: pointer;
+}
+.zazu-nav-hierarchical { overflow: visible; }
+.zazu-nav-hierarchy { gap: 5px; }
+.zazu-nav-area-trigger { min-height: 43px; }
+.zazu-nav-area-title { display: inline-flex; align-items: center; gap: 11px; }
+.zazu-nav-flyout { max-height: min(72vh, 620px); overflow-y: auto; overscroll-behavior: contain; }
+.zazu-sidebar { overflow: visible; }
+.zazu-sidebar .zazu-sidebar-footer { flex: 0 0 auto; }
+body.zazu-sidebar-collapsed .zazu-sidebar {
+    width: 76px;
+    flex-basis: 76px;
+    overflow: visible;
+}
+body.zazu-sidebar-collapsed .zazu-brand { justify-content: center; padding-inline: 8px; }
+body.zazu-sidebar-collapsed .zazu-brand-lockup,
+body.zazu-sidebar-collapsed .zazu-sidebar .zazu-workspace-profile,
+body.zazu-sidebar-collapsed .zazu-user-identity,
+body.zazu-sidebar-collapsed .zazu-user-chevron { display: none !important; }
+body.zazu-sidebar-collapsed .zazu-brand-link { justify-content: center; min-width: 0; }
+body.zazu-sidebar-collapsed .zazu-sidebar-collapse-toggle { position: absolute; top: 82px; right: -12px; z-index: 100; width: 24px; height: 28px; border-radius: 0 8px 8px 0; }
+body.zazu-sidebar-collapsed .zazu-nav { padding-inline: 9px; }
+body.zazu-sidebar-collapsed .zazu-nav-area-trigger { justify-content: center; padding-inline: 0; }
+body.zazu-sidebar-collapsed .zazu-nav-area-title { justify-content: center; }
+body.zazu-sidebar-collapsed .zazu-nav-area-title > span { display: none; }
+body.zazu-sidebar-collapsed .zazu-nav-area-chevron { display: none; }
+body.zazu-sidebar-collapsed .zazu-nav-area-trigger { font-size: 0; }
+body.zazu-sidebar-collapsed .zazu-nav-area-trigger .zazu-nav-icon { width: 22px; height: 22px; }
+body.zazu-sidebar-collapsed .zazu-sidebar-footer { padding-inline: 8px; }
+body.zazu-sidebar-collapsed .zazu-user-trigger { justify-content: center; padding-inline: 0; }
+body.zazu-sidebar-collapsed .zazu-nav-flyout { left: calc(100% + 1px); top: 0; border-radius: 0 12px 12px 12px; }
+@media (max-width: 850px) {
+    .zazu-sidebar-collapse-toggle { display: none; }
+    .zazu-sidebar { overflow-y: auto; }
+    .zazu-nav-hierarchical { overflow: visible; }
+    .zazu-nav-hierarchy { gap: 3px; }
+    .zazu-nav-area-trigger { min-height: 40px; }
+    .zazu-nav-flyout { max-height: none; overflow: visible; }
+    body.zazu-sidebar-collapsed .zazu-sidebar { width: min(320px, 86vw); flex-basis: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .zazu-sidebar-collapse-toggle { transition: none; }
+}
