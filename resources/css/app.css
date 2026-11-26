@@ -8807,7 +8807,7 @@ body.zazu-has-wallpaper .zazu-content {
 .zazu-nav-hierarchical { overflow: visible; }
 .zazu-nav-hierarchy { gap: 5px; }
 .zazu-nav-area-trigger { min-height: 43px; }
-.zazu-nav-flyout { max-height: min(72vh, 620px); overflow-y: auto; overscroll-behavior: contain; }
+/* Flyouts expand to their content; navigation must not create nested scroll areas. */
 .zazu-sidebar { overflow: visible; }
 .zazu-sidebar .zazu-sidebar-footer { flex: 0 0 auto; }
 body.zazu-sidebar-collapsed .zazu-sidebar {
