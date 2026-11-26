@@ -22,6 +22,21 @@ class UiHumanFriendlyPresentationTest extends TestCase
         $this->assertLessThan($sidebarFooter, $businessMix);
     }
 
+    public function test_sidebar_merges_workspace_identity_into_the_account_control(): void
+    {
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+        $visualCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($layout);
+        $this->assertIsString($visualCss);
+        $this->assertStringContainsString('class="zazu-user-identity zazu-footer-workspace"', $layout);
+        $this->assertStringContainsString('class="zazu-user-kicker zazu-footer-workspace-label">WORKSPACE</span>', $layout);
+        $this->assertStringNotContainsString('<div class="zazu-footer-workspace">', $layout);
+        $this->assertStringContainsString('.zazu-sidebar .zazu-workspace-profile {', $visualCss);
+        $this->assertStringContainsString('.zazu-sidebar .zazu-user-trigger {', $visualCss);
+        $this->assertStringContainsString('@media (max-width: 850px)', $visualCss);
+    }
+
     public function test_dashboard_uses_a_visible_image_layer_with_a_readable_overlay(): void
     {
         $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
