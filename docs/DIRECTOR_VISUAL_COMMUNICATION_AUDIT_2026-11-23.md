@@ -151,3 +151,8 @@ The Laravel workflow exposed three concrete regressions introduced by the naviga
 - A second base definition for .zazu-nav-area-title was appended instead of extending its canonical rule. Geometry now lives in the existing canonical selector; the duplicate rule is removed.
 
 The desktop collapse initializer existed but was not called from the main UI initialization sequence. It is now registered before mobile and hierarchical navigation setup, so the control is live rather than decorative.
+
+
+## Navigation presentation refinement — 2026-11-26
+
+Expanded desktop now uses inline, indented subnavigation beneath its selected parent, matching the supplied reference rather than opening every submenu as an off-canvas flyout. Collapsed desktop keeps the 76px branded icon rail and moves the same submenu into a floating contextual panel beside its parent. The two modes share one semantic group structure and one interaction controller. Mobile/tablet retain the full drawer and inline accordion. Added browser acceptance for collapse, anchored panel visibility, no parent-route navigation, and destination navigation.
