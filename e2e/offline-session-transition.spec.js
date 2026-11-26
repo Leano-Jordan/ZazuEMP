@@ -340,7 +340,7 @@ test('sibling browser tabs follow the active authenticated identity', async ({ p
     expect(secondUser).not.toBe(firstUser);
 
     await expect.poll(() => sibling.locator('body').getAttribute('data-zazu-user-id')).toBe(String(secondUser));
-    await expect(sibling.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(sibling.locator('body')).toContainText('You’re signed in');
     await sibling.close();
 });
 
