@@ -1019,3 +1019,29 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Scope:** This removes stale anonymous session rows at account transitions. It does not replace the separate logout/session revocation, trusted-device token revocation or DEC-019 shared-browser-profile controls.
 
+
+
+### CASE-ZAZU-0054
+
+**Status:** CLOSED — Founder-confirmed live restore success on 2026-11-26.
+
+**Engineering diagnostic code:** ENG-ARCHIVE-003  
+**Class:** F3/F7 — business archive upload transport / recovery workflow.  
+**First identified:** 2026-11-26  
+**Target:** Windows local PHP runtime, Laravel child HTTP worker, `BusinessExportController` archive upload validation and business archive restore.
+
+**Failure fingerprint:** A valid 2.20 MB encrypted Rosscore business archive passes the read-only CLI verification command, but upload through the Zazu restore screen fails with a generic “Please correct highlighted fields” message and request reference `3feb3a06-e743-49e7-9a7d-4dc5e77b68a7`. Both source and destination workspaces are unpopulated, ruling out populated-target rejection as the explanation.
+
+**Root cause found in source:** The Windows launcher passed PHP `-d` upload and POST size options to the Artisan parent process. Laravel's Windows `ServeCommand` launches a separate PHP HTTP worker and filters inherited environment variables. The child worker therefore did not reliably receive the intended upload limits; a request larger than the worker's active `upload_max_filesize` / `post_max_size` could be rejected before Laravel received the uploaded file.
+
+**Correction:** The supported launcher now creates a project-local PHP INI scan file for 100 MB upload, 110 MB POST and 300-second execution/input limits; passes `PHP_INI_SCAN_DIR` and the HTTPS secure-cookie override through Laravel's child-process allowlist; and records a runtime signature after readiness. An older verified Zazu worker without the signature is restarted. The controller also reports PHP upload/post-limit rejection explicitly instead of disguising it as a missing archive field.
+
+**Owner-confirmed resolution:** After deploying the correction and restarting through the supported launcher, the Founder retried the original 2.20 MB Rosscore archive and confirmed that the live application restore succeeded and that everything from the backup is present in the restored business workspace. This is an actual live owner acceptance, not only a unit test or read-only verification.
+
+**Verification:** On source candidate `dbda546d677dd80c99bda83bfcdfaa4dc46e8239`, all check runs completed successfully: Laravel tests, coverage, offline browser acceptance, PostgreSQL migration/recovery smoke, Zazu Quality, PHPMD, encrypted/legacy archive verification on Windows, fresh Windows PowerShell installation, secret scan, dependency security audit and Director health. The subsequent runtime-adjustment source head `34bcb1f5c800efcedfde2589ff7de38f9486dd70` passed current-head Zazu Quality, including application, formatting, secret scan and Composer security audit. Documentation-only follow-up commits record this owner acceptance. SonarCloud remains skipped where configured.
+
+**Evidence boundary:** The exact historical server log did not independently capture the PHP upload error code. The child-process configuration defect was confirmed in source and corrected; the successful retry after deployment confirms operational resolution, but do not invent an `UPLOAD_ERR_INI_SIZE` log entry. The archive passphrase and personal/business payloads must never be copied into this case record.
+
+**Separate gate:** This closes the business-level Rosscore archive restore only. The installation-wide backup/restore recovery drill on the intended owner PC remains OPEN.
+
+**Rejected approaches:** Do not blame destination occupancy when both workspaces are empty. Do not clear demo/business data to make restore pass. Do not weaken archive throttling, cryptographic validation, manifest validation or transactional rollback. Do not mark recovery complete from read-only verification alone.
