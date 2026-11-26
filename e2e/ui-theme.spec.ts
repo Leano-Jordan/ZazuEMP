@@ -178,6 +178,30 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(calendar).toHaveAttribute('aria-current', 'page');
     });
 
+    test('mobile drawer parent controls expand in place without accidental navigation', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await login(page);
+
+        const drawerToggle = page.getByRole('button', { name: 'Open navigation' });
+        await expect(drawerToggle).toBeVisible();
+        await drawerToggle.click();
+
+        const sidebar = page.locator('[data-mobile-sidebar]');
+        const sales = sidebar.locator('[data-zazu-nav-area]').filter({ hasText: 'Sales' }).first();
+        const trigger = sales.getByRole('button', { name: 'Sales', exact: true });
+        const quotes = sales.locator('[data-zazu-nav-panel] a').filter({ hasText: /^Quotes$/ });
+
+        await trigger.click();
+        await expect(sales).toHaveClass(/is-open/);
+        await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        await expect(quotes).toBeVisible();
+        await expect(page).toHaveURL(/\/dashboard$/);
+
+        await quotes.click();
+        await expect(page).toHaveURL(/\/quotes$/);
+        await expect(quotes).toHaveAttribute('aria-current', 'page');
+    });
+
     test('navigates landing to login and workspace operations without server errors', async ({ page }) => {
         const responses: number[] = [];
         page.on('response', (response) => {
