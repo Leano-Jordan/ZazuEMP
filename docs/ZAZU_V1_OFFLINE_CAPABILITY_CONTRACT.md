@@ -170,3 +170,27 @@ The browser contract now measures the heading and navigation rectangles at 390×
 **Settings is intentionally outside the current offline route allowlist.** `resources/js/app.js` exposes only routes with implemented offline views. Since `/settings` is not mapped, the unsupported Settings link and its empty navigation group are hidden while disconnected; pairing, owner administration and server-backed business settings remain online-only. Do not expose a generic Settings route or imply it works offline. Add a destination only when a particular settings function has a real local implementation and explicit regression coverage. The shell theme control remains separate from the Settings route.
 
 This screenshot review does not expand offline scope or close physical acceptance. It does not prove local-write persistence, cold launch with all radios disabled, force-close/restart, attachment round-trip or reconnect reconciliation.
+
+## Atomic sync acknowledgement and browser storage retention — 2026-11-26
+
+### Queue acknowledgement transaction
+
+The client must not acknowledge a server mutation by deleting its local queue entry separately from persisting the resulting workspace state. `public/zazu-offline.js` now performs the following in one IndexedDB read/write transaction over the mutation queue and workspace state:
+
+1. Read the persisted workspace and durable queue.
+2. Remove only server-confirmed applied/discarded queue entries; preserve retryable failures and explicit failed/conflict records.
+3. Reconcile canonical server IDs/revisions and related parent/child revisions.
+4. Resolve `pending_sync` flags against the remaining queue and open conflicts.
+5. Recalculate `local_dirty` and write the reconciled workspace before the same transaction commits.
+
+A transaction abort must leave both stores unacknowledged; a commit must leave both stores reconciled. Retries remain protected by the server mutation idempotency key. Do not restore a separate post-acknowledgement state-only write.
+
+**Automated evidence:** source commit `4cd9b5f`; browser regression test `2e3bca4`; feature-contract test/helper commits `f0de754` and `76868dc`. Exact checkpoint `76868dc` passed 75 desktop browser journeys, 765 Laravel tests (1 skipped, 5,471 assertions), PostgreSQL migration/recovery smoke, PHPMD and the Windows install/archive checks. The browser test injects a storage failure boundary to ensure the acknowledgement path does not rely on a second state-only transaction. The latest `4a5bedf` test-only timing refinement is awaiting exact-head rerun. These results do not replace a physical abrupt-termination/restart/reconnect test.
+
+### Browser-managed storage retention
+
+Zazu currently stores local workspace and attachment data in IndexedDB and service-worker assets in Cache Storage. A source audit found no use of `navigator.storage.persist()`, `navigator.storage.persisted()` or `navigator.storage.estimate()`. Therefore the application does not currently request or report persistent origin storage or available quota.
+
+Browser-managed origin storage is best-effort by default and may be evicted under storage pressure; a persistent-storage grant reduces automatic eviction but does not prevent the user from explicitly clearing site data. See [MDN: storage quotas and eviction criteria](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria) and [MDN: StorageManager](https://developer.mozilla.org/en-US/docs/Web/API/StorageManager).
+
+**Open requirement:** request persistence at an appropriate trusted-device/pairing interaction where supported; report whether the grant was obtained; monitor usage/quota and surface capacity/storage failures; handle unavailable or declined requests honestly without blocking supported offline work. Do not market browser storage as infallible or treat persistence grants as a replacement for business export/import and full recovery.
