@@ -947,7 +947,6 @@ const initializeZazuUi = () => {
     setupZazuOfflineWorkspaceProfile();
     setupZazuAuthExperience();
     setupZazuSidebarCollapse();
-    setupZazuSidebarCollapse();
     setupZazuMobileNavigation();
     setupZazuHierarchicalNavigation();
     setupZazuCommandNavigation();
