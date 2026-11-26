@@ -7707,6 +7707,7 @@ body.zazu-inspector-open { overflow:hidden; }
 }
 
 .zazu-nav-flyout {
+    display: none;
     position: static;
     left: auto;
     top: auto;
@@ -7728,6 +7729,7 @@ body.zazu-inspector-open { overflow:hidden; }
 
 .zazu-nav-area:focus-within > .zazu-nav-flyout,
 .zazu-nav-area.is-open > .zazu-nav-flyout {
+    display: block;
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -7748,6 +7750,8 @@ body.zazu-inspector-open { overflow:hidden; }
 }
 
 .zazu-nav-flyout .zazu-nav-link {
+    min-height: 36px;
+    padding-block: 8px;
     min-height: 42px;
     padding-inline: 11px;
     border: 0;
@@ -8851,4 +8855,14 @@ body.zazu-sidebar-collapsed .zazu-nav-flyout {
 }
 @media (prefers-reduced-motion: reduce) {
     .zazu-sidebar-collapse-toggle { transition: none; }
+}
+
+
+/* Navigation density: keep long permission-scoped groups visible without a
+   second scrolling region or large empty space from closed panels. */
+.zazu-nav-area-trigger { min-height: 42px; }
+.zazu-nav-hierarchy { gap: 3px; }
+.zazu-nav-flyout-links { gap: 2px; }
+@media (max-width: 850px) {
+    .zazu-nav-flyout .zazu-nav-link { min-height: 40px; }
 }
