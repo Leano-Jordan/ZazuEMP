@@ -403,13 +403,13 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create(['password' => 'new-password']);
         $firstBusiness = Business::create([
             'name' => 'Current Session Business',
-            'slug' => 'current-session-'.Str::lower(Str::random(8)),
+            'slug' => 'current-session-business',
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
         $secondBusiness = Business::create([
             'name' => 'Target Session Business',
-            'slug' => 'target-session-'.Str::lower(Str::random(8)),
+            'slug' => 'target-session-business',
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
