@@ -119,6 +119,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'auth.session'])->group(function () {
+    Route::post('/business/switch', [BusinessContextController::class, 'change'])->name('business.switch');
     Route::get('/workspace/recover', [AuthController::class, 'workspaceRecovery'])->name('workspace.recovery');
     Route::post('/workspace/recover', [AuthController::class, 'storeWorkspaceRecovery'])->name('workspace.recovery.store');
 });
@@ -339,6 +340,5 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
 });
 
 Route::middleware('auth')->group(function () {
-    Route::post('/business/switch', [BusinessContextController::class, 'change'])->name('business.switch');
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 });
