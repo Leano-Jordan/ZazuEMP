@@ -637,9 +637,15 @@ const setupZazuHierarchicalNavigation = () => {
         const trigger = area.querySelector('[data-zazu-nav-trigger]');
         if (!trigger) return;
 
-        trigger.addEventListener('click', () => {
-            const open = area.classList.toggle('is-open');
-            closeOthers(area);
+        trigger.addEventListener('click', (event) => {
+            // A navigation-group trigger is an accordion control, never a destination.
+            // Stop the event before it reaches shell-level click handlers.
+            event.preventDefault();
+            event.stopPropagation();
+
+            const open = !area.classList.contains('is-open');
+            closeOthers(open ? area : null);
+            area.classList.toggle('is-open', open);
             trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
     });
