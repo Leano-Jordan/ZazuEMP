@@ -27,7 +27,7 @@ No exploit against a live system was attempted. No production data was accessed 
 
 ### Open adversarial checks
 
-- Reuse a pre-authentication session ID after login/registration and prove it cannot authenticate. **New regression committed:** replay the original browser cookie after successful login and registration; require guest redirection while the newly rotated cookie remains authenticated. Exact-head CI is pending.
+- Reuse a pre-authentication session ID after login/registration and prove it cannot authenticate. **New regression committed:** replay the original browser cookie after successful login and registration; require guest redirection while the newly rotated cookie remains authenticated. Exact-head CI is pending. The first run exposed stale service-worker assertions, a registration test that asserted the wrong post-registration destination, and a real public accent contrast failure; those were corrected by updating the v64/5-second expectations, asserting workspace access, and darkening the shared teal to #0f6b70 (measured 5.81:1 against the public page background).
 - Race two login/logout/password-reset requests sharing the old session; prove stale writes cannot resurrect an authenticated session or overwrite the selected business context.
 - Test password reset against concurrent authenticated requests and remembered-device cookies.
 - Test session cookie attributes under actual production HTTPS/reverse-proxy configuration, not only config defaults.
