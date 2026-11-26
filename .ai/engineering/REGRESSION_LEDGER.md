@@ -317,3 +317,16 @@ A server-accepted mutation must never disappear from the local queue before its 
 **Regression:** Browser failure-injection test blocks an independent post-acknowledgement state-only transaction and verifies the flow does not depend on it. PHP source-contract test guards the shared transaction and no separate `writeState()`.
 
 **Status:** AUTOMATED-VERIFIED on exact checkpoint `4a5bedfc`: 75 desktop offline/browser tests passed; 765 Laravel tests (1 skipped, 5,471 assertions); separate mobile offline Work/visual (11), stopped-host, phone-local attachment, PostgreSQL smoke. PHPMD, static analysis and Windows installation/archive checks passed on the same application source at `76868dce`. Physical abrupt termination/restart/reconnect remains OPEN.
+
+## REG-034 — Offline workspace must disclose browser-managed storage retention state
+
+IndexedDB and Cache Storage commits do not guarantee that browser-managed origin storage will never be evicted. Best-effort storage is the browser default; origin persistence and quota are not currently requested/reported by Zazu.
+
+**Control:**
+- Detect \`navigator.storage.persisted()\` and request \`persist()\` at a deliberate trusted-device/pairing action where supported.
+- Record and display granted / not granted / unsupported / unknown status; do not block offline use when permission is declined.
+- Inspect \`estimate()\` usage/quota where available and surface storage pressure/capacity errors.
+- Never auto-delete business data, queued mutations or attachments to make space.
+- Explain that users can still explicitly clear site data; persistent storage is not a replacement for export/import or recovery.
+
+**Status:** OPEN — CASE-ZAZU-0052 / ENG-DATA-007. Source audit confirms the API and quota visibility are absent. No eviction incident is alleged. Browser tests and physical Android acceptance are required after implementation.
