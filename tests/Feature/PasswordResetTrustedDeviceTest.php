@@ -86,6 +86,7 @@ class PasswordResetTrustedDeviceTest extends TestCase
             $this->assertSame('revoked', $device->status);
             $this->assertNotNull($device->revoked_at);
             $this->assertNull($device->token_expires_at);
+            $this->assertNull($device->pairing_code_digest);
             $this->assertArrayNotHasKey('sync_token_hash', $device->metadata ?? []);
             $this->assertArrayNotHasKey('pairing_code_hash', $device->metadata ?? []);
             $this->assertArrayNotHasKey('pairing_expires_at', $device->metadata ?? []);
