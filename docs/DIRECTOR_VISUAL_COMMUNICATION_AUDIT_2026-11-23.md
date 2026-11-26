@@ -132,3 +132,12 @@ The Founder screenshot showed three persistent context blocks competing with the
 - Removed the standalone workspace block. Persistent lower-sidebar composition is now two elements instead of three; account details remain on demand.
 - The same compact layout applies to desktop, tablet and phone. The mobile drawer retains its existing scroll ownership and safe-area footer spacing.
 - No routes, permissions, account actions, workspace switching, profile data or offline behaviour were changed.
+
+
+## 2026-11-26 — Navigation interaction model correction
+
+- Treat the reference as a compact, anchored navigation system: expanded mode shows branded icon + label group triggers; each parent opens a contextual panel without navigating. Collapsed desktop mode becomes a 76px icon rail with the same panels anchored beside the selected icon.
+- Added a persistent desktop collapse/expand control with local preference persistence. Tablet and phone retain the full-width drawer and tap-controlled accordion; desktop collapse state is not applied to touch layouts.
+- Removed the vertical scrolling constraint from the desktop navigation list. Only a contextual panel may internally scroll when its content exceeds the available viewport.
+- Finance's Search destination is explicitly named Advanced Search and opens the existing workspace search page with its record type, status and date filters.
+- Retained Zazu brand lockup, current theme tokens, active-state treatment, role checks, route destinations and mobile interaction model.
