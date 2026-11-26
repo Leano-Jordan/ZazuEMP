@@ -94,7 +94,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $request->session()->regenerate();
+        $request->session()->regenerate(true);
 
         $business = app(CurrentBusiness::class)->resolve($request->user());
 
