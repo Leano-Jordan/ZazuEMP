@@ -621,7 +621,15 @@ final class BusinessArchiveService
             $newId = $file['table'] === 'businesses'
                 ? (int) $target->id
                 : (int) $idMaps[$file['table']][(string) $file['id']];
-            $filename = Str::uuid().'.bin';
+            $allowedExtensions = match ($file['table']) {
+                'businesses', 'business_capabilities', 'customers' => ['jpg', 'jpeg', 'png', 'webp'],
+                'compliance_documents' => ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
+                'event_attachments' => ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx'],
+                default => [],
+            };
+            $originalExtension = strtolower(pathinfo((string) ($file['original_name'] ?? ''), PATHINFO_EXTENSION));
+            $extension = in_array($originalExtension, $allowedExtensions, true) ? $originalExtension : 'bin';
+            $filename = Str::uuid().'.'.$extension;
             $path = match ($file['table']) {
                 'businesses' => 'business-branding/'.$target->id.'/'.$filename,
                 'business_capabilities' => 'catalogue/'.$filename,
