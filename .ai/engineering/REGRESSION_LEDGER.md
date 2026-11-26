@@ -316,4 +316,4 @@ A server-accepted mutation must never disappear from the local queue before its 
 
 **Regression:** Browser failure-injection test blocks an independent post-acknowledgement state-only transaction and verifies the flow does not depend on it. PHP source-contract test guards the shared transaction and no separate `writeState()`.
 
-**Status:** AUTOMATED-VERIFIED on checkpoint `76868dce`: 75 desktop offline/browser tests passed; 765 Laravel tests (1 skipped, 5,471 assertions); PostgreSQL smoke; PHPMD; static analysis; Windows installation/archive checks. Latest test-only boundary timing commit `4a5bedf` rerun pending. Physical abrupt termination/restart/reconnect remains OPEN.
+**Status:** AUTOMATED-VERIFIED on exact checkpoint `4a5bedfc`: 75 desktop offline/browser tests passed; 765 Laravel tests (1 skipped, 5,471 assertions); separate mobile offline Work/visual (11), stopped-host, phone-local attachment, PostgreSQL smoke. PHPMD, static analysis and Windows installation/archive checks passed on the same application source at `76868dce`. Physical abrupt termination/restart/reconnect remains OPEN.
