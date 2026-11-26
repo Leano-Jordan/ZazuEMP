@@ -919,3 +919,30 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Scope:** This closes linked-contact lookup coverage. It does not claim that every search/report/Helper V1 usability acceptance item is complete.
 
+### CASE-ZAZU-0050
+
+**Status:** FIXED IN SOURCE — exact-head offline browser CI and post-fix physical visual acceptance pending.
+
+**Engineering diagnostic code:** ENG-CSS-005  
+**Class:** F1/F2 — application responsive-layout defect plus missing geometry in the browser verification contract.  
+**First observed:** 2026-11-26  
+**Target:** Offline workspace header in resources/views/dashboard.blade.php; responsive rule ownership in resources/css/zazu-dashboard-authority.css; coverage in e2e/pwa-offline.spec.js.
+
+**Failure fingerprint:** Android phone offline workspace at approximately 390px CSS width → server-unavailable state is displayed and module actions are visible → workspace heading/description are compressed into a narrow left column while the full-width module navigation occupies the right side of the same header.
+
+**Expected:** The workspace title and explanatory copy remain readable at phone width; the module actions appear beneath the introduction, stay within the card width and remain usable; device-local status follows the navigation.
+
+**Actual:** The offline header retained its shared flex-row layout. At mobile breakpoints the generic .zazu-action-group rule sets width: 100%, but the heading remains a sibling in the same flex row. The expanded navigation therefore competes for that row and flex-shrinks the heading. The earlier offline-navigation visibility change at f6a9b3c5 removed the hide rule but did not add the corresponding responsive composition. The browser test asserted link visibility and route isolation, but did not assert element geometry.
+
+**Root cause:** CSS composition contract mismatch between a flex header and a child action group that becomes full-width on mobile. This is not evidence that the offline IndexedDB, route mapping or sync engine itself regressed.
+
+**Correction on main:**
+1. 52152f2f6770a10377c59d28cdc376fa8baa76d3 adds a responsive grid scoped only to the offline workspace header. It stacks introduction → actions → device-local status below 700px; uses two action columns at ordinary phone widths and one column at up to 340px.
+2. 20e313ef1ade96071ceee45c9afa26e56bc20e3a adds specific scoping classes to the existing offline workspace section and header.
+3. 66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9 sets the offline route test to 390×844 and asserts the navigation begins below the intro and has matching left/right bounds.
+
+**Independent navigation finding:** The offline route allowlist in resources/js/app.js intentionally excludes /settings. Unsupported navigation links and now-empty navigation groups are hidden while offline. Device pairing, owner administration and server-backed business settings remain online-only. Do not reintroduce Settings as an offline link without a specific supported local feature and tests.
+
+**Evidence:** Founder screenshots received 2026-11-26 show 13 saved records, 0 waiting to sync and 0 conflicts, plus the layout defect. Current-head Laravel run 45779103238 passed 765 tests / 1 skipped / 5,464 assertions, coverage and PostgreSQL smoke passed; offline-browser acceptance was still in progress at last check. Zazu Quality run 45779103388 passed application, formatting and secret-scan jobs but failed its independent Composer security audit on five Symfony advisories. No post-fix Android screenshot or rendered visual acceptance has been observed.
+
+**Rejected approaches:** Do not hide offline navigation again, widen the entire shared Dashboard header, remove links to satisfy the screenshot, or treat source assertions/green PHP tests as visual acceptance. Keep the correction isolated to the offline shell.
