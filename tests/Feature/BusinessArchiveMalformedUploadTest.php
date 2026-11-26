@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Customer;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -97,6 +98,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'business_id' => $target->id,
         ]);
     }
+
     public function test_archive_file_manifest_cannot_override_server_staging_metadata(): void
     {
         Storage::fake('private');
@@ -116,7 +118,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         $this->assertNotFalse($sentinelPath);
         file_put_contents($sentinelPath, 'sentinel must survive');
 
-        $zip = new ZipArchive;
+        $zip = new \\ZipArchive;
         $this->assertTrue($zip->open($archivePath) === true);
         $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
         $manifest['files'][0]['staged_path'] = $sentinelPath;
@@ -217,4 +219,5 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         );
         $this->assertDatabaseCount('customers', 0);
     }
+
 }
