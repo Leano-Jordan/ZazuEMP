@@ -184,3 +184,7 @@ The navigation state machine and stylesheet ownership have been tightened withou
 ### CI evidence and remaining independent failures
 
 The original `e87bca6` run failed Laravel because `.zazu-nav-flyout-heading` had two base declarations where the canonical-selector test requires one. That duplicate has been removed. The same original run also reported independent PHPMD findings (two complexity-threshold methods and one test class over the method-count threshold) and offline-browser acceptance failures around device trust and the hidden sync-recovery alert. Those are not navigation regressions and remain separate work items. Exact-head CI for the current navigation changes must finish before acceptance is marked green.
+
+### Browser CI follow-up — 2026-11-26
+
+The first stylesheet-ownership cleanup run passed Laravel tests and coverage but caught a navigation icon regression in the browser acceptance step: the rendered nav icon measured 16px against the 22px minimum. Restored 23px icon sizing in canonical `app.css` (collapsed rail remains 22px). The Laravel workflow now explicitly runs the collapsed desktop rail and mobile drawer keyboard-focus tests alongside the expanded navigation/mobile calendar check. The exact-head rerun is in progress; do not mark browser acceptance green until it completes.
