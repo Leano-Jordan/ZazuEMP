@@ -74,7 +74,7 @@ The previous all-pending-device scan and per-candidate password-hash work have b
 - Test expired, malformed, reused and revoked pairing attempts.
 - Measure provisioning cost with realistic pending-device counts and invalid guesses.
 - Establish whether multiple source IPs can guess a live code within its validity window at a practical rate.
-- Check pending-code cleanup, uniqueness/collision handling and whether an attacker can pair against the wrong business when several businesses have active pairing codes.
+- Verify pending-code cleanup and unique-digest collision behaviour under concurrent code generation, and confirm an attacker cannot pair against the wrong business when several businesses have active pairing codes.
 - Evaluate layered controls that do not lock out legitimate phone pairing: short-lived pairing identifier, attempt accounting, global/service-level abuse controls, bounded pending candidates and owner-visible pairing alerts.
 
 ## 4. Cross-business token substitution and stale-token replay
