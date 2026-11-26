@@ -247,7 +247,7 @@ class BusinessExportController extends Controller
         string &$restoreStage,
     ): array {
         $user = $request->user();
-        $business = \\Illuminate\\Support\\Facades\\DB::transaction(function () use ($user): Business {
+        $business = \Illuminate\Support\Facades\DB::transaction(function () use ($user): Business {
             $business = Business::create([
                 'name' => 'Restoring business archive',
                 'slug' => 'restored-'.Str::lower(Str::random(12)),
@@ -267,12 +267,12 @@ class BusinessExportController extends Controller
                 $archives,
                 $restoreStage,
             );
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             try {
-                \\Illuminate\\Support\\Facades\\DB::transaction(
+                \Illuminate\Support\Facades\DB::transaction(
                     static fn () => Business::query()->whereKey($business->id)->delete()
                 );
-            } catch (\\Throwable $cleanupException) {
+            } catch (\Throwable $cleanupException) {
                 Log::critical('Failed business archive restore left an empty destination workspace.', [
                     'business_id' => (int) $business->id,
                     'exception_class' => $cleanupException::class,
