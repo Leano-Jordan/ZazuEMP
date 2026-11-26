@@ -1,6 +1,6 @@
 # Director Adversarial Authentication Audit — 2026-11-26
 
-**Status:** Investigation in progress. This is a source-inspection checkpoint, not a completed penetration test or release clearance.  
+**Status:** Investigation in progress. Session replay regressions added on 2026-11-26; exact-head CI pending. This remains a source-inspection checkpoint, not a completed penetration test or release clearance.  
 **Repository:** Leano-Jordan/ZazuEMP  
 **Reference:** main at ebeda7a266c0564a0cff48bcf96a7335028d55d1 when this checkpoint began.  
 **Scope:** Session fixation/hijacking and concurrent account transitions; browser credential exposure/XSS/backups; pairing-code brute force/device takeover; cross-business token substitution/stale replay; password reset/owner removal/device revocation races; offline logout/account switching/queued transaction preservation.
@@ -27,7 +27,7 @@ No exploit against a live system was attempted. No production data was accessed 
 
 ### Open adversarial checks
 
-- Reuse a pre-authentication session ID after login/registration and prove it cannot authenticate.
+- Reuse a pre-authentication session ID after login/registration and prove it cannot authenticate. **New regression committed:** replay the original browser cookie after successful login and registration; require guest redirection while the newly rotated cookie remains authenticated. Exact-head CI is pending.
 - Race two login/logout/password-reset requests sharing the old session; prove stale writes cannot resurrect an authenticated session or overwrite the selected business context.
 - Test password reset against concurrent authenticated requests and remembered-device cookies.
 - Test session cookie attributes under actual production HTTPS/reverse-proxy configuration, not only config defaults.
