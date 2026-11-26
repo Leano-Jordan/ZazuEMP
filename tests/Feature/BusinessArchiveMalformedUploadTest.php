@@ -163,6 +163,10 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
+        Customer::create([
+            'business_id' => $target->id,
+            'name' => 'Existing Target Customer',
+        ]);
         $archivePath = app(BusinessArchiveService::class)->download($source);
         $stages = [];
 
