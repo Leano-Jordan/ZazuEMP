@@ -37,5 +37,10 @@ class SidebarNavigationPresentationTest extends TestCase
         $this->assertStringContainsString('setupZazuSidebarCollapse', $scripts);
         $this->assertStringContainsString('Advanced Search', $layout);
         $this->assertStringContainsString('Advanced Search', $search);
+        $this->assertSame(
+            1,
+            substr_count($scripts, '    setupZazuSidebarCollapse();'),
+            'Sidebar collapse must be initialized exactly once to prevent duplicate click handlers.'
+        );
     }
 }
