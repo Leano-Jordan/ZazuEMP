@@ -10,9 +10,10 @@ Make Zazu's existing CSS deterministic before further visual refinement. This op
 | --- | --- | --- |
 | Design tokens / themes | resources/css/app.css | Light + dark root tokens; shared colours, surfaces, typography aliases, dimensions |
 | Shared components | resources/css/app.css | Shell, cards, panels, forms, buttons, lists, shared state visuals |
-| Shared responsive structure | resources/css/zazu-responsive-theme.css | Footer, shared responsive layout, tabs, job context, form/grid behaviour |
-| Mobile shell/navigation | resources/css/zazu-mobile-refinement.css | Mobile menu, topbar grid, mobile navigation, touch sizing |
-| Component-specific extensions | resources/css/zazu-final-visual-sweep.css | Only selectors whose component class is not owned by the three authorities above; no token root and no generic shared restyling |
+| Navigation hierarchy and rail | resources/css/app.css | Permission-aware group geometry, disclosure states, collapsed rail, anchored panels, no nested scrolling |
+| Shared responsive structure | resources/css/zazu-responsive-theme.css | Footer, shared responsive layout, tabs, job context, form/grid behaviour; nav overflow remains visible |
+| Mobile shell/navigation | resources/css/zazu-mobile-refinement.css | Mobile menu, topbar grid, touch sizing, single drawer-level scroll fallback |
+| Component-specific extensions | resources/css/zazu-final-visual-sweep.css | Only selectors whose component class is not owned by the canonical shared stylesheets; no token root and no generic navigation overrides |
 
 The former zazu-final-visual-sweep.css token/component system is no longer a visual authority.
 
@@ -373,7 +374,7 @@ The owner rejected dark navy as the dominant light-mode identity. The target is 
 ### Source findings
 
 - The shell has historical repeated selector layers inside `app.css`; these are not safe to collapse wholesale because later blocks intentionally refine desktop shell appearance, mobile breakpoints, hierarchical navigation and dark-shell readability.
-- `zazu-mobile-refinement.css` owns the fixed off-canvas mobile sidebar, touch-sized links and mobile header grid. `zazu-responsive-theme.css` owns shared responsive layout and the bounded mobile nav scroll override.
+- `zazu-mobile-refinement.css` owns the fixed off-canvas mobile sidebar, touch-sized links, mobile header grid and the drawer-level scroll fallback. `zazu-responsive-theme.css` owns shared responsive layout; the navigation list itself remains overflow-visible rather than becoming a nested scroll region.
 - The desktop header/search sizing rules had been placed in the visual extension stylesheet even though they are responsive shell layout, not component-specific visual extensions.
 
 ### Consolidation executed on main
@@ -590,3 +591,9 @@ This confirms that the problem is not just two files sharing ownership. Both fil
 4. **Runtime acceptance after each coherent group:** verify dashboard and representative authenticated modules at desktop, tablet and phone widths in light and dark themes. No source-only pass may be labelled visually accepted.
 
 No CSS declarations were changed as part of this inventory. The next code change must be a narrowly scoped, evidence-backed consolidation, not a rewrite of either authority file.
+
+## Navigation authority consolidation — 2026-11-26
+
+Shared navigation geometry and state now live in `resources/css/app.css`. The generic navigation block and navigation typography overrides were removed from `zazu-final-visual-sweep.css`, so later visual extension rules cannot reset flyout positioning or reintroduce scrolling. The canonical navigation rules own the collapsed rail's relative parent anchor, absolute contextual panel, upward placement for the final group, and content-sized overflow. The mobile drawer remains the only scroll container when its content exceeds the viewport; its nav list and inline submenu remain overflow-visible.
+
+Regression tests enforce the ownership boundary and assert that the visual extension stylesheet does not regain generic navigation selectors.
