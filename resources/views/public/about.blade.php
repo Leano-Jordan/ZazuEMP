@@ -19,6 +19,7 @@
 
             <h2>Who builds Zazu</h2>
             <p>Zazu is currently developed and operated independently by its founder, Isaac Junior Lehlogonolo Maluleka. It is a solo project: there is no larger team, outsourced support desk or hidden operating company behind the product.</p>
+            <p>Zazu is the current working product name. Name clearance and any trade-mark filing remain unresolved; no registration or clearance is claimed.</p>
             <p>Rosscore Labs is the intended future business identity, but it is not yet registered and is not the current owner or contracting provider. The founder personally owns the current Zazu software and intellectual property.</p>
 
             <h2>Where the product stands</h2>
