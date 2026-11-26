@@ -122,10 +122,12 @@ test.describe('Zazu installed PWA offline shell', () => {
             .toHaveText('This browser does not support persistent storage requests.');
     });
 
-    test('surfaces quota failures without pretending the offline change was saved', async ({ page }, testInfo) => {
+    test('surfaces quota failures without pretending the offline change was saved', async ({ page, context }, testInfo) => {
         test.skip(testInfo.project.name !== 'chromium', 'IndexedDB quota failure contract runs once.');
 
         await login(page);
+        await context.setOffline(true);
+        await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
