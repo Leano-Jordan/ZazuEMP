@@ -117,6 +117,8 @@ class AuthenticationSessionSecurityTest extends TestCase
         $preAuthResponse = $this->get(route('landing'))->assertOk();
         $preAuthCookie = $preAuthResponse->getCookie(config('session.cookie'));
         $this->assertNotNull($preAuthCookie);
+        $preAuthSessionId = $preAuthCookie->getValue();
+        $this->assertDatabaseHas('sessions', ['id' => $preAuthSessionId]);
 
         $loginResponse = $this->withCookie(config('session.cookie'), $preAuthCookie->getValue())
             ->post(route('login.store'), [
@@ -128,6 +130,7 @@ class AuthenticationSessionSecurityTest extends TestCase
         $authenticatedCookie = $loginResponse->getCookie(config('session.cookie'));
         $this->assertNotNull($authenticatedCookie);
         $this->assertNotSame($preAuthCookie->getValue(), $authenticatedCookie->getValue());
+        $this->assertDatabaseMissing('sessions', ['id' => $preAuthSessionId]);
 
         $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
@@ -154,6 +157,8 @@ class AuthenticationSessionSecurityTest extends TestCase
         $preRegistrationResponse = $this->get(route('landing'))->assertOk();
         $preRegistrationCookie = $preRegistrationResponse->getCookie(config('session.cookie'));
         $this->assertNotNull($preRegistrationCookie);
+        $preRegistrationSessionId = $preRegistrationCookie->getValue();
+        $this->assertDatabaseHas('sessions', ['id' => $preRegistrationSessionId]);
 
         $registrationResponse = $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
             ->post(route('register.store'), [
@@ -169,6 +174,7 @@ class AuthenticationSessionSecurityTest extends TestCase
         $registeredCookie = $registrationResponse->getCookie(config('session.cookie'));
         $this->assertNotNull($registeredCookie);
         $this->assertNotSame($preRegistrationCookie->getValue(), $registeredCookie->getValue());
+        $this->assertDatabaseMissing('sessions', ['id' => $preRegistrationSessionId]);
 
         $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
