@@ -188,7 +188,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('|| /^\\/work\\/\\d+$/.test(pathname)', $worker);
         $this->assertSame(3, substr_count($worker, 'cachedAppPage(request, preferOfflineShell)'));
         $this->assertStringContainsString("const preferOfflineShell = shouldPreferOfflineShell(request, url.pathname, event.clientId === '');", $worker);
-        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v62\';', $worker);
+        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v63\';', $worker);
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
             $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $dashboard);
         }
@@ -431,7 +431,8 @@ class PwaOfflineFoundationTest extends TestCase
         $settings->assertOk()
             ->assertSee('data-zazu-generate-pairing', false)
             ->assertSee('data-zazu-pairing-result', false)
-            ->assertSee('Generate phone pairing code');
+            ->assertSee('Generate phone pairing code')
+            ->assertSee('12-digit code:');
 
         $client = File::get(public_path('zazu-offline.js'));
         $settingsView = File::get(resource_path('views/settings/index.blade.php'));
@@ -444,7 +445,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
         $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString('zazu-static-v62', $worker);
+        $this->assertStringContainsString('zazu-static-v63', $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
