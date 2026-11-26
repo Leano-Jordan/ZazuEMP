@@ -46,7 +46,7 @@
         .content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 42px; align-items: start; margin-top: 38px; }
         .prose { min-width: 0; }
         .prose h2 { margin: 36px 0 10px; color: var(--navy); font-size: 23px; line-height: 1.25; letter-spacing: -.025em; }
-        .prose h2:first-child { margin-top: 0; }
+        .prose h2:first-child, .first-heading { margin-top: 0; }
         .prose h3 { margin: 24px 0 7px; color: var(--navy); font-size: 17px; }
         .prose p, .prose li { color: #425969; }
         .prose ul { padding-left: 22px; }
