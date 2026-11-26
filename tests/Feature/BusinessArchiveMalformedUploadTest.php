@@ -124,5 +124,4 @@ class BusinessArchiveMalformedUploadTest extends TestCase
         );
         $this->assertDatabaseCount('customers', 0);
     }
-
 }
