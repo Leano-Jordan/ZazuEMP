@@ -105,6 +105,12 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
+            Object.defineProperty(navigator, 'storage', {
+                configurable: true,
+                value: {
+                    estimate: async () => ({ usage: 1024, quota: 2048 }),
+                },
+            });
             const state = window.ZazuOffline.getState();
             state.local_dirty = true;
             await window.ZazuOffline.persist();
