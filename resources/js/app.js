@@ -2970,11 +2970,28 @@ function setupZazuOfflineDirectoryViews() {
         return value.toFixed(value >= 100 ? 0 : value >= 10 ? 1 : 2) + ' ' + units[unit];
     };
 
+    const formatOfflineStorageEstimate = (result) => {
+        const usage = formatOfflineStorageBytes(result?.usage);
+        const quota = formatOfflineStorageBytes(result?.quota);
+        if (!usage || !quota) return 'Storage usage information is not available in this browser.';
+
+        const base = 'Using ' + usage + ' of an estimated ' + quota + ' browser storage.';
+        const nearCapacity = Number.isFinite(result?.usage)
+            && Number.isFinite(result?.quota)
+            && result.quota > 0
+            && (result.usage / result.quota) >= 0.9;
+        return nearCapacity
+            ? base + ' Storage is nearing estimated capacity. Free device space without clearing Zazu site data before adding large attachments.'
+            : base;
+    };
+
+    let offlineStorageErrorMessage = '';
     let offlineStorageProtectionRequestBound = false;
     const renderOfflineStorageProtection = async () => {
         const panel = document.querySelector('[data-zazu-offline-storage]');
         const statusNode = panel?.querySelector('[data-zazu-offline-storage-status]');
         const usageNode = panel?.querySelector('[data-zazu-offline-storage-usage]');
+        const errorNode = panel?.querySelector('[data-zazu-offline-storage-error]');
         const requestButton = panel?.querySelector('[data-zazu-offline-storage-request]');
         const offline = window.ZazuOffline;
 
@@ -3002,11 +3019,7 @@ function setupZazuOfflineDirectoryViews() {
                                 ? 'This browser does not support persistent storage requests.'
                                 : result.error || 'The browser could not confirm storage protection.';
                     statusNode.textContent = message;
-                    const usage = formatOfflineStorageBytes(result.usage);
-                    const quota = formatOfflineStorageBytes(result.quota);
-                    usageNode.textContent = usage && quota
-                        ? 'Using ' + usage + ' of an estimated ' + quota + ' browser storage.'
-                        : 'Storage usage information is not available in this browser.';
+                    usageNode.textContent = formatOfflineStorageEstimate(result);
                     requestButton.hidden = result.status === 'granted' || !result.requestSupported;
                     requestButton.disabled = false;
                 }).catch(() => {
@@ -3030,11 +3043,11 @@ function setupZazuOfflineDirectoryViews() {
                         ? 'This browser does not support persistent storage requests.'
                         : 'Persistent storage status could not be confirmed.';
 
-            const usage = formatOfflineStorageBytes(result.usage);
-            const quota = formatOfflineStorageBytes(result.quota);
-            usageNode.textContent = usage && quota
-                ? 'Using ' + usage + ' of an estimated ' + quota + ' browser storage.'
-                : 'Storage usage information is not available in this browser.';
+            usageNode.textContent = formatOfflineStorageEstimate(result);
+            if (errorNode) {
+                errorNode.textContent = offlineStorageErrorMessage;
+                errorNode.hidden = !offlineStorageErrorMessage;
+            }
 
             requestButton.hidden = result.status === 'granted' || !result.requestSupported;
             requestButton.disabled = false;
@@ -3058,6 +3071,15 @@ function setupZazuOfflineDirectoryViews() {
         refreshOfflineWorkspaceVisibility(state);
         refreshLocalAttachmentLists();
     };
+
+    window.addEventListener('zazu:offline-storage-error', event => {
+        offlineStorageErrorMessage = String(event.detail?.message || 'Local storage is full. This change was not saved.');
+        const errorNode = document.querySelector('[data-zazu-offline-storage-error]');
+        if (errorNode) {
+            errorNode.textContent = offlineStorageErrorMessage;
+            errorNode.hidden = false;
+        }
+    });
 
     // One shared origin state prevents overlapping health probes from
     // racing and hiding the local workspace after a newer offline transition.
