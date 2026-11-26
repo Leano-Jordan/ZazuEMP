@@ -5,7 +5,9 @@
 - Added feature regressions that replay the original pre-authentication browser cookie after successful login and registration.
 - The expected contract is that the stale cookie is treated as a guest, while the newly rotated authenticated cookie continues to access the workspace.
 - This strengthens the existing database-session rotation/deletion assertions; it does not prove concurrent in-flight request serialization or complete the adversarial authentication audit.
-- Exact-head Laravel, Zazu Quality and Windows checks are running. No PASS is claimed until those workflows finish on the test commit.
+- First CI run also identified stale PWA assertions that still expected v63 and 1.8 seconds; aligned them with the committed v64 and 5-second worker contract. Corrected the registration replay test to verify the dashboard rather than a workflow-dependent onboarding destination.
+- Public trust accessibility testing identified an eyebrow accent contrast ratio of 3.79:1. Darkened the shared teal to #0f6b70, measuring 5.81:1 against #f4f7f8.
+- Latest corrective test commit: `fc6257b`. Exact-head Laravel, accessibility, Zazu Quality and Windows checks are pending.
 
 ## 2026-11-26 — Public trust foundation and navigation reliability (acceptance pending)
 
