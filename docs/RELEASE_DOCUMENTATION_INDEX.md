@@ -28,7 +28,23 @@ This directory contains the operational documentation set for a commercial Zazu 
 | RELEASE_UPGRADE_ROLLBACK_RUNBOOK.md | Existing-install upgrade and rollback control | Operational draft |
 | RELEASE_DOCUMENTATION_IMPLEMENTATION_AUDIT.md | Evidence audit against current implementation | Director audit — refresh after final release decisions |
 
-| DIRECTOR_TRUST_SURFACE_EXECUTION_2026-11-26.md | Founder-directed public credibility work order, publication boundaries and continuity handover | Active execution record — see current state; public pages not yet implemented |
+| DIRECTOR_TRUST_SURFACE_EXECUTION_2026-11-26.md | Founder-directed public credibility work order, publication boundaries and continuity handover | Trust-surface foundation implemented; automated acceptance and publication review pending |
+| DIRECTOR_NAVIGATION_RECOVERY_2026-11-26.md | Collapsed-rail navigation fallback root cause, service-worker correction and regression evidence | Fix committed; exact-head CI and Founder-device acceptance pending |
+
+## Public trust surface implementation — 2026-11-26
+
+The following public GET routes are implemented in the existing Laravel application and are not authentication-gated:
+
+| Route | Purpose | Publication boundary |
+|---|---|---|
+| `/about` | Product identity, current ownership and operating stage | Public factual page; Rosscore Labs is explicitly not yet registered |
+| `/security` | Security approach, limitations and responsible disclosure guidance | No certification or independent penetration-test claim |
+| `/contact` | Direct provisional founder contact | Outlook address is provisional, not a dedicated support/privacy desk |
+| `/whats-new` | Dated engineering/product updates | Updates distinguish in-progress work from accepted releases |
+| `/privacy` | Intended personal-information handling | Review copy only; not an effective legal notice |
+| `/terms` | Intended service and customer boundaries | Review copy only; not a binding contract |
+
+Shared view layout: `resources/views/layouts/public-trust.blade.php`. Landing footer links expose the public pages. Automated route/content tests are in `tests/Feature/PublicTrustSurfaceTest.php`; exact-head CI and browser visual verification remain pending.
 
 ## Owner-confirmed commercial baseline
 
