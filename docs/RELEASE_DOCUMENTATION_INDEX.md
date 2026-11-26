@@ -28,6 +28,8 @@ This directory contains the operational documentation set for a commercial Zazu 
 | RELEASE_UPGRADE_ROLLBACK_RUNBOOK.md | Existing-install upgrade and rollback control | Operational draft |
 | RELEASE_DOCUMENTATION_IMPLEMENTATION_AUDIT.md | Evidence audit against current implementation | Director audit — refresh after final release decisions |
 
+| DIRECTOR_TRUST_SURFACE_EXECUTION_2026-11-26.md | Founder-directed public credibility work order, publication boundaries and continuity handover | Active execution record — see current state; public pages not yet implemented |
+
 ## Owner-confirmed commercial baseline
 
 - Current provider/operator: Isaac Junior Lehlogonolo Maluleka, operating independently.
