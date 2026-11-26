@@ -163,7 +163,8 @@ class PasswordResetController extends Controller
         $needsCleanup = $device->token_expires_at !== null
             || array_key_exists('sync_token_hash', $metadata)
             || array_key_exists('pairing_code_hash', $metadata)
-            || array_key_exists('pairing_expires_at', $metadata);
+            || array_key_exists('pairing_expires_at', $metadata)
+            || $device->pairing_code_digest !== null;
 
         if (! $needsAudit && ! $needsCleanup) {
             return;
@@ -179,6 +180,7 @@ class PasswordResetController extends Controller
             'status' => 'revoked',
             'revoked_at' => $device->revoked_at ?? now(),
             'token_expires_at' => null,
+            'pairing_code_digest' => null,
             'metadata' => $metadata,
         ])->saveQuietly();
 
