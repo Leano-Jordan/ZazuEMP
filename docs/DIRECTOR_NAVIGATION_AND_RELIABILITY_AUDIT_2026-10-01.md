@@ -127,3 +127,12 @@ Quick Access is not part of the target architecture and must not be reintroduced
 
 ### Reliability rule
 Navigation must minimise hunting, scrolling and prior knowledge while preserving direct access to real destinations. Search/command navigation remains a secondary accelerator, not the primary information architecture.
+
+
+## 2026-11-26 — Responsive navigation interaction correction
+
+- Navigation group triggers are accordion controls, not destinations. Their click handler now explicitly prevents default behaviour and stops propagation before updating the single-open-group state and `aria-expanded`.
+- Hover-only flyout activation is limited to fine-pointer desktop devices. Touch phones and tablets use tap-controlled accordion state, avoiding sticky touch-hover behaviour.
+- Removed a duplicate mobile active-group display override. The server-rendered active group already carries `is-open`, so the fallback was redundant and could disagree with the client accordion state.
+- Added Playwright coverage for desktop flyouts, mobile drawer toggling, tablet touch navigation, non-navigation on group-trigger taps, and correct destination navigation.
+- Desktop, tablet and phone are separate acceptance targets. The current branch checks were green before this change; this new interaction change remains pending its own CI run and must not be called verified until then.
