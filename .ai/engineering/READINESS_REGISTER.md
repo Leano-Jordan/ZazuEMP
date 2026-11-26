@@ -1,17 +1,20 @@
 **Canonical policy:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` governs commercial positioning, V1 scope, formal scorecard, ordered release gates and the controlled-pilot target. This register is evidence/status, not a competing strategy document. Current-main evidence supersedes older dated checkpoints below.
 
-## Current engineering reconciliation — 2026-11-25
+## Current engineering reconciliation — 2026-11-26
 
-**Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md). This reconciliation supersedes the dated checkpoints below for current status; they remain historical evidence.
+**Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md). This current reconciliation supersedes the historical dated checkpoints below.
 
-- Current `main`: `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d`.
-- Exact-head Laravel run `45700142579`: **761 passed / 1 skipped / 5,445 assertions**; coverage and PostgreSQL migration/recovery smoke passed. Offline browser job `139507818283` is still running; do not mark the complete workflow green yet.
-- Exact-head Windows package run `45700142740`: build, encrypted/legacy business archive verification and Windows PowerShell fresh install/launcher passed.
-- Exact-head Zazu Quality `45700142698`, PHPMD `45700142645`, Psalm `45700142619`, populated upgrade/rollback `45700142684`, Director Health `45700142739` and Push-on-main `45700142312` passed. SonarCloud `45700142666` was skipped.
-- Archive engineering hardening: attachment payloads are streamed into/out of ZIP archives with private temporary staging and a 250 MiB expanded-payload boundary; ZIP integrity is checked after export. Restore file rollback now removes partial stream writes, continues best-effort cleanup after individual deletion failures and preserves the original restore exception. Restore failure telemetry captures environment and upload diagnostics without secrets or archive contents.
-- The previous fully completed offline acceptance baseline remains `45651931394`: 93 journeys passed. The current-head offline suite must complete before updating that baseline. Physical Android cold launch/restart/reconnect remains open.
-- The encrypted business archive owner attempt on 2026-11-23 remains failed with the first failure stage unknown. Do not retry against live data or weaken the restore throttle. New streaming and diagnostics improvements are not proof that the original archive now restores.
-- Formal evidence-maturity baseline remains **71/100**; no uplift. V1 remains **NOT READY**. Open gates: physical Android Phase 2, successful owner archive restore, intended-PC installation recovery, populated quote-to-profit reconciliation, trusted-device shared-profile risk acceptance/hardening, POPIA operations and ZAZU name clearance.
+- **Current application/test candidate:** [`8477f065`](https://github.com/Leano-Jordan/ZazuEMP/commit/8477f065d947375d0fc81c99b04efb313d0299c2) on `main`. It includes responsive offline launchpad layout, crash-atomic server acknowledgement, persistent-storage status/request, quota warning and fail-closed quota-write feedback, plus service-worker cache v62.
+- **Latest exact-head Laravel run:** [`45787226043`](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45787226043) — **765 passed / 1 skipped / 5,471 assertions**; coverage PASS; PostgreSQL migration, rollback/reapplication, registration and recovery smoke PASS. Its desktop offline browser and remaining mobile jobs are still in progress at this reconciliation; do not call the complete workflow green until they finish.
+- **Storage browser test correction:** predecessor `8cfd530` had 76 browser tests pass and one fixture failure because a mock of `navigator.storage` did not survive page navigation. Commit `8477f06` re-applies that mock on the Dashboard document. Current exact-head browser run remains pending.
+- **Zazu Quality:** [`45787226126`](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/45787226126) on current candidate — application, formatting, secret scan and Composer security audit PASS.
+- **Symfony dependency security:** commit [`43e69e6`](https://github.com/Leano-Jordan/ZazuEMP/commit/43e69e623aafb43e1159e8a0664d729764575844) updates affected Symfony runtime lock entries to 7.4.24. The prior five-advisory Composer failure is resolved; Composer audit passed on both `43e69e6` and current `8477f06`. No audit suppression was added.
+- **Supporting same-application-source evidence** (the later commits only change browser test fixtures and documentation): Windows package/fresh install and encrypted/legacy archive verification PASS; populated upgrade/rollback PASS; PHPMD PASS; Psalm security analysis and SARIF publication PASS; Push-on-main static analysis PASS. SonarCloud is skipped, not passed.
+- **Offline acceptance still open:** exact-head browser run must finish; physical Android PWA review must verify the corrected mobile header, storage grant/quota panel, and v61 → v62 update preserving the authenticated business workspace. Force-close/restart and reconnect remain distinct physical checks.
+- **Other release gates remain:** owner's encrypted business restore, intended-PC full installation recovery, populated quote-to-payment-to-profit reconciliation, trusted-device shared-profile risk, POPIA operations and ZAZU name clearance.
+
+**Formal evidence maturity remains 71/100; no uplift is claimed. V1 remains NOT READY.**
+
 
 ---
 ## Latest Director engineering evidence — 2026-11-23
