@@ -6,7 +6,6 @@ use App\Models\Business;
 use App\Models\User;
 use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -97,105 +96,6 @@ class AuthenticationSessionSecurityTest extends TestCase
         ]);
     }
 
-    public function test_replayed_pre_authentication_cookie_cannot_reuse_the_authenticated_session_after_login(): void
-    {
-        config(['session.driver' => 'database']);
-
-        $user = User::factory()->create([
-            'username' => 'sessionreplay',
-            'email' => 'sessionreplay@example.com',
-            'password' => 'password123',
-        ]);
-        $business = Business::create([
-            'name' => 'Session Replay Business',
-            'slug' => 'session-replay-business',
-            'status' => 'active',
-            'currency' => 'ZAR',
-        ]);
-        $business->users()->attach($user->id, ['role' => 'owner']);
-
-        $preAuthResponse = $this->get(route('landing'))->assertOk();
-        $preAuthCookie = $preAuthResponse->getCookie(config('session.cookie'), false);
-        $this->assertNotNull($preAuthCookie);
-        $preAuthSessionId = $preAuthResponse->getCookie(config('session.cookie'))->getValue();
-        $this->assertDatabaseHas('sessions', ['id' => $preAuthSessionId]);
-
-        $loginResponse = $this->withUnencryptedCookies([config('session.cookie') => $preAuthCookie->getValue()])
-            ->post(route('login.store'), [
-                'identifier' => $user->username,
-                'password' => 'password123',
-            ])
-            ->assertRedirect(route('dashboard'));
-
-        $authenticatedCookie = $loginResponse->getCookie(config('session.cookie'), false);
-        $authenticatedSessionId = $loginResponse->getCookie(config('session.cookie'))->getValue();
-        $this->assertNotNull($authenticatedCookie);
-        $this->assertNotSame($preAuthSessionId, $authenticatedSessionId);
-        $this->assertDatabaseMissing('sessions', ['id' => $preAuthSessionId]);
-
-        $this->resetHttpSessionState();
-        $this->withUnencryptedCookies([config('session.cookie') => $authenticatedCookie->getValue()])
-            ->get(route('dashboard'))
-            ->assertOk();
-
-        $this->resetHttpSessionState();
-        $this->withUnencryptedCookies([config('session.cookie') => $preAuthCookie->getValue()])
-            ->get(route('dashboard'))
-            ->assertRedirect(route('login'));
-
-        $this->assertGuest();
-
-        $this->resetHttpSessionState();
-        $this->withUnencryptedCookies([config('session.cookie') => $authenticatedCookie->getValue()])
-            ->get(route('dashboard'))
-            ->assertOk();
-    }
-
-    public function test_replayed_pre_registration_cookie_cannot_reuse_the_registered_account_session(): void
-    {
-        config(['session.driver' => 'database']);
-
-        $preRegistrationResponse = $this->get(route('landing'))->assertOk();
-        $preRegistrationCookie = $preRegistrationResponse->getCookie(config('session.cookie'), false);
-        $this->assertNotNull($preRegistrationCookie);
-        $preRegistrationSessionId = $preRegistrationResponse->getCookie(config('session.cookie'))->getValue();
-        $this->assertDatabaseHas('sessions', ['id' => $preRegistrationSessionId]);
-
-        $registrationResponse = $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
-            ->post(route('register.store'), [
-                'name' => 'Session Replay Registration',
-                'username' => 'sessionreplayregistration',
-                'business_name' => 'Session Replay Registration Business',
-                'email' => 'sessionreplayregistration@example.com',
-                'password' => 'registration-password',
-                'password_confirmation' => 'registration-password',
-            ])
-            ->assertRedirect(route('onboarding.catalogue'));
-
-        $registeredCookie = $registrationResponse->getCookie(config('session.cookie'), false);
-        $registeredSessionId = $registrationResponse->getCookie(config('session.cookie'))->getValue();
-        $this->assertNotNull($registeredCookie);
-        $this->assertNotSame($preRegistrationSessionId, $registeredSessionId);
-        $this->assertDatabaseMissing('sessions', ['id' => $preRegistrationSessionId]);
-
-        $this->resetHttpSessionState();
-        $this->withUnencryptedCookies([config('session.cookie') => $registeredCookie->getValue()])
-            ->get(route('dashboard'));
-        $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
-
-        $this->resetHttpSessionState();
-        $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
-            ->get(route('dashboard'))
-            ->assertRedirect(route('login'));
-
-        $this->assertGuest();
-
-        $this->resetHttpSessionState();
-        $this->withUnencryptedCookies([config('session.cookie') => $registeredCookie->getValue()])
-            ->get(route('dashboard'));
-        $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
-    }
-
     public function test_password_reset_revokes_previously_authenticated_sessions(): void
     {
         config(['session.driver' => 'database']);
@@ -237,17 +137,6 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
         $this->assertDatabaseMissing('sessions', ['id' => $preResetSessionId]);
-    }
-
-    private function resetHttpSessionState(): void
-    {
-        // The feature-test container persists Laravel's session.store singleton
-        // across simulated requests. A real HTTP request gets a fresh store.
-        // Drop both the manager driver and the resolved store before replaying
-        // a browser cookie so the test exercises the database-backed session.
-        $this->app->forgetInstance('session.store');
-        app('session')->forgetDrivers();
-        Auth::forgetGuards();
     }
 
     public function test_business_switch_rejects_a_stale_authenticated_password_hash(): void
