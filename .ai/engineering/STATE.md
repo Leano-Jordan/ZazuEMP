@@ -206,3 +206,19 @@ Current owner decisions are recorded in [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-2
 - **Open:** final product name; Rosscore incorporation and IP transfer; IO registration; privacy mailbox; deployment/provider selection; final retention approval; legal/accounting review; trade-mark classes/territories and any filing; commercial launch decision.
 
 Product stability remains the immediate priority. Do not ask the Founder to repeat these decisions; consult the decision record first. Legal/brand work remains a pre-commercial-release gate and must not expand V1 scope.
+
+## Business archive restore forensic hardening — 2026-11-26
+
+**Scope:** tenant-scoped encrypted/legacy business archive export, verification, upload, restore, file staging, destination safety and owner-facing diagnostics. No installation-wide recovery or unrelated application work was changed.
+
+**Founder evidence:** the 2.20 MB Rosscore business archive passed the read-only verification command with the supplied passphrase. This proves the encrypted stream can be decrypted and the archive structure, dataset and referenced payloads pass verification. It does not prove that the selected restore destination is empty or eligible.
+
+**Confirmed destination constraint:** the populated DemoScenarioSeeder intentionally creates business records across customers, events, quotes, invoices, payments, inventory, assets, suppliers, expenses and compliance. The existing restore contract rejects populated workspaces and never merges or overwrites their data. The restore service now checks destination eligibility before staging attachment payloads and repeats the check under the business-row lock before mutation.
+
+**Confirmed security defect and correction:** untrusted file-manifest entries previously used left-biased PHP array union with server-generated staging metadata. An archive could provide a staged_path value that overrode the actual server temporary path; verification/restore cleanup could then unlink an arbitrary path accessible to PHP, and restore could read the attacker-selected path as a staged file. The manifest now requires a list, rejects unknown fields, validates and normalizes positive record IDs, and server-generated staging metadata takes precedence. A regression injects staged_path and payload_bytes and asserts that a sentinel file remains unchanged.
+
+**Restore usability corrections:** the archive form now renders actual field errors in the global summary. Owners can explicitly create a separate business workspace under the same account for the archive; the current workspace remains untouched, the authenticated owner is attached to the new business, and the session switches only after a successful restore. If restore fails, imported rows/files are rolled back and the newly created empty workspace is removed. Existing-empty-workspace restore remains supported.
+
+**New regression coverage:** hostile file-manifest metadata, occupied-target preflight before attachment staging, populated-target field error visibility, and restore into a new owner workspace while preserving the original demo workspace.
+
+**Current verification:** code and documentation changes are on main. Exact-head GitHub checks for the latest main commit are pending; do not mark this module accepted until Laravel, coverage, formatting, PHPMD, Windows encrypted/legacy archive verification, PostgreSQL recovery smoke and relevant browser checks complete. The Founder’s original Rosscore archive has not yet been restored by the live application; successful read-only verification is not represented as a completed restore.
