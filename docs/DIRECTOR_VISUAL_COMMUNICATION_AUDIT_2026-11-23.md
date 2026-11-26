@@ -156,3 +156,14 @@ The desktop collapse initializer existed but was not called from the main UI ini
 ## Navigation presentation refinement — 2026-11-26
 
 Expanded desktop now uses inline, indented subnavigation beneath its selected parent, matching the supplied reference rather than opening every submenu as an off-canvas flyout. Collapsed desktop keeps the 76px branded icon rail and moves the same submenu into a floating contextual panel beside its parent. The two modes share one semantic group structure and one interaction controller. Mobile/tablet retain the full drawer and inline accordion. Added browser acceptance for collapse, anchored panel visibility, no parent-route navigation, and destination navigation.
+
+## Navigation hardening follow-through — 2026-11-26
+
+The follow-through addresses interaction correctness and cascade ownership rather than replacing the hierarchy:
+
+- The desktop icon rail's contextual panel is anchored to its own parent group. The final group opens upward to keep the panel within the viewport.
+- The parent trigger is a disclosure control, not a route. Its `aria-expanded` state and the panel's visibility now share one explicit `is-open` state; focus alone cannot expose a closed submenu.
+- Escape closes the open panel and restores focus to its parent trigger.
+- No desktop nav list or contextual panel has an internal scrollbar. On touch layouts, the drawer is the single overflow container; the nav list and inline submenu do not create nested scrolling.
+- Shared navigation geometry and typography are owned by `resources/css/app.css`; the visual extension stylesheet no longer overrides the navigation structure.
+- PHPUnit and Playwright coverage protects initialization uniqueness, closed-panel visibility, anchored positioning, Escape focus, and scroll ownership. Final acceptance remains gated on exact-head CI.
