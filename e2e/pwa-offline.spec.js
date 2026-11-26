@@ -226,6 +226,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('.zazu-command-search')).toBeHidden();
         await expect(page.locator('.zazu-nav-link[href="/calendar"]')).toBeHidden();
         await expect(page.locator('.zazu-section-tabs a[href="/calendar"]')).toBeHidden();
+        const settingsLink = page.locator('.zazu-nav-link[href="/settings"]');
+        await expect(settingsLink).toHaveCount(1);
+        await expect(settingsLink).toBeHidden();
+        await expect(page.locator('[data-zazu-nav-area]:has(.zazu-nav-link[href="/settings"])')).toBeHidden();
 
         await visitOfflinePath('/customers');
         await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', 'customers');
@@ -238,6 +242,11 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await visitOfflinePath('/calendar');
         await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(0);
+        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toBeVisible();
+        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toContainText('This screen is not available offline yet');
+
+        await visitOfflinePath('/settings');
+        await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', 'unavailable');
         await expect(workspace.locator('[data-zazu-offline-unavailable]')).toBeVisible();
         await expect(workspace.locator('[data-zazu-offline-unavailable]')).toContainText('This screen is not available offline yet');
     });
