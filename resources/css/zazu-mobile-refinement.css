@@ -9,6 +9,11 @@
 }
 
 @media (max-width: 850px) {
+    /* Preserve the server-rendered active group when JS has not run yet. */
+    .zazu-nav-area.is-active > .zazu-nav-flyout {
+        display: block;
+    }
+
     html {
         overflow-x: hidden;
     }
