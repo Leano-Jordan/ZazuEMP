@@ -441,6 +441,7 @@ class PwaOfflineFoundationTest extends TestCase
 
         $this->assertStringContainsString('if (!/^\\d{8}$/.test(normalizedCode))', $client);
         $this->assertStringContainsString('pairing_code: normalizedCode', $client);
+        $this->assertStringContainsString('/^\\d{12}$/', $client);
         $this->assertStringNotContainsString('slice(0, 6)', $client);
         $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
         $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
