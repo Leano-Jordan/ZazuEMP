@@ -342,3 +342,37 @@ If restore fails, the newly created empty destination is deleted after the archi
 ### Restored media compatibility
 
 Restore now preserves only the safe, table-appropriate original extension for known image/document formats; unsupported or missing extensions fall back to .bin. This matters because business branding and customer-profile media are served as files whose browser MIME type is inferred from the stored extension, while catalogue images are served as public static assets. Regression coverage asserts that a restored PNG remains .png and a restored text attachment remains .txt. Never trust an archive-supplied extension outside the per-table allowlist.
+
+
+## Founder-confirmed business archive recovery — 2026-11-26
+
+**<span>OWNER-ACCEPTED — LIVE RESTORE SUCCESS</span>**
+
+The Founder has confirmed that the original **2.20 MB encrypted Rosscore business archive** was successfully restored through the Zazu application after the Windows PHP upload-worker configuration correction was deployed and the supported launcher restarted. The Founder reports that **everything from the backup is present** in the restored business workspace.
+
+This closes the previously open owner acceptance test for this specific business-level archive restore. It is stronger evidence than the earlier read-only verification and automated archive fixtures: the actual encrypted archive was uploaded, decrypted, validated and imported by the live application, and the Founder visually confirmed the restored business content.
+
+### Incident resolution and evidence boundary
+
+- The earlier restore attempt failed at the upload/request-validation stage with generic “Please correct highlighted fields” feedback and incident reference `3feb3a06-e743-49e7-9a7d-4dc5e77b68a7`.
+- The forensic correction addressed a real Windows process-boundary defect: PHP upload settings configured on the Artisan parent were not reaching Laravel's child HTTP worker. The supported launcher now supplies the limits through a project-local PHP INI scan directory and explicitly passes the required environment variables through Laravel's Windows server process.
+- After that correction was deployed and the server restarted, the Founder retried the archive and confirmed successful restoration with the expected backup contents present.
+- The Founder had clarified that the source and destination workspaces were unpopulated. Destination occupancy was **not** the cause of this incident. The empty-target requirement remains a deliberate non-destructive safety rule, not an explanation for the earlier failure.
+- The successful live restore is owner-confirmed evidence. No claim is made that the incident log independently recorded `UPLOAD_ERR_INI_SIZE`; the exact historical PHP upload error was not separately captured.
+- Do not retain or publish the archive passphrase, archive contents containing personal data, or sensitive incident payloads in engineering logs.
+
+### Acceptance record
+
+| Check | Result |
+|---|---|
+| Original encrypted Rosscore archive uploaded through Zazu | PASS — owner confirmed |
+| Live application restore completed | PASS — owner confirmed |
+| Restored business content present | PASS — owner confirmed |
+| Read-only archive verification | PASS — previously confirmed |
+| Automated encrypted/legacy archive verification on Windows | PASS — CI |
+| Empty destination safety and non-destructive restore contract | Retained |
+| Installation-wide recovery drill on the intended PC | OPEN — separate scope |
+
+**Operational instruction:** use the supported Windows launcher so the actual HTTP worker receives the configured archive upload limits. If the launcher/runtime is replaced or PHP is upgraded, repeat the upload-limit acceptance check with a safe test archive before relying on large business restores.
+
+**Status:** the 2026-11-26 Rosscore business archive restore incident is **RESOLVED / OWNER-ACCEPTED**. This does not close the separate installation-wide recovery drill, physical offline acceptance, security, commercial or legal release gates.
