@@ -302,3 +302,18 @@ When offline navigation links are visible again, the offline launchpad header mu
 - Any future offline-navigation visibility change must include responsive geometry coverage; do not regress to a flex row with a full-width child.
 
 **Status:** AUTOMATED-BROWSER-VERIFIED on main (52152f2, 20e313e, 66f7392): 74 Chromium offline journeys passed, including the 390×844 heading/navigation geometry assertion; 11 mobile viewport checks, the mobile host-outage check and phone-local attachment journey also passed. Physical Android visual review remains open.
+
+## REG-033 — Offline server acknowledgement must atomically reconcile queue and workspace state
+
+A server-accepted mutation must never disappear from the local queue before its canonical server identity/revision, related record changes, conflict state, `pending_sync` and `local_dirty` values are durably reconciled.
+
+**Control:**
+- One IndexedDB read/write transaction spans both the mutation queue and workspace state.
+- Delete only applied/discarded acknowledgements; preserve retryable and explicit failed/conflict entries.
+- Calculate local pending/dirty flags from the post-acknowledgement queue and open conflicts.
+- Update in-memory state only after transaction completion.
+- Keep the same mutation UUID for retry after an uncertain response; do not generate a new operation identity.
+
+**Regression:** Browser failure-injection test blocks an independent post-acknowledgement state-only transaction and verifies the flow does not depend on it. PHP source-contract test guards the shared transaction and no separate `writeState()`.
+
+**Status:** AUTOMATED-VERIFIED on checkpoint `76868dce`: 75 desktop offline/browser tests passed; 765 Laravel tests (1 skipped, 5,471 assertions); PostgreSQL smoke; PHPMD; static analysis; Windows installation/archive checks. Latest test-only boundary timing commit `4a5bedf` rerun pending. Physical abrupt termination/restart/reconnect remains OPEN.
