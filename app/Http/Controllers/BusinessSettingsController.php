@@ -183,8 +183,8 @@ class BusinessSettingsController extends Controller
     }
 
     /**
-    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-    * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function update(Request $request): RedirectResponse
     {
