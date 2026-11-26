@@ -89,17 +89,29 @@ final class BusinessArchiveFileService
             throw new RuntimeException('The business archive file manifest is invalid.');
         }
 
+        if (! array_is_list($manifest['files'])) {
+            throw new RuntimeException('The business archive file manifest must be a list.');
+        }
+
         $references = [];
         $entries = [];
+        $allowedKeys = ['table', 'id', 'column', 'disk_column', 'source_disk', 'entry', 'original_name'];
         foreach ($manifest['files'] as $file) {
-            if (! is_array($file)) {
+            if (! is_array($file) || array_diff(array_keys($file), $allowedKeys) !== []) {
                 throw new RuntimeException('The archive contains an invalid business file reference.');
             }
-            if (array_key_exists('bytes', $file)) {
-                throw new RuntimeException('The archive file manifest must not contain inline payload bytes.');
+            $id = $file['id'] ?? null;
+            if (! is_string($file['table'] ?? null)
+                || ! is_string($file['column'] ?? null)
+                || ! is_string($file['entry'] ?? null)
+                || ! is_string($file['source_disk'] ?? null)
+                || (! is_int($id) && ! (is_string($id) && ctype_digit($id)))
+                || (int) $id < 1
+                || (array_key_exists('original_name', $file) && ! is_string($file['original_name']))) {
+                throw new RuntimeException('The archive contains an invalid business file reference.');
             }
-            $key = implode(':', [(string) ($file['table'] ?? ''), (string) ($file['id'] ?? ''), (string) ($file['column'] ?? '')]);
-            $entry = (string) ($file['entry'] ?? '');
+            $key = implode(':', [$file['table'], (string) (int) $id, $file['column']]);
+            $entry = $file['entry'];
             if (isset($references[$key])) {
                 throw new RuntimeException('The archive contains a duplicate business file reference.');
             }
@@ -164,7 +176,7 @@ final class BusinessArchiveFileService
             throw new RuntimeException('The archive contains an unsupported source storage disk.');
         }
 
-        return $file + $this->stager->stage($zip, $entry, $remainingBytes);
+        return $this->stager->stage($zip, $entry, $remainingBytes) + $file;
     }
 
     private function assertSafeArchiveFileReference(array $file, string $table, string $column, string $entry, array $allowedColumns): void
