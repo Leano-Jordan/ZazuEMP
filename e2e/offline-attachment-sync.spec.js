@@ -1136,7 +1136,7 @@ test('re-pair invalidates the old sync session and retries queued work with the 
 
     const oldSync = page.evaluate(() => window.ZazuOffline.sync().catch(() => null));
     await oldPushSeen;
-    await page.evaluate(() => window.ZazuOffline.pair('12345678'));
+    await page.evaluate(() => window.ZazuOffline.pair('123456789012'));
     releaseOldPush();
     await oldSync;
     await newPush;
@@ -1424,7 +1424,7 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
         });
     });
 
-    await page.evaluate(() => window.ZazuOffline.pair('65432100'));
+    await page.evaluate(() => window.ZazuOffline.pair('654321001234'));
     await newTokenSync;
     await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.getState().sync?.token))
         .toBe('cross-tab-new-token');
