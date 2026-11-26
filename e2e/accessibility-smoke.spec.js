@@ -70,3 +70,20 @@ test('authenticated core workspace surfaces meet serious WCAG accessibility chec
     }
 });
 
+test('public trust pages meet serious WCAG accessibility checks', async ({ page }) => {
+    const surfaces = [
+        ['/about', 'About'],
+        ['/security', 'Security'],
+        ['/contact', 'Contact'],
+        ['/whats-new', "What's new"],
+        ['/privacy', 'Privacy review'],
+        ['/terms', 'Terms review'],
+    ];
+
+    for (const [path, label] of surfaces) {
+        const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+        expect(response?.status(), `${label} page must load successfully`).toBe(200);
+        await expect(page.locator('main')).toBeVisible();
+        await expectNoSeriousAccessibilityViolations(page, `public ${label.toLowerCase()}`);
+    }
+});
