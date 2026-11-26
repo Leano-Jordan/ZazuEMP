@@ -11,6 +11,12 @@ class RouteIntegrityTest extends TestCase
     public function test_expected_application_routes_are_registered(): void
     {
         $expected = [
+            'public.about',
+            'public.security',
+            'public.contact',
+            'public.whats-new',
+            'public.privacy',
+            'public.terms',
             'login',
             'login.store',
             'owner.login',
