@@ -263,3 +263,18 @@ Working commercial hypotheses:
 - **Separation of concerns:** The owner-operated installation backup/off-disk copy/full-restore acceptance remains a separate V1 recovery gate. It must not be labelled DB-001 or used to revive the dormant incident.
 - **Recordkeeping:** Retain historical references and diagnostic tooling for traceability, but mark old DB-001 OPEN/critical/next-target notes as superseded. The top-level dispositions in `.ai/engineering/STATE.md` and `docs/V1_RELEASE_CHECKLIST.md` are authoritative.
 - **Reason:** Keep Director effort focused on reproducible defects and real release risks instead of repeatedly pursuing an unconfirmed historical test-time anomaly.
+
+
+## DEC-029 — Founder-directed public credibility and trust-surface work
+
+- **Date:** 2026-11-26
+- **Status:** ACTIVE
+- **Authority:** Founder-directed execution following the public-credibility assessment.
+- **Decision:** Improve Zazu's public trust surface before visual redesign. Build accurate Privacy, Terms, Contact, About, Security and What's New destinations, but keep Privacy and Terms as review copies until publication details and owner/legal review are complete. Defer a public status page until real monitoring exists.
+- **Sequence:** Trust-surface foundation → source-derived quote/deposit/cost/profit demonstration → Founder-authorised non-commercial private pilot (synthetic data by default) → bounded CSS polish after critical release gates.
+- **Credibility baseline:** Founder-provided judgement score 22/40 (55%), distinct from the formal evidence-maturity score 71/100. Do not combine or silently revise either.
+- **Positioning boundary:** Zazu remains an event management platform, not a catering product. “From enquiry to profit” is accepted as a concise workflow-story direction, not proof that every stage is fully production-accepted. Preserve the V1 mandate's current promise until formally changed. Do not imply native WhatsApp integration or advertise module count as the primary value.
+- **Commercial boundary:** No ads, charging, public pricing, public beta, paid pilot, fabricated testimonials, uptime/SLA claims or premature commercialisation.
+- **Legal/identity boundary:** Follow `FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md`. Founder personally owns current IP and is current solo operator; Rosscore Labs is not registered/current owner; ZAZU name clearance is unresolved/high risk; Information Officer registration is incomplete; no production hosting or third-party processor is provisioned; provisional Outlook contact is not a dedicated mailbox. No legal notice or terms may be represented as effective until their publication gates close.
+- **Engineering boundary:** Keep security/recovery/physical offline/commercial gates active. Trust-surface code must be low-risk public GET-only work, reuse existing Laravel architecture, and include access/content/route/accessibility tests. No branches; main only.
+- **Record:** `docs/DIRECTOR_TRUST_SURFACE_EXECUTION_2026-11-26.md` and `.ai/engineering/STATE.md` are the execution handover and current state.
