@@ -10,6 +10,11 @@
 
 This is the concise live state register, not a session diary. Detailed incident evidence belongs in FAILURE_CASES.md, durable decisions in DECISION_LOG.md, recurring regressions in REGRESSION_LEDGER.md, and historical implementation evidence in dated audit/release records.
 
+
+## Active security investigation — 2026-11-26
+
+Founder-directed adversarial authentication audit is now the active security investigation. Scope and source-derived checkpoint: [DIRECTOR_ADVERSARIAL_AUTHENTICATION_AUDIT_2026-11-26.md](../../docs/DIRECTOR_ADVERSARIAL_AUTHENTICATION_AUDIT_2026-11-26.md). The six mandatory tracks are session fixation/concurrent account transitions; browser credential leakage/XSS/backups; pairing-code brute force/device takeover; cross-business token substitution/stale replay; password reset/owner removal/device revocation races; and offline logout/account switching/queued transaction preservation. Audit is OPEN; source inspection is not a penetration-test PASS. Preserve DEC-019 and the business-scoped offline queue; do not weaken controls or clear user data as a test. Continue on main only, no branches.
+
 ## Product identity and scope
 
 Zazu is an **event management platform**, not catering software. The event is the centre of the operating model. Business capabilities describe services and resources an operator brings to an event; catering, equipment hire, sound/AV, décor, rentals, baking and photography are examples, not product boundaries. The strategic direction is to help plan, coordinate and carry out different event formats. V1 claims must remain limited to workflows actually implemented and accepted.
