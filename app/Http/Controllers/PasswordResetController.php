@@ -161,16 +161,26 @@ class PasswordResetController extends Controller
     {
         $metadata = $device->metadata ?? [];
         $needsAudit = $device->status !== 'revoked' || $device->revoked_at === null;
-        $needsCleanup = $device->token_expires_at !== null
+
+        if (! $needsAudit && ! $this->deviceHasRevocableCredentials($device, $metadata)) {
+            return;
+        }
+
+        $this->persistTrustedDeviceRevocation($device, $metadata);
+        $this->recordTrustedDeviceRevocationAudit($device, $businesses, $needsAudit);
+    }
+
+    private function deviceHasRevocableCredentials(SyncDevice $device, array $metadata): bool
+    {
+        return $device->token_expires_at !== null
             || array_key_exists('sync_token_hash', $metadata)
             || array_key_exists('pairing_code_hash', $metadata)
             || array_key_exists('pairing_expires_at', $metadata)
             || $device->pairing_code_digest !== null;
+    }
 
-        if (! $needsAudit && ! $needsCleanup) {
-            return;
-        }
-
+    private function persistTrustedDeviceRevocation(SyncDevice $device, array $metadata): void
+    {
         unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
 
         // Recovery intentionally spans every business this user owns. The
@@ -184,17 +194,33 @@ class PasswordResetController extends Controller
             'pairing_code_digest' => null,
             'metadata' => $metadata,
         ])->saveQuietly();
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection<int, Business> $businesses
+     */
+    private function recordTrustedDeviceRevocationAudit(
+        SyncDevice $device,
+        \Illuminate\Support\Collection $businesses,
+        bool $needsAudit,
+    ): void {
+        if (! $needsAudit) {
+            return;
+        }
 
         $business = $businesses->get($device->business_id);
-        if ($needsAudit && $business instanceof Business) {
-            // The audit belongs to the target business, which may not be the
-            // currently selected workspace during multi-business account recovery.
-            AuditLog::withoutEvents(fn () => Audit::record('sync.device.revoked', $business, [
-                'device_id' => (int) $device->id,
-                'device_name' => $device->device_name,
-                'device_type' => $device->device_type,
-                'reason' => 'owner_password_reset',
-            ], $business->id));
+        if (! $business instanceof Business) {
+            return;
         }
+
+        // The audit belongs to the target business, which may not be the
+        // currently selected workspace during multi-business account recovery.
+        AuditLog::withoutEvents(fn () => Audit::record('sync.device.revoked', $business, [
+            'device_id' => (int) $device->id,
+            'device_name' => $device->device_name,
+            'device_type' => $device->device_type,
+            'reason' => 'owner_password_reset',
+        ], $business->id));
     }
+
 }
