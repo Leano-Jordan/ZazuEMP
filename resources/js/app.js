@@ -665,6 +665,9 @@ const setupZazuHierarchicalNavigation = () => {
     document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
 
+        // The mobile drawer owns Escape while open and must retain focus restoration.
+        if (document.body.classList.contains('zazu-mobile-menu-open')) return;
+
         // Capture the active control before closing the group updates aria-expanded.
         const activeTrigger = document.querySelector('[data-zazu-nav-trigger][aria-expanded="true"]');
         closeOthers(null);
