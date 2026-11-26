@@ -386,7 +386,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("status: 'failed'", $client);
         $this->assertOfflineMutationAcknowledgementIsAtomic($client);
         $this->assertStringContainsString('crypto.randomUUID()', $client);
-        $this->assertStringContainsString('Local offline state write was aborted.', $client);
+        $this->assertStringContainsString('Local offline state write was aborted; this change was not saved.', $client);
         $this->assertStringContainsString('Offline queue acknowledgement was aborted.', $client);
         $app = File::get(resource_path('js/app.js'));
         $this->assertStringContainsString('data-zazu-offline-save-error', $app);
