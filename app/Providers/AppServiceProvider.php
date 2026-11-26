@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Event;
 use App\Models\Asset;
@@ -47,8 +48,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerLocalPhpIniPassthrough();
         $this->registerRevisionTracking();
         $this->registerRateLimiters();
+    }
+
+    /**
+     * Pass the local PHP scan-directory override into Laravel's child dev-server process.
+     *
+     * Laravel filters inherited environment variables on Windows; without this allowlist
+     * entry, PHP_INI_SCAN_DIR set by the Zazu launcher reaches Artisan but not the web server.
+     */
+    private function registerLocalPhpIniPassthrough(): void
+    {
+        if (! in_array('PHP_INI_SCAN_DIR', ServeCommand::$passthroughVariables, true)) {
+            ServeCommand::$passthroughVariables[] = 'PHP_INI_SCAN_DIR';
+        }
     }
 
     private function registerRevisionTracking(): void
