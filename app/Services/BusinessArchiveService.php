@@ -29,6 +29,14 @@ final class BusinessArchiveService
 
     private const MAX_UNCOMPRESSED_BYTES = 262144000;
 
+    private const SAFE_RESTORE_FILE_EXTENSIONS = [
+        'businesses' => ['jpg', 'jpeg', 'png', 'webp'],
+        'business_capabilities' => ['jpg', 'jpeg', 'png', 'webp'],
+        'customers' => ['jpg', 'jpeg', 'png', 'webp'],
+        'compliance_documents' => ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
+        'event_attachments' => ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx'],
+    ];
+
     /**
      * Parent scope is used only for tables without their own business_id.
      * The order is also the dependency order used during restore.
@@ -621,12 +629,7 @@ final class BusinessArchiveService
             $newId = $file['table'] === 'businesses'
                 ? (int) $target->id
                 : (int) $idMaps[$file['table']][(string) $file['id']];
-            $allowedExtensions = match ($file['table']) {
-                'businesses', 'business_capabilities', 'customers' => ['jpg', 'jpeg', 'png', 'webp'],
-                'compliance_documents' => ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
-                'event_attachments' => ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx'],
-                default => [],
-            };
+            $allowedExtensions = self::SAFE_RESTORE_FILE_EXTENSIONS[$file['table']] ?? [];
             $originalExtension = strtolower(pathinfo((string) ($file['original_name'] ?? ''), PATHINFO_EXTENSION));
             $extension = in_array($originalExtension, $allowedExtensions, true) ? $originalExtension : 'bin';
             $filename = Str::uuid().'.'.$extension;
