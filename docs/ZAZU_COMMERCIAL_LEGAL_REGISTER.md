@@ -359,3 +359,19 @@ The release document set has been refreshed against the Information Regulator's 
 - Information Regulator eServices: https://eservices.inforegulator.org.za/services.aspx
 
 **Disposition:** documentation refinement in this checkpoint is complete; operational POPIA sign-off remains **OPEN**. No compliance certification or legal sign-off is claimed.
+
+
+## Founder-confirmed ownership and legal posture — 2026-11-26
+
+The current authoritative decision record is [FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
+
+- The Founder personally owns Zazu EMP and its current IP until further notice. Rosscore Labs is not registered and is not the current owner or contracting party. A future transfer must be documented after proper establishment; do not backdate it.
+- The Founder is the sole person involved. There are no employees, co-founders or contractors.
+- The Founder has not registered an Information Officer. The Founder is the proposed IO for the current individual operation, subject to confirming the correct registration route with the Information Regulator. Do not claim registration.
+- The product's intended V1 personal-information scope is customer/staff contact details, business/workspace data, event/job details, commercial records and business documents/photos/attachments. Identity numbers, bank-account details, children's data and medical/sensitive data are not intended V1 categories; free text and uploads can still introduce accidental sensitive data.
+- No Zazu production hosting or third-party processing provider has been provisioned/selected. Hosted and local/offline remain intended product directions; provider inventory and written operator terms must be based on actual future procurement, not framework capability or old shortlist research.
+- A dedicated privacy mailbox is approved in principle but not yet created. The existing Outlook address remains provisional.
+- The Founder has requested a retention proposal. The schedule is provisional, not approved or technically enforced.
+- No commercial launch is planned now. A controlled non-commercial test with close trusted members is acceptable after specific approval; use synthetic data where practical. Legal duties still apply if personal information is processed.
+
+This is a project-control record, not a legal opinion. The POPIA/PAIA role, registration timing, privacy notice, retention periods and operator arrangements must be checked against the actual individual/business structure and actual deployment before personal information is processed commercially.
