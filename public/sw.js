@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v63';
+const CACHE_NAME = 'zazu-static-v64';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -545,7 +545,7 @@ self.addEventListener('message', (event) => {
     })());
 });
 
-async function fetchWithTimeout(request, timeoutMs = 1800) {
+async function fetchWithTimeout(request, timeoutMs = 5000) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
