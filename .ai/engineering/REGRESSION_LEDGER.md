@@ -290,3 +290,15 @@ Operators may search using the details they remember about a contact rather than
 
 **Status:** CLOSED — exact-head Laravel (745 passed / 1 skipped / 5,244 assertions), Zazu Quality, PHPMD and PostgreSQL migration/recovery passed on 6226b510. See CASE-ZAZU-0048 / ENG-SEARCH-001.
 
+## REG-032 — Offline workspace launchpad heading must not be compressed by mobile navigation
+
+When offline navigation links are visible again, the offline launchpad header must not inherit the shared flex-row behaviour in which the generic action group becomes full-width at phone breakpoints. Otherwise the action group and heading compete for the same row, leaving the title/description in a narrow column.
+
+**Control:**
+- Keep the responsive correction scoped to the offline workspace; do not alter shared Dashboard headers or the broader product navigation layout.
+- At widths up to 700px, stack the introduction, module actions and device-local status in that order. Use a two-column action grid at normal phone widths and a one-column grid at widths up to 340px.
+- Preserve permission-filtered module links and the explicit offline-route allowlist. Do not show Settings or other destinations that lack implemented offline views.
+- The offline browser contract must check actual heading/navigation geometry at 390×844: navigation starts below the introduction and aligns to its left/right content edges. Link visibility alone is insufficient.
+- Any future offline-navigation visibility change must include responsive geometry coverage; do not regress to a flex row with a full-width child.
+
+**Status:** FIXED IN SOURCE on main (52152f2, 20e313e, 66f7392). Exact-head offline browser acceptance and post-fix physical visual review remain pending; this is not yet visually accepted.
