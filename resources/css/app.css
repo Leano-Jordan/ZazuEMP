@@ -7721,7 +7721,6 @@ body.zazu-inspector-open { overflow:hidden; }
     transition: opacity 120ms ease, visibility 120ms ease;
 }
 
-.zazu-nav-area:hover > .zazu-nav-flyout,
 .zazu-nav-area:focus-within > .zazu-nav-flyout,
 .zazu-nav-area.is-open > .zazu-nav-flyout {
     opacity: 1;
@@ -7763,6 +7762,14 @@ body.zazu-inspector-open { overflow:hidden; }
     background: color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-sidebar-surface));
     color: var(--zazu-sidebar-ink);
     box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 851px) {
+    .zazu-nav-area:hover > .zazu-nav-flyout {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
 }
 
 @media (max-width: 850px) {
