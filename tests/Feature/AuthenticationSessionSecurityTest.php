@@ -5,10 +5,10 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\User;
 use App\Support\CurrentBusiness;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AuthenticationSessionSecurityTest extends TestCase
