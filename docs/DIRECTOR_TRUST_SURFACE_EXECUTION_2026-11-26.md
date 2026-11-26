@@ -95,7 +95,7 @@ Source-level investigation found a race: service-worker route fetches timed out 
 
 ## Current engineering dependency
 
-The adversarial authentication audit remains OPEN. The latest source head at this record is `45c2861a58587988a3e956b7415e821c43a71623` (navigation incident documentation; application changes are included in its ancestors). Current-head checks are pending; no exact-head CI PASS is claimed. Continue the active security investigation and the remaining V1 gates in `.ai/engineering/STATE.md`.
+The adversarial authentication audit remains OPEN. The latest application-code head at this record is `330c5c3d406b6fc7de071dc77055f894a4b81c40`; subsequent commits are documentation/workflow updates. Current-head automated checks are pending. Current-head checks are pending; no exact-head CI PASS is claimed. Continue the active security investigation and the remaining V1 gates in `.ai/engineering/STATE.md`.
 
 ## Next execution slice
 
