@@ -303,3 +303,32 @@ Replace the archive path with the exact artifact created by the backup command. 
 Database client streaming: MySQL and PostgreSQL SQL dumps are streamed to private staging files, and restore imports stream from those files. PHP does not retain the complete SQL dump in a process output string or input string. Process diagnostics are bounded to the most recent 8 KiB. This reduces PHP memory pressure; it does not raise the existing 2 GiB uncompressed archive ceiling or replace disk-space planning.
 
 The backup command does not publish the ZIP immediately after writing it. It reopens the temporary archive with ZIP consistency checking, validates the Zazu format and configured database driver, checks exact payload membership against the manifest, and recomputes every payload SHA-256. A failed check prevents publication. Restore independently repeats its own validation before any installation mutation.
+
+## Business archive restore forensic follow-up — 2026-11-26
+
+The encrypted archive read-only verification command validates decryption, ZIP structure, manifest/dataset integrity and referenced file payloads. It deliberately does not validate whether the currently selected destination business is empty or unpaired. A successful verification is therefore not proof that the selected workspace is eligible for restore.
+
+The business archive restore contract remains intentionally non-destructive:
+
+- Restore requires an empty, unpaired destination business.
+- Existing business records are never merged, replaced or deleted.
+- Existing offline device and sync history blocks restore.
+- The destination is checked before attachment payloads are staged, then checked again inside the database transaction while the business row is locked. The second check closes the race between preflight and mutation.
+- The populated DemoScenarioSeeder is not a valid restore destination: it deliberately creates customers, events, quotes, invoices, payments, inventory, assets, suppliers, expenses and compliance records. Use a newly created empty workspace for a restore test; do not clear the demo dataset to bypass this boundary.
+
+The restore form now displays the actual field-level failure rather than an empty generic error summary. An occupied target reports that a newly created empty workspace is required.
+
+### Archive manifest security correction
+
+A forensic review found that file payload manifest entries were combined with server-generated staging metadata using PHP's left-biased array union. Because the manifest was untrusted and its keys were not allowlisted, an attacker-controlled staged_path could override the temporary file path returned by the server stager. The later cleanup path could then unlink an arbitrary path accessible to the PHP process; restore could also attempt to read that attacker-selected path as a staged payload.
+
+The file manifest now:
+- must be a JSON list;
+- accepts only the documented file-reference keys;
+- validates positive numeric record IDs and normalizes IDs before duplicate-reference detection;
+- rejects unknown fields such as staged_path and payload_bytes;
+- gives server-generated staging metadata precedence over archive metadata.
+
+Regression coverage injects those fields into a valid archive and verifies that validation rejects the archive without deleting or changing a sentinel file. Another regression proves that an occupied destination is rejected before attachment staging and that the existing target records remain unchanged.
+
+**Verification boundary:** these corrections are committed to main; do not mark the module accepted until exact-head Laravel, formatting, PHPMD, Windows encrypted/legacy archive, and recovery checks pass. The founder's separate real-world restore attempt remains an independent acceptance test.
