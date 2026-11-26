@@ -3,8 +3,8 @@
 **Last reconciled:** 2026-11-26
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
-**Previous application acceptance checkpoint:** `a3ec1523ccdf2f1b6ff92f4e1fcf62ba1914877d` (earlier Laravel, coverage and PostgreSQL evidence; it is not the current UI candidate).  
-**Current main candidate:** `66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9` (offline workspace responsive-header correction; current-head CI reconciliation is recorded below).
+**Latest verified application/test checkpoint:** `76868dce36756bb90146bc03ce7daad1c01caa0f` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, coverage, PostgreSQL, PHPMD, browser, Windows package/recovery and code-analysis results recorded below).  
+**Latest main commit:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (test-only adjustment that arms the acknowledgement failure guard at the mocked server boundary; exact-head rerun is in progress).
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
@@ -86,15 +86,15 @@ Physical-device, owner-PC recovery, populated-business and legal/brand acceptanc
 
 ## Founder physical offline observation — 2026-11-26 (new evidence)
 
-The Founder reports that with the Zazu PC host OFF, the Android phone successfully opens offline workspace pages and those pages render locally available business data. This is a material improvement over the previously observed frozen last-online Dashboard / all-sections-on-one-page failure. The offline-state banner is visible and communicates that the server is unavailable, locally saved records remain on the device, and only supported offline screens are available. The Founder reports that the Settings navigation is absent and the rendered UI still needs refinement.
+The Founder reports that with the Zazu PC host OFF, the Android phone successfully opens offline workspace pages and those pages render locally available business data. This is a material improvement over the previously observed frozen last-online Dashboard / all-sections-on-one-page failure. The offline-state banner is visible and communicates that the server is unavailable, locally saved records remain on the device, and only supported offline screens are available. Follow-up screenshots exposed a narrow-column mobile header defect. Source review also confirmed that Settings is intentionally excluded from the offline route allowlist because its current settings functions are server-dependent; do not present this as a missing supported offline route.
 
 **Evidence classification:** OWNER-OBSERVED PARTIAL PASS for phone-side offline route/page rendering with local data while the PC host is off. This is not a full offline acceptance pass. The PC being off is explicitly recorded; do not ask the Founder to repeat that condition or basic connected PC/mobile setup.
 
-**Remaining engineering work:** inspect and correct supported offline navigation (including the Settings destination where its functions are supported offline), verify route-specific page content rather than merely page shells, and refine visual composition without replacing the existing UI. Preserve the existing offline-state banner and its honest limitations. Continue to verify local persistence/restart, supported local mutations, attachment access and reconnect reconciliation through existing automated evidence and the remaining targeted physical checks.
+**Remaining engineering and acceptance work:** the offline launchpad header has been corrected and browser-verified; unsupported Settings remains online-only. Continue with browser-managed storage-retention hardening, local persistence/restart, supported local mutations, attachment access and reconnect reconciliation. Preserve the existing offline-state banner and its honest capability limits.
 
 **Owner interaction rule:** treat this observation as durable acceptance evidence. Do not ask the Founder again whether offline pages load, whether they contain local data, or whether the PC was on. Ask for another physical check only when engineering has reached a new, specific acceptance step that cannot be established through source inspection or automation; state exactly what new evidence is needed and why. Never repeat a previously completed setup or test.
 
-**Gate status:** physical Android offline acceptance remains OPEN pending the remaining distinct checks; the prior all-pages-collapse/frozen-dashboard symptom is no longer the current owner-reported behaviour. UI/navigation refinement is now the active engineering target, not restarting the offline architecture.
+**Gate status:** physical Android offline acceptance remains OPEN pending a post-fix phone visual check and the remaining distinct checks. The prior all-pages-collapse/frozen-dashboard symptom is no longer the current owner-reported behaviour. The mobile header correction is now automated-browser-verified; continue refining the existing architecture rather than restarting it.
 
 ## Founder mobile screenshot review and responsive-header regression — 2026-11-26
 
@@ -107,8 +107,31 @@ The Founder supplied two further Android screenshots (09:48 and 09:49) showing t
 - `20e313ef1ade96071ceee45c9afa26e56bc20e3a` — add offline-only scope classes to the existing Blade shell.
 - `66f7392aeb7f187c2b6bd3acb45b96dc6a56cce9` — extend the offline browser contract to assert the heading and navigation align full-width and stack correctly at 390×844.
 
-This is **IMPLEMENTED IN SOURCE and AUTOMATED-BROWSER-VERIFIED** on candidate source/test commit 66f7392 (74 Chromium offline journeys passed, including the 390×844 geometry assertion; separate mobile host-outage and attachment checks passed). No post-fix Android screenshot or physical visual acceptance is claimed.
+This is **IMPLEMENTED IN SOURCE and AUTOMATED-BROWSER-VERIFIED** on `76868dce` (75 Chromium offline/browser journeys passed, including 390×844 header geometry and the atomic acknowledgement guard; the separate mobile suite passed 11 tests, plus mobile host-outage and phone-local attachment checks). No post-fix Android screenshot or physical visual acceptance is claimed. The subsequent `4a5bedf` commit only makes the test failure-injection boundary more deterministic; its current-head rerun is still in progress.
 
 **Settings navigation boundary:** source inspection confirms the offline route allowlist in `resources/js/app.js` includes only route families with an implemented local view. `/settings` is not mapped, so its unsupported sidebar destination and the otherwise-empty System group are hidden while disconnected. Pairing, owner administration and server-backed business settings remain online-only under the current contract. Do not restore a generic Settings link merely to make it visible; only expose a specific Settings function after its local data/behaviour is implemented and tested. The shell theme toggle remains independently available.
 
-**Owner-test rule:** do not ask the Founder to repeat the already-established offline page/data/host condition. After current-head browser CI passed, the only new physical confirmation to request is the corrected offline launchpad layout at phone width while the server remains unavailable. Persistence, airplane-mode cold launch, restart, attachments and reconnect remain separate open checks.
+**Owner-test rule:** do not ask the Founder to repeat the already-established offline page/data/host condition. After the latest test-only rerun completes, the only new physical confirmation to request is the corrected offline launchpad layout at phone width while the server remains unavailable. Persistence, airplane-mode cold launch, restart, attachments and reconnect remain separate open checks.
+
+## Offline mutation acknowledgement crash-consistency — 2026-11-26
+
+A source-level transaction audit found that server acknowledgement previously removed a queue row in one IndexedDB transaction, then reconciled the local server ID/revision, pending flags and `local_dirty` in a second state-only transaction. A browser termination in that gap could leave a locally pending record with no queue entry, causing the next bootstrap to remain blocked.
+
+**Correction:** `public/zazu-offline.js` now reads the persisted workspace and queue and commits queue acknowledgement/removal, canonical identity/revision reconciliation, related-record reconciliation, conflict persistence, `pending_sync` flags and `local_dirty` in one `[QUEUE, STATE]` read/write transaction. If the transaction aborts, IndexedDB rolls back both stores; if it commits, the queue and workspace state move together. The server's idempotency key remains the safe retry boundary.
+
+**Evidence on exact checkpoint `76868dce`:**
+- Laravel: **765 passed, 1 skipped, 5,471 assertions**.
+- Offline browser acceptance: **75 passed** across the desktop offline suites, including the 390×844 layout assertion and acknowledgement failure-injection contract.
+- Separate mobile offline Work/visual suite: **11 passed**; mobile stopped-host check: **1 passed**; phone-local attachment journey: **1 passed**.
+- PostgreSQL migration/recovery smoke: **1 passed**.
+- PHPMD, static analysis, Windows installation build, encrypted/legacy archive verification and fresh Windows installation: PASS.
+- Zazu Quality application/formatting/secret-scan jobs: PASS; Composer security audit remains FAILED on five Symfony advisories (CVE-2026-133743, CVE-2026-133746, CVE-2026-133751, CVE-2026-133754, CVE-2026-133755). SonarCloud is skipped, not passed.
+- The latest `main` commit `4a5bedf` changes only the test's failure-injection timing and is awaiting its own exact-head Laravel/browser rerun.
+
+This is automated transaction-level evidence, not a simulated physical power-cut/restart test and not full reconnect acceptance. Physical local-write/restart/reconnect checks remain open.
+
+## Browser-managed local storage retention — OPEN
+
+Source audit found IndexedDB and Cache API usage but no `navigator.storage.persist()`, `persisted()` or `estimate()` handling. IndexedDB transaction durability protects an individual committed write; it does not itself prevent the browser from evicting an origin's storage bucket under storage pressure. Browser storage defaults to best-effort unless persistence is granted; users can still explicitly clear site data. See [MDN storage quotas and eviction criteria](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria) and [MDN StorageManager](https://developer.mozilla.org/en-US/docs/Web/API/StorageManager).
+
+**Required next engineering slice:** detect/report persistence grant state where supported, request persistent storage at an appropriate trusted-device/pairing interaction, inspect quota/usage, and make declined/unsupported persistence visible without blocking the user from working. Never imply a persistence request guarantees against explicit user deletion. Business export/import and full recovery remain separate safeguards.
