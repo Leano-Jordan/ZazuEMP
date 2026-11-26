@@ -107,6 +107,59 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(request).toBeHidden();
     });
 
+    test('surfaces quota failures without pretending the offline change was saved', async ({ page }, testInfo) => {
+        test.skip(testInfo.project.name !== 'chromium', 'IndexedDB quota failure contract runs once.');
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.local_dirty = true;
+            await window.ZazuOffline.persist();
+
+            const originalTransaction = IDBDatabase.prototype.transaction;
+            let injected = false;
+            IDBDatabase.prototype.transaction = function (storeNames, mode, options) {
+                const names = Array.isArray(storeNames) ? storeNames : [storeNames];
+                if (!injected && mode === 'readwrite'
+                    && names.includes('state') && names.includes('mutations')) {
+                    injected = true;
+                    IDBDatabase.prototype.transaction = originalTransaction;
+                    throw new DOMException('Injected browser storage quota failure.', 'QuotaExceededError');
+                }
+                return originalTransaction.call(this, storeNames, mode, options);
+            };
+
+            try {
+                await window.ZazuOffline.queueMutation('customer', 'create', {
+                    local_id: 'quota-boundary-test',
+                    record: { name: 'Quota boundary test customer' },
+                }, state);
+                window.__zazuQuotaFailure = { injected, rejected: false };
+            } catch (error) {
+                window.__zazuQuotaFailure = {
+                    injected,
+                    rejected: true,
+                    name: error.name,
+                    message: error.message,
+                };
+            }
+        });
+
+        const outcome = await page.evaluate(() => window.__zazuQuotaFailure);
+        expect(outcome.injected).toBe(true);
+        expect(outcome.rejected).toBe(true);
+        expect(outcome.name).toBe('QuotaExceededError');
+        expect(outcome.message).toContain('Zazu could not save this change');
+
+        const workspace = page.locator('[data-zazu-offline-workspace]');
+        await expect(workspace).toBeVisible();
+        const warning = workspace.locator('[data-zazu-offline-storage-error]');
+        await expect(warning).toBeVisible();
+        await expect(warning).toContainText('This device is low on browser storage');
+        await expect(warning).toContainText('failed transaction was not committed');
+    });
+
     test('refreshes the business-mix panel from the matching local profile while disconnected', async ({ page, context }, testInfo) => {
         test.skip(testInfo.project.name !== 'chromium', 'Local workspace profile presentation contract runs once.');
 
