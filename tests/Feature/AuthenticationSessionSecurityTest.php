@@ -43,7 +43,9 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->post(route('login.store'), [
             'identifier' => 'sessionrotation',
             'password' => 'password123',
-        ])->assertRedirect(route('dashboard'));
+        ])
+            ->assertRedirect(route('dashboard'))
+            ->assertSessionHas('auth_modal', 'login');
 
         $authenticatedSessionId = app('session')->driver()->getId();
         $this->assertNotSame($preAuthenticationSessionId, $authenticatedSessionId);
