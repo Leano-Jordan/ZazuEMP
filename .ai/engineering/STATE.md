@@ -4,7 +4,7 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest verified application/test checkpoint:** `76868dce36756bb90146bc03ce7daad1c01caa0f` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, coverage, PostgreSQL, PHPMD, browser, Windows package/recovery and code-analysis results recorded below).  
-**Latest main commit:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (test-only adjustment that arms the acknowledgement failure guard at the mocked server boundary; exact-head rerun is in progress).
+**Latest application/test candidate:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (test-only adjustment that arms the acknowledgement failure guard at the mocked server boundary; exact-head rerun is in progress). Subsequent commits on `main` in this batch update the living engineering records only.
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
