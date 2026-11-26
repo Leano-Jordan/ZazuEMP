@@ -530,6 +530,22 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
+    test('owner can generate a phone pairing code from Settings', async ({ page }, testInfo) => {
+        test.skip(testInfo.project.name !== 'chromium', 'Owner phone-pairing UI contract runs once.');
+
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+
+        const generateButton = page.getByRole('button', { name: 'Generate phone pairing code' });
+        const result = page.locator('[data-zazu-pairing-result]');
+
+        await expect(generateButton).toBeVisible();
+        await generateButton.click();
+
+        await expect(result).toContainText(/^12-digit code: \\d{12} · expires /);
+        await expect(generateButton).toBeEnabled();
+    });
+
     test('retries primary device registration and drains queued customers after the host returns', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Primary device registration recovery contract runs once.');
