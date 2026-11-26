@@ -18,6 +18,11 @@ class SyncDevice extends Model
         'status' => 'active',
     ];
 
+    protected $hidden = [
+        'metadata',
+        'pairing_code_digest',
+    ];
+
     protected $fillable = [
         'business_id',
         'approved_by_user_id',
