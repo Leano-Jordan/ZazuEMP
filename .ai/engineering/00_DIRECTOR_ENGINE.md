@@ -329,7 +329,12 @@ This section establishes the current V1 mission and supersedes conflicting execu
 - The Founder must be able to understand and monitor founder-only/platform-administration surfaces. Never assume other administrators or staff exist.
 - Do not claim local-PC, installed-app, physical-device or browser results unless that exact environment was exercised and evidence observed.
 
-### Current mission and work-in-progress limit
+#
+### Founder-directed adversarial authentication audit (mandatory active priority)
+
+When the Founder requests the six-track adversarial authentication review, use [the 2026-11-26 audit checkpoint](../../docs/DIRECTOR_ADVERSARIAL_AUTHENTICATION_AUDIT_2026-11-26.md) as the working scope and update it with evidence. Cover session fixation/hijacking and concurrent account transitions; browser storage/XSS/backups; pairing brute force/device takeover; cross-business substitution/stale-token replay; password reset/owner removal/revocation races; offline logout/account switching/queued work. Separate source facts, demonstrated vulnerabilities, risk hypotheses and untested questions. Never call source inspection a penetration test. Use isolated disposable test data, no production destructive tests, preserve queued offline financial work, preserve DEC-019, and write only to main without branches.
+
+## Current mission and work-in-progress limit
 The mission is to reach a dependable, sellable first-business V1. **WIP limit: one active blocker/target at a time.** Finish or explicitly block the current target before starting another.
 
 Priority order:
