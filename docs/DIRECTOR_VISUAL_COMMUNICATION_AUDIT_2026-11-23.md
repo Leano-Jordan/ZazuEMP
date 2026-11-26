@@ -120,3 +120,15 @@ The current `package.json` has no icon package dependency. The dashboard current
 - This closes only the purchasing-create label inconsistency. Quote and Job editor page-level layout, responsive rendering and physical visual acceptance remain open.
 
 - Verification note: the first exact-head quality run flagged one extra blank line at the end of the expanded presentation test. The test file was corrected to Pint's existing style; no production code or formatter rule was changed. The corrected commit is `717dea4e` and requires a fresh exact-head quality run.
+
+
+## 2026-11-26 — Sidebar information-density refinement
+
+The Founder screenshot showed three persistent context blocks competing with the navigation: a boxed business-mix card, a separate workspace identity card, and a signed-in account control. The result consumed too much vertical space and repeated workspace identity.
+
+- Retained all five navigation groups, route permissions, active states, submenu destinations and mobile drawer behaviour.
+- Kept the business mix as a quiet, read-only one-line context summary below navigation: active-offering count, compact focus chips and a subtle catalogue-management link. The secondary category paragraph is no longer persistently displayed in the sidebar; the underlying data and live-update hooks remain intact.
+- Merged workspace identity into the existing account trigger. It now shows the active workspace as the primary label and the signed-in person/role as supporting context. The existing account popover continues to contain account details, business switching, experience preference, setup, settings and sign-out.
+- Removed the standalone workspace block. Persistent lower-sidebar composition is now two elements instead of three; account details remain on demand.
+- The same compact layout applies to desktop, tablet and phone. The mobile drawer retains its existing scroll ownership and safe-area footer spacing.
+- No routes, permissions, account actions, workspace switching, profile data or offline behaviour were changed.
