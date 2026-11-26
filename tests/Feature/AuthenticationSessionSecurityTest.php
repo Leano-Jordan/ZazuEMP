@@ -129,19 +129,19 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertNotNull($authenticatedCookie);
         $this->assertNotSame($preAuthCookie->getValue(), $authenticatedCookie->getValue());
 
-        Auth::forgetGuards();
+        $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
             ->get(route('dashboard'))
             ->assertOk();
 
-        Auth::forgetGuards();
+        $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $preAuthCookie->getValue())
             ->get(route('dashboard'))
             ->assertRedirect(route('login'));
 
         $this->assertGuest();
 
-        Auth::forgetGuards();
+        $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
             ->get(route('dashboard'))
             ->assertOk();
@@ -170,19 +170,19 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertNotNull($registeredCookie);
         $this->assertNotSame($preRegistrationCookie->getValue(), $registeredCookie->getValue());
 
-        Auth::forgetGuards();
+        $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
             ->get(route('dashboard'));
         $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
 
-        Auth::forgetGuards();
+        $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
             ->get(route('dashboard'))
             ->assertRedirect(route('login'));
 
         $this->assertGuest();
 
-        Auth::forgetGuards();
+        $this->resetHttpSessionState();
         $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
             ->get(route('dashboard'));
         $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
@@ -229,6 +229,12 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
         $this->assertDatabaseMissing('sessions', ['id' => $preResetSessionId]);
+    }
+
+    private function resetHttpSessionState(): void
+    {
+        Auth::forgetGuards();
+        app('session')->forgetDrivers();
     }
 
     public function test_business_switch_rejects_a_stale_authenticated_password_hash(): void
