@@ -968,7 +968,49 @@ function setupZazuOfflineWorkspaceProfile() {
     render();
 }
 
+function setupZazuAuthContextGuard() {
+    const body = document.body;
+    if (!body || !('BroadcastChannel' in window)) return;
+
+    // Laravel's web session is shared by every tab in this browser profile.
+    // Notify sibling tabs when a newly rendered page establishes a different
+    // authenticated user or selected business, so stale privileged UI cannot
+    // remain open after logout, login or workspace switching elsewhere.
+    const currentUserId = String(body.dataset.zazuUserId || '');
+    const currentBusinessId = String(body.dataset.zazuBusinessId || '');
+    let channel;
+
+    try {
+        channel = new BroadcastChannel('zazu-auth-context');
+    } catch (_) {
+        return;
+    }
+
+    channel.addEventListener('message', event => {
+        const next = event.data;
+        if (!next || next.type !== 'context-changed') return;
+
+        const nextUserId = String(next.userId || '');
+        const nextBusinessId = String(next.businessId || '');
+        if (nextUserId === currentUserId && nextBusinessId === currentBusinessId) return;
+
+        channel.close();
+        window.location.reload();
+    });
+
+    // Broadcast only the server-rendered identity. No credentials or personal
+    // data are sent; BroadcastChannel is transient and does not persist state.
+    channel.postMessage({
+        type: 'context-changed',
+        userId: currentUserId,
+        businessId: currentBusinessId,
+    });
+
+    window.addEventListener('pagehide', () => channel.close(), { once: true });
+}
+
 const initializeZazuUi = () => {
+    setupZazuAuthContextGuard();
     // Bind local profile rendering before optional UI initializers so a
     // non-critical widget failure cannot leave offline business data stale.
     setupZazuOfflineWorkspaceProfile();
