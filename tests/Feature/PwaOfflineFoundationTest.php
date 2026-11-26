@@ -183,11 +183,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('(preferShell && offlineShell) || cachedPage || offlineShell || Response.error()', $worker);
         $this->assertStringContainsString("request.mode === 'navigate' && response.redirected && response.url", $worker);
         $this->assertStringContainsString('Response.redirect(destination.href, 302)', $worker);
-        $this->assertStringContainsString('function shouldPreferOfflineShell(request, pathname, coldLaunch = false)', $worker);
-        $this->assertStringContainsString("'/finance/invoices/create'", $worker);
-        $this->assertStringContainsString('|| /^\\/work\\/\\d+$/.test(pathname)', $worker);
+        $this->assertStringContainsString('function shouldPreferOfflineShell(request, coldLaunch = false)', $worker);
+        $this->assertStringContainsString('return coldLaunch;', $worker);
+        $this->assertStringNotContainsString('preserveExactRoute', $worker);
         $this->assertSame(3, substr_count($worker, 'cachedAppPage(request, preferOfflineShell)'));
-        $this->assertStringContainsString("const preferOfflineShell = shouldPreferOfflineShell(request, url.pathname, event.clientId === '');", $worker);
+        $this->assertStringContainsString("const preferOfflineShell = shouldPreferOfflineShell(request, event.clientId === '');", $worker);
         $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v64\';', $worker);
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
             $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $dashboard);
