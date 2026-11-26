@@ -949,7 +949,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0051
 
-**Status:** AUTOMATED-VERIFIED on exact checkpoint `76868dce`; latest test-only refinement `4a5bedf` awaiting rerun. Physical abrupt-termination/restart acceptance remains OPEN.
+**Status:** AUTOMATED-VERIFIED on exact checkpoint `4a5bedfc`. Physical abrupt-termination/restart acceptance remains OPEN.
 
 **Engineering diagnostic code:** ENG-DATA-006  
 **Class:** F1 — client-side data-integrity / transaction-boundary defect.  
@@ -969,8 +969,8 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression controls:**
 - Browser test added at `2e3bca483fba45c239951d9ff107b85f7b59cee3` injects a failure boundary against an independent state-only transaction after the server push boundary and verifies the acknowledgement is completed without relying on that second transaction.
 - PHP architecture test/helper updates at `f0de754df79856cefb50dc940731b8d6e7ce8062` and `76868dce36756bb90146bc03ce7daad1c01caa0f` assert queue removal, workspace-state put, dirty-state derivation and absence of a separate `writeState()` in the acknowledgement path.
-- Test-only refinement `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` arms the failure boundary when the mocked push reaches the server boundary; exact-head rerun pending.
+- Test-only refinement `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` arms the failure boundary when the mocked push reaches the server boundary; exact-head rerun PASS.
 
-**Evidence on `76868dce`:** Laravel **765 passed / 1 skipped / 5,471 assertions**; desktop offline/browser acceptance **75 passed**; mobile offline Work/visual suite **11 passed**; mobile host-outage **1 passed**; phone-local attachment **1 passed**; PostgreSQL migration/recovery smoke **1 passed**; PHPMD and static analysis passed; Windows build, encrypted/legacy archive verification and fresh install passed. Zazu Quality application/formatting/secret-scan passed; Composer security audit failed independently on five Symfony advisories. This automated evidence does not claim a physical power-cut test or close restart/reconnect acceptance.
+**Evidence on exact checkpoint `4a5bedfc`:** Laravel **765 passed / 1 skipped / 5,471 assertions**; desktop offline/browser acceptance **75 passed**; mobile offline Work/visual suite **11 passed**; mobile host-outage **1 passed**; phone-local attachment **1 passed**; PostgreSQL migration/recovery smoke **1 passed**. PHPMD, static analysis, Windows build, encrypted/legacy archive verification and fresh install passed on the same application source at `76868dce`; the final `4a5bedf` commit only refines test-injection timing. Zazu Quality application/formatting/secret-scan passed; Composer security audit failed independently on five Symfony advisories. This automated evidence does not claim a physical power-cut test or close restart/reconnect acceptance.
 
 **Rejected approaches:** Never mark the queue row deleted first and rely on a later state write. Do not retry with a new mutation UUID after an uncertain server response; preserve the original idempotency identity. Do not call the browser test a physical power-cut test.
