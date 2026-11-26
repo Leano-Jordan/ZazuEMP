@@ -141,3 +141,13 @@ The Founder screenshot showed three persistent context blocks competing with the
 - Removed the vertical scrolling constraint from the desktop navigation list. Only a contextual panel may internally scroll when its content exceeds the available viewport.
 - Finance's Search destination is explicitly named Advanced Search and opens the existing workspace search page with its record type, status and date filters.
 - Retained Zazu brand lockup, current theme tokens, active-state treatment, role checks, route destinations and mobile interaction model.
+
+
+## 2026-11-26 — Navigation CI root-cause correction
+
+The Laravel workflow exposed three concrete regressions introduced by the navigation foundation:
+- The group trigger's accessible name was changed to "Work navigation", breaking the existing Work-group browser locator. It now exposes the visible group name as its accessible name.
+- The account control's "Signed in" context label was replaced with "WORKSPACE", breaking the account-shell contract. The label is restored while the active workspace remains the primary identity.
+- A second base definition for .zazu-nav-area-title was appended instead of extending its canonical rule. Geometry now lives in the existing canonical selector; the duplicate rule is removed.
+
+The desktop collapse initializer existed but was not called from the main UI initialization sequence. It is now registered before mobile and hierarchical navigation setup, so the control is live rather than decorative.
