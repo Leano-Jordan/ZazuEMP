@@ -7015,11 +7015,9 @@ body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
     min-height: 0;
 }
 .zazu-nav {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: visible;
 }
 .zazu-nav-hierarchical,
 .zazu-nav-hierarchy {
@@ -7052,6 +7050,9 @@ body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
 .zazu-nav-flyout {
     position: static;
     display: none;
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
     width: auto;
     margin: 3px 0 9px 14px;
     padding: 4px 0 4px 12px;
@@ -7087,9 +7088,9 @@ body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
 }
 @media (max-width: 850px) {
     .zazu-nav {
-        flex: 1 1 auto;
+        flex: 0 0 auto;
         min-height: 0;
-        overflow-y: auto;
+        overflow: visible;
     }
     .zazu-nav-flyout {
         position: static;
@@ -7114,6 +7115,25 @@ body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
     }
     .zazu-nav-flyout .zazu-nav-link {
         min-height: 44px;
+    }
+}
+
+/* Collapsed rail panels are anchored to their trigger, not the sidebar root.
+   The final group opens upward so its full submenu remains inside the viewport. */
+@media (min-width: 851px) {
+    body.zazu-sidebar-collapsed .zazu-nav-area {
+        position: relative;
+    }
+
+    body.zazu-sidebar-collapsed .zazu-nav-flyout {
+        max-height: none;
+        overflow: visible;
+    }
+
+    body.zazu-sidebar-collapsed .zazu-nav-hierarchy > .zazu-nav-area:last-child > .zazu-nav-flyout {
+        top: auto;
+        bottom: 0;
+        border-radius: 12px 0 12px 12px;
     }
 }
 
