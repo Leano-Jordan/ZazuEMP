@@ -341,3 +341,12 @@ IndexedDB and Cache Storage commits do not guarantee that browser-managed origin
 **Required regression:** Playwright must prove desktop group opening does not navigate, mobile and 810px tablet taps open/close groups without changing URL, and selecting a child destination navigates to that exact destination and closes the drawer.
 
 **Status:** IMPLEMENTED — awaiting current-main CI and browser verification.
+
+
+## REG-034 — Laravel regression repair: session-bound business switch and mobile recovery
+
+- Move `business.switch` under `auth.session`; stale password-hash sessions must be invalidated before a business context can change.
+- Preserve the server-rendered `.is-active` mobile navigation fallback while JS initialises.
+- Keep pairing validation regression expectations aligned with the 12-digit one-time pairing contract.
+- Required verification: full Laravel suite, Postgres migration smoke, offline browser acceptance, responsive navigation E2E, and Director contract lint.
+- Status: FIX COMMITTED — awaiting exact-head CI.
