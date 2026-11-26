@@ -4,11 +4,19 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest fully verified broad application / acceptance candidate:** `dbda546d677dd80c99bda83bfcdfaa4dc46e8239` — all exact-head workflows completed successfully: Laravel tests, coverage, PostgreSQL migration/recovery smoke, offline browser acceptance, Zazu Quality, PHPMD, Director Health, Windows packaging, encrypted/legacy archive verification and fresh Windows PowerShell installation. Secret scan and Composer security audit passed. Windows prerelease publication was skipped. The subsequent runtime-adjustment source head `34bcb1f5c800efcedfde2589ff7de38f9486dd70` passed current-head application, formatting, secret scan and Composer security audit. Subsequent commits on `main` are documentation-only acceptance records. SonarCloud remains skipped.
-**Latest application-code head:** `34bcb1f5c800efcedfde2589ff7de38f9486dd70` (restore upload-runtime correction); current `main` also contains documentation-only commits recording the successful owner restore acceptance.
+**Latest application-code head:** `bf8dc41aa7ad4837a3c19d54bbd9d5158e4c53c7` (2026-11-26 auth-context listener retained across back-forward-cache restores). The latest commit status endpoint returned no combined status checks; exact-head CI is UNVERIFIED. The previous `34bcb1f5c800efcedfde2589ff7de38f9486dd70` runtime-adjustment evidence remains historical, not proof for the current head.
 **Release verdict:** NOT READY — the Rosscore business archive restore is now owner-accepted; separate offline, adversarial security, commercial, installation-wide recovery and legal/brand gates remain.
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
 This is the concise live state register, not a session diary. Detailed incident evidence belongs in FAILURE_CASES.md, durable decisions in DECISION_LOG.md, recurring regressions in REGRESSION_LEDGER.md, and historical implementation evidence in dated audit/release records.
+
+## Founder-directed trust-surface work — 2026-11-26
+
+Accepted direction and execution record: [DIRECTOR_TRUST_SURFACE_EXECUTION_2026-11-26.md](../../docs/DIRECTOR_TRUST_SURFACE_EXECUTION_2026-11-26.md). Founder-provided public-credibility baseline is **22/40 (55%)**, judgement-based and separate from the formal **71/100 evidence-maturity score**. Work order: (1) accurate public trust surface, (2) source-derived workflow demonstration, (3) authorised non-commercial private pilot with synthetic data by default, then (4) bounded CSS polish after critical release gates. No ads, charging, public pricing, public beta, uptime/SLA promises or broad redesign.
+
+Important identity/claim constraints: Zazu remains an event management platform, not a catering product. “From enquiry to profit” is an accepted workflow-story direction, not proof that every stage is production-accepted; preserve the current V1 mandate promise until formally changed. Do not imply native WhatsApp integration. Rosscore Labs is not yet registered/current owner; the Founder personally owns current IP. ZAZU name clearance is unresolved/high risk. Information Officer registration is incomplete; Outlook contact is provisional; no production hosting or third-party processor is provisioned. Privacy and Terms remain review drafts, not effective public legal notices. Status page is deferred until real monitoring exists.
+
+Latest source head is `bf8dc41aa7ad4837a3c19d54bbd9d5158e4c53c7`; current-head combined status query returned no checks. Do not claim exact-head CI PASS. Active adversarial authentication audit remains OPEN. Continue it without displacing recovery, physical offline and commercial acceptance gates. Trust-surface implementation must be low-risk public GET-only work, reuse current Laravel shell, add route/accessibility/content tests, and record rendered verification as UNVERIFIED if browser evidence is unavailable.
 
 
 ## Active security investigation — 2026-11-26
