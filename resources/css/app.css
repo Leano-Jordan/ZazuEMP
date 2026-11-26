@@ -8865,3 +8865,17 @@ body.zazu-sidebar-collapsed .zazu-nav-flyout {
 @media (max-width: 850px) {
     .zazu-nav-flyout .zazu-nav-link { min-height: 40px; }
 }
+
+
+/* The rail's popover carries its own context; expanded navigation already
+   communicates that context in the parent row. */
+.zazu-nav-flyout-heading { display: none; }
+body.zazu-sidebar-collapsed .zazu-nav-flyout-heading {
+    display: block;
+    padding: 5px 10px 9px;
+    color: var(--zazu-sidebar-label);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
