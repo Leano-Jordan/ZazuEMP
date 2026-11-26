@@ -21,7 +21,7 @@ class PublicTrustSurfaceTest extends TestCase
             $response = $this->get(route($route));
 
             $response->assertOk();
-            $response->assertSee($heading);
+            $response->assertSee($heading, false);
         }
     }
 
