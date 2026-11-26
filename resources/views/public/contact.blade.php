@@ -11,7 +11,7 @@
     <div class="content-grid">
         <article class="prose">
             <section class="content-card">
-                <h2 style="margin-top:0">General enquiries</h2>
+                <h2 class="first-heading">General enquiries</h2>
                 <p><a href="mailto:rosscorelabs@outlook.com">rosscorelabs@outlook.com</a></p>
                 <p>This is the founder's current provisional contact address. It is not a dedicated Zazu support desk or privacy mailbox. A dedicated privacy channel has not yet been established.</p>
             </section>
