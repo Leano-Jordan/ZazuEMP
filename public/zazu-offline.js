@@ -1768,47 +1768,107 @@
 
         const result = await response.json();
         if (sessionCleared || !state?.sync?.token) return;
-        const recorded = new Map((result.recorded || []).map(item => [item.id, item]));
+        const recorded = new Map((Array.isArray(result.recorded) ? result.recorded : []).map(item => [item.id, item]));
         const db = await openDb();
 
+        // Queue acknowledgement, server identity reconciliation, conflict
+        // recording and local_dirty recalculation must commit together. If the
+        // browser is terminated after the server accepts a mutation, a retry
+        // must either find the original queue entry or the fully reconciled
+        // local record; there must be no half-acknowledged intermediate state.
         await new Promise((resolve, reject) => {
             const tx = db.transaction([QUEUE, STATE], 'readwrite');
-            const store = tx.objectStore(QUEUE);
+            const queueStore = tx.objectStore(QUEUE);
             const stateStore = tx.objectStore(STATE);
             const currentStateRequest = stateStore.get('current');
+            const queueRequest = queueStore.getAll();
             let nextState = null;
-
+            let currentStateReady = false;
+            let queueReady = false;
             let sessionMismatch = false;
-            currentStateRequest.onsuccess = () => {
+
+            const identityTargets = {
+                customer: 'customers',
+                service: 'catalogue',
+                job: 'jobs',
+                quote: 'quotes',
+                preparation: 'preparations',
+                supplier: 'suppliers',
+                purchase_order: 'purchase_orders',
+                invoice: 'invoices',
+                expense: 'expenses',
+                inventory_item: 'inventory_items',
+                asset: 'assets',
+                event_cost: 'costs',
+            };
+
+            const findLocalRecord = (workspace, entityType, localId, mutation) => {
+                const target = identityTargets[entityType];
+                if (target) {
+                    return (workspace[target] || []).find(item => item.local_id === localId) || null;
+                }
+
+                const payload = mutation.payload?.record || {};
+                if (entityType === 'payment') {
+                    const invoice = (workspace.invoices || []).find(item =>
+                        item.local_id === payload.invoice_local_id
+                    );
+                    return invoice?.payments?.find(item => item.local_id === localId) || null;
+                }
+
+                if (entityType === 'inventory_movement') {
+                    const inventoryItem = (workspace.inventory_items || []).find(item =>
+                        item.local_id === payload.inventory_item_local_id
+                    );
+                    return inventoryItem?.movements?.find(item => item.local_id === localId) || null;
+                }
+
+                if (entityType === 'asset_allocation') {
+                    const asset = (workspace.assets || []).find(item => item.local_id === payload.asset_local_id);
+                    return asset?.allocations?.find(item => item.local_id === localId) || null;
+                }
+
+                return null;
+            };
+
+            const reconcile = () => {
+                if (!currentStateReady || !queueReady || sessionMismatch) return;
+
                 const persistedState = currentStateRequest.result || state || blank();
                 if (sessionCleared || (persistedState.sync?.token || null) !== pushSessionToken) {
                     sessionMismatch = true;
                     tx.abort();
                     return;
                 }
+
                 nextState = {
                     ...persistedState,
                     conflicts: [...(persistedState.conflicts || [])],
                 };
+
+                const queueById = new Map((queueRequest.result || []).map(item => [item.id, item]));
 
                 for (const mutation of mutations) {
                     const remote = recorded.get(mutation.id);
                     if (!remote) continue;
 
                     if (remote.status === 'applied' || remote.status === 'discarded') {
-                        store.delete(mutation.id);
+                        queueStore.delete(mutation.id);
+                        queueById.delete(mutation.id);
                     } else if (remote.error && remote.conflict_id) {
                         // A deterministic domain/identity rejection is terminal
                         // until the operator resolves its explicit conflict record.
                         // Persist the failed queue record and conflict together.
-                        store.put({
+                        const failedMutation = {
                             ...mutation,
                             status: 'failed',
                             server_sequence: remote.sequence,
                             server_status: remote.status,
                             conflict_id: remote.conflict_id,
                             last_error: remote.error,
-                        });
+                        };
+                        queueStore.put(failedMutation);
+                        queueById.set(mutation.id, failedMutation);
 
                         nextState.conflicts = [
                             ...nextState.conflicts.filter(item => Number(item.id) !== Number(remote.conflict_id)),
@@ -1826,40 +1886,179 @@
                     } else if (remote.error && remote.retryable) {
                         // Infrastructure/unexpected failures must remain retryable.
                         // Do not strand them as failed records without a resolvable conflict.
-                        store.put({
+                        const retryableMutation = {
                             ...mutation,
                             status: 'pending',
                             server_sequence: remote.sequence,
                             server_status: remote.status,
                             last_error: remote.error,
-                        });
+                        };
+                        queueStore.put(retryableMutation);
+                        queueById.set(mutation.id, retryableMutation);
                     } else if (remote.error) {
                         // Fail closed if a future server response adds an error
                         // without either a conflict record or retryable disposition.
-                        store.put({
+                        const failedMutation = {
                             ...mutation,
                             status: 'failed',
                             server_sequence: remote.sequence,
                             server_status: remote.status,
                             last_error: remote.error,
-                        });
+                        };
+                        queueStore.put(failedMutation);
+                        queueById.set(mutation.id, failedMutation);
                     } else {
-                        store.put({
+                        const unconfirmedMutation = {
                             ...mutation,
                             server_sequence: remote.sequence,
                             server_status: remote.status,
                             last_error: remote.error || 'The server did not confirm this offline change',
-                        });
+                        };
+                        queueStore.put(unconfirmedMutation);
+                        queueById.set(mutation.id, unconfirmedMutation);
                     }
                 }
 
+                const relatedReconciliations = [];
+
+                for (const mutation of mutations) {
+                    const remote = recorded.get(mutation.id);
+                    if (remote?.status !== 'applied') continue;
+
+                    const identity = remote.identity;
+                    if (identity) {
+                        const localId = identity.local_id || mutation.payload?.local_id;
+                        const record = findLocalRecord(nextState, identity.entity_type, localId, mutation);
+                        if (record) {
+                            record.id = Number(identity.server_id);
+                            record.server_id = Number(identity.server_id);
+                            record.local_id = localId;
+                            record.revision = Number(identity.revision || record.revision || 1);
+                        }
+                    }
+
+                    const relatedIdentities = Array.isArray(remote.related_identities)
+                        ? remote.related_identities
+                        : (remote.related_identity ? [remote.related_identity] : []);
+                    for (const related of relatedIdentities) {
+                        const target = identityTargets[related.entity_type];
+                        const relatedRecord = target
+                            ? (nextState[target] || []).find(item => item.local_id === related.local_id)
+                            : null;
+                        if (relatedRecord) {
+                            relatedRecord.revision = Number(related.revision || relatedRecord.revision || 1);
+                            relatedReconciliations.push({
+                                entityType: related.entity_type,
+                                localId: related.local_id,
+                                record: relatedRecord,
+                                sourceMutation: mutation,
+                            });
+                        }
+                    }
+                }
+
+                const remainingMutations = [...queueById.values()]
+                    .filter(item => item.status === 'pending')
+                    .sort(compareMutationOrder);
+                const openConflicts = nextState.conflicts.filter(conflict => conflict.status === 'open');
+
+                for (const related of relatedReconciliations) {
+                    if (related.record?.pending_sync !== true) continue;
+
+                    const sourcePayload = related.sourceMutation.payload?.record || {};
+                    const stillPending = remainingMutations.some(item => {
+                        const payload = item.payload?.record || {};
+                        const localId = payload.local_id || item.entity_id;
+
+                        if (item.entity_type === related.entityType && localId === related.localId) return true;
+
+                        if (related.entityType === 'purchase_order') {
+                            return item.entity_type === 'purchase_receipt'
+                                && payload.purchase_order_local_id === related.localId;
+                        }
+
+                        if (related.entityType === 'inventory_item') {
+                            if (item.entity_type === 'inventory_movement'
+                                && payload.inventory_item_local_id === related.localId) return true;
+
+                            return related.sourceMutation.entity_type === 'purchase_receipt'
+                                && item.entity_type === 'purchase_receipt'
+                                && payload.purchase_order_local_id === sourcePayload.purchase_order_local_id;
+                        }
+
+                        return false;
+                    }) || openConflicts.some(conflict => {
+                        if (related.entityType === 'purchase_order') {
+                            return conflict.entity_type === 'purchase_receipt';
+                        }
+
+                        if (related.entityType === 'inventory_item') {
+                            return related.sourceMutation.entity_type === 'purchase_receipt'
+                                ? conflict.entity_type === 'purchase_receipt'
+                                : conflict.entity_type === 'inventory_movement';
+                        }
+
+                        return conflict.entity_type === related.entityType
+                            && conflict.entity_id === related.localId;
+                    });
+
+                    if (!stillPending) {
+                        related.record.pending_sync = false;
+
+                        if (related.entityType === 'purchase_order') {
+                            for (const line of related.record.items || []) {
+                                if (line.pending_sync === true) line.pending_sync = false;
+                            }
+                        }
+
+                        if (related.entityType === 'inventory_item') {
+                            for (const movement of related.record.movements || []) {
+                                if (movement.pending_sync === true) movement.pending_sync = false;
+                            }
+                        }
+                    }
+                }
+
+                for (const mutation of mutations) {
+                    const remote = recorded.get(mutation.id);
+                    if (!['applied', 'discarded'].includes(remote?.status)) continue;
+
+                    const localId = mutation.payload?.local_id || mutation.entity_id;
+                    if (!localId) continue;
+
+                    const sameRecordStillPending = remainingMutations.some(item =>
+                        item.entity_type === mutation.entity_type
+                        && (item.payload?.local_id || item.entity_id) === localId
+                    );
+                    if (sameRecordStillPending) continue;
+
+                    const record = findLocalRecord(nextState, mutation.entity_type, localId, mutation);
+                    if (record?.pending_sync === true) record.pending_sync = false;
+                }
+
+                nextState.local_dirty = remainingMutations.length > 0;
                 stateStore.put(nextState, 'current');
             };
 
+            currentStateRequest.onsuccess = () => {
+                currentStateReady = true;
+                reconcile();
+            };
+            queueRequest.onsuccess = () => {
+                queueReady = true;
+                reconcile();
+            };
             currentStateRequest.onerror = () => tx.abort();
+            queueRequest.onerror = () => tx.abort();
             tx.oncomplete = () => {
-                if (nextState) replaceWorkspaceState(nextState);
-                durableStateSnapshot = cloneWorkspaceState(state || blank());
+                if (!nextState) {
+                    reject(new Error('Offline queue acknowledgement completed without reconciling its workspace state.'));
+                    return;
+                }
+                if (!sessionCleared) {
+                    replaceWorkspaceState(nextState);
+                    durableStateSnapshot = cloneWorkspaceState(nextState);
+                }
                 resolve();
             };
             tx.onerror = () => reject(tx.error || new Error('Offline queue acknowledgement failed.'));
@@ -1868,167 +2067,7 @@
                 : (tx.error || new Error('Offline queue acknowledgement was aborted.')));
         });
 
-        const identityTargets = {
-            customer: 'customers',
-            service: 'catalogue',
-            job: 'jobs',
-            quote: 'quotes',
-            preparation: 'preparations',
-            supplier: 'suppliers',
-            purchase_order: 'purchase_orders',
-            invoice: 'invoices',
-            expense: 'expenses',
-            inventory_item: 'inventory_items',
-            asset: 'assets',
-            event_cost: 'costs',
-        };
-
-        const findLocalRecord = (entityType, localId, mutation) => {
-            const target = identityTargets[entityType];
-            if (target) {
-                return (state[target] || []).find(item => item.local_id === localId) || null;
-            }
-
-            const payload = mutation.payload?.record || {};
-            if (entityType === 'payment') {
-                const invoice = (state.invoices || []).find(item =>
-                    item.local_id === payload.invoice_local_id
-                );
-                return invoice?.payments?.find(item => item.local_id === localId) || null;
-            }
-
-            if (entityType === 'inventory_movement') {
-                const inventoryItem = (state.inventory_items || []).find(item =>
-                    item.local_id === payload.inventory_item_local_id
-                );
-                return inventoryItem?.movements?.find(item => item.local_id === localId) || null;
-            }
-
-            if (entityType === 'asset_allocation') {
-                const asset = (state.assets || []).find(item => item.local_id === payload.asset_local_id);
-                return asset?.allocations?.find(item => item.local_id === localId) || null;
-            }
-
-            return null;
-        };
-
-        const relatedReconciliations = [];
-
-        for (const mutation of mutations) {
-            const remote = recorded.get(mutation.id);
-            const identity = remote?.identity;
-            if (remote?.status !== 'applied') continue;
-
-            if (identity) {
-                const localId = identity.local_id || mutation.payload?.local_id;
-                const record = findLocalRecord(identity.entity_type, localId, mutation);
-                if (record) {
-                    record.id = Number(identity.server_id);
-                    record.server_id = Number(identity.server_id);
-                    record.local_id = localId;
-                    record.revision = Number(identity.revision || record.revision || 1);
-                }
-            }
-
-            const relatedIdentities = Array.isArray(remote?.related_identities)
-                ? remote.related_identities
-                : (remote?.related_identity ? [remote.related_identity] : []);
-            for (const related of relatedIdentities) {
-                const target = identityTargets[related.entity_type];
-                const relatedRecord = target
-                    ? (state[target] || []).find(item => item.local_id === related.local_id)
-                    : null;
-                if (relatedRecord) {
-                    relatedRecord.revision = Number(related.revision || relatedRecord.revision || 1);
-                    relatedReconciliations.push({
-                        entityType: related.entity_type,
-                        localId: related.local_id,
-                        record: relatedRecord,
-                        sourceMutation: mutation,
-                    });
-                }
-            }
-        }
-
-        const remainingMutations = await pending();
-        const openConflicts = (state.conflicts || []).filter(conflict => conflict.status === 'open');
-
-        for (const related of relatedReconciliations) {
-            if (related.record?.pending_sync !== true) continue;
-
-            const sourcePayload = related.sourceMutation.payload?.record || {};
-            const stillPending = remainingMutations.some(item => {
-                const payload = item.payload?.record || {};
-                const localId = payload.local_id || item.entity_id;
-
-                if (item.entity_type === related.entityType && localId === related.localId) return true;
-
-                if (related.entityType === 'purchase_order') {
-                    return item.entity_type === 'purchase_receipt'
-                        && payload.purchase_order_local_id === related.localId;
-                }
-
-                if (related.entityType === 'inventory_item') {
-                    if (item.entity_type === 'inventory_movement'
-                        && payload.inventory_item_local_id === related.localId) return true;
-
-                    return related.sourceMutation.entity_type === 'purchase_receipt'
-                        && item.entity_type === 'purchase_receipt'
-                        && payload.purchase_order_local_id === sourcePayload.purchase_order_local_id;
-                }
-
-                return false;
-            }) || openConflicts.some(conflict => {
-                if (related.entityType === 'purchase_order') {
-                    return conflict.entity_type === 'purchase_receipt';
-                }
-
-                if (related.entityType === 'inventory_item') {
-                    return related.sourceMutation.entity_type === 'purchase_receipt'
-                        ? conflict.entity_type === 'purchase_receipt'
-                        : conflict.entity_type === 'inventory_movement';
-                }
-
-                return conflict.entity_type === related.entityType
-                    && conflict.entity_id === related.localId;
-            });
-
-            if (!stillPending) {
-                related.record.pending_sync = false;
-
-                if (related.entityType === 'purchase_order') {
-                    for (const line of related.record.items || []) {
-                        if (line.pending_sync === true) line.pending_sync = false;
-                    }
-                }
-
-                if (related.entityType === 'inventory_item') {
-                    for (const movement of related.record.movements || []) {
-                        if (movement.pending_sync === true) movement.pending_sync = false;
-                    }
-                }
-            }
-        }
-
-        for (const mutation of mutations) {
-            const remote = recorded.get(mutation.id);
-            if (!['applied', 'discarded'].includes(remote?.status)) continue;
-
-            const localId = mutation.payload?.local_id || mutation.entity_id;
-            if (!localId) continue;
-
-            const sameRecordStillPending = remainingMutations.some(item =>
-                item.entity_type === mutation.entity_type
-                && (item.payload?.local_id || item.entity_id) === localId
-            );
-            if (sameRecordStillPending) continue;
-
-            const record = findLocalRecord(mutation.entity_type, localId, mutation);
-            if (record?.pending_sync === true) record.pending_sync = false;
-        }
-        state.local_dirty = remainingMutations.length > 0;
         if (sessionCleared || !state?.sync?.token) return;
-        await writeState();
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }
 
