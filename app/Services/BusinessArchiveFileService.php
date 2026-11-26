@@ -97,7 +97,13 @@ final class BusinessArchiveFileService
         $entries = [];
         $allowedKeys = ['table', 'id', 'column', 'disk_column', 'source_disk', 'entry', 'original_name'];
         foreach ($manifest['files'] as $file) {
-            if (! is_array($file) || array_diff(array_keys($file), $allowedKeys) !== []) {
+            if (! is_array($file)) {
+                throw new RuntimeException('The archive contains an invalid business file reference.');
+            }
+            if (array_key_exists('bytes', $file)) {
+                throw new RuntimeException('The archive file manifest must not contain inline payload bytes.');
+            }
+            if (array_diff(array_keys($file), $allowedKeys) !== []) {
                 throw new RuntimeException('The archive contains an invalid business file reference.');
             }
             $id = $file['id'] ?? null;
