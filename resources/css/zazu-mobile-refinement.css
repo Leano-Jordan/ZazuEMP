@@ -50,8 +50,9 @@
         height: 100dvh;
         min-height: 100dvh;
         z-index: 100;
-        /* Keep the sidebar shell unclipped; the navigation region owns scrolling. */
-        overflow: visible;
+        /* The drawer is the single scroll container; nav groups do not scroll independently. */
+        overflow-y: auto;
+        overflow-x: hidden;
         transform: translateX(-105%);
         transition: transform 180ms ease;
         box-shadow: 18px 0 42px color-mix(in srgb, var(--zazu-ink) 18%, transparent);
@@ -93,8 +94,7 @@
     }
 
     .zazu-nav {
-        overflow-y: auto;
-        overscroll-behavior: contain;
+        overflow: visible;
         padding: 14px 12px;
     }
 
