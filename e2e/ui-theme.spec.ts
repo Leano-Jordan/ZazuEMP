@@ -156,7 +156,8 @@ test.describe('Zazu UI theme and navigation', () => {
         const collapse = page.getByRole('button', { name: 'Collapse sidebar' });
         const work = sidebar.locator('[data-zazu-nav-area]').filter({ hasText: 'Work' }).first();
         const trigger = work.getByRole('button', { name: 'Work', exact: true });
-        const calendar = work.locator('[data-zazu-nav-panel] a').filter({ hasText: /^Calendar$/ });
+        const panel = work.locator('[data-zazu-nav-panel]');
+        const calendar = panel.locator('a').filter({ hasText: /^Calendar$/ });
 
         await expect(collapse).toBeVisible();
         await collapse.click();
@@ -167,8 +168,11 @@ test.describe('Zazu UI theme and navigation', () => {
         // the rail trigger controls its contextual panel without changing route.
         await trigger.click();
         await expect(work).not.toHaveClass(/is-open/);
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        await expect(panel).toBeHidden();
         await trigger.click();
         await expect(work).toHaveClass(/is-open/);
+        await expect(panel).toBeVisible();
         await expect(trigger).toHaveAttribute('aria-expanded', 'true');
         await expect(calendar).toBeVisible();
         await expect(page).toHaveURL(/\/dashboard$/);
