@@ -56,6 +56,40 @@ class AuthenticationSessionSecurityTest extends TestCase
         ]);
     }
 
+    public function test_registration_rotates_and_destroys_the_pre_authentication_session(): void
+    {
+        config(['session.driver' => 'database']);
+
+        $this->withSession(['pre_registration_marker' => 'must-not-survive-registration'])
+            ->get(route('landing'))
+            ->assertOk();
+
+        $preRegistrationSessionId = app('session')->driver()->getId();
+        $this->assertNotEmpty($preRegistrationSessionId);
+        $this->assertDatabaseHas('sessions', ['id' => $preRegistrationSessionId]);
+
+        $this->post(route('register.store'), [
+            'name' => 'Session Registration Owner',
+            'username' => 'sessionregister',
+            'business_name' => 'Session Registration Business',
+            'email' => 'sessionregister@example.com',
+            'password' => 'registration-password',
+            'password_confirmation' => 'registration-password',
+        ])
+            ->assertRedirect(route('onboarding.catalogue'))
+            ->assertSessionHas('auth_modal', 'register');
+
+        $user = User::query()->where('email', 'sessionregister@example.com')->firstOrFail();
+        $authenticatedSessionId = app('session')->driver()->getId();
+
+        $this->assertNotSame($preRegistrationSessionId, $authenticatedSessionId);
+        $this->assertDatabaseMissing('sessions', ['id' => $preRegistrationSessionId]);
+        $this->assertDatabaseHas('sessions', [
+            'id' => $authenticatedSessionId,
+            'user_id' => $user->id,
+        ]);
+    }
+
     public function test_password_reset_revokes_previously_authenticated_sessions(): void
     {
         config(['session.driver' => 'database']);
@@ -77,6 +111,13 @@ class AuthenticationSessionSecurityTest extends TestCase
 
         $token = Password::createToken($user);
 
+        $this->withSession(['pre_reset_marker' => 'must-not-survive-password-reset'])
+            ->get(route('landing'))
+            ->assertOk();
+        $preResetSessionId = app('session')->driver()->getId();
+        $this->assertNotEmpty($preResetSessionId);
+        $this->assertDatabaseHas('sessions', ['id' => $preResetSessionId]);
+
         $this->post(route('password.update'), [
             'token' => $token,
             'email' => $user->email,
@@ -86,6 +127,7 @@ class AuthenticationSessionSecurityTest extends TestCase
 
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
+        $this->assertDatabaseMissing('sessions', ['id' => $preResetSessionId]);
     }
 
     public function test_business_switch_rejects_a_stale_authenticated_password_hash(): void
