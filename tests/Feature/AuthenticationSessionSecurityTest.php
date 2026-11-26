@@ -239,8 +239,13 @@ class AuthenticationSessionSecurityTest extends TestCase
 
     private function resetHttpSessionState(): void
     {
-        Auth::forgetGuards();
+        // The feature-test container persists Laravel's session.store singleton
+        // across simulated requests. A real HTTP request gets a fresh store.
+        // Drop both the manager driver and the resolved store before replaying
+        // a browser cookie so the test exercises the database-backed session.
+        $this->app->forgetInstance('session.store');
         app('session')->forgetDrivers();
+        Auth::forgetGuards();
     }
 
     public function test_business_switch_rejects_a_stale_authenticated_password_hash(): void
