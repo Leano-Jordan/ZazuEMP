@@ -946,6 +946,7 @@ const initializeZazuUi = () => {
     // non-critical widget failure cannot leave offline business data stale.
     setupZazuOfflineWorkspaceProfile();
     setupZazuAuthExperience();
+    setupZazuSidebarCollapse();
     setupZazuMobileNavigation();
     setupZazuHierarchicalNavigation();
     setupZazuCommandNavigation();
@@ -967,6 +968,33 @@ if (document.readyState === 'loading') {
     initializeZazuUi();
 }
 
+
+function setupZazuSidebarCollapse() {
+    const toggle = document.querySelector('[data-sidebar-collapse-toggle]');
+    const sidebar = document.querySelector('[data-mobile-sidebar]');
+    if (!toggle || !sidebar) return;
+
+    const key = 'zazu-sidebar-collapsed';
+    const desktop = window.matchMedia('(min-width: 851px)');
+    const apply = (collapsed) => {
+        const active = desktop.matches && collapsed;
+        document.body.classList.toggle('zazu-sidebar-collapsed', active);
+        toggle.setAttribute('aria-pressed', active ? 'true' : 'false');
+        toggle.setAttribute('aria-label', active ? 'Expand sidebar' : 'Collapse sidebar');
+        toggle.title = active ? 'Expand sidebar' : 'Collapse sidebar';
+        toggle.querySelector('span').textContent = active ? '›' : '‹';
+    };
+
+    let saved = false;
+    try { saved = window.localStorage.getItem(key) === '1'; } catch (_) {}
+    apply(saved);
+    toggle.addEventListener('click', () => {
+        saved = !document.body.classList.contains('zazu-sidebar-collapsed');
+        try { window.localStorage.setItem(key, saved ? '1' : '0'); } catch (_) {}
+        apply(saved);
+    });
+    desktop.addEventListener('change', () => apply(saved));
+}
 
 function setupZazuMobileNavigation() {
     const sidebar = document.querySelector('[data-mobile-sidebar]');
