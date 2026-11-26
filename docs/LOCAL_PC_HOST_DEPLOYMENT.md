@@ -28,6 +28,13 @@
 
 The HTTPS launcher starts Laravel itself on `127.0.0.1:8000`, enables secure session cookies for that process, verifies/uses compiled Vite assets, and starts Caddy on the selected private Wi-Fi IPv4 address at HTTPS port `8443`. The phone connects only to Caddy; it must not connect directly to port 8000.
 
+### PHP upload limits and child-process inheritance
+
+The business archive restore form accepts files up to 100 MiB. The supported Windows launcher creates a project-local PHP scan file setting `upload_max_filesize=100M`, `post_max_size=110M`, and 300-second execution/input limits. It passes `PHP_INI_SCAN_DIR` and the HTTPS-only `SESSION_SECURE_COOKIE` override through Laravel's Windows `artisan serve` child-process environment filter. Passing PHP `-d` options to the Artisan parent alone is insufficient: Laravel starts a separate PHP HTTP worker, and those command-line options are not inherited by that worker.
+
+The launcher records the runtime configuration signature after the HTTP server passes its readiness check. If an older Zazu worker is already listening without that signature, the launcher safely stops that verified project-owned process and starts it again with the required limits. **After updating the repository, run the supported launcher again; do not leave an older server process running.** A manually started `php artisan serve` process does not receive the project-local upload overrides.
+
+
 ### Certificate identity
 
 The launcher prints the exact Caddy public CA certificate path (`root.crt`). An Android certificate installed previously is suitable only if it is this Caddy installation's matching root certificate. The source repository cannot inspect the phone's installed certificate store, so verify by opening the exact printed HTTPS URL and confirming Chrome shows no certificate warning. Do not reinstall a different certificate just because the URL/IP changed; the root CA and the IP-specific leaf certificate are different things. Never transfer the CA private key.
