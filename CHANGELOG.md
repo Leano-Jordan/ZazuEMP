@@ -17,6 +17,7 @@
 - Found a second, broader fallback-policy defect: almost every in-app navigation preferred the cached Dashboard over its exact route when offline or on request failure. Changed the policy so only cold launches prefer Dashboard; in-app navigations now prefer the exact active-business cached destination.
 - Added worker regressions for exact-route fallback across ordinary destinations, cold-launch Dashboard preference, slow-but-healthy destinations, hanging-host timeout behaviour, and collapsed desktop rail Playwright coverage, alongside public trust route/content tests and route-integrity assertions.
 - The first run exposed one obsolete hanging-host assertion that still expected Dashboard. Updated it to require the exact cached in-app destination after the bounded 5-second wait; this is the intended offline-first navigation contract.
+- Updated the Laravel PWA foundation contract test, which still asserted the removed narrow route allowlist, to verify that Dashboard preference is now limited to cold launches.
 - **Acceptance pending:** current-head Laravel, Zazu Quality, service-worker and browser checks must pass. Founder-device navigation and visual verification are not yet claimed. Privacy and Terms remain non-effective review copies.
 
 ## 2026-11-26 — Adversarial authentication hardening
