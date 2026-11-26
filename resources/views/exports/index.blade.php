@@ -62,21 +62,25 @@
             <article class="zazu-export-action zazu-export-restore">
                 <div class="zazu-export-action-icon" aria-hidden="true"><x-icon name="upload" size="21" /></div>
                 <h3>Restore an archive</h3>
-                <p>Validate and restore a Zazu business archive into a clean, empty workspace.</p>
+                <p>Restore into a newly created, empty, unpaired workspace. Populated demo workspaces are not valid destinations; existing records and offline sync state are never overwritten or merged.</p>
                 <form method="POST" action="{{ route('exports.archive.restore') }}" enctype="multipart/form-data" class="zazu-export-form">
                     @csrf
-                    <label for="business-archive" class="zazu-field-label">Business archive file
-                        <input id="business-archive" name="archive" type="file" accept=".zazu,application/zip" required class="zazu-input mt-1 w-full">
-                    </label>
-                    <label for="archive-restore-password" class="zazu-field-label">Archive passphrase <span class="font-normal opacity-70">(V2 only)</span>
-                        <input id="archive-restore-password" name="archive_password" type="password" minlength="12" maxlength="128" autocomplete="off" class="zazu-input mt-1 w-full">
-                    </label>
-                    @error('archive')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                    @error('archive_password')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <div class="zazu-field">
+                        <label for="business-archive" class="zazu-field-label">Business archive file
+                            <input id="business-archive" name="archive" type="file" accept=".zazu,application/zip" required class="zazu-input mt-1 w-full">
+                        </label>
+                        @error('archive')
+                            <p class="zazu-field-error text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="zazu-field">
+                        <label for="archive-restore-password" class="zazu-field-label">Archive passphrase <span class="font-normal opacity-70">(V2 only)</span>
+                            <input id="archive-restore-password" name="archive_password" type="password" minlength="12" maxlength="128" autocomplete="off" class="zazu-input mt-1 w-full">
+                        </label>
+                        @error('archive_password')
+                            <p class="zazu-field-error text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                     <button type="submit" class="zazu-btn zazu-btn-secondary"><x-icon name="shield-check" size="16" class="mr-2" /> Validate &amp; restore</button>
                 </form>
             </article>
