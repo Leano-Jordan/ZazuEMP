@@ -56,3 +56,29 @@ test('mobile and tablet navigation use tap-controlled groups and preserve destin
         await expect(page.locator('main')).toBeVisible();
     }
 });
+
+test('collapsed desktop rail keeps destination links clickable across full-page navigation', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await login(page);
+
+    const collapse = page.locator('[data-sidebar-collapse-toggle]');
+    await collapse.click();
+    await expect(page.locator('body')).toHaveClass(/zazu-sidebar-collapsed/);
+
+    const sales = page.locator('[data-zazu-nav-area]').filter({ has: page.getByRole('button', { name: /Sales/ }) });
+    const salesTrigger = sales.getByRole('button', { name: /Sales/ });
+    await salesTrigger.click();
+    await expect(salesTrigger).toHaveAttribute('aria-expanded', 'true');
+
+    const quotesLink = sales.getByRole('link', { name: 'Quotes' });
+    await expect(quotesLink).toBeVisible();
+    await quotesLink.click();
+
+    await expect(page).toHaveURL(/\\/quotes$/);
+    await expect(page.getByRole('heading', { name: /Quotes/ })).toBeVisible();
+    await expect(page.locator('body')).toHaveClass(/zazu-sidebar-collapsed/);
+
+    const activeSales = page.locator('[data-zazu-nav-area]').filter({ has: page.getByRole('button', { name: /Sales/ }) });
+    await expect(activeSales).toHaveClass(/is-active/);
+    await expect(activeSales.getByRole('link', { name: 'Quotes' })).toHaveAttribute('aria-current', 'page');
+});
