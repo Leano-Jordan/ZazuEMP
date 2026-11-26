@@ -17,6 +17,55 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
 
+test('pre-authentication session cookie cannot be replayed after successful login', async ({ page, browser }, testInfo) => {
+    test.setTimeout(30_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Session fixation replay runs once on desktop Chromium.');
+
+    await page.goto('/?auth=login', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
+
+    const cookieName = (await page.context().cookies())
+        .find(cookie => /session/i.test(cookie.name) && cookie.name.toUpperCase() !== 'XSRF-TOKEN')?.name;
+    expect(cookieName, 'the browser must receive the Laravel session cookie').toBeTruthy();
+
+    const preAuthenticationCookie = (await page.context().cookies())
+        .find(cookie => cookie.name === cookieName);
+    expect(preAuthenticationCookie).toBeTruthy();
+
+    await page.getByLabel('Username or email').fill(DEMO_EMAIL);
+    await page.locator('#auth_password').fill(DEMO_PASSWORD);
+    await page.locator('[data-auth-submit]').click();
+    await page.waitForURL(url => url.pathname === '/dashboard');
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+
+    const authenticatedCookie = (await page.context().cookies())
+        .find(cookie => cookie.name === cookieName);
+    expect(authenticatedCookie).toBeTruthy();
+    expect(authenticatedCookie.value).not.toBe(preAuthenticationCookie.value);
+
+    // Replay the exact pre-login encrypted cookie from an independent browser
+    // context. This avoids the feature-test container's reused PHP session store
+    // and models a second browser holding a copied pre-authentication cookie.
+    const origin = new URL(page.url()).origin;
+    const replayContext = await browser.newContext();
+    await replayContext.addCookies([{
+        name: preAuthenticationCookie.name,
+        value: preAuthenticationCookie.value,
+        url: origin,
+        httpOnly: preAuthenticationCookie.httpOnly,
+        secure: preAuthenticationCookie.secure,
+        sameSite: preAuthenticationCookie.sameSite,
+    }]);
+
+    const replayPage = await replayContext.newPage();
+    await replayPage.goto(`${origin}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await expect(replayPage).toHaveURL(/\/\?auth=login$/);
+    await expect(replayPage.locator('[data-auth-modal]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+
+    await replayContext.close();
+});
+
 async function waitForOfflineRuntime(page) {
     await expect.poll(
         () => page.evaluate(() => Boolean(window.ZazuOffline?.ready)),
