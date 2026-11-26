@@ -344,10 +344,25 @@ if ($listeners.Count -gt 0) {
     }
 
     if ($alreadyZazu) {
-        # Source files can be updated while the existing PHP process remains alive.
-        # Never silently report a healthy launch when that process is serving code
-        # whose database migrations have not been applied.
-        Push-Location $ProjectPath
+        $runtimeSignature = "zazu-php-runtime-v2|$php|upload=100M|post=110M|execution=300|input=300"
+        $runtimeSignaturePath = Join-Path $ProjectPath 'storage\\framework\\zazu-php-runtime.signature'
+        $existingRuntimeSignature = if (Test-Path $runtimeSignaturePath -PathType Leaf) {
+            (Get-Content $runtimeSignaturePath -Raw).Trim()
+        } else {
+            ''
+        }
+
+        if ($existingRuntimeSignature -ne $runtimeSignature) {
+            Write-Host 'Restarting the existing Zazu server to apply verified PHP upload limits.'
+            & $PSCommandPath -ProjectPath $ProjectPath -Port $Port -Stop
+            if (@(Get-ZazuListener).Count -gt 0) {
+                throw 'The existing Zazu server could not be restarted safely to apply PHP upload limits.'
+            }
+        } else {
+            # Source files can be updated while the existing PHP process remains alive.
+            # Never silently report a healthy launch when that process is serving code
+            # whose database migrations have not been applied.
+            Push-Location $ProjectPath
         try {
             $statusOutput = @(& $php $artisan 'migrate:status' '--no-ansi' 2>&1 | ForEach-Object { "$_" })
             $statusExitCode = $LASTEXITCODE
@@ -367,8 +382,9 @@ if ($listeners.Count -gt 0) {
             Pop-Location
         }
 
-        Write-Host ("Zazu is already listening at http://{0}:{1}; migration status is current." -f $BindAddress, $Port)
-        return
+            Write-Host ("Zazu is already listening at http://{0}:{1}; migration status is current." -f $BindAddress, $Port)
+            return
+        }
     }
 
     if ($wrongBinding.Count -gt 0 -and $listeners.Count -eq $wrongBinding.Count) {
@@ -461,28 +477,49 @@ $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $stdout = Join-Path $logDirectory "zazu-dev-$stamp.out.log"
 $stderr = Join-Path $logDirectory "zazu-dev-$stamp.err.log"
 
+$runtimeIniDirectory = Join-Path $ProjectPath 'storage\\framework\\php-runtime'
+$runtimeIniPath = Join-Path $runtimeIniDirectory 'zazu-upload.ini'
+$runtimeSignaturePath = Join-Path $ProjectPath 'storage\\framework\\zazu-php-runtime.signature'
+$runtimeSignature = "zazu-php-runtime-v2|$php|upload=100M|post=110M|execution=300|input=300"
+New-Item -ItemType Directory -Path $runtimeIniDirectory -Force | Out-Null
+@'
+upload_max_filesize=100M
+post_max_size=110M
+max_execution_time=300
+max_input_time=300
+'@ | Set-Content -Path $runtimeIniPath -Encoding ASCII
+
 $previousSecureCookieValue = [Environment]::GetEnvironmentVariable('SESSION_SECURE_COOKIE', 'Process')
+$previousPhpIniScanDirectory = [Environment]::GetEnvironmentVariable('PHP_INI_SCAN_DIR', 'Process')
 try {
     if ($SecureCookies) {
         # Override the installer’s localhost-HTTP default only for this HTTPS-hosted PHP process.
         $env:SESSION_SECURE_COOKIE = 'true'
     }
 
-    # Keep the PHP built-in server aligned with the archive restore form's documented 100 MiB upload limit.
-# PHP's common CLI defaults (2M upload / 8M POST) otherwise reject valid business archives
-# before Laravel can inspect them, leaving an empty request and a misleading validation error.
-$serverArguments = @(
-    '-d', 'upload_max_filesize=100M',
-    '-d', 'post_max_size=110M',
-    '-d', 'max_execution_time=300',
-    '-d', 'max_input_time=300',
-    'artisan', 'serve', "--host=$BindAddress", "--port=$Port"
-)
-$process = Start-Process -FilePath $php -ArgumentList $serverArguments -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
+    # Laravel's Windows ServeCommand starts a second PHP process and filters
+    # inherited environment variables. AppServiceProvider explicitly allows
+    # PHP_INI_SCAN_DIR through so the actual HTTP worker loads these limits.
+    $defaultScanDirectory = (& $php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;' 2>$null | Out-String).Trim()
+    $scanDirectories = @()
+    if (-not [string]::IsNullOrWhiteSpace($previousPhpIniScanDirectory)) {
+        $scanDirectories += $previousPhpIniScanDirectory
+    } elseif (-not [string]::IsNullOrWhiteSpace($defaultScanDirectory)) {
+        $scanDirectories += $defaultScanDirectory
+    } else {
+        # An empty first path element preserves PHP's compiled-in scan directory.
+        $scanDirectories += ''
+    }
+    $scanDirectories += $runtimeIniDirectory
+    $env:PHP_INI_SCAN_DIR = $scanDirectories -join ';'
+
+    $serverArguments = @('artisan', 'serve', "--host=$BindAddress", "--port=$Port")
+    $process = Start-Process -FilePath $php -ArgumentList $serverArguments -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
 } finally {
     if ($SecureCookies) {
         [Environment]::SetEnvironmentVariable('SESSION_SECURE_COOKIE', $previousSecureCookieValue, 'Process')
     }
+    [Environment]::SetEnvironmentVariable('PHP_INI_SCAN_DIR', $previousPhpIniScanDirectory, 'Process')
 }
 
 function Test-ZazuTcpEndpoint {
@@ -590,6 +627,8 @@ if (-not $ready) {
     }
     throw ("Zazu did not open port $Port within 45 seconds. Startup output:{0}{1}" -f [Environment]::NewLine, $details)
 }
+
+Set-Content -Path $runtimeSignaturePath -Value $runtimeSignature -Encoding ASCII
 
 Write-Host "Zazu development server is running independently of VS Code."
 Write-Host ("URL: http://{0}:{1}" -f $BindAddress, $Port)
