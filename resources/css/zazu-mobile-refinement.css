@@ -149,10 +149,6 @@
         flex: 1 1 auto;
     }
 
-    /* No-JS recovery: the server-rendered active group must remain reachable. */
-    .zazu-nav-area.is-active > .zazu-nav-flyout {
-        display: block;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
