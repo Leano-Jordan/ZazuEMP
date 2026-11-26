@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#172b3b">
     <meta name="description" content="@yield('description', 'Zazu EMP — event management and business operations.')">
     <title>@yield('title', 'Zazu EMP') · Zazu EMP</title>
-    <style>
+    <style nonce="{{ request()->attributes->get('cspNonce') }}">
         :root {
             color-scheme: light;
             --page: #f4f7f8;
