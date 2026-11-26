@@ -54,11 +54,17 @@ Earlier exact-head runs on commits `66f7392`, `f6a9b3c` and `a3ec152` remain use
 
 Automated offline navigation is now passing. The owner must still accept disconnected cold launch, route isolation, local writes, force-close/restart, reopening phone-local attachments and reconnect reconciliation on the actual Android device. Connected PC/phone operation previously passed; do not repeat that setup.
 
-### 2. Encrypted business archive restore — owner test failed; root stage UNKNOWN
+### 2. Encrypted business archive restore — CLOSED for the Rosscore archive; owner-accepted
 
-On 2026-11-23 the Founder verified an installation backup and a business archive. The encrypted business archive was attempted in a disposable empty workspace and failed with “archive failed to load”; a later SYS-002/429 was rate limiting, not the proven cause. The first failing stage remains unknown. Preserve the original archive, passphrase and disposable target. Never retry against the live business or weaken the three-attempt throttle. The endpoint is capped at 100 MB upload and the expanded archive at 250 MB; the user interface states both limits. No evidence currently proves either limit caused the failure. Investigate with the original incident-stage logs or safe reproducible fixtures.
+On 2026-11-26 the Founder confirmed that the original **2.20 MB encrypted Rosscore business archive restored successfully through the live Zazu application** and that everything from the backup is present in the restored business workspace. This is the real-world owner acceptance that was previously missing; it supersedes the earlier “owner test failed / root stage UNKNOWN” status for this archive.
 
-The encrypted path uses Sodium secretstream XChaCha20-Poly1305 with Argon2id, private temporary staging, ZIP/manifest allowlisting, business ownership validation and transactional restore. Automated encrypted/legacy archive tests and Windows archive checks pass; these do not reproduce the owner's real archive.
+The correction addressed a confirmed Windows process-boundary defect: PHP upload limits configured on the Artisan parent process were not inherited by Laravel's child HTTP worker. The supported launcher now creates a project-local PHP INI scan file and passes `PHP_INI_SCAN_DIR` through Laravel's Windows server process allowlist, with a runtime signature that triggers restart of an older Zazu worker. The Founder retried after the correction was deployed and the server restarted, then confirmed the live restore and restored contents.
+
+The Founder explicitly clarified that both workspaces were unpopulated. Target occupancy was not the cause of the failure. The empty, unpaired destination requirement remains a deliberate safety contract. The original request-validation incident reference was `3feb3a06-e743-49e7-9a7d-4dc5e77b68a7`; no separate server-log evidence was captured proving the precise historical PHP upload error code, so record the PHP worker configuration defect as the corrected implementation cause, not as a log-confirmed code for that exact request.
+
+The encrypted path uses Sodium secretstream XChaCha20-Poly1305 with Argon2id, private temporary staging, strict ZIP/manifest allowlisting, business ownership validation and transactional restore. Read-only verification, automated encrypted/legacy archive checks and the live owner-confirmed restore now provide complementary evidence. Detailed operator guidance and the acceptance record are in [RELEASE_BACKUP_RESTORE_RUNBOOK.md](../../docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md#founder-confirmed-business-archive-recovery--2026-11-26).
+
+**Separate gate remains OPEN:** installation-wide backup/restore recovery on the intended owner PC is not the same workflow and is not closed by this business-level archive restore.
 
 ### 3. Installation-wide recovery — OPEN
 
@@ -85,7 +91,7 @@ Automated backup/restore, rollback, PostgreSQL recovery smoke, Windows packaging
 ## Execution order — aligned to the binding V1 mandate
 
 1. **Gate 1 — offline continuity and session/device boundaries.** Close current-head CI for the pairing UI and session-transition hardening; continue focused cross-tab, stale-token, logout/account-switch and queued-write checks. Physical Android cold launch, restart, attachments and reconnect remain separate owner acceptance.
-2. **Gate 2 — recovery and installation.** Forensically isolate the prior encrypted business-archive restore failure using safe diagnostics or a disposable reproducible fixture only. Preserve the original archive, passphrase and target; never retry against the live business or weaken throttles. Then complete the intended-PC installation recovery/key-custody drill.
+2. **Gate 2 — recovery and installation.** The Rosscore business archive restore is owner-accepted and closed. Complete the separate intended-PC installation-wide recovery/key-custody drill; do not conflate it with business-level export/import.
 3. **Gate 3 — commercial workflow integrity.** Reconcile the populated quote → acceptance → invoice → payments → purchasing/receiving → actual costs → profit path against records, documents and reports.
 4. **Gate 4 — security, privacy and brand.** Continue adversarial tenant/session/device/file checks; resolve and verify security-result publication; keep the DEC-019 shared-profile risk explicit; obtain POPIA operational and ZAZU name-clearance decisions from the Founder.
 5. **Gate 5 — usability, performance and pilot operations.** Complete human-eye responsive acceptance, supported-hardware baselines, onboarding and release operating instructions.
@@ -231,3 +237,18 @@ Product stability remains the immediate priority. Do not ask the Founder to repe
 **Correction committed to main:** the launcher now creates a project-local PHP INI scan file, passes `PHP_INI_SCAN_DIR` through Laravel's Windows child-process allowlist, and sets the parent environment ordering so the variable is available in `$_ENV`. The HTTPS-only `SESSION_SECURE_COOKIE` override is also explicitly passed through. A runtime signature is written only after HTTP readiness; an older verified Zazu worker without that signature is restarted to apply the new limits. Request validation now reports the active PHP upload/post limit when PHP rejects the body before archive processing. Regression coverage checks the child-process passthrough contract.
 
 **Important verification boundary:** this is a strong code-level root cause for the 2.20 MB upload rejection, not yet proof that the Founder’s exact failed request had `UPLOAD_ERR_INI_SIZE` or exceeded `post_max_size`. The incident reference `3feb3a06-e743-49e7-9a7d-4dc5e77b68a7` belongs to the request-validation stage; its server log diagnostics identify the actual failing field and PHP upload settings. Do not claim the archive was restored until the updated launcher is deployed, the real restore succeeds, and exact-head CI passes.
+
+
+## Founder-confirmed Rosscore business archive restore — 2026-11-26
+
+<badge color="success">OWNER-ACCEPTED — RESTORE SUCCESSFUL</badge>
+
+The Founder confirmed that the original 2.20 MB encrypted Rosscore business archive restored successfully through the live Zazu application and that everything from the backup is present in the restored workspace. The attempt succeeded after the PHP upload configuration correction was deployed and the supported Windows launcher restarted.
+
+Both source and destination workspaces were unpopulated; target occupancy was not the cause. The earlier 2.20 MB upload rejection was consistent with a confirmed defect in which PHP upload limits set on the Artisan parent did not reach Laravel's child HTTP worker. The launcher now supplies a project-local INI scan directory through the child-process environment allowlist and restarts older workers that lack the runtime signature. The exact historical request log did not separately prove the PHP upload error code; preserve that distinction in future incident reporting.
+
+**Closed:** this specific encrypted Rosscore business archive export/import and live restore acceptance.
+
+**Still open:** installation-wide backup/restore recovery on the intended PC; this is a separate recovery scope. The overall release verdict remains NOT READY because other security, physical offline, commercial and legal gates remain open.
+
+The runbook contains the owner acceptance evidence, incident resolution, operational instructions and explicit verification boundary: [Business archive recovery acceptance](../../docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md#founder-confirmed-business-archive-recovery--2026-11-26).
