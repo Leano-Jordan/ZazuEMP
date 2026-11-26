@@ -16,7 +16,7 @@
             --line: #d8e2e8;
             --navy: #172b3b;
             --navy-soft: #213b4e;
-            --teal: #168b91;
+            --teal: #0f6b70;
             --teal-soft: #e6f4f3;
             --warning: #fff5df;
             --warning-line: #e7c77c;
