@@ -16,7 +16,7 @@ Route::post('/sentinel/recovery', [SentinelLocalRecoveryController::class, 'veri
     ->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class)
     ->name('sentinel.local-recovery.verify');
 
-Route::post('/sync/provision', [SyncController::class, 'provision'])->middleware('throttle:30,1');
+Route::post('/sync/provision', [SyncController::class, 'provision'])->middleware('throttle:10,1');
 Route::get('/support/incidents/{requestId}', [IncidentDiagnosticController::class, 'show'])
     ->whereUuid('requestId')
     ->middleware(['signed', 'throttle:20,1'])
