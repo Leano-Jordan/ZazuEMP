@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-26 — Authentication session replay regression (acceptance pending)
+
+- Added feature regressions that replay the original pre-authentication browser cookie after successful login and registration.
+- The expected contract is that the stale cookie is treated as a guest, while the newly rotated authenticated cookie continues to access the workspace.
+- This strengthens the existing database-session rotation/deletion assertions; it does not prove concurrent in-flight request serialization or complete the adversarial authentication audit.
+- Exact-head Laravel, Zazu Quality and Windows checks are running. No PASS is claimed until those workflows finish on the test commit.
+
 ## 2026-11-26 — Public trust foundation and navigation reliability (acceptance pending)
 
 - Added public About, Security, Contact and What's New pages, plus clearly labelled Privacy and Terms pre-publication review copies. Linked the trust surface from the landing-page footer and a shared responsive public layout.
