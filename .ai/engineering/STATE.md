@@ -153,3 +153,8 @@ The initial source audit found no `navigator.storage.persist()`, `persisted()` o
 ## Sidebar UX refinement — 2026-11-26
 
 The persistent sidebar context has been simplified without changing navigation architecture: the derived business mix is a compact, low-emphasis summary; workspace identity is integrated into the existing account trigger; the standalone workspace card is removed. Account actions remain in the existing popover. All five permission-gated navigation groups and responsive interaction contracts remain unchanged. Current visual change requires exact-head Laravel, quality and responsive browser checks before acceptance.
+
+
+## Navigation acceptance — 2026-11-26
+
+Desktop navigation has two modes: expanded labelled sidebar and collapsed icon rail. Both expose all five permission-filtered groups through anchored contextual panels; parent activation never navigates. No desktop nav-list scrolling. Phone/tablet use the full drawer and tap accordion. Finance > Advanced Search opens the existing search page and its advanced filters. The new interaction model requires fresh CI and viewport E2E verification before acceptance.
