@@ -327,7 +327,11 @@ test('sibling browser tabs follow the active authenticated identity', async ({ p
     await expect(sibling.locator('body')).toHaveAttribute('data-zazu-user-id', String(firstUser));
 
     await page.goto('/');
-    await page.locator('form[action$="/logout"]').evaluate(form => form.requestSubmit());
+    await page.evaluate(() => {
+        const form = document.querySelector('form[action$="/logout"]');
+        if (!form) throw new Error('Logout form was not found');
+        form.requestSubmit();
+    });
     await expect(page.locator('body')).not.toHaveAttribute('data-zazu-user-id', String(firstUser));
 
     await login(page, MANAGER_EMAIL, ROLE_PASSWORD);
