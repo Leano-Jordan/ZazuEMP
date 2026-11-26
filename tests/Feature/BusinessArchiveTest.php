@@ -679,9 +679,11 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame($target->id, $restoredEvent->business_id);
         $this->assertSame('Archive Source', $target->fresh()->name);
         $this->assertSame('private', $attachment->disk);
+        $this->assertStringEndsWith('.txt', $attachment->path);
         $this->assertSame('private archive attachment bytes', Storage::disk('private')->get($attachment->path));
 
         $restoredCapability = BusinessCapability::query()->where('business_id', $target->id)->firstOrFail();
+        $this->assertStringEndsWith('.png', $restoredCapability->image_path);
         $this->assertTrue(Storage::disk('public')->exists($restoredCapability->image_path));
         $this->assertSame('public catalogue image bytes', Storage::disk('public')->get($restoredCapability->image_path));
         $this->assertDatabaseMissing('customers', [
