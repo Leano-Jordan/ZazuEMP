@@ -70,7 +70,7 @@ Automated backup/restore, rollback, PostgreSQL recovery smoke, Windows packaging
 - Populated quote-to-payment-to-actual-cost/profit reconciliation remains open.
 - POPIA operational controls and ZAZU name clearance remain open.
 - **Symfony dependency security — RESOLVED:** the five advisories previously reported against Symfony 7.4.23 / 8.0.15 were addressed by lockfile update commit `43e69e6` to Symfony **7.4.24**. Composer security audit passed in Zazu Quality runs `45787154093` and `45787226126`; no advisory exception or suppression was added.
-- PHPMD/Psalm SARIF publication still fails; analysis steps ran, but do not claim published results. SonarCloud is skipped.
+- PHPMD passed on current verified head `e564ec24`. Psalm taint analysis and SARIF publication passed on earlier candidate `cb17492e`, but were not rerun on the current source head; do not report that as current-head evidence. SonarCloud is skipped.
 - No independent penetration test has been completed; automated scanners and source review are not a penetration test.
 
 ## Cleanup completed on main
