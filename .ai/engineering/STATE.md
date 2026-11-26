@@ -163,3 +163,8 @@ Desktop navigation has two modes: expanded labelled sidebar and collapsed icon r
 ## CI regression root causes — 2026-11-26
 
 Three Laravel acceptance failures were traced to navigation integration: accessible-name drift on the Work trigger, removal of the account's Signed in context label, and a duplicated canonical .zazu-nav-area-title CSS rule. Corrected at source. The collapse initializer was also present but not invoked by the main initializer; it is now wired into startup. Re-run Laravel, coverage, and offline browser acceptance before declaring green.
+
+
+## Navigation presentation refinement — 2026-11-26
+
+Expanded desktop submenu presentation is inline/indented; collapsed desktop uses anchored contextual panels. Mobile/tablet retain inline drawer accordions. One semantic nav tree and shared parent trigger logic serve all viewports. Browser regression now covers collapsed desktop click-through and confirms parent activation does not navigate.
