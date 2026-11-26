@@ -2986,78 +2986,79 @@ function setupZazuOfflineDirectoryViews() {
     };
 
     let offlineStorageErrorMessage = '';
-    let offlineStorageProtectionRequestBound = false;
     const renderOfflineStorageProtection = async () => {
-        const panel = document.querySelector('[data-zazu-offline-storage]');
-        const statusNode = panel?.querySelector('[data-zazu-offline-storage-status]');
-        const usageNode = panel?.querySelector('[data-zazu-offline-storage-usage]');
-        const errorNode = panel?.querySelector('[data-zazu-offline-storage-error]');
-        const requestButton = panel?.querySelector('[data-zazu-offline-storage-request]');
         const offline = window.ZazuOffline;
+        const panels = Array.from(document.querySelectorAll('[data-zazu-offline-storage]'));
+        if (!offline?.getStorageProtectionStatus || !panels.length) return;
 
-        if (!panel || !statusNode || !usageNode || !requestButton || !offline?.getStorageProtectionStatus) return;
+        await Promise.all(panels.map(async panel => {
+            const statusNode = panel.querySelector('[data-zazu-offline-storage-status]');
+            const usageNode = panel.querySelector('[data-zazu-offline-storage-usage]');
+            const errorNode = panel.querySelector('[data-zazu-offline-storage-error]');
+            const requestButton = panel.querySelector('[data-zazu-offline-storage-request]');
+            if (!statusNode || !usageNode || !requestButton) return;
 
-        if (!offlineStorageProtectionRequestBound) {
-            offlineStorageProtectionRequestBound = true;
-            requestButton.addEventListener('click', () => {
-                if (requestButton.disabled || !window.ZazuOffline?.requestStorageProtection) return;
+            if (requestButton.dataset.zazuStorageRequestBound !== 'true') {
+                requestButton.dataset.zazuStorageRequestBound = 'true';
+                requestButton.addEventListener('click', () => {
+                    if (requestButton.disabled || !window.ZazuOffline?.requestStorageProtection) return;
 
-                requestButton.disabled = true;
-                statusNode.textContent = 'Requesting browser storage protection…';
-                usageNode.textContent = '';
+                    requestButton.disabled = true;
+                    statusNode.textContent = 'Requesting browser storage protection…';
+                    usageNode.textContent = '';
 
-                // This call invokes StorageManager.persist() synchronously
-                // before its first await, preserving the button activation.
-                const request = window.ZazuOffline.requestStorageProtection();
-                request.then(result => {
-                    if (!panel.isConnected) return;
-                    const message = result.requestResult === 'granted'
-                        ? 'Persistent storage is enabled for this browser.'
-                        : result.requestResult === 'denied'
-                            ? 'The browser did not grant persistent storage. Offline work can continue, but automatic cleanup remains possible.'
-                            : result.requestResult === 'unsupported'
-                                ? 'This browser does not support persistent storage requests.'
-                                : result.error || 'The browser could not confirm storage protection.';
-                    statusNode.textContent = message;
-                    usageNode.textContent = formatOfflineStorageEstimate(result);
-                    requestButton.hidden = result.status === 'granted' || !result.requestSupported;
-                    requestButton.disabled = false;
-                }).catch(() => {
-                    if (!panel.isConnected) return;
-                    statusNode.textContent = 'The browser could not confirm storage protection.';
-                    requestButton.disabled = false;
+                    // This call invokes StorageManager.persist() synchronously
+                    // before its first await, preserving the button activation.
+                    const request = window.ZazuOffline.requestStorageProtection();
+                    request.then(result => {
+                        if (!panel.isConnected) return;
+                        statusNode.textContent = result.requestResult === 'granted'
+                            ? 'Persistent storage is enabled for this browser.'
+                            : result.requestResult === 'denied'
+                                ? 'The browser did not grant persistent storage. Offline work can continue, but automatic cleanup remains possible.'
+                                : result.requestResult === 'unsupported'
+                                    ? 'This browser does not support persistent storage requests.'
+                                    : result.error || 'The browser could not confirm storage protection.';
+                        usageNode.textContent = formatOfflineStorageEstimate(result);
+                        requestButton.hidden = result.status === 'granted' || !result.requestSupported;
+                        requestButton.disabled = false;
+                    }).catch(() => {
+                        if (!panel.isConnected) return;
+                        statusNode.textContent = 'The browser could not confirm storage protection.';
+                        requestButton.disabled = false;
+                    });
                 });
-            });
-        }
-
-        requestButton.disabled = true;
-        try {
-            const result = await offline.getStorageProtectionStatus();
-            if (!panel.isConnected) return;
-
-            statusNode.textContent = result.status === 'granted'
-                ? 'Persistent storage is enabled for this browser.'
-                : result.status === 'not_granted'
-                    ? 'Persistent storage has not been granted. The browser may automatically clear this device’s saved data under storage pressure.'
-                    : result.status === 'unsupported'
-                        ? 'This browser does not support persistent storage requests.'
-                        : 'Persistent storage status could not be confirmed.';
-
-            usageNode.textContent = formatOfflineStorageEstimate(result);
-            if (errorNode) {
-                errorNode.textContent = offlineStorageErrorMessage;
-                errorNode.hidden = !offlineStorageErrorMessage;
             }
 
-            requestButton.hidden = result.status === 'granted' || !result.requestSupported;
-            requestButton.disabled = false;
-        } catch {
-            if (!panel.isConnected) return;
-            statusNode.textContent = 'Storage protection status is unavailable.';
-            usageNode.textContent = 'Offline work remains available. Keep a separate business backup.';
-            requestButton.hidden = false;
-            requestButton.disabled = false;
-        }
+            requestButton.disabled = true;
+            try {
+                const result = await offline.getStorageProtectionStatus();
+                if (!panel.isConnected) return;
+
+                statusNode.textContent = result.status === 'granted'
+                    ? 'Persistent storage is enabled for this browser.'
+                    : result.status === 'not_granted'
+                        ? 'Persistent storage has not been granted. The browser may automatically clear this device’s saved data under storage pressure.'
+                        : result.status === 'unsupported'
+                            ? 'This browser does not support persistent storage requests.'
+                            : 'Persistent storage status could not be confirmed.';
+
+                usageNode.textContent = formatOfflineStorageEstimate(result);
+                if (errorNode) {
+                    errorNode.textContent = offlineStorageErrorMessage;
+                    errorNode.hidden = !offlineStorageErrorMessage;
+                }
+
+                requestButton.hidden = result.status === 'granted' || !result.requestSupported;
+                requestButton.disabled = false;
+            } catch {
+                if (!panel.isConnected) return;
+                statusNode.textContent = 'Storage protection status is unavailable.';
+                usageNode.textContent = 'Offline work remains available. Keep a separate business backup.';
+                requestButton.hidden = false;
+                requestButton.disabled = false;
+            }
+        }));
     };
 
     const render = () => {
