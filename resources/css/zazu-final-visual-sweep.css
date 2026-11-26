@@ -4016,9 +4016,7 @@ from { opacity: 0; transform: translateY(4px); }
     color: var(--zazu-primary-light);
 }
 
-.zazu-nav-flyout {
-    z-index: 180;
-}
+/* Navigation stacking is owned by app.css. */
 /* Never let the dashboard collapse into a near-white slab. */
 .zazu-dash-hero,
 .zazu-dash-surface {
@@ -7006,146 +7004,7 @@ body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
 }
 
 
-/* DIRECTOR 2026-11-23 — predictable accordion navigation.
-   Flyouts were overlapping adjacent destinations and the active Work group
-   was not retained after page navigation. Keep groups in the sidebar flow. */
-.zazu-sidebar {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-.zazu-nav {
-    flex: 0 0 auto;
-    min-height: 0;
-    overflow: visible;
-}
-.zazu-nav-hierarchical,
-.zazu-nav-hierarchy {
-    min-width: 0;
-    width: 100%;
-}
-.zazu-nav-area {
-    position: static;
-    width: 100%;
-}
-.zazu-nav-area-trigger {
-    width: 100%;
-    min-height: 48px;
-    padding-inline: 13px;
-    justify-content: space-between;
-}
-.zazu-nav-area-title {
-    display: inline-flex;
-    align-items: center;
-    gap: 11px;
-    min-width: 0;
-}
-.zazu-nav-icon,
-.zazu-sidebar .zazu-icon {
-    width: 23px;
-    height: 23px;
-    flex: 0 0 23px;
-    stroke-width: 1.9;
-}
-.zazu-nav-flyout {
-    position: static;
-    display: none;
-    max-height: none;
-    overflow: visible;
-    overscroll-behavior: auto;
-    width: auto;
-    margin: 3px 0 9px 14px;
-    padding: 4px 0 4px 12px;
-    border: 0;
-    border-left: 2px solid color-mix(in srgb, var(--zazu-primary) 35%, var(--zazu-sidebar-muted));
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: none;
-}
-.zazu-nav-area.is-open > .zazu-nav-flyout {
-    display: block;
-}
-.zazu-nav-area:not(.is-open):hover > .zazu-nav-flyout {
-    display: none;
-}
-.zazu-nav-flyout-links {
-    display: grid;
-    gap: 3px;
-}
-.zazu-nav-flyout .zazu-nav-link {
-    min-height: 43px;
-    padding-inline: 12px;
-    font-size: 13px;
-}
-.zazu-nav-area-trigger:focus-visible,
-.zazu-nav-flyout .zazu-nav-link:focus-visible {
-    outline: 2px solid var(--zazu-focus);
-    outline-offset: 2px;
-}
-@media (max-width: 850px) {
-    .zazu-nav {
-        flex: 0 0 auto;
-        min-height: 0;
-        overflow: visible;
-    }
-    .zazu-nav-flyout {
-        position: static;
-        display: none;
-        width: auto;
-        margin: 2px 0 8px 12px;
-        padding: 4px 0 4px 11px;
-        border: 0;
-        border-left: 2px solid color-mix(in srgb, var(--zazu-primary) 35%, var(--zazu-sidebar-muted));
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
-    .zazu-nav-area.is-open > .zazu-nav-flyout {
-        display: block;
-    }
-    .zazu-nav-area-trigger {
-        min-height: 50px;
-    }
-    .zazu-nav-flyout .zazu-nav-link {
-        min-height: 44px;
-    }
-}
-
-/* Collapsed rail panels are anchored to their trigger, not the sidebar root.
-   The final group opens upward so its full submenu remains inside the viewport. */
-@media (min-width: 851px) {
-    body.zazu-sidebar-collapsed .zazu-nav-area {
-        position: relative;
-    }
-
-    body.zazu-sidebar-collapsed .zazu-nav-flyout {
-        position: absolute;
-        left: calc(100% + 1px);
-        top: 0;
-        width: 244px;
-        margin: 0;
-        padding: 9px;
-        border: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 22%, var(--zazu-sidebar));
-        border-radius: 0 12px 12px 12px;
-        background: var(--zazu-sidebar-surface);
-        box-shadow: 12px 18px 36px color-mix(in srgb, #000 22%, transparent);
-        max-height: none;
-        overflow: visible;
-    }
-
-    body.zazu-sidebar-collapsed .zazu-nav-hierarchy > .zazu-nav-area:last-child > .zazu-nav-flyout {
-        top: auto;
-        bottom: 0;
-        border-radius: 12px 0 12px 12px;
-    }
-}
+/* Shared navigation geometry and state are owned by resources/css/app.css. */
 
 /* DIRECTOR 2026-11-23 — month board remains complete on narrow screens.
    Keep all seven days in a horizontally scrollable calendar viewport rather
