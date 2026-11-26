@@ -185,7 +185,7 @@ The client must not acknowledge a server mutation by deleting its local queue en
 
 A transaction abort must leave both stores unacknowledged; a commit must leave both stores reconciled. Retries remain protected by the server mutation idempotency key. Do not restore a separate post-acknowledgement state-only write.
 
-**Automated evidence:** source commit `4cd9b5f`; browser regression test `2e3bca4`; feature-contract test/helper commits `f0de754` and `76868dc`. Exact checkpoint `76868dc` passed 75 desktop browser journeys, 765 Laravel tests (1 skipped, 5,471 assertions), PostgreSQL migration/recovery smoke, PHPMD and the Windows install/archive checks. The browser test injects a storage failure boundary to ensure the acknowledgement path does not rely on a second state-only transaction. The latest `4a5bedf` test-only timing refinement is awaiting exact-head rerun. These results do not replace a physical abrupt-termination/restart/reconnect test.
+**Automated evidence:** source commit `4cd9b5f`; browser regression test `2e3bca4`; feature-contract test/helper commits `f0de754` and `76868dc`. Exact checkpoint `76868dc` passed 75 desktop browser journeys, 765 Laravel tests (1 skipped, 5,471 assertions), PostgreSQL migration/recovery smoke, PHPMD and the Windows install/archive checks. The browser test injects a storage failure boundary to ensure the acknowledgement path does not rely on a second state-only transaction. The `4a5bedf` test-only timing refinement passed on exact-head rerun. These results do not replace a physical abrupt-termination/restart/reconnect test.
 
 ### Browser-managed storage retention
 
