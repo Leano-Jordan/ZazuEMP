@@ -305,6 +305,13 @@
             <span class="zazu-dash-kicker">Workspace status</span>
             <strong data-zazu-offline-overview-status>Your saved workspace is ready on this device</strong>
             <span>Reconnect to send queued changes and refresh server data.</span>
+            <div class="zazu-offline-storage-protection mt-3" data-zazu-offline-storage>
+                <span class="zazu-dash-kicker">Device storage protection</span>
+                <strong data-zazu-offline-storage-status>Checking browser storage protection…</strong>
+                <span data-zazu-offline-storage-usage></span>
+                <p class="zazu-card-description">Persistent storage can reduce automatic browser cleanup. It cannot prevent someone from clearing this browser's site data.</p>
+                <button type="button" class="zazu-btn zazu-btn-secondary mt-2" data-zazu-offline-storage-request hidden>Request storage protection</button>
+            </div>
         </article>
     </section>
     <section class="zazu-dash-surface" data-zazu-offline-unavailable hidden aria-labelledby="zazu-offline-unavailable-title">
