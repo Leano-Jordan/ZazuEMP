@@ -7,7 +7,7 @@
 
 ## Executive position
 
-The current architecture has several sound controls: session ID regeneration at login and registration, session invalidation on logout, auth.session middleware on the main authenticated workspace, one-use expiring hashed pairing codes, random device bearer tokens stored server-side as SHA-256 hashes, device active/expiry checks, operation-level device revalidation, business-scoped sync queries, and explicit offline queue preservation across web logout and workspace switching.
+The current architecture has several sound controls: session ID regeneration at login and registration, session invalidation on logout, auth.session middleware on the main authenticated workspace, one-use expiring pairing codes stored as application-key-derived HMAC digests in a unique indexed column, random device bearer tokens stored server-side as SHA-256 hashes, device active/expiry checks, operation-level device revalidation, business-scoped sync queries, and explicit offline queue preservation across web logout and workspace switching.
 
 That is not sufficient evidence to call the system hardened. The offline credential is deliberately stored unencrypted in business-scoped IndexedDB, so the unlocked browser profile and same-origin JavaScript remain trusted. Pairing protection is currently an IP-based 30-per-minute limit on the public provisioning endpoint; distributed guessing and expensive candidate scanning need adversarial validation. Account/session transition races and owner-removal semantics need targeted tests.
 
@@ -56,17 +56,17 @@ No exploit against a live system was attempted. No production data was accessed 
 
 ### Verified controls
 
-- Pairing code is generated with random_int(10000000, 99999999) (eight decimal digits).
+- Pairing code is generated with `random_int(100_000_000_000, 999_999_999_999)` (12 decimal digits).
 - Default lifetime is 10 minutes; owner may request 5–30 minutes.
-- Only the password hash of the pairing code is stored.
-- Provisioning endpoint is public by design and has throttle:30,1 (IP-based Laravel limiter).
-- Provisioning locks pending candidates, checks expiry and hash, changes status to active and nulls pairing hash/expiry in the same database transaction. A consumed code is therefore not reusable after successful provisioning.
+- Only an HMAC-SHA256 digest derived from `APP_KEY` with a Zazu-specific purpose string is stored in a dedicated, unique indexed column; the raw code is returned once to the owner.
+- Provisioning endpoint is public by design and has an IP-based `throttle:10,1` limiter.
+- Provisioning performs a direct indexed lookup for the exact digest, locks only the matching device, checks expiry, then clears the digest and expiry while activating the device in the same database transaction. A consumed code is therefore not reusable after successful provisioning.
 - Pairing and sync API responses receive no-store/private cache headers.
 - Successful pairing returns a 64-character random bearer; only SHA-256 hash is stored.
 
 ### Preliminary risk requiring adversarial validation
 
-The current throttle is per source IP, not per pairing code, pending device or business. A distributed attacker can obtain more attempts from multiple source IPs. Each invalid request scans all currently pending, unexpired devices and performs a password-hash check for each candidate; this can become a resource-amplification vector as pending pairings accumulate. This is a source-derived risk hypothesis, not a demonstrated takeover.
+The previous all-pending-device scan and per-candidate password-hash work have been removed. The indexed digest lookup bounds each provisioning request to one candidate row and avoids holding locks across unrelated pending pairings. The 12-digit code and tighter per-IP cap materially raise online guessing cost; a distributed volumetric attack remains a residual availability question, not a demonstrated takeover.
 
 ### Open adversarial checks
 
@@ -137,9 +137,9 @@ The current throttle is per source IP, not per pairing code, pending device or b
 |---|---|---|
 | Session fixation / hijacking | Strong baseline controls present; concurrent transition behaviour not yet proven | OPEN |
 | Browser credential leakage / XSS / backups | Known HIGH residual risk: unencrypted IndexedDB bearer and business data | OPEN |
-| Pairing brute force / takeover | Eight-digit one-use code, 10-minute default, IP throttle; distributed guessing and scan amplification need testing | OPEN |
+| Pairing brute force / takeover | 12-digit code, APP_KEY-derived HMAC digest, single-row locked lookup and 10/minute IP cap; independent race/load testing remains | OPEN |
 | Cross-business substitution / stale replay | Strong business scoping and operation-level credential guards present | OPEN |
 | Password reset / owner removal / revocation | Reset revokes devices for current owner memberships; member-removal lifecycle not found in inspected routes | OPEN |
 | Offline logout / account switching / queued work | Business-scoped queue preservation and separate credential/session boundaries documented | OPEN |
 
-**No overall security PASS is issued.** The next engineering gate is to add focused adversarial regression tests for pairing abuse, concurrent account/session transitions, reset/revocation races, cross-business identifier substitution, and offline multi-tab account changes. Findings must be classified by demonstrated exploitability, impact and affected trust boundary before implementation decisions are made.
+**No overall security PASS is issued.** Pairing lookup and credential invalidation are hardened in source; exact-head Laravel, migration, browser and static-security workflows must pass before this implementation slice is accepted. Remaining gates include concurrent pairing execution, distributed abuse/load measurement, reset/revocation races, cross-business identifier substitution, hostile-content/XSS testing, backup review and offline multi-tab account changes. Findings must be classified by demonstrated exploitability, impact and affected trust boundary before implementation decisions are made.
