@@ -34,6 +34,7 @@ class SidebarNavigationPresentationTest extends TestCase
         $this->assertIsString($search);
         $this->assertStringContainsString('data-sidebar-collapse-toggle', $layout);
         $this->assertStringContainsString('zazu-sidebar-collapsed', $styles);
+        $this->assertStringContainsString('body.zazu-sidebar-collapsed .zazu-nav-area.is-open', $styles);
         $this->assertStringContainsString('setupZazuSidebarCollapse', $scripts);
         $this->assertStringContainsString('Advanced Search', $layout);
         $this->assertStringContainsString('Advanced Search', $search);
