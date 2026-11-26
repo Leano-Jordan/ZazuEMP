@@ -124,6 +124,11 @@ final class BusinessArchiveService
             $this->reportRestoreStage($onStage, 'archive_envelope_validation');
             [$manifest, $data, $definitions] = $this->readArchiveEnvelope($zip);
 
+            // Reject an occupied destination before staging potentially large file
+            // payloads. restoreRows repeats this check under the business lock.
+            $this->reportRestoreStage($onStage, 'target_workspace_preflight');
+            $this->assertTargetIsEmpty($target, $definitions);
+
             $this->reportRestoreStage($onStage, 'attachment_payload_staging');
             $filePayloads = $this->files->readArchiveFilePayloads($zip, $manifest, $data);
 
@@ -413,7 +418,7 @@ final class BusinessArchiveService
         ] as $syncTable) {
             if (Schema::hasTable($syncTable)
                 && DB::table($syncTable)->where('business_id', $target->id)->exists()) {
-                throw new RuntimeException('Restore stopped: the target workspace is not empty or still has offline sync state. Restore before pairing devices.');
+                throw new RuntimeException('Restore stopped: this workspace still has offline device or sync state. Choose a clean, unpaired workspace; existing sync history is never overwritten.');
             }
         }
 
@@ -433,7 +438,7 @@ final class BusinessArchiveService
             }
             $rows = $query->get()->map(fn ($row): array => (array) $row)->all();
             if ($rows !== []) {
-                throw new RuntimeException('Restore stopped: the selected business workspace is not empty.');
+                throw new RuntimeException('Restore stopped: this workspace already contains business records. Choose a newly created empty workspace; Zazu will not overwrite or merge existing records.');
             }
             $targetRows[$table] = $rows;
         }
