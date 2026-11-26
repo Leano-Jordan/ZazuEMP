@@ -85,8 +85,8 @@
                 <div class="zazu-nav-hierarchy">
                     @if($business)
                     <div class="zazu-nav-area {{ request()->routeIs('dashboard','work.*','customers.*','calendar.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
-                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('dashboard','work.*','customers.*','calendar.*') ? 'true' : 'false' }}" aria-label="Work" aria-controls="zazu-nav-workspace"><span class="zazu-nav-area-title"><x-icon name="briefcase" size="18" class="zazu-nav-icon" /><span> Work</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
-                        <div class="zazu-nav-flyout" id="zazu-nav-workspace" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
+                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('dashboard','work.*','customers.*','calendar.*') ? 'true' : 'false' }}" aria-label="Work" title="Work" aria-controls="zazu-nav-workspace"><span class="zazu-nav-area-title"><x-icon name="briefcase" size="18" class="zazu-nav-icon" /><span> Work</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
+                        <div class="zazu-nav-flyout" id="zazu-nav-workspace" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">Work</div><div class="zazu-nav-flyout-links">
                             <a href="{{ route('dashboard') }}" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>Dashboard</a>
                             @if($can('work.view'))<a href="{{ route('work.index') }}" class="zazu-nav-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if(request()->routeIs('work.*')) aria-current="page" @endif>Jobs</a>@endif
                             @if($can('customers.view'))<a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" @if(request()->routeIs('customers.*')) aria-current="page" @endif>Customers</a>@endif
@@ -94,15 +94,15 @@
                         </div></div>
                     </div>
                     <div class="zazu-nav-area {{ request()->routeIs('capabilities.*','quotes.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
-                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('capabilities.*','quotes.*') ? 'true' : 'false' }}" aria-label="Sales" aria-controls="zazu-nav-sales"><span class="zazu-nav-area-title"><x-icon name="receipt" size="18" class="zazu-nav-icon" /><span> Sales</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
-                        <div class="zazu-nav-flyout" id="zazu-nav-sales" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
+                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('capabilities.*','quotes.*') ? 'true' : 'false' }}" aria-label="Sales" title="Sales" aria-controls="zazu-nav-sales"><span class="zazu-nav-area-title"><x-icon name="receipt" size="18" class="zazu-nav-icon" /><span> Sales</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
+                        <div class="zazu-nav-flyout" id="zazu-nav-sales" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">Sales</div><div class="zazu-nav-flyout-links">
                             @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" class="zazu-nav-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Services &amp; prices</a>@endif
                             @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" class="zazu-nav-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}">Quotes</a>@endif
                         </div></div>
                     </div>
                     <div class="zazu-nav-area {{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
-                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'true' : 'false' }}" aria-label="Resources" aria-controls="zazu-nav-resources"><span class="zazu-nav-area-title"><x-icon name="package" size="18" class="zazu-nav-icon" /><span> Resources</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
-                        <div class="zazu-nav-flyout" id="zazu-nav-resources" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
+                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'true' : 'false' }}" aria-label="Resources" title="Resources" aria-controls="zazu-nav-resources"><span class="zazu-nav-area-title"><x-icon name="package" size="18" class="zazu-nav-icon" /><span> Resources</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
+                        <div class="zazu-nav-flyout" id="zazu-nav-resources" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">Resources</div><div class="zazu-nav-flyout-links">
                             @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}">Purchasing</a>@endif
                             @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" class="zazu-nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">Suppliers</a>@endif
                             @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" class="zazu-nav-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}">Inventory</a>@endif
@@ -110,8 +110,8 @@
                         </div></div>
                     </div>
                     <div class="zazu-nav-area {{ request()->routeIs('finance.*','search.*','reports.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
-                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('finance.*','search.*','reports.*') ? 'true' : 'false' }}" aria-label="Finance" aria-controls="zazu-nav-money"><span class="zazu-nav-area-title"><x-icon name="wallet" size="18" class="zazu-nav-icon" /><span> Finance</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
-                        <div class="zazu-nav-flyout" id="zazu-nav-money" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
+                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('finance.*','search.*','reports.*') ? 'true' : 'false' }}" aria-label="Finance" title="Finance" aria-controls="zazu-nav-money"><span class="zazu-nav-area-title"><x-icon name="wallet" size="18" class="zazu-nav-icon" /><span> Finance</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
+                        <div class="zazu-nav-flyout" id="zazu-nav-money" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">Finance</div><div class="zazu-nav-flyout-links">
                             @if($can('finance.view'))<a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}">Finance</a>@endif
                             <a href="{{ route('search.index') }}" class="zazu-nav-link {{ request()->routeIs('search.*') ? 'active' : '' }}">Advanced Search</a>
                             @if($can('reports.view'))<a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">Reports</a>@endif
@@ -120,8 +120,8 @@
                     @endif
                     @if($isOwner || $isPlatformAdmin)
                     <div class="zazu-nav-area {{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*','exports.*') ? 'is-active is-open' : '' }}" data-zazu-nav-area>
-                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*','exports.*') ? 'true' : 'false' }}" aria-label="System" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title"><x-icon name="settings" size="18" class="zazu-nav-icon" /><span> System</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
-                        <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
+                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*','exports.*') ? 'true' : 'false' }}" aria-label="System" title="System" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title"><x-icon name="settings" size="18" class="zazu-nav-icon" /><span> System</span></span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
+                        <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-heading">System</div><div class="zazu-nav-flyout-links">
                             @if($isOwner)
                                 <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">Owner Admin</a>
                                 <a href="{{ route('exports.index') }}" class="zazu-nav-link {{ request()->routeIs('exports.*') ? 'active' : '' }}">Data export &amp; recovery</a>
