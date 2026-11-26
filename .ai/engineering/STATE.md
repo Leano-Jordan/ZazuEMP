@@ -134,6 +134,8 @@ This is automated transaction-level evidence, not a simulated physical power-cut
 
 ## Browser-managed local storage retention — OPEN
 
+**Tracked as:** CASE-ZAZU-0052 / ENG-DATA-007. This is a platform-retention exposure identified by source audit, not a reported data-loss incident.
+
 Source audit found IndexedDB and Cache API usage but no `navigator.storage.persist()`, `persisted()` or `estimate()` handling. IndexedDB transaction durability protects an individual committed write; it does not itself prevent the browser from evicting an origin's storage bucket under storage pressure. Browser storage defaults to best-effort unless persistence is granted; users can still explicitly clear site data. See [MDN storage quotas and eviction criteria](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria) and [MDN StorageManager](https://developer.mozilla.org/en-US/docs/Web/API/StorageManager).
 
 **Required next engineering slice:** detect/report persistence grant state where supported, request persistent storage at an appropriate trusted-device/pairing interaction, inspect quota/usage, and make declined/unsupported persistence visible without blocking the user from working. Never imply a persistence request guarantees against explicit user deletion. Business export/import and full recovery remain separate safeguards.
