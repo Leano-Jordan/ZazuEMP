@@ -54,7 +54,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 configurable: true,
                 value: {
                     persisted: async () => false,
-                    estimate: async () => ({ usage: 2 * 1024 * 1024, quota: 100 * 1024 * 1024 }),
+                    estimate: async () => ({ usage: 95 * 1024 * 1024, quota: 100 * 1024 * 1024 }),
                     persist: () => {
                         window.__zazuPersistRequestCount += 1;
                         return Promise.resolve(false);
@@ -71,7 +71,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const request = workspace.locator('[data-zazu-offline-storage-request]');
 
         await expect(status).toContainText('Persistent storage has not been granted');
-        await expect(usage).toHaveText('Using 2.00 MB of an estimated 100 MB browser storage.');
+        await expect(usage).toHaveText('Using 95.0 MB of an estimated 100 MB browser storage. Storage is nearing estimated capacity. Free device space without clearing Zazu site data before adding large attachments.');
         await expect(request).toBeVisible();
 
         await request.click();
