@@ -64,6 +64,7 @@ No exploit against a live system was attempted. No production data was accessed 
 - Regression tests cover 12-digit issuance, digest-only persistence, one-code-to-one-device lookup, one-use consumption, expiry cleanup and the 10-attempt per-IP limiter.
 - Pairing and sync API responses receive no-store/private cache headers.
 - Successful pairing returns a 64-character random bearer; only SHA-256 hash is stored.
+- SyncDevice hides credential metadata and the pairing digest from model serialization, reducing accidental exposure through future JSON responses.
 
 ### Preliminary risk requiring adversarial validation
 
