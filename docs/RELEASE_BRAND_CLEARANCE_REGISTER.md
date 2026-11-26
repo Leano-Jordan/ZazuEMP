@@ -41,3 +41,14 @@ The repository's earlier commercial audit also recorded public South African use
 **OPEN / HIGH RISK.**
 
 No engineering change is justified by the current evidence. This is an external commercial/legal decision gate.
+
+
+## Founder decision — 2026-11-26
+
+The Founder has **not approved ZAZU as the final product name** and has made no decision to retain it or rename. The Founder personally owns the current software IP and is the intended owner of any brand rights for now; Rosscore Labs is not registered and is not the current owner. The Founder intends South African protection with international expansion in mind, but no filing, paid search, professional engagement, domain/social registration or other brand spend is authorised now. No ZAZU domain, social account, logo registration or trade-mark application has been secured by the Founder.
+
+The working descriptor **Event & Business Operations** and promise **Run every job. Control every cost. Keep working.** remain acceptable positioning only; they do not settle the product name.
+
+**Current disposition:** OPEN / HIGH RISK. Keep the ZAZU name provisional and preserve a fallback name. Prior collision evidence remains relevant. The Founder is prioritising product stability before registration spend. Do not claim clearance or initiate a filing without a later Founder decision.
+
+See [Founder Legal and Brand Decisions](FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md).
