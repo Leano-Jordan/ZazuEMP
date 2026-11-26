@@ -17,6 +17,12 @@ class BusinessArchiveMalformedUploadTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_local_php_worker_receives_runtime_upload_and_secure_cookie_overrides(): void
+    {
+        $this->assertContains('PHP_INI_SCAN_DIR', ServeCommand::$passthroughVariables);
+        $this->assertContains('SESSION_SECURE_COOKIE', ServeCommand::$passthroughVariables);
+    }
+
     public function test_malformed_business_archive_is_returned_as_validation_error_without_mutation(): void
     {
         $this->signInAsOwner();
