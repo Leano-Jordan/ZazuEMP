@@ -4,7 +4,7 @@
 **Authority:** Founder-directed execution; Founder retains final authority  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Write target:** `main` only  
-**Status:** ACCEPTED DIRECTION / IMPLEMENTATION IN PROGRESS  
+**Status:** TRUST-SURFACE FOUNDATION IMPLEMENTED / AUTOMATED ACCEPTANCE PENDING  
 **Release posture:** Private, non-commercial pilot only when explicitly authorised; no advertising, charging, public beta or public pricing.
 
 ## Objective
@@ -74,10 +74,33 @@ The authoritative Founder record is `FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md
 - No real pilot personal information until the privacy, Information Officer and operator/deployment boundaries are addressed.
 - No branch creation or writes outside `main`.
 
+## Implemented foundation — 2026-11-26
+
+The existing Laravel public surface now contains named, unauthenticated GET routes for About, Security, Contact, What's New, Privacy review and Terms review. The six pages share an accessible responsive layout, use a CSP nonce for inline styles, and link to one another through consistent navigation/footer elements. The landing page footer now exposes the trust destinations.
+
+Implemented files:
+- `routes/web.php`: `public.about`, `public.security`, `public.contact`, `public.whats-new`, `public.privacy`, `public.terms`.
+- `resources/views/layouts/public-trust.blade.php`: shared public layout and navigation.
+- `resources/views/public/{about,security,contact,whats-new,privacy,terms}.blade.php`: factual page content.
+- `resources/views/landing.blade.php`: discoverable public trust links.
+- `tests/Feature/PublicTrustSurfaceTest.php` and `tests/Feature/RouteIntegrityTest.php`: public access, identity/legal wording and route contracts.
+
+Privacy and Terms pages are intentionally marked **PRE-PUBLICATION REVIEW COPY** with no effective date. Contact uses the owner-confirmed provisional Outlook address and explicitly states it is not a dedicated support/privacy desk. No pricing, status page, uptime promise, processor, company incorporation or Information Officer registration is claimed.
+
+## Navigation reliability correction — 2026-11-26
+
+Source-level investigation found a race: service-worker route fetches timed out at 1.8 seconds, while the app's origin health probe could take 3 seconds. A slow but healthy destination could therefore be replaced by the cached Dashboard shell and then be treated as online, leaving the wrong page visible. The correction raises the worker navigation window to 5 seconds, advances the worker cache to v64, improves collapsed flyout stacking, and adds slow-route plus collapsed-rail regression coverage. Detailed evidence: [DIRECTOR_NAVIGATION_RECOVERY_2026-11-26.md](DIRECTOR_NAVIGATION_RECOVERY_2026-11-26.md).
+
+**Verification:** Code and tests are committed to `main`. GitHub Actions is running; exact-head automated results and Founder-device verification are still pending. Do not call the navigation defect closed until those gates pass and the corrected worker is installed and exercised.
+
 ## Current engineering dependency
 
-The adversarial authentication audit remains OPEN. Latest source commit at this record is `bf8dc41aa7ad4837a3c19d54bbd9d5158e4c53c7` (retains the auth-context BroadcastChannel listener across back-forward-cache restores). The latest commit reports no combined status checks through the connected GitHub status endpoint; do not infer a pass. Continue the active security investigation and the remaining V1 gates in `.ai/engineering/STATE.md`.
+The adversarial authentication audit remains OPEN. The latest source head at this record is `45c2861a58587988a3e956b7415e821c43a71623` (navigation incident documentation; application changes are included in its ancestors). Current-head checks are pending; no exact-head CI PASS is claimed. Continue the active security investigation and the remaining V1 gates in `.ai/engineering/STATE.md`.
 
 ## Next execution slice
 
-Implement the smallest safe trust-surface foundation in the existing Laravel public surface, starting with factual About, Security and What's New content plus a real Contact route. Keep Privacy and Terms as clearly labelled review copies until publication gates are met. Update this record and `.ai/engineering/STATE.md` with each verified implementation/acceptance change.
+1. Verify exact-head Laravel, Zazu Quality, service-worker and browser acceptance; fix any regressions.
+2. Obtain one Founder-device collapsed-rail navigation check after the v64 worker is installed. Do not repeat generic browser smoke.
+3. Review the public pages against actual deployment details and obtain owner/legal sign-off before making Privacy or Terms effective.
+4. Prepare a source-derived 90-second enquiry-to-profit demonstration using synthetic records.
+5. Keep the private pilot and bounded CSS polish behind their existing gates.
