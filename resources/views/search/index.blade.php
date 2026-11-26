@@ -1,11 +1,11 @@
 <x-app-layout>
-    <x-slot:title>Search</x-slot:title>
+    <x-slot:title>Advanced Search</x-slot:title>
     <x-slot:heading>Workspace search</x-slot:heading>
 
     <section class="zazu-page-intro">
         <div>
-            <span class="zazu-eyebrow">Find records</span>
-            <h2>Search across the workspace.</h2>
+            <span class="zazu-eyebrow">Advanced Search</span>
+            <h2>Find anything across your workspace.</h2>
             <p>Results stay inside the active business context and are limited to records your current access level can see.</p>
         </div>
     </section>
