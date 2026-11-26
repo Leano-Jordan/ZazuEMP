@@ -249,8 +249,8 @@
     </section>
 
 
-<section class="zazu-dash-surface" data-zazu-offline-workspace hidden aria-label="Offline workspace">
-    <header class="zazu-dash-surface-head zazu-dash-panel-head">
+<section class="zazu-dash-surface zazu-offline-workspace" data-zazu-offline-workspace hidden aria-label="Offline workspace">
+    <header class="zazu-dash-surface-head zazu-dash-panel-head zazu-offline-workspace-head">
         <div class="zazu-dash-panel-heading">
             <span class="zazu-dash-kicker">Device workspace</span>
             <h2>Offline workspace</h2>
