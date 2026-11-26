@@ -310,6 +310,10 @@ class BusinessArchiveMalformedUploadTest extends TestCase
                 'business_id' => $originalWorkspace->id,
                 'name' => 'Imported Rosscore Customer',
             ]);
+            $this->assertDatabaseHas('audit_logs', [
+                'business_id' => $restoredWorkspace->id,
+                'action' => 'business.archive_restored',
+            ]);
         } finally {
             @unlink($archivePath);
         }
