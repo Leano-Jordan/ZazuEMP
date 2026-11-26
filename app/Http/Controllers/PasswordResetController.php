@@ -72,11 +72,14 @@ class PasswordResetController extends Controller
         $status = Password::reset(
             $validated,
             function (User $user, string $password): void {
-                $user->password = $password;
-                $user->setRememberToken(Str::random(60));
-                $user->save();
+                DB::transaction(function () use ($user, $password): void {
+                    $user->password = $password;
+                    $user->setRememberToken(Str::random(60));
+                    $user->save();
 
-                event(new PasswordReset($user));
+                    event(new PasswordReset($user));
+                    $this->revokeOwnedBusinessDevices($user);
+                });
             }
         );
 
@@ -103,8 +106,6 @@ class PasswordResetController extends Controller
         }
 
         Auth::logoutOtherDevices($validated['password']);
-
-        $this->revokeOwnedBusinessDevices($user);
 
         $ownedBusiness = $user->businesses()
             ->where('businesses.status', 'active')
