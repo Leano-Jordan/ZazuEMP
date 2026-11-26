@@ -157,14 +157,15 @@ class BusinessExportController extends Controller
             $restoreStage = 'archive_validation_and_restore';
             $encrypted = is_string($decryptedPath);
             if ((bool) ($validated['restore_as_new_workspace'] ?? false)) {
-                [$restoredBusiness, $result] = $this->restoreArchiveIntoNewWorkspace(
+                [, $result] = $this->restoreArchiveIntoNewWorkspace(
                     $request,
+                    $business,
+                    $currentBusiness,
                     $restorePath,
                     $encrypted,
                     $archives,
                     $restoreStage,
                 );
-                $currentBusiness->switchTo((int) $restoredBusiness->id, $request->user());
             } else {
                 $result = $this->restoreArchiveIntoBusiness(
                     $business,
@@ -241,6 +242,8 @@ class BusinessExportController extends Controller
      */
     private function restoreArchiveIntoNewWorkspace(
         Request $request,
+        Business $originalBusiness,
+        CurrentBusiness $currentBusiness,
         string $restorePath,
         bool $encrypted,
         BusinessArchiveService $archives,
@@ -260,6 +263,7 @@ class BusinessExportController extends Controller
         });
 
         try {
+            $currentBusiness->switchTo((int) $business->id, $user);
             $result = $this->restoreArchiveIntoBusiness(
                 $business,
                 $restorePath,
@@ -278,6 +282,8 @@ class BusinessExportController extends Controller
                     'exception_class' => $cleanupException::class,
                 ]);
             }
+
+            $currentBusiness->switchTo((int) $originalBusiness->id, $user);
 
             throw $exception;
         }
