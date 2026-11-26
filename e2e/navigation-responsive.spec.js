@@ -74,7 +74,7 @@ test('collapsed desktop rail keeps destination links clickable across full-page 
     await expect(quotesLink).toBeVisible();
     await quotesLink.click();
 
-    await expect(page).toHaveURL(/\\/quotes$/);
+    await expect(page).toHaveURL(/\/quotes$/);
     await expect(page.getByRole('heading', { name: /Quotes/ })).toBeVisible();
     await expect(page.locator('body')).toHaveClass(/zazu-sidebar-collapsed/);
 
