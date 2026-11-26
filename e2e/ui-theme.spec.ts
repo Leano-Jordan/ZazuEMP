@@ -221,6 +221,15 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(quotes).toBeVisible();
         await expect(page).toHaveURL(/\/dashboard$/);
 
+        await quotes.focus();
+        await page.keyboard.press('Escape');
+        await expect(page.locator('body')).not.toHaveClass(/zazu-mobile-menu-open/);
+        await expect(drawerToggle).toBeFocused();
+
+        await drawerToggle.click();
+        await expect(page.locator('body')).toHaveClass(/zazu-mobile-menu-open/);
+        await trigger.click();
+        await expect(quotes).toBeVisible();
         await quotes.click();
         await expect(page).toHaveURL(/\/quotes$/);
         await expect(quotes).toHaveAttribute('aria-current', 'page');
