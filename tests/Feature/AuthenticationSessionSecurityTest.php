@@ -48,6 +48,11 @@ class AuthenticationSessionSecurityTest extends TestCase
         $authenticatedSessionId = app('session')->driver()->getId();
         $this->assertNotSame($preAuthenticationSessionId, $authenticatedSessionId);
         $this->assertDatabaseMissing('sessions', ['id' => $preAuthenticationSessionId]);
+        $this->assertDatabaseHas('sessions', [
+            'id' => $authenticatedSessionId,
+            'user_id' => $user->id,
+        ]);
+    }
 
     public function test_password_reset_revokes_previously_authenticated_sessions(): void
     {
@@ -108,10 +113,5 @@ class AuthenticationSessionSecurityTest extends TestCase
             ->assertRedirect();
 
         $this->assertGuest();
-    }
-        $this->assertDatabaseHas('sessions', [
-            'id' => $authenticatedSessionId,
-            'user_id' => $user->id,
-        ]);
     }
 }
