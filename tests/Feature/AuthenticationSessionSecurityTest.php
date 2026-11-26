@@ -96,6 +96,91 @@ class AuthenticationSessionSecurityTest extends TestCase
         ]);
     }
 
+    public function test_replayed_pre_authentication_cookie_cannot_reuse_the_authenticated_session_after_login(): void
+    {
+        config(['session.driver' => 'database']);
+
+        $user = User::factory()->create([
+            'username' => 'sessionreplay',
+            'email' => 'sessionreplay@example.com',
+            'password' => 'password123',
+        ]);
+        $business = Business::create([
+            'name' => 'Session Replay Business',
+            'slug' => 'session-replay-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        $preAuthResponse = $this->get(route('landing'))->assertOk();
+        $preAuthCookie = $preAuthResponse->getCookie(config('session.cookie'));
+        $this->assertNotNull($preAuthCookie);
+
+        $loginResponse = $this->withCookie(config('session.cookie'), $preAuthCookie->getValue())
+            ->post(route('login.store'), [
+                'identifier' => $user->username,
+                'password' => 'password123',
+            ])
+            ->assertRedirect(route('dashboard'));
+
+        $authenticatedCookie = $loginResponse->getCookie(config('session.cookie'));
+        $this->assertNotNull($authenticatedCookie);
+        $this->assertNotSame($preAuthCookie->getValue(), $authenticatedCookie->getValue());
+
+        $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
+            ->get(route('dashboard'))
+            ->assertOk();
+
+        $this->withCookie(config('session.cookie'), $preAuthCookie->getValue())
+            ->get(route('dashboard'))
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+
+        $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
+            ->get(route('dashboard'))
+            ->assertOk();
+    }
+
+    public function test_replayed_pre_registration_cookie_cannot_reuse_the_registered_account_session(): void
+    {
+        config(['session.driver' => 'database']);
+
+        $preRegistrationResponse = $this->get(route('landing'))->assertOk();
+        $preRegistrationCookie = $preRegistrationResponse->getCookie(config('session.cookie'));
+        $this->assertNotNull($preRegistrationCookie);
+
+        $registrationResponse = $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
+            ->post(route('register.store'), [
+                'name' => 'Session Replay Registration',
+                'username' => 'sessionreplayregistration',
+                'business_name' => 'Session Replay Registration Business',
+                'email' => 'sessionreplayregistration@example.com',
+                'password' => 'registration-password',
+                'password_confirmation' => 'registration-password',
+            ])
+            ->assertRedirect(route('onboarding.catalogue'));
+
+        $registeredCookie = $registrationResponse->getCookie(config('session.cookie'));
+        $this->assertNotNull($registeredCookie);
+        $this->assertNotSame($preRegistrationCookie->getValue(), $registeredCookie->getValue());
+
+        $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
+            ->get(route('onboarding.catalogue'))
+            ->assertOk();
+
+        $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
+            ->get(route('onboarding.catalogue'))
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+
+        $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
+            ->get(route('onboarding.catalogue'))
+            ->assertOk();
+    }
+
     public function test_password_reset_revokes_previously_authenticated_sessions(): void
     {
         config(['session.driver' => 'database']);
