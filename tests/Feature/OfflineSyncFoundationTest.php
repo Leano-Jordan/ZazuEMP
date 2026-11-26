@@ -2495,6 +2495,10 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(4, $pairing['selection_count']);
 
         $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
+        $this->assertSame(SyncDevice::pairingCodeDigest($pairing['pairing_code']), $device->pairing_code_digest);
+        $this->assertArrayNotHasKey('pairing_code_hash', $device->metadata ?? []);
+
+        $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
         $selectedTypes = collect($device->metadata['bootstrap_selection'])->pluck('type')->sort()->values()->all();
         $this->assertSame(['customer', 'job', 'preparation', 'quote'], $selectedTypes);
 
@@ -2912,6 +2916,7 @@ class OfflineSyncFoundationTest extends TestCase
             'device_name' => 'Revocation test phone',
             'device_type' => 'phone',
             'status' => 'active',
+            'pairing_code_digest' => str_repeat('b', 64),
             'metadata' => [
                 'sync_token_hash' => hash('sha256', $plainToken),
                 'pairing_code_hash' => 'obsolete-pairing-hash',
@@ -2932,6 +2937,7 @@ class OfflineSyncFoundationTest extends TestCase
         $device->refresh();
         $this->assertSame('revoked', $device->status);
         $this->assertNotNull($device->revoked_at);
+        $this->assertNull($device->pairing_code_digest);
         $this->assertArrayNotHasKey('sync_token_hash', $device->metadata ?? []);
         $this->assertArrayNotHasKey('pairing_code_hash', $device->metadata ?? []);
         $this->assertArrayNotHasKey('pairing_expires_at', $device->metadata ?? []);
