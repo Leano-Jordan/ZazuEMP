@@ -977,7 +977,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0052
 
-**Status:** OPEN — browser-managed storage-retention hardening not implemented. No browser-eviction/data-loss incident has been reported; this is a verified architecture gap.
+**Status:** IMPLEMENTED IN SOURCE — exact-head browser CI and physical Android acceptance pending. No browser-eviction/data-loss incident has been reported; this was a verified architecture gap.
 
 **Engineering diagnostic code:** ENG-DATA-007  
 **Class:** F1/F7 — local-data durability boundary / browser platform dependency.  
