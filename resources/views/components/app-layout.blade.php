@@ -160,11 +160,6 @@
             @endif
 
             <div class="zazu-sidebar-footer">
-                <div class="zazu-footer-workspace">
-                    <span class="zazu-footer-workspace-label">Workspace</span>
-                    <strong>{{ $business?->name ?? 'Zazu EMP' }}</strong>
-                    <span>{{ $nicheLabel }} · {{ $experienceLabel }}</span>
-                </div>
                 @auth
                     <div class="zazu-user-menu" data-user-menu>
                         <button
@@ -176,10 +171,10 @@
                             aria-label="Open account menu for {{ '@'.auth()->user()->username }}"
                         >
                             <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="sm" />
-                            <span class="zazu-user-identity">
-                                <span class="zazu-user-kicker">Signed in</span>
-                                <strong>{{ auth()->user()->name }}</strong>
-                                <span>{{ '@'.auth()->user()->username }} · {{ ucfirst(str_replace('_', ' ', $currentRole ?? 'member')) }}</span>
+                            <span class="zazu-user-identity zazu-footer-workspace">
+                                <span class="zazu-user-kicker zazu-footer-workspace-label">WORKSPACE</span>
+                                <strong>{{ $business?->name ?? 'Zazu EMP' }}</strong>
+                                <span>{{ auth()->user()->name }} · {{ ucfirst(str_replace('_', ' ', $currentRole ?? 'member')) }}</span>
                             </span>
                             <svg class="zazu-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
                         </button>
