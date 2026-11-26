@@ -166,7 +166,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'profile_photo_path' => $sourcePath,
         ]);
 
-        $target = \App\Models\Business::create([
+        $target = Business::create([
             'name' => 'Occupied Restore Target',
             'slug' => 'occupied-restore-target',
             'status' => 'active',
@@ -304,7 +304,7 @@ class BusinessArchiveMalformedUploadTest extends TestCase
 
             $this->assertSame(
                 (int) $restoredWorkspace->id,
-                app(\App\Support\CurrentBusiness::class)->id(auth()->user())
+                app(CurrentBusiness::class)->id(auth()->user())
             );
             $this->assertDatabaseHas('customers', [
                 'business_id' => $restoredWorkspace->id,
