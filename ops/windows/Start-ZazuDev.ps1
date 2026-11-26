@@ -363,24 +363,24 @@ if ($listeners.Count -gt 0) {
             # Never silently report a healthy launch when that process is serving code
             # whose database migrations have not been applied.
             Push-Location $ProjectPath
-        try {
-            $statusOutput = @(& $php $artisan 'migrate:status' '--no-ansi' 2>&1 | ForEach-Object { "$_" })
-            $statusExitCode = $LASTEXITCODE
-            $statusText = $statusOutput -join [Environment]::NewLine
-            $migrationTableMissing = $statusText -match '(?i)migration table.*not found'
+            try {
+                $statusOutput = @(& $php $artisan 'migrate:status' '--no-ansi' 2>&1 | ForEach-Object { "$_" })
+                $statusExitCode = $LASTEXITCODE
+                $statusText = $statusOutput -join [Environment]::NewLine
+                $migrationTableMissing = $statusText -match '(?i)migration table.*not found'
 
-            if ($statusExitCode -ne 0 -and -not $migrationTableMissing) {
-                throw ("Zazu is already running, but its database update status could not be checked. No changes were made." + [Environment]::NewLine + $statusText)
-            }
+                if ($statusExitCode -ne 0 -and -not $migrationTableMissing) {
+                    throw ("Zazu is already running, but its database update status could not be checked. No changes were made." + [Environment]::NewLine + $statusText)
+                }
 
-            $pendingStatusRows = @($statusOutput | Where-Object { $_.Trim() -eq 'Pending' })
-            $hasPendingMigrations = $migrationTableMissing -or ($pendingStatusRows.Count -gt 0)
-            if ($hasPendingMigrations) {
-                throw 'Zazu is already running with pending database migrations. No migration was applied while the server was active. Double-click Stop-Zazu-Dev.cmd, then Start-Zazu-Dev.cmd to run the verified backup-first update before reopening Zazu.'
+                $pendingStatusRows = @($statusOutput | Where-Object { $_.Trim() -eq 'Pending' })
+                $hasPendingMigrations = $migrationTableMissing -or ($pendingStatusRows.Count -gt 0)
+                if ($hasPendingMigrations) {
+                    throw 'Zazu is already running with pending database migrations. No migration was applied while the server was active. Double-click Stop-Zazu-Dev.cmd, then Start-Zazu-Dev.cmd to run the verified backup-first update before reopening Zazu.'
+                }
+            } finally {
+                Pop-Location
             }
-        } finally {
-            Pop-Location
-        }
 
             Write-Host ("Zazu is already listening at http://{0}:{1}; migration status is current." -f $BindAddress, $Port)
             return
@@ -513,7 +513,7 @@ try {
     $scanDirectories += $runtimeIniDirectory
     $env:PHP_INI_SCAN_DIR = $scanDirectories -join ';'
 
-    $serverArguments = @('artisan', 'serve', "--host=$BindAddress", "--port=$Port")
+    $serverArguments = @('-d', 'variables_order=EGPCS', 'artisan', 'serve', "--host=$BindAddress", "--port=$Port")
     $process = Start-Process -FilePath $php -ArgumentList $serverArguments -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
 } finally {
     if ($SecureCookies) {
