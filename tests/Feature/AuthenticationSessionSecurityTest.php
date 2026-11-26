@@ -128,16 +128,19 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertNotNull($authenticatedCookie);
         $this->assertNotSame($preAuthCookie->getValue(), $authenticatedCookie->getValue());
 
+        Auth::forgetGuards();
         $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
             ->get(route('dashboard'))
             ->assertOk();
 
+        Auth::forgetGuards();
         $this->withCookie(config('session.cookie'), $preAuthCookie->getValue())
             ->get(route('dashboard'))
             ->assertRedirect(route('login'));
 
         $this->assertGuest();
 
+        Auth::forgetGuards();
         $this->withCookie(config('session.cookie'), $authenticatedCookie->getValue())
             ->get(route('dashboard'))
             ->assertOk();
@@ -166,19 +169,22 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertNotNull($registeredCookie);
         $this->assertNotSame($preRegistrationCookie->getValue(), $registeredCookie->getValue());
 
+        Auth::forgetGuards();
         $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
-            ->get(route('dashboard'))
-            ->assertOk();
+            ->get(route('dashboard'));
+        $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
 
+        Auth::forgetGuards();
         $this->withCookie(config('session.cookie'), $preRegistrationCookie->getValue())
             ->get(route('dashboard'))
             ->assertRedirect(route('login'));
 
         $this->assertGuest();
 
+        Auth::forgetGuards();
         $this->withCookie(config('session.cookie'), $registeredCookie->getValue())
-            ->get(route('dashboard'))
-            ->assertOk();
+            ->get(route('dashboard'));
+        $this->assertAuthenticatedAs(User::query()->where('email', 'sessionreplayregistration@example.com')->firstOrFail());
     }
 
     public function test_password_reset_revokes_previously_authenticated_sessions(): void
