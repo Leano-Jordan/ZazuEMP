@@ -94,7 +94,7 @@ class PasswordResetController extends Controller
         $user = User::query()->where('email', $validated['email'])->firstOrFail();
 
         Auth::login($user);
-        $request->session()->regenerate();
+        $request->session()->regenerate(true);
 
         // Revoke existing database-backed sessions immediately. For other
         // drivers, AuthenticateSession + logoutOtherDevices provide the guard.
