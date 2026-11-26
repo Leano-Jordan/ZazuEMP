@@ -2498,7 +2498,6 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(SyncDevice::pairingCodeDigest($pairing['pairing_code']), $device->pairing_code_digest);
         $this->assertArrayNotHasKey('pairing_code_hash', $device->metadata ?? []);
 
-        $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
         $selectedTypes = collect($device->metadata['bootstrap_selection'])->pluck('type')->sort()->values()->all();
         $this->assertSame(['customer', 'job', 'preparation', 'quote'], $selectedTypes);
 
