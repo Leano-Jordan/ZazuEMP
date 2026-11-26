@@ -4508,8 +4508,6 @@ li {
 }
 
 /* Navigation and controls should read as controls, not miniature headings. */
-.zazu-nav-link,
-.zazu-nav-area-trigger,
 .zazu-user-menu-link,
 .zazu-section-tabs a,
 .zazu-topbar button,
@@ -4517,13 +4515,6 @@ li {
 button,
 [role="button"] {
     font-family: var(--zazu-font-ui);
-}
-
-.zazu-nav-link,
-.zazu-nav-area-trigger {
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.25;
 }
 
 .zazu-button,
