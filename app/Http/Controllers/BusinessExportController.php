@@ -117,8 +117,11 @@ class BusinessExportController extends Controller
         $errors = $exception->errors();
         $archiveErrors = $errors['archive'] ?? [];
         $reference = 'Restore request reference: '.$incidentId;
+        $uploadFailure = $this->restoreUploadLimitFailure($request);
 
-        if ($archiveErrors === []) {
+        if ($uploadFailure !== null) {
+            $archiveErrors = [$uploadFailure.' '.$reference];
+        } elseif ($archiveErrors === []) {
             $archiveErrors[] = $reference;
         } else {
             $archiveErrors[0] = rtrim($archiveErrors[0]).' '.$reference;
@@ -127,6 +130,31 @@ class BusinessExportController extends Controller
         $errors['archive'] = $archiveErrors;
 
         return back()->withErrors($errors);
+    }
+
+    /**
+     * Explain PHP-level upload rejection before it is mistaken for an invalid archive.
+     */
+    private function restoreUploadLimitFailure(Request $request): ?string
+    {
+        $uploadedFile = $request->file('archive');
+        if ($uploadedFile?->getError() === UPLOAD_ERR_INI_SIZE) {
+            return 'The server rejected this file before Zazu could read it. The active PHP upload_max_filesize is '.ini_get('upload_max_filesize').'. Restart Zazu with the current host launcher to apply its 100 MB archive limit.';
+        }
+
+        if ($uploadedFile !== null || (int) $request->server('CONTENT_LENGTH', 0) <= 0) {
+            return null;
+        }
+
+        $postMaxSize = (string) ini_get('post_max_size');
+        $postMaxBytes = function_exists('ini_parse_quantity') ? ini_parse_quantity($postMaxSize) : 0;
+        $contentLength = (int) $request->server('CONTENT_LENGTH', 0);
+
+        if ($postMaxBytes > 0 && $contentLength > $postMaxBytes) {
+            return 'The server rejected this request before Zazu could read the archive because PHP post_max_size is '.$postMaxSize.'. Restart Zazu with the current host launcher to apply its 110 MB request limit.';
+        }
+
+        return null;
     }
 
     /**
