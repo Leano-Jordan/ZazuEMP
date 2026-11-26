@@ -943,6 +943,34 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Independent navigation finding:** The offline route allowlist in resources/js/app.js intentionally excludes /settings. Unsupported navigation links and now-empty navigation groups are hidden while offline. Device pairing, owner administration and server-backed business settings remain online-only. Do not reintroduce Settings as an offline link without a specific supported local feature and tests.
 
-**Evidence:** Founder screenshots received 2026-11-26 show 13 saved records, 0 waiting to sync and 0 conflicts, plus the layout defect. Exact-head Laravel run 45779103238 passed 765 tests / 1 skipped / 5,464 assertions; coverage and PostgreSQL smoke passed. Offline-browser run 45779103238 completed PASS: 74 Chromium offline journeys passed, including the 390×844 geometry assertion, plus 11 mobile-viewport checks, the mobile stopped-host check and phone-local attachment round-trip. Zazu Quality run 45779103388 passed application, formatting and secret-scan jobs but failed its independent Composer security audit on five Symfony advisories. Zazu Quality run 45779103388 passed application, formatting and secret-scan jobs but failed its independent Composer security audit on five Symfony advisories. No post-fix Android screenshot or rendered visual acceptance has been observed.
+**Evidence:** Founder screenshots received 2026-11-26 show 13 saved records, 0 waiting to sync and 0 conflicts, plus the layout defect. Exact-head Laravel run 45779103238 passed 765 tests / 1 skipped / 5,464 assertions; coverage and PostgreSQL smoke passed. Offline-browser run 45779103238 completed PASS: 74 Chromium offline journeys passed, including the 390×844 geometry assertion, plus 11 mobile-viewport checks, the mobile stopped-host check and phone-local attachment round-trip. Zazu Quality run 45779103388 passed application, formatting and secret-scan jobs but failed its independent Composer security audit on five Symfony advisories. No post-fix Android screenshot or rendered visual acceptance has been observed.
 
 **Rejected approaches:** Do not hide offline navigation again, widen the entire shared Dashboard header, remove links to satisfy the screenshot, or treat source assertions/green PHP tests as visual acceptance. Keep the correction isolated to the offline shell.
+
+### CASE-ZAZU-0051
+
+**Status:** AUTOMATED-VERIFIED on exact checkpoint `76868dce`; latest test-only refinement `4a5bedf` awaiting rerun. Physical abrupt-termination/restart acceptance remains OPEN.
+
+**Engineering diagnostic code:** ENG-DATA-006  
+**Class:** F1 — client-side data-integrity / transaction-boundary defect.  
+**First observed:** 2026-11-26  
+**Target:** `public/zazu-offline.js` sync push acknowledgement; regression coverage in `e2e/pwa-offline.spec.js` and `tests/Feature/PwaOfflineFoundationTest.php`.
+
+**Failure fingerprint:** Server returns a successful recorded mutation → client removes the queued mutation → browser terminates before a separate workspace-state write → local record retains stale `pending_sync`/server identity/ `local_dirty` state but no longer has a queue record to reconcile.
+
+**Expected:** An acknowledgement is a single durable state transition. Either the transaction commits queue removal and all local identity/revision/dirty-flag reconciliation together, or it aborts and leaves both stores unchanged so the same idempotent mutation can be retried.
+
+**Previous actual:** Queue acknowledgement/removal was committed in a `[QUEUE, STATE]` transaction, then local identity/revision, related records, pending flags and `local_dirty` were persisted later through `writeState()` in a separate state-only transaction. A crash in the gap could strand a locally pending record with no mutation to replay.
+
+**Root cause:** The client split one logical sync acknowledgement across two IndexedDB transactions. IndexedDB guarantees atomicity within a transaction, not across two independent transactions.
+
+**Correction:** Commit `public/zazu-offline.js` change `4cd9b5fd317cc9ba25e5f23cf1cbb30a0fd5e4e4`. The new `push()` reads the persisted workspace and queue, then commits acknowledged queue deletes, canonical and related identity/revision updates, conflict state, `pending_sync` flags and `local_dirty` in the same read/write transaction over `[QUEUE, STATE]`. It updates the in-memory workspace only after transaction completion.
+
+**Regression controls:**
+- Browser test added at `2e3bca483fba45c239951d9ff107b85f7b59cee3` injects a failure boundary against an independent state-only transaction after the server push boundary and verifies the acknowledgement is completed without relying on that second transaction.
+- PHP architecture test/helper updates at `f0de754df79856cefb50dc940731b8d6e7ce8062` and `76868dce36756bb90146bc03ce7daad1c01caa0f` assert queue removal, workspace-state put, dirty-state derivation and absence of a separate `writeState()` in the acknowledgement path.
+- Test-only refinement `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` arms the failure boundary when the mocked push reaches the server boundary; exact-head rerun pending.
+
+**Evidence on `76868dce`:** Laravel **765 passed / 1 skipped / 5,471 assertions**; desktop offline/browser acceptance **75 passed**; mobile offline Work/visual suite **11 passed**; mobile host-outage **1 passed**; phone-local attachment **1 passed**; PostgreSQL migration/recovery smoke **1 passed**; PHPMD and static analysis passed; Windows build, encrypted/legacy archive verification and fresh install passed. Zazu Quality application/formatting/secret-scan passed; Composer security audit failed independently on five Symfony advisories. This automated evidence does not claim a physical power-cut test or close restart/reconnect acceptance.
+
+**Rejected approaches:** Never mark the queue row deleted first and rely on a later state write. Do not retry with a new mutation UUID after an uncertain server response; preserve the original idempotency identity. Do not call the browser test a physical power-cut test.
