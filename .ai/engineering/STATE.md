@@ -3,8 +3,8 @@
 **Last reconciled:** 2026-11-26
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
-**Latest verified application/test checkpoint:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, offline browser/mobile, PostgreSQL and code-analysis rerun passed).  
-**Current application/test candidate:** `573a52dc04f481bc484f10da5d8e55353a49295e` (12-digit indexed HMAC phone pairing, single-row provisioning, revocation/reset invalidation, atomic password-reset/device-revocation transaction, stale-session business-switch regression, pairing abuse/expiry/one-use tests, hidden credential metadata and offline client v63; exact-head CI validation queued).
+**Latest fully verified browser/offline checkpoint:** `ee370e717b6160cccb8b8c45ea85b12cdfb9e6a9` — exact-head Laravel, PostgreSQL and coverage passed; 78 desktop offline/browser journeys passed, plus quote confirmation (1), mobile offline Work (11), stopped-host (1) and phone-local attachment (1). The Settings owner pairing journey now has a real-server browser regression and passed on this checkpoint.  
+**Current engineering candidate:** `cb17492e344d0e399b9bb40e735651dedf938e8e` — adds JSON content type to owner phone-pairing, login pre-auth session rotation regression, separate password-reset/session-transition regressions, and smaller trusted-device revocation helpers. On this exact candidate PHPMD, Director Health, populated upgrade/rollback, PHP security analysis and SARIF publication have passed; Windows archive verification and installation build passed while the fresh-install check is running. Laravel/offline-browser and Zazu Quality are queued; SonarCloud is skipped. Do not call this candidate fully green until the exact-head Laravel, Quality and Windows workflows complete.
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
@@ -82,15 +82,15 @@ Automated backup/restore, rollback, PostgreSQL recovery smoke, Windows packaging
 - Removed contradictory DB-001 active-blocker guidance and stale Morpheus role hierarchy from operating bootstraps.
 - The existing deploy/render-staging ref is preserved as read-only historical state; no non-main ref was modified and no branch was created.
 
-## Execution order
+## Execution order — aligned to the binding V1 mandate
 
-1. Forensically isolate the real encrypted business-archive restore failure without touching the live business or original verified backup.
-2. Continue targeted adversarial tenant/session/device/file and business-rule tests; resolve SARIF publishing configuration so completed analysis reaches GitHub code scanning.
-3. Complete installation recovery key-custody review and owner-PC drill when the Founder can accept it.
-4. Reconcile the populated commercial workflow.
-5. Prepare POPIA and ZAZU name-clearance decisions for Founder acceptance.
+1. **Gate 1 — offline continuity and session/device boundaries.** Close current-head CI for the pairing UI and session-transition hardening; continue focused cross-tab, stale-token, logout/account-switch and queued-write checks. Physical Android cold launch, restart, attachments and reconnect remain separate owner acceptance.
+2. **Gate 2 — recovery and installation.** Forensically isolate the prior encrypted business-archive restore failure using safe diagnostics or a disposable reproducible fixture only. Preserve the original archive, passphrase and target; never retry against the live business or weaken throttles. Then complete the intended-PC installation recovery/key-custody drill.
+3. **Gate 3 — commercial workflow integrity.** Reconcile the populated quote → acceptance → invoice → payments → purchasing/receiving → actual costs → profit path against records, documents and reports.
+4. **Gate 4 — security, privacy and brand.** Continue adversarial tenant/session/device/file checks; resolve and verify security-result publication; keep the DEC-019 shared-profile risk explicit; obtain POPIA operational and ZAZU name-clearance decisions from the Founder.
+5. **Gate 5 — usability, performance and pilot operations.** Complete human-eye responsive acceptance, supported-hardware baselines, onboarding and release operating instructions.
 
-Physical-device, owner-PC recovery, populated-business and legal/brand acceptance remain separate Founder gates. Continue source, test, documentation and CI work that does not require those actions.
+Physical-device, owner-PC recovery, populated-business and legal/brand acceptance remain separate Founder gates. Current code and automation evidence cannot substitute for those approvals. This ordering follows [the binding Commercial V1 Mandate](../../docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md).
 
 ## Founder physical offline observation — 2026-11-26 (new evidence)
 
