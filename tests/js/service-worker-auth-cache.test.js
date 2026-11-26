@@ -1059,7 +1059,7 @@ test('a slow but healthy in-app destination is not replaced by the cached dashbo
     await navigation.finished();
 });
 
-test('a hanging host with Wi-Fi still connected falls back after the navigation grace period', async () => {
+test('a hanging host with Wi-Fi still connected preserves the cached in-app destination after the navigation grace period', async () => {
     const worker = bootWorker(async (request, init) => {
         if (new URL(request.url).pathname === '/dashboard') {
             return new MockResponse('<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Local dashboard shell</main></body></html>', {
@@ -1095,8 +1095,8 @@ test('a hanging host with Wi-Fi still connected falls back after the navigation 
     const response = await navigation.response;
     const elapsed = Date.now() - startedAt;
     assert.equal(response.ok, true);
-    assert.match(await response.text(), /data-zazu-user-id="41"/);
-    assert.doesNotMatch(await response.text(), /Stale customer snapshot/);
+    assert.match(await response.text(), /Stale customer snapshot/);
+    assert.doesNotMatch(await response.text(), /Local dashboard shell/);
     assert.ok(elapsed < 6500, 'the worker must not leave the installed app waiting indefinitely on a dead host');
     await navigation.finished();
 });
