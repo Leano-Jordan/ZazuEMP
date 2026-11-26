@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\AuditLog;
 use App\Services\BusinessArchiveEncryptionService;
 use App\Services\BusinessArchiveService;
 use App\Services\BusinessSpreadsheetExportService;
@@ -157,15 +158,14 @@ class BusinessExportController extends Controller
             $restoreStage = 'archive_validation_and_restore';
             $encrypted = is_string($decryptedPath);
             if ((bool) ($validated['restore_as_new_workspace'] ?? false)) {
-                [, $result] = $this->restoreArchiveIntoNewWorkspace(
+                [$restoredBusiness, $result] = $this->restoreArchiveIntoNewWorkspace(
                     $request,
-                    $business,
-                    $currentBusiness,
                     $restorePath,
                     $encrypted,
                     $archives,
                     $restoreStage,
                 );
+                $currentBusiness->switchTo((int) $restoredBusiness->id, $request->user());
             } else {
                 $result = $this->restoreArchiveIntoBusiness(
                     $business,
@@ -217,17 +217,30 @@ class BusinessExportController extends Controller
         bool $encrypted,
         BusinessArchiveService $archives,
         string &$restoreStage,
+        bool $newWorkspace = false,
     ): array {
         return $archives->restore(
             $restorePath,
             $business,
-            static function (array $result) use ($business, $encrypted): void {
-                Audit::record('business.archive_restored', null, [
-                    'tables' => $result['tables'],
-                    'records' => $result['records'],
-                    'files' => $result['files'],
-                    'encrypted' => $encrypted,
-                ], (int) $business->id);
+            static function (array $result) use ($business, $encrypted, $newWorkspace): void {
+                $writeAudit = static function () use ($business, $encrypted, $result): void {
+                    Audit::record('business.archive_restored', null, [
+                        'tables' => $result['tables'],
+                        'records' => $result['records'],
+                        'files' => $result['files'],
+                        'encrypted' => $encrypted,
+                    ], (int) $business->id);
+                };
+
+                if ($newWorkspace) {
+                    // The new workspace is owner-attached but not yet selected.
+                    // Bypass only the active-workspace model event for this explicit audit write.
+                    AuditLog::withoutEvents($writeAudit);
+
+                    return;
+                }
+
+                $writeAudit();
             },
             static function (string $stage) use (&$restoreStage): void {
                 $restoreStage = $stage;
@@ -242,8 +255,6 @@ class BusinessExportController extends Controller
      */
     private function restoreArchiveIntoNewWorkspace(
         Request $request,
-        Business $originalBusiness,
-        CurrentBusiness $currentBusiness,
         string $restorePath,
         bool $encrypted,
         BusinessArchiveService $archives,
@@ -263,13 +274,13 @@ class BusinessExportController extends Controller
         });
 
         try {
-            $currentBusiness->switchTo((int) $business->id, $user);
             $result = $this->restoreArchiveIntoBusiness(
                 $business,
                 $restorePath,
                 $encrypted,
                 $archives,
                 $restoreStage,
+                true,
             );
         } catch (\Throwable $exception) {
             try {
@@ -282,8 +293,6 @@ class BusinessExportController extends Controller
                     'exception_class' => $cleanupException::class,
                 ]);
             }
-
-            $currentBusiness->switchTo((int) $originalBusiness->id, $user);
 
             throw $exception;
         }
