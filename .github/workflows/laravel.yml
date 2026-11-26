@@ -250,6 +250,8 @@ jobs:
       run: npm run test:e2e -- --project=chromium-mobile e2e/ui-theme.spec.ts --grep "opens and follows links"
     - name: Verify desktop rail, accordion, keyboard focus and mobile calendar
       run: npm run test:e2e -- --project=chromium e2e/ui-theme.spec.ts --grep "keeps sidebar navigation expanded|collapsed desktop rail|mobile drawer parent controls"
+    - name: Verify responsive and collapsed navigation destinations
+      run: npm run test:e2e -- --project=chromium e2e/navigation-responsive.spec.js
     - name: Run offline browser acceptance suite
       run: npm run test:e2e -- --project=chromium e2e/pwa-offline.spec.js e2e/offline-session-transition.spec.js e2e/offline-conflict-resolution.spec.js e2e/offline-attachment-sync.spec.js e2e/offline-work-creation.spec.js e2e/zazu-visual-foundation.spec.js
     - name: Verify quote single-unit confirmation on desktop
