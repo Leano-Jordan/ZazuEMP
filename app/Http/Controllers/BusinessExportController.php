@@ -88,12 +88,13 @@ class BusinessExportController extends Controller
             $validated = $request->validate([
                 'archive' => ['required', 'file', 'max:102400'],
                 'archive_password' => ['nullable', 'string', 'min:12', 'max:128'],
+                'restore_as_new_workspace' => ['sometimes', 'boolean'],
             ]);
         } catch (ValidationException $exception) {
             return $this->rejectRestoreRequest($request, $business, $exception);
         }
 
-        return $this->restoreValidatedArchive($request, $business, $validated, $archives, $encryption);
+        return $this->restoreValidatedArchive($request, $business, $validated, $archives, $encryption, $currentBusiness);
     }
 
     private function rejectRestoreRequest(
@@ -136,6 +137,7 @@ class BusinessExportController extends Controller
         array $validated,
         BusinessArchiveService $archives,
         BusinessArchiveEncryptionService $encryption,
+        CurrentBusiness $currentBusiness,
     ): RedirectResponse {
         $decryptedPath = null;
         $restoreStage = 'upload_access';
@@ -154,21 +156,24 @@ class BusinessExportController extends Controller
 
             $restoreStage = 'archive_validation_and_restore';
             $encrypted = is_string($decryptedPath);
-            $result = $archives->restore(
-                $restorePath,
-                $business,
-                static function (array $result) use ($business, $encrypted): void {
-                    Audit::record('business.archive_restored', null, [
-                        'tables' => $result['tables'],
-                        'records' => $result['records'],
-                        'files' => $result['files'],
-                        'encrypted' => $encrypted,
-                    ], (int) $business->id);
-                },
-                static function (string $stage) use (&$restoreStage): void {
-                    $restoreStage = $stage;
-                }
-            );
+            if ((bool) ($validated['restore_as_new_workspace'] ?? false)) {
+                [$restoredBusiness, $result] = $this->restoreArchiveIntoNewWorkspace(
+                    $request,
+                    $restorePath,
+                    $encrypted,
+                    $archives,
+                    $restoreStage,
+                );
+                $currentBusiness->switchTo((int) $restoredBusiness->id, $request->user());
+            } else {
+                $result = $this->restoreArchiveIntoBusiness(
+                    $business,
+                    $restorePath,
+                    $encrypted,
+                    $archives,
+                    $restoreStage,
+                );
+            }
         } catch (RuntimeException $exception) {
             return $this->restoreRuntimeFailure(
                 $request,
@@ -200,6 +205,84 @@ class BusinessExportController extends Controller
             'success',
             sprintf('Business archive restored: %d records and %d files.', $result['records'], $result['files'])
         );
+    }
+
+    /**
+     * @return array{tables:int,records:int,files:int}
+     */
+    private function restoreArchiveIntoBusiness(
+        Business $business,
+        string $restorePath,
+        bool $encrypted,
+        BusinessArchiveService $archives,
+        string &$restoreStage,
+    ): array {
+        return $archives->restore(
+            $restorePath,
+            $business,
+            static function (array $result) use ($business, $encrypted): void {
+                Audit::record('business.archive_restored', null, [
+                    'tables' => $result['tables'],
+                    'records' => $result['records'],
+                    'files' => $result['files'],
+                    'encrypted' => $encrypted,
+                ], (int) $business->id);
+            },
+            static function (string $stage) use (&$restoreStage): void {
+                $restoreStage = $stage;
+            }
+        );
+    }
+
+    /**
+     * Create a separate owner workspace without disturbing the currently selected business.
+     *
+     * @return array{0:Business,1:array{tables:int,records:int,files:int}}
+     */
+    private function restoreArchiveIntoNewWorkspace(
+        Request $request,
+        string $restorePath,
+        bool $encrypted,
+        BusinessArchiveService $archives,
+        string &$restoreStage,
+    ): array {
+        $user = $request->user();
+        $business = \\Illuminate\\Support\\Facades\\DB::transaction(function () use ($user): Business {
+            $business = Business::create([
+                'name' => 'Restoring business archive',
+                'slug' => 'restored-'.Str::lower(Str::random(12)),
+                'status' => 'active',
+                'currency' => 'ZAR',
+            ]);
+            $business->users()->attach($user->getAuthIdentifier(), ['role' => 'owner']);
+
+            return $business;
+        });
+
+        try {
+            $result = $this->restoreArchiveIntoBusiness(
+                $business,
+                $restorePath,
+                $encrypted,
+                $archives,
+                $restoreStage,
+            );
+        } catch (\\Throwable $exception) {
+            try {
+                \\Illuminate\\Support\\Facades\\DB::transaction(
+                    static fn () => Business::query()->whereKey($business->id)->delete()
+                );
+            } catch (\\Throwable $cleanupException) {
+                Log::critical('Failed business archive restore left an empty destination workspace.', [
+                    'business_id' => (int) $business->id,
+                    'exception_class' => $cleanupException::class,
+                ]);
+            }
+
+            throw $exception;
+        }
+
+        return [$business, $result];
     }
 
     /**
