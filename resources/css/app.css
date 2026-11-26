@@ -7727,7 +7727,6 @@ body.zazu-inspector-open { overflow:hidden; }
     transition: opacity 140ms ease, visibility 140ms ease;
 }
 
-.zazu-nav-area:focus-within > .zazu-nav-flyout,
 .zazu-nav-area.is-open > .zazu-nav-flyout {
     display: block;
     opacity: 1;
