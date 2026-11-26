@@ -88,7 +88,7 @@ Codes are permanent once assigned. Never recycle a code.
 
 | ENG-DATA-005 | CASE-ZAZU-0049 | Concurrent browser tabs persist stale whole-workspace snapshots | F1 | CLOSED — exact-head two-tab adversarial regression and full offline browser acceptance passed on ffb5b5c |
 | ENG-DATA-006 | CASE-ZAZU-0051 | Offline server acknowledgement split across queue and workspace transactions | F1 | AUTOMATED-VERIFIED — physical termination/restart acceptance pending |
-| ENG-DATA-007 | CASE-ZAZU-0052 | Browser-managed offline storage remains best-effort without persistence/quota handling | F1/F7 | OPEN — persistence grant reporting and capacity controls not implemented |
+| ENG-DATA-007 | CASE-ZAZU-0052 | Browser-managed offline storage retention and quota controls | F1/F7 | IMPLEMENTED IN SOURCE — exact-head browser and physical Android acceptance pending |
 
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
 
