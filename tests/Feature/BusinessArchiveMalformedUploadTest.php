@@ -97,6 +97,99 @@ class BusinessArchiveMalformedUploadTest extends TestCase
             'business_id' => $target->id,
         ]);
     }
+    public function test_archive_file_manifest_cannot_override_server_staging_metadata(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+        $this->signInAsOwner();
+        $business = auth()->user()->businesses()->firstOrFail();
+        $path = 'profile-photos/customers/manifest-guard.jpg';
+        Storage::disk('private')->put($path, 'private customer image');
+        Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Manifest Guard Customer',
+            'profile_photo_path' => $path,
+        ]);
+
+        $archivePath = app(BusinessArchiveService::class)->download($business);
+        $sentinelPath = tempnam(sys_get_temp_dir(), 'zazu-restore-sentinel-');
+        $this->assertNotFalse($sentinelPath);
+        file_put_contents($sentinelPath, 'sentinel must survive');
+
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($archivePath) === true);
+        $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        $manifest['files'][0]['staged_path'] = $sentinelPath;
+        $manifest['files'][0]['payload_bytes'] = -1;
+        $this->assertTrue($zip->deleteName('manifest.json'));
+        $this->assertTrue($zip->addFromString('manifest.json', json_encode($manifest, JSON_THROW_ON_ERROR)));
+        $this->assertTrue($zip->close());
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->verify($archivePath);
+                $this->fail('Untrusted manifest fields must not override server staging metadata.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('invalid business file reference', $exception->getMessage());
+            }
+
+            $this->assertFileExists($sentinelPath);
+            $this->assertSame('sentinel must survive', file_get_contents($sentinelPath));
+        } finally {
+            @unlink($archivePath);
+            @unlink($sentinelPath);
+        }
+    }
+
+    public function test_populated_restore_target_is_rejected_before_attachment_staging(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        $sourcePath = 'profile-photos/customers/preflight-source.jpg';
+        Storage::disk('private')->put($sourcePath, 'source image');
+        Customer::create([
+            'business_id' => $source->id,
+            'name' => 'Preflight Source Customer',
+            'profile_photo_path' => $sourcePath,
+        ]);
+
+        $target = \\App\\Models\\Business::create([
+            'name' => 'Occupied Restore Target',
+            'slug' => 'occupied-restore-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $archivePath = app(BusinessArchiveService::class)->download($source);
+        $stages = [];
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore(
+                    $archivePath,
+                    $target,
+                    null,
+                    static function (string $stage) use (&$stages): void {
+                        $stages[] = $stage;
+                    }
+                );
+                $this->fail('Restore must not import into a populated workspace.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('already contains business records', $exception->getMessage());
+            }
+
+            $this->assertContains('target_workspace_preflight', $stages);
+            $this->assertNotContains('attachment_payload_staging', $stages);
+            $this->assertDatabaseMissing('customers', [
+                'business_id' => $target->id,
+                'name' => 'Preflight Source Customer',
+            ]);
+        } finally {
+            @unlink($archivePath);
+        }
+    }
+
     public function test_non_zip_upload_reports_the_specific_libzip_failure_code(): void
     {
         $this->signInAsOwner();
