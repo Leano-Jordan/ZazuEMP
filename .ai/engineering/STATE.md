@@ -4,7 +4,7 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest verified application/test checkpoint:** `4a5bedfcbb8b59e09de5398694e5050cc7a61de7` (atomic offline sync acknowledgement + mobile offline layout; exact-head Laravel, offline browser/mobile, PostgreSQL and code-analysis rerun passed).  
-**Current application/test candidate:** `b1e82dd1d619253e6f76d6bdf53c467672d17767` (12-digit indexed HMAC phone pairing, single-row provisioning, revocation/reset invalidation, atomic password-reset/device-revocation transaction, stale-session business-switch regression, pairing abuse/expiry/one-use tests and offline client v63; exact-head CI validation pending).
+**Current application/test candidate:** `573a52dc04f481bc484f10da5d8e55353a49295e` (12-digit indexed HMAC phone pairing, single-row provisioning, revocation/reset invalidation, atomic password-reset/device-revocation transaction, stale-session business-switch regression, pairing abuse/expiry/one-use tests, hidden credential metadata and offline client v63; exact-head CI validation queued).
 **Release verdict:** NOT READY
 **Formal evidence-maturity score:** 71/100 (baseline retained; no uplift without a formal domain-by-domain reassessment)
 
