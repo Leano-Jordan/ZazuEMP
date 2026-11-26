@@ -542,7 +542,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(generateButton).toBeVisible();
         await generateButton.click();
 
-        await expect(result).toContainText(/^12-digit code: \\d{12} · expires /);
+        await expect(result).toContainText(/^12-digit code: \d{12} · expires /);
         await expect(generateButton).toBeEnabled();
     });
 
