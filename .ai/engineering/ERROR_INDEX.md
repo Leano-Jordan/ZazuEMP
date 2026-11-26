@@ -87,6 +87,7 @@ Codes are permanent once assigned. Never recycle a code.
 
 
 | ENG-DATA-005 | CASE-ZAZU-0049 | Concurrent browser tabs persist stale whole-workspace snapshots | F1 | CLOSED — exact-head two-tab adversarial regression and full offline browser acceptance passed on ffb5b5c |
+| ENG-DATA-006 | CASE-ZAZU-0051 | Offline server acknowledgement split across queue and workspace transactions | F1 | AUTOMATED-VERIFIED — physical termination/restart acceptance pending |
 
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
 
