@@ -7647,7 +7647,7 @@ body.zazu-inspector-open { overflow:hidden; }
 
 .zazu-nav-hierarchy {
     display: grid;
-    gap: 7px;
+    gap: 3px;
 }
 
 .zazu-nav-area {
@@ -7711,8 +7711,11 @@ body.zazu-inspector-open { overflow:hidden; }
     position: static;
     left: auto;
     top: auto;
-    z-index: 90;
+    z-index: 180;
     width: auto;
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
     margin: 2px 0 6px 12px;
     padding: 4px 0 4px 12px;
     border: 0;
@@ -8843,6 +8846,11 @@ body.zazu-sidebar-collapsed .zazu-nav-flyout {
     background: var(--zazu-sidebar-surface);
     box-shadow: 12px 18px 36px color-mix(in srgb, #000 22%, transparent);
 }
+body.zazu-sidebar-collapsed .zazu-nav-hierarchy > .zazu-nav-area:last-child > .zazu-nav-flyout {
+    top: auto;
+    bottom: 0;
+    border-radius: 12px 0 12px 12px;
+}
 @media (max-width: 850px) {
     .zazu-sidebar-collapse-toggle { display: none; }
     .zazu-sidebar { overflow-y: auto; }
@@ -8857,13 +8865,7 @@ body.zazu-sidebar-collapsed .zazu-nav-flyout {
 }
 
 
-/* Navigation density: keep long permission-scoped groups visible without a
-   second scrolling region or large empty space from closed panels. */
-.zazu-nav-area-trigger { min-height: 42px; }
-.zazu-nav-hierarchy { gap: 3px; }
-@media (max-width: 850px) {
-    .zazu-nav-flyout .zazu-nav-link { min-height: 40px; }
-}
+/* Navigation density is owned by the canonical hierarchy and link rules above. */
 
 
 /* Collapsed rail panels need a visible heading because their parent
