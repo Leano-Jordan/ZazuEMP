@@ -330,3 +330,14 @@ IndexedDB and Cache Storage commits do not guarantee that browser-managed origin
 - Explain that users can still explicitly clear site data; persistent storage is not a replacement for export/import or recovery.
 
 **Status:** IMPLEMENTED IN SOURCE — CASE-ZAZU-0052 / ENG-DATA-007. Browser tests now cover grant/denial/unsupported, 90% quota warning and quota-error feedback; exact-head CI and physical Android acceptance are pending. No eviction incident is alleged.
+
+
+## REG-033 — Responsive navigation trigger and touch-flyout state divergence
+
+**Risk:** Navigation-group buttons are controls, not links. A group tap must never cause navigation. CSS hover flyouts must not be activated on coarse touch pointers, and mobile accordion visibility must have one state authority.
+
+**Control:** Group-trigger clicks prevent default and stop propagation, then update only the selected group's `is-open` class and `aria-expanded`. Desktop hover activation is scoped to fine pointers above the mobile/tablet breakpoint. Remove duplicate mobile visibility fallbacks when server-rendered `is-open` already provides no-JS recovery.
+
+**Required regression:** Playwright must prove desktop group opening does not navigate, mobile and 810px tablet taps open/close groups without changing URL, and selecting a child destination navigates to that exact destination and closes the drawer.
+
+**Status:** IMPLEMENTED — awaiting current-main CI and browser verification.
