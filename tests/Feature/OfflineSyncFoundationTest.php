@@ -2396,14 +2396,14 @@ class OfflineSyncFoundationTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $code = '48273195';
+        $code = '482731950624';
 
         $device = SyncDevice::create([
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
             'status' => 'pending',
+            'pairing_code_digest' => SyncDevice::pairingCodeDigest($code),
             'metadata' => [
-                'pairing_code_hash' => Hash::make($code),
                 'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
             ],
         ]);
@@ -2423,7 +2423,8 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->assertSame(200, $first->getStatusCode());
         $this->assertSame('active', $pairedDevice->status);
-        $this->assertNull($pairedDevice->metadata['pairing_code_hash']);
+        $this->assertNull($pairedDevice->pairing_code_digest);
+        $this->assertArrayNotHasKey('pairing_code_hash', $pairedDevice->metadata ?? []);
         $this->assertSame(
             $pairedAt->copy()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS)->timestamp,
             $pairedDevice->token_expires_at->timestamp,
@@ -2490,7 +2491,7 @@ class OfflineSyncFoundationTest extends TestCase
             app(CurrentBusiness::class),
         );
         $pairing = $pairingResponse->getData(true);
-        $this->assertMatchesRegularExpression('/^\d{8}$/', $pairing['pairing_code']);
+        $this->assertMatchesRegularExpression('/^\d{12}$/', $pairing['pairing_code']);
         $this->assertSame(4, $pairing['selection_count']);
 
         $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
@@ -2949,13 +2950,13 @@ class OfflineSyncFoundationTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $code = '391842';
+        $code = '391842629174';
         $device = SyncDevice::create([
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
             'status' => 'pending',
+            'pairing_code_digest' => SyncDevice::pairingCodeDigest($code),
             'metadata' => [
-                'pairing_code_hash' => Hash::make($code),
                 'pairing_expires_at' => now()->subSecond()->toIso8601String(),
             ],
         ]);
@@ -2974,6 +2975,7 @@ class OfflineSyncFoundationTest extends TestCase
         }
 
         $this->assertSame('pending', $device->fresh()->status);
+        $this->assertNull($device->fresh()->pairing_code_digest);
         $this->assertNull($device->fresh()->metadata['sync_token_hash'] ?? null);
     }
 
