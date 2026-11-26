@@ -7224,3 +7224,135 @@ body.zazu-has-wallpaper:not(.zazu-dashboard-page) .zazu-context-card {
         border-radius: 0 0 var(--zazu-radius-md) var(--zazu-radius-md);
     }
 }
+
+
+/* DIRECTOR — calm sidebar composition / 2026-11-26
+   Keep the five navigation destinations discoverable; reduce the persistent
+   context area to one quiet business summary and one account/workspace control. */
+.zazu-sidebar .zazu-workspace-profile {
+    margin: 8px 18px 4px;
+    padding: 9px 1px 5px;
+    border: 0;
+    border-top: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.zazu-sidebar .zazu-workspace-profile-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 6px;
+}
+.zazu-sidebar .zazu-workspace-profile-heading > span {
+    font-size: 9px;
+    letter-spacing: .09em;
+}
+.zazu-sidebar .zazu-workspace-profile-heading > strong {
+    font-size: 10px;
+    white-space: nowrap;
+}
+.zazu-sidebar .zazu-workspace-profile-focuses {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    max-height: 23px;
+    overflow: hidden;
+}
+.zazu-sidebar .zazu-workspace-profile-focuses span {
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 15%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--zazu-sidebar-surface) 45%, transparent);
+    font-size: 9px;
+    line-height: 1.35;
+}
+.zazu-sidebar .zazu-workspace-profile > p {
+    display: none;
+}
+.zazu-sidebar .zazu-workspace-profile > a {
+    display: inline-flex;
+    margin-top: 5px;
+    padding: 0;
+    background: transparent;
+    font-size: 10px;
+    font-weight: 700;
+}
+.zazu-sidebar .zazu-sidebar-footer {
+    padding: 8px 12px max(10px, env(safe-area-inset-bottom));
+    border-top: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 16%, transparent);
+}
+.zazu-sidebar .zazu-user-menu {
+    width: 100%;
+}
+.zazu-sidebar .zazu-user-trigger {
+    width: 100%;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: transparent;
+    text-align: left;
+}
+.zazu-sidebar .zazu-user-trigger:hover,
+.zazu-sidebar .zazu-user-trigger[aria-expanded="true"] {
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+    background: color-mix(in srgb, var(--zazu-sidebar-hover) 78%, transparent);
+}
+.zazu-sidebar .zazu-user-trigger .zazu-footer-workspace {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.zazu-sidebar .zazu-footer-workspace-label {
+    margin: 0;
+    font-size: 8px;
+    line-height: 1.2;
+    letter-spacing: .12em;
+}
+.zazu-sidebar .zazu-footer-workspace strong {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.zazu-sidebar .zazu-footer-workspace > span:last-child {
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    font-size: 9px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.zazu-sidebar .zazu-user-chevron {
+    flex: 0 0 15px;
+}
+@media (max-width: 850px) {
+    .zazu-sidebar .zazu-workspace-profile {
+        margin-inline: 16px;
+    }
+    .zazu-sidebar .zazu-sidebar-footer {
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .zazu-sidebar .zazu-user-trigger {
+        transition: none;
+    }
+}
