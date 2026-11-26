@@ -58,6 +58,12 @@ class UiDashboardResponsiveTest extends TestCase
         }
 
         // Keep state rules and responsive ownership separate from base geometry.
+        $this->assertStringNotContainsString(
+            '.zazu-nav-area:focus-within > .zazu-nav-flyout',
+            $appCss,
+            'A focused but collapsed navigation trigger must not expose its closed submenu.'
+        );
+        $this->assertStringContainsString('.zazu-nav-area.is-open > .zazu-nav-flyout {', $appCss);
         $this->assertStringContainsString('.zazu-nav-link:hover {', $appCss);
         $this->assertStringContainsString('.zazu-nav-link.active {', $appCss);
         $this->assertStringContainsString('.zazu-nav-flyout .zazu-nav-link.active {', $appCss);
