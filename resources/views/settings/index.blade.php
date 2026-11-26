@@ -436,6 +436,14 @@
     <section class="zazu-context-card mt-4" aria-labelledby="zazu-data-protection-title">
         <div class="zazu-context-title" id="zazu-data-protection-title">Data protection</div>
         <p class="zazu-context-copy mt-1">Installation-wide backups and restores are managed by the system operator. Business self-service export and restore is not available in this build.</p>
+        <div class="mt-3" data-zazu-offline-storage>
+            <span class="zazu-dash-kicker">This device's offline data</span>
+            <strong data-zazu-offline-storage-status>Checking browser storage protection…</strong>
+            <span data-zazu-offline-storage-usage></span>
+            <p class="zazu-context-copy mt-1">Persistent browser storage can reduce automatic cleanup under storage pressure. It cannot prevent someone from clearing this browser's site data. Keep separate business backups.</p>
+            <button type="button" class="zazu-btn zazu-btn-secondary mt-2" data-zazu-offline-storage-request hidden>Request storage protection</button>
+            <p class="zazu-field-help mt-2" data-zazu-offline-storage-error hidden role="alert"></p>
+        </div>
     </section>
 
 <script nonce="{{ request()->attributes->get('cspNonce') }}">
