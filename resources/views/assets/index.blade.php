@@ -1,8 +1,8 @@
 <x-app-layout><x-slot:title>Assets</x-slot:title><x-slot:heading>Assets</x-slot:heading>
 <section class="zazu-command-band"><div><div class="zazu-eyebrow">Resources</div><h2 class="zazu-command-title">Physical asset register</h2><p class="zazu-command-copy">Track individual reusable equipment separately from consumable stock.</p></div><div class="zazu-command-meta"><div class="zazu-command-meta-label">Assets</div><div class="zazu-command-meta-value">{{ $assets->count() }}</div></div></section>
-<section class="zazu-card zazu-list mt-5 zazu-assets-directory"><div class="zazu-card-header"><div class="zazu-section-heading"><div class="zazu-card-title">Asset register</div><a href="{{ route('assets.create') }}" class="zazu-btn zazu-btn-primary">Add asset</a></div></div>
+<section class="zazu-card zazu-list mt-5 zazu-assets-directory" data-zazu-offline-collection="assets" data-zazu-offline-collection-list><div class="zazu-card-header"><div class="zazu-section-heading"><div class="zazu-card-title">Asset register</div><a href="{{ route('assets.create') }}" class="zazu-btn zazu-btn-primary">Add asset</a></div></div>
 @forelse($assets as $asset)
-<div class="zazu-list-item">
+<div class="zazu-list-item" data-zazu-server-record-id="{{ $asset->id }}">
     <div class="zazu-list-main">
         <div class="zazu-list-title">{{ $asset->name }} <span class="zazu-chip zazu-chip-info">{{ $asset->asset_tag }}</span></div>
         <div class="zazu-list-meta">{{ ucfirst($asset->condition) }} · {{ $asset->location ?: 'Location not set' }}</div>
