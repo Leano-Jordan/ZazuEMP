@@ -389,7 +389,7 @@ test('offline workspace exposes locally stored quotes with their sync state', as
     await expect(quoteRow).toContainText('Waiting to sync');
 });
 
-test('offline workspace distinguishes synced local jobs from pending jobs', async ({ page }) => {
+test('normal Work register distinguishes synced local jobs from pending jobs', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const syncedReference = 'ZAZ-SYNC-' + runId;
     const syncedName = 'Previously synced local job ' + runId;
@@ -612,8 +612,8 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toHaveCount(1);
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
 
-    // The cached dashboard is the fallback for unprimed routes. It must expose
-    // the IndexedDB working set instead of leaving the operator on a stale snapshot.
+    // The cached Dashboard keeps its normal layout and exposes the offline
+    // overview without replacing the operating interface.
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     const offlineWorkspace = page.locator('[data-zazu-offline-workspace]');
     await expect(offlineWorkspace).toBeVisible();
