@@ -133,8 +133,8 @@ async function markOfflineFallback(response) {
 
     const html = await response.clone().text();
     const marker = '<meta name="zazu-offline-fallback" content="1">';
-    const markedHtml = /<head(?:\\s[^>]*)?>/i.test(html)
-        ? html.replace(/<head((?:\\s[^>]*)?)>/i, '<head$1>' + marker)
+    const markedHtml = /<head(?:\s[^>]*)?>/i.test(html)
+        ? html.replace(/<head((?:\s[^>]*)?)>/i, '<head$1>' + marker)
         : marker + html;
 
     // The body length and validators no longer describe the injected HTML.
