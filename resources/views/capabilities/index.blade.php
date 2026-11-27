@@ -22,9 +22,11 @@
 
         <section class="zazu-catalogue-toolbar">
             <div class="zazu-catalogue-tabs" role="tablist" aria-label="Business catalogue" data-zazu-offline-catalogue-tabs>
-                <button type="button" class="zazu-catalogue-tab {{ $equipment->isNotEmpty() || $services->isEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isNotEmpty() || $services->isEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-equipment" data-catalogue-tab="equipment" data-zazu-catalogue-tab-count="equipment">
-                    <span>Hire &amp; rental</span><span class="zazu-tab-count font-mono" data-zazu-catalogue-count="equipment">{{ $equipment->count() }}</span>
-                </button>
+                @if ($equipment->isNotEmpty() || $services->isEmpty())
+                    <button type="button" class="zazu-catalogue-tab {{ $equipment->isNotEmpty() || $services->isEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isNotEmpty() || $services->isEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-equipment" data-catalogue-tab="equipment" data-zazu-catalogue-tab-count="equipment">
+                        <span>Hire &amp; rental</span><span class="zazu-tab-count font-mono" data-zazu-catalogue-count="equipment">{{ $equipment->count() }}</span>
+                    </button>
+                @endif
                 <button type="button" class="zazu-catalogue-tab {{ $equipment->isEmpty() && $services->isNotEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isEmpty() && $services->isNotEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-services" data-catalogue-tab="services" data-zazu-catalogue-tab-count="services">
                     <span>Services &amp; products</span><span class="zazu-tab-count font-mono" data-zazu-catalogue-count="services">{{ $services->count() }}</span>
                 </button>
