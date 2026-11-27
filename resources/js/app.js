@@ -2759,6 +2759,18 @@ function setupZazuOfflineDirectoryViews() {
                 ['Notes', record.notes],
             ],
         },
+        preparations: {
+            entity: 'preparation',
+            title: record => record.title || 'Preparation item',
+            meta: record => [record.category, record.quantity !== null && record.quantity !== undefined ? String(record.quantity)+' '+(record.unit || 'units') : '', record.due_date ? 'Due '+record.due_date : '', String(record.status || 'open').replace(/_/g, ' ')].filter(Boolean).join(' · '),
+            fields: record => [
+                ['Category', record.category],
+                ['Quantity', record.quantity !== null && record.quantity !== undefined ? String(record.quantity)+' '+(record.unit || 'units') : null],
+                ['Due date', record.due_date],
+                ['Status', String(record.status || 'open').replace(/_/g, ' ')],
+                ['Notes', record.notes],
+            ],
+        },
         costs: {
             entity: 'event_cost',
             title: record => record.description || record.category || 'Event cost',
@@ -3040,6 +3052,42 @@ function setupZazuOfflineDirectoryViews() {
                 chip.setAttribute('aria-label', syncStatus.label+'. '+syncStatus.title);
                 actions.append(chip);
 
+                if (collection === 'preparations') {
+                    for (const [status, label] of [['open', 'Open'], ['blocked', 'Blocked'], ['ready', 'Ready']]) {
+                        const statusForm = document.createElement('form');
+                        statusForm.method = 'POST';
+                        statusForm.action = window.location.pathname;
+                        statusForm.dataset.zazuOfflineEntity = 'preparation';
+                        statusForm.dataset.zazuOfflineJobId = String(record.event_id || '');
+                        statusForm.dataset.zazuOfflineLocalId = String(record.local_id || '');
+                        const serverId = Number(record.server_id ?? record.id ?? 0);
+                        if (serverId > 0) statusForm.dataset.zazuOfflineServerId = String(serverId);
+                        statusForm.dataset.zazuOfflineForceQueue = '1';
+                        const fields = {
+                            title: record.title || '',
+                            category: record.category || '',
+                            quantity: record.quantity ?? '',
+                            unit: record.unit || '',
+                            due_date: record.due_date || '',
+                            notes: record.notes || '',
+                            status,
+                        };
+                        for (const [name, value] of Object.entries(fields)) {
+                            const hidden = document.createElement('input');
+                            hidden.type = 'hidden';
+                            hidden.name = name;
+                            hidden.value = String(value);
+                            statusForm.append(hidden);
+                        }
+                        const statusButton = document.createElement('button');
+                        statusButton.type = 'submit';
+                        statusButton.className = status === record.status ? 'zazu-btn zazu-btn-secondary' : 'zazu-btn zazu-btn-ghost';
+                        statusButton.textContent = label;
+                        statusForm.append(statusButton);
+                        actions.append(statusForm);
+                    }
+                }
+
                 const detailButton = document.createElement('button');
                 detailButton.type = 'button';
                 detailButton.className = 'zazu-btn zazu-btn-ghost';
@@ -3296,6 +3344,7 @@ function setupZazuOfflineDirectoryViews() {
             }
 
             if (empty) empty.hidden = records.length > 0;
+            if (collection === 'preparations') setupZazuOfflineForms();
         });
     };
 
@@ -4172,14 +4221,27 @@ function setupZazuOfflineForms() {
             } else if (entity === 'preparation') {
                 const state = window.ZazuOffline.getState();
                 const serverJobId = form.dataset.zazuOfflineJobId;
-                const job = state?.jobs?.find(item => Number(item.id ?? item.server_id) === Number(serverJobId));
+                const localRecordId = form.dataset.zazuOfflineLocalId;
+                const serverRecordId = form.dataset.zazuOfflineServerId;
+                const existing = state?.preparations?.find(item =>
+                    (localRecordId && item.local_id === localRecordId)
+                    || (serverRecordId && Number(item.server_id ?? item.id) === Number(serverRecordId))
+                );
+                const job = state?.jobs?.find(item =>
+                    (serverJobId && Number(item.id ?? item.server_id) === Number(serverJobId))
+                    || (existing?.event_local_id && item.local_id === existing.event_local_id)
+                );
                 if (!job?.local_id) {
                     window.alert('This job is not available in this device copy yet.');
                     return;
                 }
+                if (serverRecordId && !existing?.local_id) {
+                    window.alert('This preparation item is not available in this device copy yet. Reconnect and refresh the job before changing its status.');
+                    return;
+                }
                 payload = {
-                    local_id: localId,
-                    server_id: null,
+                    local_id: existing?.local_id || localRecordId || localId,
+                    server_id: existing?.server_id ?? (serverRecordId ? Number(serverRecordId) : null),
                     event_local_id: job.local_id,
                     title: get('title'),
                     category: get('category') || null,
@@ -4189,6 +4251,7 @@ function setupZazuOfflineForms() {
                     status: get('status') || 'open',
                     notes: get('notes') || null,
                 };
+                payload.__operation = existing?.local_id ? 'update' : 'create';
             } else if (entity === 'event_cost') {
                 const state = window.ZazuOffline.getState();
                 const serverJobId = form.dataset.zazuOfflineJobId;
