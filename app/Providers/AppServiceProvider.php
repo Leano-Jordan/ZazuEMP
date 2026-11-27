@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function registerLocalPhpIniPassthrough(): void
     {
-        foreach (['PHP_INI_SCAN_DIR', 'SESSION_SECURE_COOKIE'] as $variable) {
+        foreach (['PHP_INI_SCAN_DIR', 'SESSION_SECURE_COOKIE', 'ZAZU_TEST_TRUST_FORWARDED_IPS'] as $variable) {
             if (! in_array($variable, ServeCommand::$passthroughVariables, true)) {
                 ServeCommand::$passthroughVariables[] = $variable;
             }
