@@ -75,9 +75,13 @@ async function waitForOfflineRuntime(page) {
 
 async function waitForOfflinePagesPrimed(page) {
     await expect.poll(
-        () => page.locator('html').getAttribute('data-zazu-offline-pages-primed'),
+        () => page.locator('html').evaluate(element => ({
+            primed: element.dataset.zazuOfflinePagesPrimed || 'pending',
+            reason: element.dataset.zazuOfflinePagesPrimeReason || null,
+            routeCount: element.dataset.zazuOfflinePagesPrimeRouteCount || null,
+        })),
         { message: 'the authenticated page cache must be primed before changing business context' },
-    ).toBe('true');
+    ).toMatchObject({ primed: 'true' });
 }
 
 async function openPublicNavigation(page) {
