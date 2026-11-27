@@ -36,3 +36,10 @@ This record separates historical failures that have been corrected from the curr
 5. Keep Basic/Intermediate/Professional as capability labels only. No feature gate or numerical limit is authorised.
 
 **Current verdict:** historical defects listed above have recorded corrective changes. The latest offline implementation is not CI-certified from the available evidence. Zazu V1 remains NOT READY.
+## Workflow trigger clarification — 2026-11-27
+
+- `.github/workflows/laravel.yml` runs on pushes to `main` when application/test paths change. It includes Laravel/PHPUnit, PostgreSQL migration/recovery and the offline-browser acceptance jobs.
+- PHPMD and Psalm workflows also have `push` triggers for relevant app/test paths. The separate full `zazu-browser.yml` workflow is PR/manual-dispatch triggered; the focused offline browser suite is part of `laravel.yml`.
+- The connected workflow-run fetch function filters to pull-request-triggered runs only. An empty result does not mean push-triggered workflows were not created. The combined-status lookup returned no status entries and this connector exposes no push-run job/log listing or workflow-dispatch operation.
+- Therefore the current exact-head state is **UNVERIFIED through the available connector**, not evidence that the jobs did not run and not evidence that they passed. Read the `main` push run in GitHub Actions for the exact test commit before treating this change as accepted.
+- Latest engineering state update: `57fe5d3`. Latest test commit: `b30de1b`. Latest source fix: `0f8447b`.
