@@ -1,12 +1,13 @@
 # Changelog
 
-## 2026-11-27 — Offline navigation and cross-tab acceptance corrections
+## 2026-11-27 — Exact-route offline navigation and cross-tab acceptance corrections
 
-- Corrected cold-launch detection in the service worker. An empty `FetchEvent.clientId` is not sufficient evidence of a cold launch; checking for any same-origin window was also unreliable because same-tab navigations may no longer expose the old client and unrelated tabs can produce false positives.
-- The worker now uses a same-origin navigation referrer to preserve in-app route intent when `clientId` is empty. An absent, `about:client`, malformed or non-local referrer retains the cold-launch Dashboard behaviour. The app's strict-origin-when-cross-origin policy preserves same-origin referrers.
-- Added unit and feature coverage for same-origin referrer versus cold-launch behaviour. Updated offline browser journeys to explicitly model same-origin in-app navigation; the installed-app cold-launch test omits a referrer.
+- The service worker's cold-launch classification proved unreliable. Empty `FetchEvent.clientId`, request referrer and live-window enumeration did not consistently distinguish installed-app launches from same-tab route changes in browser acceptance.
+- Removed the cold-launch Dashboard preference. Every navigation now prefers the exact URL from the active user/business cache; Dashboard is used only when the requested route is not cached. The configured installed-app start URL remains Dashboard, while cached deep links preserve their destination.
+- Added worker and Laravel feature assertions for exact-route selection on both cold launch and in-app navigation, plus safe Dashboard fallback for uncached routes. Browser acceptance now uses real same-tab anchor clicks rather than `page.goto()` to model user navigation.
+- The referrer-based run passed Laravel, coverage, PostgreSQL and Zazu Quality, but browser acceptance remained 78 passed / 2 failed. The actual-anchor test correction reproduced both failures, confirming the worker fallback policy—not merely the test fixture—was at fault.
+- Current exact-route correction is committed across worker `2332115`, worker tests `880b6b6`, feature contract `c90f256`, route-click acceptance `1e87892`, customer edit acceptance `d6d0ee3`, and application comment `b6c7d1c`. Exact-head CI is pending; no pass is claimed.
 - Corrected the cross-tab identity E2E fixture to accept the intentional logout confirmation dialog. The previous test auto-dismissed it and therefore never exercised the logout transition.
-- The intermediate live-client attempt passed Laravel, coverage, PostgreSQL, Zazu Quality and Windows packaging, but offline browser acceptance remained 77 passed / 3 failed. The referrer-based correction is committed across worker `a2b8957`, worker tests `102b6fa`, feature contract `0871121`, PWA acceptance `b769a63` and customer edit acceptance `651ac45`. Exact-head CI is pending; no new pass is claimed.
 
 
 ## 2026-11-26 — Authentication session replay regression (acceptance pending)
