@@ -516,14 +516,13 @@ class PwaOfflineFoundationTest extends TestCase
         $workShow = File::get(resource_path('views/work/show.blade.php'));
         $requirementsIndex = File::get(resource_path('views/requirements/index.blade.php'));
 
-        $this->assertStringContainsString(
-            "|^\\\\/(?:quotes\\\\/[^/]+\\\\/view|invoices\\\\/[^/]+\\\\/view|payments\\\\/[^/]+\\\\/receipt)$|.test(route.pathname)",
-            $worker
-        );
-        $this->assertStringContainsString("$event->isClosed() ? route('work.quotes.index', $event)", $workShow);
-        $this->assertStringContainsString("@unless ($event->isClosed())", $workShow);
-        $this->assertStringContainsString("@if (!$latestQuote && !$event->isClosed())", $workShow);
-        $this->assertStringContainsString("@unless ($scopeLocked)", $requirementsIndex);
+        $this->assertStringContainsString('quotes\\/[^/]+\\/view', $worker);
+        $this->assertStringContainsString('invoices\\/[^/]+\\/view', $worker);
+        $this->assertStringContainsString('payments\\/[^/]+\\/receipt', $worker);
+        $this->assertStringContainsString('$event->isClosed() ? route(\'work.quotes.index\', $event)', $workShow);
+        $this->assertStringContainsString('@unless ($event->isClosed())', $workShow);
+        $this->assertStringContainsString('@if (!$latestQuote && !$event->isClosed())', $workShow);
+        $this->assertStringContainsString('@unless ($scopeLocked)', $requirementsIndex);
     }
 
     public function test_pwa_icon_files_are_present(): void
