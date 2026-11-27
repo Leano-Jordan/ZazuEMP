@@ -311,7 +311,7 @@
         @if ($license)
             <div class="zazu-list-item mt-4">
                 <div class="min-w-0 flex-1">
-                    <strong class="block">Installed entitlement: {{ $license->plan === 'solo' ? 'Advanced' : ucfirst($license->plan) }} · {{ $license->statusLabel() }}</strong>
+                    <strong class="block">Installed entitlement: {{ config('zazu.experience_levels.'.($license->plan === 'solo' ? 'advanced' : $license->plan).'.label', ucfirst($license->plan)) }} · {{ $license->statusLabel() }}</strong>
                     <p class="zazu-context-copy mt-1">
                         @if ($license->starts_at)
                             Starts {{ $license->starts_at->format('d M Y') }}
