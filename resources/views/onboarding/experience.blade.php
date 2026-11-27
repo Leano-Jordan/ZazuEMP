@@ -9,7 +9,7 @@
             @if($isFounder)
                 <p class="zazu-field-help mt-3" role="status">Founder access: all experience levels are available to this configured account. This does not change the business licence or customer entitlements.</p>
             @elseif($isTrial)
-                <p class="zazu-field-help mt-3" role="status">Your 30-day Advanced trial ends {{ $trialEndsAt?->format('j M Y') }}. It moves to Basic Free at expiry unless you actively install a paid entitlement.</p>
+                <p class="zazu-field-help mt-3" role="status">Your 30-day Professional trial ends {{ $trialEndsAt?->format('j M Y') }}. It moves to Basic Free at expiry unless you actively install a paid entitlement.</p>
             @else
                 <p class="zazu-field-help mt-3" role="status">Workspace tier: <strong>{{ $maximumLevelLabel }}</strong>. You can select this tier or a lower experience.</p>
             @endif
@@ -55,7 +55,7 @@
                 <span aria-hidden="true">+</span>
             </summary>
             <div class="zazu-disclosure-body">
-                <p class="zazu-fieldset-help">Basic, Intermediate and Advanced are the three workspace payment tiers. Your selection controls presentation within the tier available to this business.</p>
+                <p class="zazu-fieldset-help">Basic, Intermediate and Professional are the three workspace capability levels. Your selection controls presentation within the tier available to this business.</p>
                 <div class="zazu-form-grid">
                     @foreach($options as $key => $option)
                         @php($isAvailable = in_array($key, $availableLevels, true))
