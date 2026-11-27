@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v65';
+const CACHE_NAME = 'zazu-static-v66';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -412,8 +412,8 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
             || route.pathname === '/api'
             || route.pathname.startsWith('/api/')
             || ['/logout', '/business/switch'].includes(route.pathname)
-            || /^\\/(?:build|images|icons|media|storage)\\//.test(route.pathname)
-            || /\\.[a-z0-9]{2,8}$/i.test(route.pathname)) return;
+            || /^\/(?:build|images|icons|media|storage)\//.test(route.pathname)
+            || /\.[a-z0-9]{2,8}$/i.test(route.pathname)) return;
 
         const canonicalPath = route.pathname;
         if (seenRoutes.has(canonicalPath)) return;
@@ -466,7 +466,7 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                     // each primed document. This expands coverage from the
                     // user's actual navigation graph while retaining strict
                     // same-origin, route-count and session boundaries.
-                    for (const match of html.matchAll(/<a\\b[^>]*\\bhref\\s*=\\s*["']([^"']+)["']/gi)) {
+                    for (const match of html.matchAll(/<a\b[^>]*\bhref\s*=\s*["']([^"']+)["']/gi)) {
                         addRoute(match[1].replace(/&amp;/g, '&'));
                     }
 
