@@ -151,7 +151,7 @@ final class SyncBootstrapDeliveryTargetResolver
             'expense' => FinanceExpense::class,
             'inventory_item' => InventoryItem::class,
             'event_cost' => EventCost::class,
-            'asset' => 'asset',
+            'asset' => Asset::class,
         ];
 
         return $models[$entityType] ?? null;
@@ -175,7 +175,7 @@ final class SyncBootstrapDeliveryTargetResolver
             'invoice' => 'invoice',
             'expense' => 'expense',
             'inventory_item' => 'inventory_item',
-            'asset' => Asset::class,
+            'asset' => 'asset',
             'event_cost' => 'event_cost',
             default => null,
         };
