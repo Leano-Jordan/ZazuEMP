@@ -2586,6 +2586,7 @@ function setupZazuOfflineDirectoryViews() {
                 ? directory.querySelector('[data-zazu-server-quote-id="' + serverId + '"]')
                 : null;
             if (serverRow) {
+                const version = quote.latest_version || quote.latestVersion || {};
                 const title = serverRow.querySelector('.zazu-list-title');
                 if (title) title.textContent = quote.reference || 'Quote #' + serverId;
                 const meta = serverRow.querySelector('.zazu-list-meta');
@@ -2595,6 +2596,12 @@ function setupZazuOfflineDirectoryViews() {
                         quote.currency || state?.business?.currency || 'ZAR',
                     ].join(' · ');
                 }
+                const numericCells = serverRow.querySelectorAll('.zazu-side-primary');
+                if (numericCells[0]) numericCells[0].textContent = version.version ? 'v' + String(version.version) : '—';
+                if (numericCells.length > 1) numericCells[numericCells.length - 1].textContent = version.total !== undefined ? String(version.total) : '—';
+                const statusCells = serverRow.querySelectorAll('.zazu-chip');
+                const statusCell = statusCells.length > 1 ? statusCells[1] : null;
+                if (statusCell) statusCell.textContent = String(version.status || quote.status || 'draft').replace(/_/g, ' ');
                 const syncStatus = localSyncStatus(state, 'quote', quote.local_id, serverId, quote.pending_sync === true);
                 const syncTarget = meta || serverRow.querySelector('.zazu-list-main') || serverRow;
                 let syncChip = syncTarget.querySelector('[data-zazu-local-sync-chip]');
@@ -2643,16 +2650,18 @@ function setupZazuOfflineDirectoryViews() {
             chip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
             sync.append(chip);
 
+            const quoteVersion = quote.latest_version || quote.latestVersion || {};
             const version = document.createElement('div');
             version.className = 'zazu-side-primary';
-            version.textContent = quote.version ? 'v' + String(quote.version) : '—';
+            version.textContent = quoteVersion.version ? 'v' + String(quoteVersion.version) : '—';
             const status = document.createElement('div');
-            const statusChip = text('span', 'zazu-chip zazu-chip-neutral', String(quote.status || 'draft').replace(/_/g, ' '));
+            const quoteStatus = String(quoteVersion.status || quote.status || 'draft').replace(/_/g, ' ');
+            const statusChip = text('span', 'zazu-chip zazu-chip-neutral', quoteStatus);
             status.append(statusChip);
             const total = document.createElement('div');
             total.className = 'zazu-side-primary';
-            total.textContent = quote.total !== undefined && quote.total !== null
-                ? String(quote.currency || state?.business?.currency || 'ZAR') + ' ' + String(quote.total)
+            total.textContent = quoteVersion.total !== undefined && quoteVersion.total !== null
+                ? String(quote.currency || state?.business?.currency || 'ZAR') + ' ' + String(quoteVersion.total)
                 : '—';
             main.append(sync);
             row.append(identity, version, status, total);
