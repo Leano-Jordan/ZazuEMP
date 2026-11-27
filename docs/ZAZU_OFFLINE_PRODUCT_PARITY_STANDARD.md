@@ -324,3 +324,34 @@ No automated green check by itself proves visual or functional parity. The curre
 - The browser suite was rewritten to use native Customers, Work, Quotes, Inventory, Suppliers, Finance, Settings and Catalogue pages. Uncached route tests now assert a connection-required state in the same shell.
 
 **Validation:** these changes are on `main`; exact-head Laravel, browser, quality/security and Windows package runs are queued/pending at this checkpoint. Do not treat the previous green baseline as validation of these new changes. Physical PC and Android acceptance remain open.
+
+
+## 15. Iteration 3 implementation log — preparation and travel boundaries (2026-11-27)
+
+**Status: IMPLEMENTED ON MAIN — exact-head automated validation pending; physical acceptance open.**
+
+### Preparation register
+
+- The normal Preparation page now exposes its existing register to the shared native collection renderer.
+- Server-backed preparation rows carry stable server IDs. Local records reconcile into those rows rather than creating duplicates.
+- Local-only preparation records render in the normal Preparation list with their existing Zazu row treatment and saved-detail inspection.
+- Existing Open / Blocked / Ready controls are now offline-aware. On a disconnected device, the selected status is queued as an update against the existing local identity; it does not create a second preparation record.
+- The native row status chip is reconciled from the local working copy so the displayed state follows the queued change.
+- Added Laravel source-contract coverage for the native register, stable row identity, status form metadata, update operation and dynamic form binding.
+
+### Travel calculation boundary
+
+- Travel calculations currently have no offline domain mutation handler, local collection, or bootstrap contract. They must not be represented as offline CRUD.
+- The normal travel-create page now states that saving requires a live connection.
+- Submission is intercepted synchronously. The browser checks origin reachability before allowing the normal Laravel submission; when unavailable, it keeps the form values on screen and explains that no local draft was saved.
+- Added source-contract coverage for the online-only boundary and its safe submission guard.
+- Travel index data remains a cached server snapshot, not a live or locally editable travel ledger.
+
+### Remaining work and acceptance
+
+- Exact-head CI must validate the preparation local create/status-update flow, dynamic forms, JS build, Laravel suite, browser suite, PostgreSQL recovery, quality/security and Windows packaging.
+- Add full desktop/mobile browser acceptance for preparation create and status changes, including reload and reconnect without duplicates.
+- Physical PC and Android disconnected status changes and restart persistence remain Founder acceptance gates.
+- Travel remains connection-dependent until a complete local data contract, calculations, mutation validation, identity reconciliation and tests are implemented.
+
+No release or parity gate is marked accepted by this implementation log.
