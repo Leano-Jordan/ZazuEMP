@@ -391,30 +391,37 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     const controller = new AbortController();
     activePrimeController = controller;
 
-    const uniqueRoutes = [...new Set(Array.isArray(routes) ? routes : [])]
-        .map((path) => {
-            if (typeof path !== 'string' || path.length > 2048) return null;
+    const uniqueRoutes = [];
+    const seenRoutes = new Set();
+    const addRoute = (path) => {
+        if (typeof path !== 'string' || path.length > 2048
+            || uniqueRoutes.length >= MAX_PRIME_ROUTES) return;
 
-            let route;
-            try {
-                route = new URL(path, self.location.origin);
-            } catch {
-                return null;
-            }
+        let route;
+        try {
+            route = new URL(path, self.location.origin);
+        } catch {
+            return;
+        }
 
-            // The message channel is same-origin, but route values are still
-            // input. Never let cache priming turn them into credentialed
-            // cross-origin fetches (for example, a //host/path URL).
-            if (route.origin !== self.location.origin
-                || route.username !== ''
-                || route.password !== ''
-                || route.pathname === '/api'
-                || route.pathname.startsWith('/api/')) return null;
+        // Cache only same-origin application documents. Never prime APIs,
+        // session-changing endpoints, private media or static assets as pages.
+        if (route.origin !== self.location.origin
+            || route.username !== ''
+            || route.password !== ''
+            || route.pathname === '/api'
+            || route.pathname.startsWith('/api/')
+            || ['/logout', '/business/switch'].includes(route.pathname)
+            || /^\\/(?:build|images|icons|media|storage)\\//.test(route.pathname)
+            || /\\.[a-z0-9]{2,8}$/i.test(route.pathname)) return;
 
-            return route.pathname + route.search;
-        })
-        .filter(Boolean)
-        .slice(0, MAX_PRIME_ROUTES);
+        const canonicalPath = route.pathname;
+        if (seenRoutes.has(canonicalPath)) return;
+        seenRoutes.add(canonicalPath);
+        uniqueRoutes.push(canonicalPath);
+    };
+
+    (Array.isArray(routes) ? routes : []).forEach(addRoute);
 
     const primedPrivateMediaUrls = new Set();
     const primedStaticAssetUrls = new Set();
@@ -454,6 +461,14 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
 
                     const pageRequest = new Request(new URL(path, self.location.origin));
                     await cache.put(pageRequest, response.clone());
+
+                    // Discover further authenticated pages from real links in
+                    // each primed document. This expands coverage from the
+                    // user's actual navigation graph while retaining strict
+                    // same-origin, route-count and session boundaries.
+                    for (const match of html.matchAll(/<a\\b[^>]*\\bhref\\s*=\\s*["']([^"']+)["']/gi)) {
+                        addRoute(match[1].replace(/&amp;/g, '&'));
+                    }
 
                     await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);
                     await primePrivateMediaFromHtml(
