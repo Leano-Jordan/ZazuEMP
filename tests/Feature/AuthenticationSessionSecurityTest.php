@@ -152,7 +152,7 @@ class AuthenticationSessionSecurityTest extends TestCase
             'ip_address' => '127.0.0.1',
             'user_agent' => 'concurrent-request-a',
             'payload' => base64_encode(json_encode([
-                'login_web_' . sha1('App\\Models\\User') => 42,
+                'login_web_'.sha1('App\\Models\\User') => 42,
                 '_token' => Str::random(40),
             ], JSON_THROW_ON_ERROR)),
             'last_activity' => now()->timestamp,
