@@ -181,6 +181,7 @@ class PwaOfflineFoundationTest extends TestCase
     {
         $worker = File::get(public_path('sw.js'));
         $app = File::get(resource_path('js/app.js'));
+        $layout = File::get(resource_path('views/components/app-layout.blade.php'));
 
         $this->assertStringContainsString('async function cachedAppPage(request)', $worker);
         $this->assertStringContainsString('if (cachedPage) return cachedPage;', $worker);
@@ -188,7 +189,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('async function markOfflineFallback(response)', $worker);
         $this->assertStringContainsString('zazu-offline-fallback', $worker);
         $this->assertStringContainsString('const isFallbackDocument = document.querySelector(', $app);
-        $this->assertStringContainsString('workspace.hidden = true;', $app);
+        $this->assertStringContainsString('const refreshOfflineApplicationState = () => {', $app);
+        $this->assertStringNotContainsString('data-zazu-offline-workspace', $app);
+        $this->assertStringNotContainsString('data-zazu-offline-workspace', $layout);
+        $this->assertStringNotContainsString('components.offline-workspace', $layout);
         $this->assertStringContainsString('data-zazu-offline-route-unavailable', $app);
         $this->assertStringContainsString('This page is not saved on this device yet', $app);
         $this->assertStringContainsString("retry.addEventListener('click', () => window.location.reload());", $app);
@@ -199,6 +203,8 @@ class PwaOfflineFoundationTest extends TestCase
 
         $this->assertStringContainsString('const uniqueRoutes = [];', $worker);
         $this->assertStringContainsString('uniqueRoutes.length >= MAX_PRIME_ROUTES', $worker);
+        $this->assertStringContainsString('routeDiscoveryTruncated', $worker);
+        $this->assertStringContainsString('discoveredCachedPages.every(Boolean)', $worker);
         $this->assertStringContainsString('for (const match of html.matchAll(/<a\\b', $worker);
         $this->assertStringContainsString('addRoute(match[1].replace(/&amp;/g, \'&\'));', $worker);
         $this->assertStringContainsString('const routes = new Set([', $app);
@@ -228,7 +234,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('data-zazu-offline-collection="catalogue"', $view);
     }
 
-    public function test_offline_workspace_navigation_remains_available_in_offline_mode(): void
+    public function test_application_navigation_remains_available_in_offline_mode(): void
     {
         $styles = File::get(resource_path('css/app.css'));
 
@@ -462,9 +468,14 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertFileExists(public_path('icons/zazu-512.svg'));
     }
 
-    public function test_legacy_offline_workspace_view_is_removed(): void
+    public function test_legacy_offline_workspace_views_are_removed(): void
     {
+        $layout = File::get(resource_path('views/components/app-layout.blade.php'));
+
         $this->assertFileDoesNotExist(resource_path('views/offline.blade.php'));
+        $this->assertFileDoesNotExist(resource_path('views/components/offline-workspace.blade.php'));
+        $this->assertStringNotContainsString('components.offline-workspace', $layout);
+        $this->assertStringNotContainsString('data-zazu-offline-workspace', $layout);
     }
 
     public function test_invoice_create_form_is_offline_enabled(): void
