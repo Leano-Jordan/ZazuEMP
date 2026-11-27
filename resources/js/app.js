@@ -2688,15 +2688,6 @@ function setupZazuOfflineDirectoryViews() {
                 ['Address', record.address], ['Notes', record.notes],
             ],
         },
-        catalogue: {
-            entity: 'service',
-            title: record => record.name || 'Unnamed service',
-            meta: record => [record.capability_type, (record.is_active ?? record.active) === false ? 'Inactive' : 'Active'].filter(Boolean).join(' · '),
-            fields: record => [
-                ['Type', record.capability_type], ['Description', record.description],
-                ['Availability', (record.is_active ?? record.active) === false ? 'Inactive' : 'Active'],
-            ],
-        },
         inventory_items: {
             entity: 'inventory_item',
             editPath: '/inventory/create',
@@ -3451,7 +3442,7 @@ function setupZazuOfflineDirectoryViews() {
     });
 
     // One shared origin state prevents overlapping health probes from
-    // racing and hiding the local workspace after a newer offline transition.
+    // racing and leaving the offline indicator in a stale state.
     let lastOriginAvailable = navigator.onLine;
     const refreshOfflineApplicationState = () => {
         applyOfflineRouteView();
@@ -3567,7 +3558,7 @@ function setupZazuOfflineDirectoryViews() {
                 window.dispatchEvent(new CustomEvent('zazu:origin-availability', {
                     detail: { available: lastOriginAvailable },
                 }));
-                refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState());
+                refreshOfflineApplicationState();
             } finally {
                 checking = false;
                 if (refreshQueued) {
@@ -3584,7 +3575,7 @@ function setupZazuOfflineDirectoryViews() {
             window.dispatchEvent(new CustomEvent('zazu:origin-availability', {
                 detail: { available: false },
             }));
-            refreshOfflineWorkspaceVisibility(window.ZazuOffline.getState());
+            refreshOfflineApplicationState();
             refreshOriginAvailability();
         });
         window.addEventListener('focus', refreshOriginAvailability);
