@@ -4055,8 +4055,24 @@ test.describe('Zazu installed PWA offline shell', () => {
                 ['/work', 'Jobs'],
                 ['/work/create', 'New job'],
             ]) {
-                const response = await page.goto(path, { waitUntil: 'domcontentloaded', referer: page.url() });
-                expect(response?.ok(), path + ' must be available from the authenticated offline cache').toBe(true);
+                const navigationResponse = page.waitForResponse(response =>
+                    response.request().isNavigationRequest()
+                    && new URL(response.url()).pathname === path
+                );
+                // Exercise a real same-tab link navigation. page.goto() creates
+                // a browser-driven navigation without an initiating document
+                // client and therefore models a cold launch, not a user click.
+                await page.evaluate((destination) => {
+                    const link = document.createElement('a');
+                    link.href = destination;
+                    link.textContent = 'Offline navigation test';
+                    link.dataset.zazuNavigationFixture = 'true';
+                    document.body.appendChild(link);
+                    link.click();
+                }, path);
+                const response = await navigationResponse;
+                expect(response.ok(), path + ' must be available from the authenticated offline cache').toBe(true);
+                await page.waitForURL(url => url.pathname === path);
                 await expect(page.locator('.zazu-page-title')).toHaveText(heading);
                 await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
             }
