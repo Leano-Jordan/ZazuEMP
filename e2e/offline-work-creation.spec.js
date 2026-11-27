@@ -503,10 +503,14 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // Cache entries can appear before the service worker has finished warming
     // their dependent assets. Wait for its explicit completion acknowledgement
     // before simulating a disconnected launch.
-    await page.waitForFunction(
-        () => document.documentElement.dataset.zazuOfflinePagesPrimed === 'true',
-        { timeout: 20_000 },
-    );
+    await expect.poll(
+        () => page.evaluate(() => ({
+            primed: document.documentElement.dataset.zazuOfflinePagesPrimed || 'pending',
+            reason: document.documentElement.dataset.zazuOfflinePagesPrimeReason || null,
+            routeCount: document.documentElement.dataset.zazuOfflinePagesPrimeRouteCount || null,
+        })),
+        { timeout: 20_000, message: 'offline route priming must finish before disconnected job creation' },
+    ).toMatchObject({ primed: 'true' });
 
     // The owner must explicitly trust this browser before offline changes can sync.
     await trustCurrentDevice(page);
