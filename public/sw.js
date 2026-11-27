@@ -125,24 +125,23 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
-async function shouldPreferOfflineShell(request, event) {
+function shouldPreferOfflineShell(request, event) {
     if (request.mode !== 'navigate') return false;
 
-    // FetchEvent.clientId is empty for top-level navigation requests, including
-    // clicks from an existing page. Use the live window-client set to distinguish
-    // an actual cold launch from an in-app route transition.
+    // Some browsers expose an empty clientId for every top-level navigation.
+    // A same-origin referrer identifies a route transition from the existing
+    // app; an absent/non-local referrer is a genuine cold launch.
     if (event.clientId) return false;
 
-    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    const hasExistingAppWindow = windows.some((client) => {
-        try {
-            return new URL(client.url).origin === self.location.origin;
-        } catch {
-            return false;
-        }
-    });
+    const referrer = request.referrer;
+    if (!referrer || referrer === 'about:client') return true;
 
-    return !hasExistingAppWindow;
+    try {
+        const referrerUrl = new URL(referrer);
+        return referrerUrl.origin !== self.location.origin;
+    } catch {
+        return true;
+    }
 }
 
 async function cachedAppPage(request, preferShell = false) {
@@ -586,6 +585,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     const requestGeneration = activeUserGeneration;
+    const preferOfflineShell = shouldPreferOfflineShell(request, event);
     const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
     const isAppPage = request.method === 'GET'
         && url.origin === self.location.origin
@@ -593,12 +593,7 @@ self.addEventListener('fetch', (event) => {
         && (request.mode === 'navigate' || acceptsHtml);
 
     if (isAppPage) {
-        // respondWith must be called synchronously during the fetch event.
-        // Cold-launch detection is asynchronous because it inspects live clients,
-        // so resolve it inside the response promise rather than the event callback.
         event.respondWith((async () => {
-            const preferOfflineShell = await shouldPreferOfflineShell(request, event);
-
             // When the browser reports no network, do not spend four seconds
             // attempting the unreachable Laravel host. Resolve the authenticated
             // page from its user/business cache immediately instead.
