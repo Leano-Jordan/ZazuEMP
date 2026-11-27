@@ -903,7 +903,8 @@ test('native Preparation page queues a status update against the existing local 
             operation: mutation?.operation,
             serverId: mutation?.payload?.server_id,
             localId: mutation?.payload?.local_id,
-            expectedRevision: mutation?.payload?.expected_revision,
+            queuedStatus: mutation?.payload?.record?.status,
+            queuedJobIdentity: mutation?.payload?.record?.event_local_id,
             localDirty: state.local_dirty,
         };
     }, { preparationLocalId })).toEqual({
@@ -911,15 +912,16 @@ test('native Preparation page queues a status update against the existing local 
         operation: 'update',
         serverId: preparationServerId,
         localId: preparationLocalId,
-        expectedRevision: 2,
+        queuedStatus: 'ready',
+        queuedJobIdentity: job.local_id,
         localDirty: true,
     });
-    await expect(row.locator('.zazu-chip')).toHaveText('Ready');
+    await expect(row.getByRole('button', { name: 'Ready' })).toHaveClass(/zazu-btn-secondary/);
 
     await page.reload({ waitUntil: 'domcontentloaded' });
     const reloadedRow = page.locator('[data-zazu-offline-collection="preparations"] [data-zazu-local-record="preparations"]').filter({ hasText: 'Offline readiness status check' });
     await expect(reloadedRow).toBeVisible();
-    await expect(reloadedRow.locator('.zazu-chip')).toHaveText('Ready');
+    await expect(reloadedRow.getByRole('button', { name: 'Ready' })).toHaveClass(/zazu-btn-secondary/);
     await expect.poll(async () => page.evaluate(async ({ preparationLocalId }) =>
         (await window.ZazuOffline.pending()).filter(item =>
             item.entity_type === 'preparation' && item.payload?.local_id === preparationLocalId
