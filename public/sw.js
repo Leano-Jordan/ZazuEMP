@@ -125,14 +125,24 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
-function shouldPreferOfflineShell(request, coldLaunch = false) {
+async function shouldPreferOfflineShell(request, event) {
     if (request.mode !== 'navigate') return false;
 
-    // Only a cold app launch should deliberately open the dashboard shell.
-    // In-app navigation must prefer the exact destination from the active
-    // business cache when the host is offline or temporarily unreachable;
-    // otherwise destinations silently land on the dashboard and lose intent.
-    return coldLaunch;
+    // FetchEvent.clientId is empty for top-level navigation requests, including
+    // clicks from an existing page. Use the live window-client set to distinguish
+    // an actual cold launch from an in-app route transition.
+    if (event.clientId) return false;
+
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const hasExistingAppWindow = windows.some((client) => {
+        try {
+            return new URL(client.url).origin === self.location.origin;
+        } catch {
+            return false;
+        }
+    });
+
+    return !hasExistingAppWindow;
 }
 
 async function cachedAppPage(request, preferShell = false) {
@@ -578,7 +588,7 @@ self.addEventListener('fetch', (event) => {
     const requestGeneration = activeUserGeneration;
     // A top-level navigation with no initiating client is a cold app launch
     // (for example, opening the installed Zazu icon while the host is down).
-    const preferOfflineShell = shouldPreferOfflineShell(request, event.clientId === '');
+    const preferOfflineShell = await shouldPreferOfflineShell(request, event);
     const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
     const isAppPage = request.method === 'GET'
         && url.origin === self.location.origin
