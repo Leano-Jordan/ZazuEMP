@@ -216,7 +216,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('routeDiscoveryTruncated', $worker);
         $this->assertStringContainsString('routesTruncated === true', $worker);
         $this->assertStringContainsString('routesTruncated: routeList.length > 100', $app);
-        $this->assertStringContainsString('discoveredCachedPages.every(Boolean)', $worker);
+        $this->assertStringContainsString('discoveredMissing.length === 0', $worker);
         $this->assertStringContainsString('for (const match of html.matchAll(/<a\\b', $worker);
         $this->assertStringContainsString('addRoute(match[1].replace(/&amp;/g, \'&\'));', $worker);
         $this->assertStringContainsString('const routes = new Set([', $app);
