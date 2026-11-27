@@ -166,8 +166,14 @@ class AuthenticationSessionSecurityTest extends TestCase
         );
         $this->assertStringContainsString('login_web_', $inFlightHandler->read($sessionId));
 
-        // Request B logs out / resets the account and destroys that session.
-        $this->assertTrue($inFlightHandler->destroy($sessionId));
+        // Request B uses its own handler instance to log out / reset the
+        // account and destroy the session while request A remains in flight.
+        $logoutHandler = new DatabaseSessionHandler(
+            DB::connection(),
+            config('session.table', 'sessions'),
+            (int) config('session.lifetime', 120),
+        );
+        $this->assertTrue($logoutHandler->destroy($sessionId));
         $this->assertDatabaseMissing('sessions', ['id' => $sessionId]);
 
         // Request A finishes later. Laravel's database handler must UPDATE the
