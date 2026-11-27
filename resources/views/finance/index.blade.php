@@ -49,7 +49,7 @@
     </div>
 </section>
 
-<section class="zazu-card zazu-list mt-5">
+<section class="zazu-card zazu-list mt-5" data-zazu-offline-collection="invoices" data-zazu-offline-collection-list>
     <div class="zazu-card-header"><div><div class="zazu-eyebrow">Receivables</div><div class="zazu-card-title mt-1">Invoices</div></div><span class="zazu-section-count">{{ $invoices->total() }}</span></div>
     @forelse($invoices as $invoice)
         @php
@@ -60,7 +60,7 @@
                 default => 'info-circle',
             };
         @endphp
-        <div class="zazu-list-item">
+        <div class="zazu-list-item" data-zazu-server-record-id="{{ $invoice->id }}">
             <div class="zazu-list-main">
                 <div class="zazu-list-title">{{ $invoice->number }}</div>
                 <div class="zazu-list-meta">{{ $invoice->event?->name ?: 'No job linked' }} · due {{ $invoice->due_at?->format('d M Y') ?: 'Not set' }}</div>
@@ -95,7 +95,7 @@
             <div class="zazu-empty">No payments recorded.</div>
         @endforelse
     </div>
-    <div class="zazu-card zazu-list">
+    <div class="zazu-card zazu-list" data-zazu-offline-collection="expenses" data-zazu-offline-collection-list>
         <div class="zazu-card-header"><div class="zazu-card-title">Recent expenses</div></div>
         @forelse($expenses as $expense)
             @php
@@ -106,7 +106,7 @@
                     default => 'info-circle',
                 };
             @endphp
-            <div class="zazu-list-item">
+            <div class="zazu-list-item" data-zazu-server-record-id="{{ $expense->id }}">
                 <div class="zazu-list-main"><div class="zazu-list-title">{{ $expense->description }}</div><div class="zazu-list-meta"><x-icon name="{{ $expenseStatusIcon }}" size="16" class="zazu-status-icon" />{{ ucfirst($expense->status) }} · {{ $expense->expense_date->format('d M Y') }}</div></div>
                 <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $expense->currency }} {{ $expense->amount }}</div></div>
             </div>
