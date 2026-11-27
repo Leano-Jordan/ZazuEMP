@@ -10,10 +10,9 @@
 
 - The product is operated by the owner as an individual / solo operator.
 - The owner currently handles product operation, support, privacy requests, incidents and customer administration.
-- The three commercial tiers are **Basic (Free), Intermediate (paid) and Advanced (paid)**. Intermediate pricing and the final tier-by-tier feature matrix are not yet approved.
-- The existing **R99 per business/workspace/month** amount remains a working Advanced price target, not a published offer or finalized billing contract.
-- Free trial: **30 days**, with the Advanced experience available during the trial.
-- At trial end, the workspace moves to Basic Free unless an active paid Intermediate or Advanced entitlement is installed.
+- The three customer-facing capability levels are **Basic, Intermediate and Professional**. They are one product with increasing operational capability, not separate applications.
+- No prices, billing terms or numerical capacity limits are approved by the current Founder decision. Earlier R99 and four-tier pricing proposals are historical hypotheses and must not be published or implemented.
+- The existing 30-day trial currently grants the highest capability ceiling, now labelled Professional, then falls back to Basic continuity unless a valid higher entitlement is installed.
 - On subscription expiry or non-payment, the customer is **not locked out**. Basic Free continuity remains available. Expiry alone does not authorise deletion, withholding or destruction of customer data.
 - Trial expiry never silently starts paid billing.
 - Both hosted and local/offline deployment models are intended.
@@ -21,9 +20,9 @@
 - The approved public-facing service-area wording is **Pretoria North, Gauteng, South Africa**. Do not publish the owner's residential street address or imply that this area is a registered office.
 - Direct personal contact details remain outside this public repository until their exact public-facing use is approved.
 
-## 2. Three-tier commercial model — feature matrix pending approval
+## 2. Three-tier capability model
 
-The three experience levels are the three workspace payment tiers. A business-level entitlement sets the maximum selectable experience; each member keeps an individual presentation preference within that ceiling.
+The three capability levels are Basic, Intermediate and Professional. A business-level entitlement sets the maximum capability level; each member keeps an independent presentation preference within that ceiling. See [ZAZU_THREE_TIER_CAPABILITY_MATRIX.md](ZAZU_THREE_TIER_CAPABILITY_MATRIX.md) for the current capability design.
 
 ### Basic — Free, ongoing
 The permanent continuity tier. It must remain useful for day-to-day work and preserve access to existing customer-owned records after a trial or paid subscription ends. No active-event, user, storage or other numerical cap is approved for enforcement yet.
@@ -31,14 +30,14 @@ The permanent continuity tier. It must remain useful for day-to-day work and pre
 ### Intermediate — paid
 The middle tier for businesses that need more connected operational control across jobs, resources, purchasing, costs, suppliers and finance. The price and exact included features/quotas are **not approved**. Do not publish a price or enforce a module restriction on the basis of this description alone.
 
-### Advanced — paid
-The highest tier for the fullest operational picture, detailed controls, deeper search and guidance. R99 per business/workspace/month remains a working price target, not a published offer. The 30-day Advanced trial uses this same tier ceiling.
+### Professional
+The highest capability level for complex operations, consolidated oversight, advanced analytics, resource/capacity management and deeper administration. These are intended capabilities and must be mapped to implemented evidence before enforcement.
 
 ### Commercial and engineering safeguards
 
-- A new eligible workspace receives a 30-day Advanced trial from its creation timestamp.
+- A new eligible workspace receives a 30-day Professional trial from its creation timestamp.
 - At trial expiry, the effective tier becomes Basic Free unless an active signed Intermediate or Advanced entitlement is installed.
-- A valid Intermediate entitlement permits Basic and Intermediate experience levels; a valid Advanced entitlement permits all three.
+- A valid Intermediate entitlement permits Basic and Intermediate capability levels; a valid Professional entitlement (internal identifier `advanced`) permits all three.
 - An expired, revoked, not-yet-active or unsupported entitlement resolves to Basic and does not restart a trial.
 - No silent paid conversion, workspace lockout, data deletion or withholding of customer-owned records because of expiry or non-payment.
 - The current implementation enforces the **experience-level ceiling only**. It does not yet enforce a module-by-module paid-feature matrix, quotas, team-size limits or storage caps.
@@ -53,8 +52,8 @@ The highest tier for the fullest operational picture, detailed controls, deeper 
 - Trial expiry automatically moves the workspace to Basic Free; it must not silently start a paid subscription.
 - Access to the purchased tier resumes after successful payment/renewal.
 - Recommended billing: monthly in advance, cancellable before the next billing date.
-- State whether R99 includes VAT where applicable, payment method, billing date, cancellation process and any payment fees before checkout.
-- No unlimited storage, unlimited media uploads, guaranteed uptime or 24/7 support promise at R99.
+- Pricing, checkout, billing cadence, cancellation and payment fees are outside the current tier-design scope and require a later explicit Founder decision.
+- No storage, media, uptime or support commitment is approved as part of a tier at this stage.
 
 ## 4. Deployment and hosting recommendation
 
@@ -74,7 +73,7 @@ This is a starting pilot estimate, not a purchase or final production sizing dec
 
 ### Storage and backup
 
-- **Storage quotas are not approved for any tier.** Do not enforce a Basic, Intermediate or Advanced quota, upload cap or downgrade restriction until the owner approves the complete three-tier matrix and its data-safe downgrade/export behaviour. Earlier 250 MB / 2 GB figures are proposals only, not product policy.
+- **Storage quotas are not approved for any tier.** Do not enforce a Basic, Intermediate or Professional quota, upload cap or downgrade restriction until the owner approves the complete three-tier matrix and its data-safe downgrade/export behaviour. Earlier 250 MB / 2 GB figures are proposals only, not product policy.
 - Keep application database and private media storage separated from public web assets.
 - Encrypt backups and restrict access to the owner/operator.
 - Keep at least one backup copy outside the primary server/provider failure domain.
