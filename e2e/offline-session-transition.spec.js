@@ -10,8 +10,9 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
     await page.getByLabel('Username or email').fill(email);
     await page.locator('#auth_password').fill(password);
-    const loginResponsePromise = page.waitForResponse(response =>
-        response.url().includes('/login') && response.request().method() === 'POST',
+    const loginResponsePromise = page.waitForResponse(
+        response => response.url().includes('/login') && response.request().method() === 'POST',
+        { timeout: 10_000 },
     );
     await page.locator('[data-auth-submit]').click();
     const loginResponse = await loginResponsePromise;
