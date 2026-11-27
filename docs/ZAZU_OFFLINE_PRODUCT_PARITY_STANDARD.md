@@ -336,7 +336,7 @@ No automated green check by itself proves visual or functional parity. The curre
 - Server-backed preparation rows carry stable server IDs. Local records reconcile into those rows rather than creating duplicates.
 - Local-only preparation records render in the normal Preparation list with their existing Zazu row treatment and saved-detail inspection.
 - Existing Open / Blocked / Ready controls are now offline-aware. On a disconnected device, the selected status is queued as an update against the existing local identity; it does not create a second preparation record.
-- The native row status chip is reconciled from the local working copy so the displayed state follows the queued change.
+- For server-backed rows, the native status chip is reconciled from the local working copy. Local-only rows expose the selected status through their native status action controls.
 - Added Laravel source-contract coverage for the native register, stable row identity, status form metadata, update operation and dynamic form binding.
 
 ### Travel calculation boundary
@@ -350,7 +350,8 @@ No automated green check by itself proves visual or functional parity. The curre
 ### Remaining work and acceptance
 
 - Exact-head CI must validate the preparation local create/status-update flow, dynamic forms, JS build, Laravel suite, browser suite, PostgreSQL recovery, quality/security and Windows packaging.
-- Add full desktop/mobile browser acceptance for preparation create and status changes, including reload and reconnect without duplicates.
+- Added a focused Playwright acceptance case for a disconnected status update, checking the real queued mutation envelope, existing server/local identity, persisted status after reload and duplicate prevention. It is committed but its exact-head run is still pending.
+- The browser acceptance must also cover preparation create and reconnect reconciliation; physical PC and Android checks remain Founder-owned.
 - Physical PC and Android disconnected status changes and restart persistence remain Founder acceptance gates.
 - Travel remains connection-dependent until a complete local data contract, calculations, mutation validation, identity reconciliation and tests are implemented.
 
