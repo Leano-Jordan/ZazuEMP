@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\User;
+use App\Models\SyncDevice;
 use App\Support\ExperienceLevel;
 use App\Support\NicheFocus;
+use App\Support\Offline\SyncMutationRecorder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -86,4 +88,58 @@ class ExperienceLevelTrialTest extends TestCase
             $user->businesses()->whereKey($business->id)->first()->pivot->experience_level
         );
     }
+
+    public function test_expired_trial_does_not_discard_a_queued_offline_mutation(): void
+    {
+        $createdAt = Carbon::parse('2026-11-01 09:00:00', 'UTC');
+        $business = Business::create([
+            'name' => 'Queued Downgrade Business',
+            'slug' => 'queued-downgrade-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->forceFill(['created_at' => $createdAt])->saveQuietly();
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'experience_level' => 'advanced',
+            'primary_niche' => NicheFocus::DEFAULT,
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        try {
+            Carbon::setTestNow($createdAt->copy()->addDays(29));
+            $mutation = app(SyncMutationRecorder::class)->record(
+                $device,
+                'event',
+                'local-job-before-expiry',
+                'upsert',
+                [
+                    'local_id' => 'local-job-before-expiry',
+                    'record' => ['name' => 'Existing active job'],
+                ],
+            );
+
+            Carbon::setTestNow($createdAt->copy()->addDays(30));
+            $levels = app(ExperienceLevel::class);
+
+            $this->assertSame('basic', $levels->for($user, $business));
+            $this->assertSame('advanced', $levels->selected($user, $business));
+            $this->assertDatabaseHas('sync_mutations', [
+                'id' => $mutation->id,
+                'business_id' => $business->id,
+                'sync_device_id' => $device->id,
+                'entity_type' => 'event',
+                'entity_id' => 'local-job-before-expiry',
+            ]);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
 }
