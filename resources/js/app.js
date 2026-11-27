@@ -2868,6 +2868,13 @@ function setupZazuOfflineDirectoryViews() {
                 const chip = text('span', 'zazu-chip zazu-chip-neutral', status.label);
                 chip.title = status.title;
                 chip.setAttribute('aria-label', status.label + '. ' + status.title);
+                const canEdit = [...catalogue.querySelectorAll('a[href]')].some(link => {
+                    try {
+                        return new URL(link.href, window.location.origin).pathname === '/capabilities/create';
+                    } catch {
+                        return false;
+                    }
+                });
 
                 let row;
                 if (group === 'equipment') {
@@ -2893,6 +2900,13 @@ function setupZazuOfflineDirectoryViews() {
                     const actions = document.createElement('div');
                     actions.className = 'zazu-catalogue-actions';
                     actions.append(chip);
+                    if (canEdit) {
+                        const editLink = document.createElement('a');
+                        editLink.className = 'zazu-btn zazu-btn-ghost zazu-btn-sm';
+                        editLink.href = '/capabilities/create#offline-edit=' + encodeURIComponent(record.local_id);
+                        editLink.textContent = 'Edit';
+                        actions.append(editLink);
+                    }
                     row.append(actions);
                 } else {
                     row = document.createElement('article');
@@ -2918,6 +2932,16 @@ function setupZazuOfflineDirectoryViews() {
                         chip,
                     );
                     row.append(meta);
+                    if (canEdit) {
+                        const actions = document.createElement('div');
+                        actions.className = 'zazu-catering-actions';
+                        const editLink = document.createElement('a');
+                        editLink.className = 'zazu-btn zazu-btn-secondary zazu-btn-sm';
+                        editLink.href = '/capabilities/create#offline-edit=' + encodeURIComponent(record.local_id);
+                        editLink.textContent = 'Edit item';
+                        actions.append(editLink);
+                        row.append(actions);
+                    }
                 }
 
                 row.dataset.zazuLocalRecord = 'catalogue';
