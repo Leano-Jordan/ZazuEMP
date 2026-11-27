@@ -20,18 +20,19 @@ This record separates historical failures that have been corrected from the curr
 
 ## Current verification boundary
 
-- Latest application/test source candidate recorded by the repository is be3457b3a0e7057010492ff8df700aeac90d001d.
-- Documentation-only commits followed, with latest repository commit 8b7eb8ea6f573b5544cf70f8d57865a68a5542a5 at the time of this audit.
-- GitHub combined status for 8b7eb8e returned an empty status list; the connected workflow-run lookup returned no runs. That lookup is limited to PR-triggered runs, so an empty response is not proof that Actions has no run or that CI passed.
-- Exact-head Laravel, offline browser, quality/security, PHPMD/Psalm SARIF and Windows package results for be3457b3 remain unconfirmed through the available repository status interface.
+- Latest application source candidate remains be3457b3a0e7057010492ff8df700aeac90d001d.
+- Added a test-only downgrade regression on 104fefe: a queued server-side mutation created before trial expiry remains pending after the effective tier resolves to Basic. The test has not yet been executed by an observed CI run.
+- Latest repository documentation/state commit at this reconciliation is ebd222a096674226d4ac5a5611abbe43b4cc5158.
+- GitHub combined status for the test commit 104fefe and documentation/state commit ebd222a returned empty status lists; the connected workflow-run lookup returned no PR-triggered runs. The lookup is limited to PR-triggered runs, so an empty response is not proof that Actions has no run or that CI passed.
+- Exact-head Laravel, offline browser, quality/security, PHPMD/Psalm SARIF and Windows package results for the latest source/test state remain unconfirmed through the available repository status interface.
 - SonarCloud is SKIPPED, not passed.
 
 ## Director action
 
 1. Do not rerun historical failures whose fixes are already evidenced; do not waste cycles rerunning green predecessor jobs.
-2. Obtain or trigger exact-head workflows for be3457b3 and inspect failed job logs before changing code. A retry is appropriate only for an identified infrastructure/transient failure; test or product failures require a code/test correction.
+2. Obtain exact-head workflows for the current source/test state and inspect failed job logs before changing code. A retry is appropriate only for an identified infrastructure/transient failure; test or product failures require a code/test correction.
 3. Treat the native-page offline architecture as implemented but not accepted until exact-head Laravel and browser runs pass. Physical PC/Android checks remain separate.
-4. Continue the tier source/test audit. The matrix now records the actual entitlement implementation boundary, queued-mutation regression gaps and the 500-record bootstrap technical bound. That bound is not an approved commercial quota.
+4. Continue the full reconnect regression and resolve the 500-record offline snapshot completeness boundary.
 5. Keep Basic/Intermediate/Professional as capability labels only. No feature gate or numerical limit is authorised.
 
 **Current verdict:** historical defects listed above have recorded corrective changes. The latest offline implementation is not CI-certified from the available evidence. Zazu V1 remains NOT READY.
