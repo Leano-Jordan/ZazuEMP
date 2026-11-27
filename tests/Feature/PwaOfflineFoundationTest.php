@@ -69,11 +69,15 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('routesTruncated: routeList.length > 100', $app);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages-complete'", $app);
         $this->assertStringContainsString("zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false'", $app);
-        $this->assertStringContainsString("event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed })", $worker);
+        $this->assertStringContainsString('zazuOfflinePagesPrimeReason = event.data.reason ||', $app);
+        $this->assertStringContainsString("reason: success ? null : routeDiscoveryTruncated", $worker);
+        $this->assertStringContainsString("'required-pages-not-cached'", $worker);
+        $this->assertStringContainsString("'discovered-pages-not-cached'", $worker);
+        $this->assertStringContainsString("event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', ...completed })", $worker);
         $this->assertStringContainsString("'/dashboard',", $worker);
         $this->assertStringContainsString("uniqueRoutes.filter(path => ['/customers', '/customers/create', '/work', '/work/create'].includes(path))", $worker);
-        $this->assertStringContainsString('requiredCachedPages.every(Boolean)', $worker);
-        $this->assertStringContainsString('discoveredCachedPages.every(Boolean)', $worker);
+        $this->assertStringContainsString('requiredMissing.length === 0', $worker);
+        $this->assertStringContainsString('discoveredMissing.length === 0', $worker);
         $this->assertStringContainsString('!routeDiscoveryTruncated', $worker);
         $this->assertStringContainsString('const requiredCachedPages = await Promise.all(requiredOfflineRoutes.map', $worker);
         $this->assertStringContainsString('let activePrimeTask = null;', $worker);
