@@ -211,7 +211,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('addRoute(match[1].replace(/&amp;/g, \'&\'));', $worker);
         $this->assertStringContainsString('const routes = new Set([', $app);
         $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
-        $this->assertStringContainsString('routes: [...routes].slice(0, 100)', $app);
+        $this->assertStringContainsString('routes: routeList.slice(0, 100)', $app);
         $this->assertStringContainsString("window.addEventListener('popstate', applyOfflineRouteView);", $app);
         $this->assertStringContainsString('Zazu is offline', $app);
         $this->assertStringNotContainsString('Only supported offline screens can be used', $app);
