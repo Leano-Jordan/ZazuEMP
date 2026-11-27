@@ -253,3 +253,20 @@ Quotes have a separate local renderer, but its current `[data-zazu-local-quotes]
 ### Explicitly read-only until separately implemented
 
 Calendar, search, reports, audit/compliance and export/restore routes must retain their normal cached page identity, but their cached data is not proof of freshness and their server-dependent actions must not be simulated offline. Add a clear connection/freshness state where appropriate; do not silently present stale snapshots as live data.
+
+
+## 12. Iteration 2 implementation log — 2026-11-27
+
+**Status: IN PROGRESS — current-head automated validation pending.**
+
+Native-page integration now extends beyond Customers and Work:
+
+- `renderOfflineCollections()` can target either a native module register or the legacy workspace.
+- Suppliers, Inventory, Assets, Purchasing, Finance invoices/expenses and Work costs now expose native register targets and stable server-row IDs.
+- Local-only records are inserted into those normal registers. Locally edited server-backed records reconcile into their existing row and receive an inline sync indicator rather than a duplicate.
+- The Quotes page now exposes its native register to the local quote renderer; local quote rows retain version, status and total columns.
+- The browser acceptance scenario now primes these pages while connected, disconnects, and checks local records in the native registers. Catalogue remains an explicit fallback gap because its equipment and services tabs have distinct layouts.
+
+A first browser run after Iteration 1 showed that some older tests still expected the reduced workspace to replace the native Dashboard and Work pages. Those assertions were rewritten to verify native page identity and local records in the normal directories. The same run exposed a real layout shift: the connectivity notice was pushing the page down. It is now a fixed overlay so the offline state does not change page geometry.
+
+**Current release gate:** do not accept Iteration 1 or Iteration 2 until the latest `main` commit passes the full browser acceptance suite and all other CI checks. The latest test changes cover the responsive navigation baseline, customer/job create pages, Dashboard, Work detail attachments, normal module registers and quote register. Physical PC/Android verification is still required after CI.
