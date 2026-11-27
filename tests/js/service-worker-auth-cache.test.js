@@ -53,6 +53,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
     const listeners = new Map();
     const cacheStore = new Map();
     const fetchCalls = [];
+    const windowClients = [];
 
     function requestUrl(input) {
         const raw = typeof input === 'string'
@@ -109,7 +110,10 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
     const self = {
         location: { origin: ORIGIN },
         navigator: { onLine: initiallyOnline },
-        clients: { claim: async () => {} },
+        clients: {
+            claim: async () => {},
+            matchAll: async () => windowClients,
+        },
         skipWaiting: async () => {},
         addEventListener: (name, handler) => listeners.set(name, handler),
     };
@@ -167,7 +171,19 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
         return Promise.all(pending);
     }
 
-    return { caches, dispatchActivate, dispatchFetch, dispatchMessage, fetchCalls, Request: MockRequest, Response: MockResponse, setOnline: (online) => { self.navigator.onLine = online; } };
+    return {
+        caches,
+        dispatchActivate,
+        dispatchFetch,
+        dispatchMessage,
+        fetchCalls,
+        Request: MockRequest,
+        Response: MockResponse,
+        setOnline: (online) => { self.navigator.onLine = online; },
+        setWindowClients: (clients) => {
+            windowClients.splice(0, windowClients.length, ...clients);
+        },
+    };
 }
 
 test('service worker upgrades preserve authenticated offline pages and active business context', async () => {
@@ -1122,11 +1138,15 @@ test('cold offline app launch prefers the local dashboard while in-app Work navi
     assert.equal(await coldResponse.text(), '<main>Offline dashboard</main>');
     await coldLaunch.finished();
 
+    // Browser navigation requests commonly have an empty clientId even when
+    // they were initiated by a live page. Existing same-origin window clients
+    // distinguish this transition from opening the installed app cold.
+    worker.setWindowClients([{ id: 'active-zazu-client', url: ORIGIN + '/dashboard' }]);
     const inAppNavigation = worker.dispatchFetch(new worker.Request('/work/42', {
         method: 'GET',
         mode: 'navigate',
         headers: { accept: 'text/html' },
-    }), 'active-zazu-client');
+    }), '');
     const inAppResponse = await inAppNavigation.response;
     assert.equal(await inAppResponse.text(), '<main>Offline Work detail with attachments</main>');
     await inAppNavigation.finished();
