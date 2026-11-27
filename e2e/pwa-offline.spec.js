@@ -323,6 +323,13 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('.zazu-page-title')).toHaveText('New customer');
         await expect(customerForm.locator('input[name="name"]')).toBeVisible();
 
+        // Prime both real page documents through normal online navigation
+        // before the disconnected reload assertions.
+        await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('form#new-job-form')).toBeVisible();
+        await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+        await expect(customerForm).toBeVisible();
+
         const onlineGeometry = await customerForm.boundingBox();
         await context.setOffline(true);
         await page.reload({ waitUntil: 'domcontentloaded' });
