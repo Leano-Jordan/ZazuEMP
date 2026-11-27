@@ -203,14 +203,15 @@ This standard can only be weakened or narrowed by an explicit Founder decision. 
 
 Changes pushed to `main`:
 
-- Exact cached route documents now bypass the legacy workspace takeover in `applyOfflineRouteView()`. The normal cached page, forms, controls and page title remain in place.
-- The service worker returns exact cached pages unchanged. When the Dashboard is used because the requested route is not cached, it injects `<meta name="zazu-offline-fallback" content="1">` into the fallback HTML so the client can distinguish the two cases.
+- `applyOfflineRouteView()` no longer classifies routes into replacement collection screens. Exact cached pages retain their native content; the legacy collection workspace is always hidden and is no longer a user-facing fallback.
+- The service worker returns exact cached pages unchanged. When the Dashboard document is used because the requested route is not cached, it injects `<meta name="zazu-offline-fallback" content="1">`; the client displays a connection-required state in the normal shell without showing Dashboard data as the requested page.
 - The offline stylesheet no longer hides command search or section tabs.
-- Cache version advanced to `zazu-static-v65` so installed clients receive the updated service worker.
+- Cache version advanced to `zazu-static-v66` so installed clients receive the updated service worker.
 - Added service-worker regression assertions for exact-page preservation and explicit fallback identity.
-- Replaced the previous route-workspace-only browser test with a desktop/mobile scenario covering the cached customer-create and job-create pages, their titles, forms, navigation controls and layout geometry.
+- Replaced the previous route-workspace-only browser test with a desktop/mobile scenario covering cached customer-create and job-create pages, their titles, forms, navigation controls and layout geometry.
+- Page priming now starts from the user's real same-origin navigation links and recursively discovers linked pages from primed HTML, bounded to 100 routes and excluding APIs, session-changing endpoints, private media and static assets.
 
-**Known transitional boundary:** the legacy reduced workspace remains available only when the service worker genuinely has to serve a fallback document, and the Dashboard still retains its existing offline overview. This is not full parity and does not close the requirement. Iteration 2 must move local records and supported actions into the ordinary route components and remove the reduced workspace as a user-facing substitute.
+**Known transitional boundary:** an uncached route cannot yet render its full route-specific page. It now shows an explicit connection-required state inside the normal Zazu shell, with normal navigation preserved. This is honest fallback behaviour, not full parity; route priming coverage and normal-page local data integration remain in progress.
 
 **Validation record:** an initial build caught an over-escaped route-normalization regex; it was corrected. The first service-worker test run then caught an invalid regex in a new test assertion; that assertion was corrected to a literal HTML inclusion check. The current exact-head CI run must pass the service-worker suite, Laravel tests, browser acceptance, PostgreSQL recovery, quality/security checks and Windows packaging before Iteration 1 can be accepted. Physical owner-PC and Android verification remain mandatory.
 
@@ -265,8 +266,49 @@ Native-page integration now extends beyond Customers and Work:
 - Suppliers, Inventory, Assets, Purchasing, Finance invoices/expenses and Work costs now expose native register targets and stable server-row IDs.
 - Local-only records are inserted into those normal registers. Locally edited server-backed records reconcile into their existing row and receive an inline sync indicator rather than a duplicate.
 - The Quotes page now exposes its native register to the local quote renderer; local quote rows retain version, status and total columns.
-- The browser acceptance scenario now primes these pages while connected, disconnects, and checks local records in the native registers. Catalogue remains an explicit fallback gap because its equipment and services tabs have distinct layouts.
+- The browser acceptance scenario now primes these pages while connected, disconnects, and checks local records in the native registers. Catalogue's equipment and services tabs have now been given native offline record adapters; this must be confirmed by the current exact-head browser run.
 
 A first browser run after Iteration 1 showed that some older tests still expected the reduced workspace to replace the native Dashboard and Work pages. Those assertions were rewritten to verify native page identity and local records in the normal directories. The same run exposed a real layout shift: the connectivity notice was pushing the page down. It is now a fixed overlay so the offline state does not change page geometry.
 
 **Current release gate:** do not accept Iteration 1 or Iteration 2 until the latest `main` commit passes the full browser acceptance suite and all other CI checks. The latest test changes cover the responsive navigation baseline, customer/job create pages, Dashboard, Work detail attachments, normal module registers and quote register. Physical PC/Android verification is still required after CI.
+
+## 13. Implementation update — 2026-11-27
+
+**Current source checkpoint:** `31b431200651b69531925abf5192f32ab89d8ae1` on `main`.  
+**Status:** implementation in progress; current-head CI is queued/pending; no offline parity acceptance claim.
+
+### Iteration 1 correction
+
+- Removed the broad route-family replacement behaviour from the application client.
+- Exact cached documents retain their original Blade-rendered pages and forms.
+- The shared reduced collection workspace is kept hidden rather than promoted as an offline substitute.
+- A real service-worker fallback is explicitly marked and shown as a connection-required state in the normal application shell. The normal navigation remains available, and the requested path is displayed.
+- A retry control re-requests the intended route; the user is not silently redirected to a different module.
+- Same-origin navigation links are recursively discovered during page priming, with a hard limit of 100 routes per priming pass and exclusions for APIs, logout/business switching, private media, static assets and file URLs.
+
+### Iteration 2 catalogue integration
+
+- The normal Services & Prices page now always renders both native tabs and their page panels, including their empty states. This allows a locally saved offering to appear even when the server-side collection was empty when the page was cached.
+- Existing server catalogue rows carry stable server IDs for reconciliation.
+- Locally saved rental capabilities are inserted into the native Hire & Rental register; services, products and packages are inserted into the native Services & Products cards.
+- The native tab counts update from the local state. When a local service is the only available catalogue group, the correct tab is activated automatically unless the user has manually selected a tab.
+- Local sync status is shown inline using the existing Zazu chip treatment. The catalogue does not use the legacy workspace as its directory.
+
+### Regression coverage added or revised
+
+- Service-worker unit coverage verifies exact cached pages are returned unchanged and only the true Dashboard fallback receives the fallback marker.
+- Laravel source-contract tests require native page preservation, bounded recursive page priming and native catalogue targets.
+- Browser acceptance now includes catalogue local records in the native tab, preserves the customer/job form geometry and navigation, and checks that an unprimed route shows the honest fallback state without exposing the legacy workspace.
+- The native module browser scenario covers suppliers, inventory, assets, purchasing, quotes, finance and catalogue.
+
+### Remaining Iteration 2 work
+
+- Audit all local collection adapters against every normal route and ensure there are no duplicate or missing local rows.
+- Verify catalogue edits and images: a normal local record must not imply that an image upload has been safely queued if its bytes are not stored.
+- Extend native local-data rendering to every remaining module and detail route, including preparations, travel and job-linked operations.
+- Add visual comparisons beyond geometry-only assertions, at desktop and Android viewport sizes.
+- Keep attachment, sync, conflict, storage quota, account-switch and business-isolation tests as separate data-safety gates.
+
+### Acceptance boundary
+
+No automated green check by itself proves visual or functional parity. The current source changes remain unaccepted until the latest single commit passes Laravel, browser acceptance, PostgreSQL recovery, quality/security and Windows packaging. Owner-PC and Android physical host-loss, cold-launch, restart, local-work and reconnect tests remain open.
