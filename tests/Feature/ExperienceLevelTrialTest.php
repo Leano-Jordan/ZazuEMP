@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
-use App\Models\User;
 use App\Models\SyncDevice;
+use App\Models\User;
 use App\Support\ExperienceLevel;
 use App\Support\NicheFocus;
 use App\Support\Offline\SyncMutationRecorder;
