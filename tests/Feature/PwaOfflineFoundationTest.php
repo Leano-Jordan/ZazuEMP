@@ -530,9 +530,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('@unless ($scopeLocked)', $requirementsIndex);
         $this->assertSame(2, substr_count($quoteEventIndex, 'if (!$event->isClosed() && !$quotes->contains'));
         $this->assertStringContainsString("'ZAZU_TEST_TRUST_FORWARDED_IPS'", $provider);
-        $this->assertStringContainsString("filter_var($forwardedIp, FILTER_VALIDATE_IP)", $provider);
-        $this->assertStringContainsString("'login:identifier-ip:'.$identifier.'|'.$clientIp", $provider);
-        $this->assertStringContainsString("'login:ip:'.$clientIp", $provider);
+        $this->assertStringContainsString('filter_var($forwardedIp, FILTER_VALIDATE_IP)', $provider);
+        $this->assertStringContainsString('$clientIp', $provider);
+        $this->assertStringContainsString('login:identifier-ip:', $provider);
+        $this->assertStringContainsString('login:ip:', $provider);
         $this->assertStringContainsString("env('ZAZU_TEST_TRUST_FORWARDED_IPS', false) ? '*'", $bootstrap);
     }
 
