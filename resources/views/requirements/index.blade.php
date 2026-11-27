@@ -59,7 +59,9 @@
             <div class="zazu-empty">
                 <div class="zazu-empty-title">No requirements yet</div>
                 <p class="zazu-empty-copy">Start translating the customer brief into concrete quantities, services, rentals or other deliverables.</p>
-                <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Choose first service</a>
+                @unless ($scopeLocked)
+                    <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Choose first service</a>
+                @endunless
             </div>
         @endforelse
     </section>
