@@ -64,7 +64,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('request.onblocked = () => reject', $attachmentOpen);
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js',", $app);
         $this->assertStringContainsString("scope: '/',", $app);
-        $this->assertStringContainsString("target.postMessage({ type: 'prime-pages', userId, businessId, routes }, [channel.port2])", $app);
+        $this->assertStringContainsString("type: 'prime-pages',", $app);
+        $this->assertStringContainsString('routes: routeList.slice(0, 100)', $app);
+        $this->assertStringContainsString('routesTruncated: routeList.length > 100', $app);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages-complete'", $app);
         $this->assertStringContainsString("zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false'", $app);
         $this->assertStringContainsString("event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed })", $worker);
