@@ -663,7 +663,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         // Prime the real module pages while connected. Offline acceptance must
         // exercise exact cached pages, not the legacy Dashboard fallback.
-        for (const path of ['/suppliers', '/inventory', '/assets', '/purchasing', '/finance']) {
+        for (const path of ['/suppliers', '/inventory', '/assets', '/purchasing', '/finance', '/quotes']) {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
             expect(response?.ok(), path + ' must load online before its offline snapshot is cached').toBe(true);
         }
@@ -698,6 +698,11 @@ test.describe('Zazu installed PWA offline shell', () => {
                 reference: 'PO-OFF-005', supplier_name: 'Offline Supplier Proof', status: 'part_received',
                 total_amount: '1250.00', currency: 'ZAR', items: [{ description: 'Table linen', quantity: '10', received_quantity: '5', line_total: '1250.00' }],
             }];
+            state.quotes = [{
+                id: 809, server_id: 809, local_id: identity('09'),
+                reference: 'Q-OFF-009', event_name: 'Offline venue event', status: 'draft', currency: 'ZAR',
+                latest_version: { version: 1, status: 'draft', total: '1800.00', items: [{ description: 'Venue hire', quantity: 1, total: '1800.00' }] },
+            }];
             state.invoices = [{
                 id: 806, server_id: 806, local_id: identity('06'),
                 number: 'INV-OFF-006', status: 'part_paid', total: '2500.00', paid_amount: '1000.00',
@@ -722,6 +727,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             ['/inventory', '.zazu-inventory-directory', 'inventory_items', 'Offline Stock Proof'],
             ['/assets', '.zazu-assets-directory', 'assets', 'Offline Marquee'],
             ['/purchasing', '.zazu-purchasing-page', 'purchase_orders', 'PO-OFF-005'],
+            ['/quotes', '[data-zazu-local-quotes]', 'quote', 'Q-OFF-009'],
         ];
         for (const [path, containerSelector, collection, label] of nativeExpectations) {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
