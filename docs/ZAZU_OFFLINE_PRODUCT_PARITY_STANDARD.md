@@ -195,3 +195,21 @@ Do not convert any of these statuses to PASS without exact-head evidence and the
 ## 9. Change control
 
 This standard can only be weakened or narrowed by an explicit Founder decision. Engineering implementation details may evolve, but the product requirement—same Zazu offline—does not change through incidental code, test, documentation or release-note edits.
+
+
+## 10. Implementation log — Iteration 1 (2026-11-27)
+
+**Status: IN PROGRESS — automated validation pending; physical acceptance not started.**
+
+Changes pushed to `main`:
+
+- Exact cached route documents now bypass the legacy workspace takeover in `applyOfflineRouteView()`. The normal cached page, forms, controls and page title remain in place.
+- The service worker returns exact cached pages unchanged. When the Dashboard is used because the requested route is not cached, it injects `<meta name="zazu-offline-fallback" content="1">` into the fallback HTML so the client can distinguish the two cases.
+- The offline stylesheet no longer hides command search or section tabs.
+- Cache version advanced to `zazu-static-v65` so installed clients receive the updated service worker.
+- Added service-worker regression assertions for exact-page preservation and explicit fallback identity.
+- Replaced the previous route-workspace-only browser test with a desktop/mobile scenario covering the cached customer-create and job-create pages, their titles, forms, navigation controls and layout geometry.
+
+**Known transitional boundary:** the legacy reduced workspace remains available only when the service worker genuinely has to serve a fallback document, and the Dashboard still retains its existing offline overview. This is not full parity and does not close the requirement. Iteration 2 must move local records and supported actions into the ordinary route components and remove the reduced workspace as a user-facing substitute.
+
+**Validation record:** an initial build caught an over-escaped route-normalization regex; it was corrected. The first service-worker test run then caught an invalid regex in a new test assertion; that assertion was corrected to a literal HTML inclusion check. The current exact-head CI run must pass the service-worker suite, Laravel tests, browser acceptance, PostgreSQL recovery, quality/security checks and Windows packaging before Iteration 1 can be accepted. Physical owner-PC and Android verification remain mandatory.
