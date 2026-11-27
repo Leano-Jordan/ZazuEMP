@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v67';
+const CACHE_NAME = 'zazu-static-v68';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -386,14 +386,14 @@ async function setContext(userId, businessId, expectedGeneration = null) {
     });
 }
 
-async function primePages(routes, primeGeneration = activeUserGeneration, primeUserId = activeUserId, primeBusinessId = activeBusinessId) {
+async function primePages(routes, primeGeneration = activeUserGeneration, primeUserId = activeUserId, primeBusinessId = activeBusinessId, routesTruncated = false) {
     activePrimeController?.abort();
     const controller = new AbortController();
     activePrimeController = controller;
 
     const uniqueRoutes = [];
     const seenRoutes = new Set();
-    let routeDiscoveryTruncated = false;
+    let routeDiscoveryTruncated = routesTruncated === true;
     const addRoute = (path) => {
         if (typeof path !== 'string' || path.length > 2048) return;
 
@@ -571,7 +571,7 @@ self.addEventListener('message', (event) => {
             if (generation !== activeUserGeneration) return false;
             const activeGeneration = await setContext(requestedUserId, requestedBusinessId, generation);
             if (activeGeneration === null) return false;
-            return primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId);
+            return primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId, event.data.routesTruncated === true);
         })();
 
         activePrimeTask = task;
