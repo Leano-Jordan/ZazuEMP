@@ -17,7 +17,7 @@
         <section class="zazu-metric-card"><h2 class="zazu-metric-label">Records</h2><div class="zazu-metric-value">{{ $costs->count() }}</div><div class="zazu-metric-note">Cost entries for this work</div></section>
     </div>
 
-    <section class="zazu-card zazu-list">
+    <section class="zazu-card zazu-list" data-zazu-offline-collection="costs" data-zazu-offline-collection-list>
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Operational records</div>
             <div class="zazu-section-heading"><div><div class="zazu-card-title mt-1">Cost list</div></div><a href="{{ route('work.costs.create', $event) }}" class="zazu-btn zazu-btn-primary">Add cost</a></div>
@@ -31,7 +31,7 @@
             </div>
         @endif
         @forelse ($costs as $cost)
-            <div class="zazu-list-item">
+            <div class="zazu-list-item" data-zazu-server-record-id="{{ $cost->id }}">
                 <div class="zazu-list-main">
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="zazu-list-title">{{ $cost->description }}</span>
