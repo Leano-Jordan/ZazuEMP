@@ -461,7 +461,7 @@ function setupZazuCatalogue() {
                 selectTab(tabs[nextIndex].dataset.catalogueTab, true);
             });
         });
-        selectTab(tabs[0]?.dataset.catalogueTab || 'equipment');
+        selectTab([...tabs].find(tab => tab.getAttribute('aria-selected') === 'true')?.dataset.catalogueTab || tabs[0]?.dataset.catalogueTab || 'equipment');
 
         let drawerReturnFocus = null;
         const closeDrawer = () => {
