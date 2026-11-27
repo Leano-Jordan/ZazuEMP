@@ -843,7 +843,7 @@ function setupZazuHelper() {
                 connectivity.hidden = originAvailable;
                 connectivity.textContent = originAvailable
                     ? ''
-                    : 'Connection to Zazu is unavailable. Job recommendations are paused until the server responds. Use only the supported offline workspace meanwhile.';
+                    : 'Connection to Zazu is unavailable. Job recommendations are paused until the server responds. Continue in cached Zazu pages; uncached pages require reconnection.';
             }
 
             syncRecommendation();
