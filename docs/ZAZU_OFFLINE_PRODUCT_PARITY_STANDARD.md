@@ -229,10 +229,10 @@ The route-preservation change makes this gap explicit: an exact cached route no 
 
 ### Existing local collection support that still targets the legacy workspace
 
-The generic `renderOfflineCollections()` renderer currently targets `[data-zazu-offline-collection]` sections in `offline-workspace.blade.php`. The collections include:
+The generic `renderOfflineCollections()` renderer now targets `[data-zazu-offline-collection]` registers embedded in the normal module pages. The deleted secondary workspace is no longer a data or UI dependency. Native collection targets include:
 
 - Suppliers
-- Services/catalogue
+- Services/catalogue (dedicated renderer in the normal Services & Prices tabs)
 - Inventory items and movements
 - Assets and allocations
 - Purchase orders and order lines
@@ -240,16 +240,16 @@ The generic `renderOfflineCollections()` renderer currently targets `[data-zazu-
 - Expenses
 - Work costs
 
-Quotes have a separate local renderer, but its current `[data-zazu-local-quotes]` target is also in the legacy workspace.
+Quotes have a separate local renderer targeting `[data-zazu-local-quotes]` in the normal Quotes page. Customers and Work use their native directory renderers.
 
 ### Iteration 2 implementation order
 
-1. Move quote, supplier, catalogue, inventory, asset and purchasing local records into their existing normal register/list components.
-2. Move invoice, payment, expense and event-cost records into the existing Finance and Work cost views.
+1. Complete route-by-route verification of the native customer, Work, quote, supplier, catalogue, inventory, asset, purchasing and finance registers.
+2. Extend native local-data rendering to preparation, travel, job-linked costs and remaining operational detail routes.
 3. Reconcile local edits against cached server rows by stable server identity; never duplicate a record or silently overwrite a newer local edit.
-4. Reuse each page's existing row structure and action semantics. Add sync/conflict state as a compact inline status, not a replacement page.
-5. Add route-level tests for both server-backed local edits and local-only records, including reload and reconnect.
-6. Once all supported records are visible in their native pages, reduce the shared workspace to a compact sync/health surface and remove its collection-directory role.
+4. Reuse each page's existing row structure and action semantics. Add sync/conflict state as compact inline status, not a replacement page.
+5. Add route-level tests for server-backed local edits and local-only records, including reload, cold launch and reconnect.
+6. Keep the secondary workspace component deleted; do not reintroduce a parallel offline UI.
 
 ### Explicitly read-only until separately implemented
 
@@ -262,10 +262,11 @@ Calendar, search, reports, audit/compliance and export/restore routes must retai
 
 Native-page integration now extends beyond Customers and Work:
 
-- `renderOfflineCollections()` can target either a native module register or the legacy workspace.
+- `renderOfflineCollections()` now targets native module registers only; the secondary `offline-workspace` component has been removed from the application layout and deleted.
 - Suppliers, Inventory, Assets, Purchasing, Finance invoices/expenses and Work costs now expose native register targets and stable server-row IDs.
 - Local-only records are inserted into those normal registers. Locally edited server-backed records reconcile into their existing row and receive an inline sync indicator rather than a duplicate.
-- The Quotes page now exposes its native register to the local quote renderer; local quote rows retain version, status and total columns.
+- The Quotes page exposes its native register to the local quote renderer; local quote rows retain version, status and total columns.
+- Supplier and Inventory local-record editing is exercised through their existing normal-page inline editors; the UI no longer depends on a separate collection editor.
 - The browser acceptance scenario now primes these pages while connected, disconnects, and checks local records in the native registers. Catalogue's equipment and services tabs have now been given native offline record adapters; this must be confirmed by the current exact-head browser run.
 
 A first browser run after Iteration 1 showed that some older tests still expected the reduced workspace to replace the native Dashboard and Work pages. Those assertions were rewritten to verify native page identity and local records in the normal directories. The same run exposed a real layout shift: the connectivity notice was pushing the page down. It is now a fixed overlay so the offline state does not change page geometry.
@@ -274,17 +275,17 @@ A first browser run after Iteration 1 showed that some older tests still expecte
 
 ## 13. Implementation update — 2026-11-27
 
-**Current source checkpoint:** `31b431200651b69531925abf5192f32ab89d8ae1` on `main`.  
+**Current source checkpoint before this documentation update:** `79e623083d8ddf6a0a3de6552ef41e7709948113` on `main`.  
 **Status:** implementation in progress; current-head CI is queued/pending; no offline parity acceptance claim.
 
 ### Iteration 1 correction
 
 - Removed the broad route-family replacement behaviour from the application client.
 - Exact cached documents retain their original Blade-rendered pages and forms.
-- The shared reduced collection workspace is kept hidden rather than promoted as an offline substitute.
+- The reduced collection workspace component has been removed from the authenticated layout and deleted. The normal page renderers are the only collection surfaces.
 - A real service-worker fallback is explicitly marked and shown as a connection-required state in the normal application shell. The normal navigation remains available, and the requested path is displayed.
 - A retry control re-requests the intended route; the user is not silently redirected to a different module.
-- Same-origin navigation links are recursively discovered during page priming, with a hard limit of 100 routes per priming pass and exclusions for APIs, logout/business switching, private media, static assets and file URLs.
+- Same-origin navigation links are recursively discovered during page priming, with a hard limit of 100 routes per priming pass. Priming reports success only when every discovered route is cached and the route graph was not truncated; public/auth endpoints, APIs, session-changing routes, private media, static assets and file URLs are excluded.
 
 ### Iteration 2 catalogue integration
 
@@ -298,13 +299,13 @@ A first browser run after Iteration 1 showed that some older tests still expecte
 
 - Service-worker unit coverage verifies exact cached pages are returned unchanged and only the true Dashboard fallback receives the fallback marker.
 - Laravel source-contract tests require native page preservation, bounded recursive page priming and native catalogue targets.
-- Browser acceptance now includes catalogue local records in the native tab, preserves the customer/job form geometry and navigation, and checks that an unprimed route shows the honest fallback state without exposing the legacy workspace.
+- Browser acceptance now includes catalogue local records in the native tab, preserves the customer/job form geometry and navigation, and checks that an unprimed route shows the honest fallback state with no secondary workspace component.
 - The native module browser scenario covers suppliers, inventory, assets, purchasing, quotes, finance and catalogue.
 
 ### Remaining Iteration 2 work
 
 - Audit all local collection adapters against every normal route and ensure there are no duplicate or missing local rows.
-- Verify catalogue edits and images: a normal local record must not imply that an image upload has been safely queued if its bytes are not stored.
+- Verify catalogue edits and images: a normal local record must not imply that an image upload has been safely queued if its bytes are not stored. The current form explicitly defers image changes offline.
 - Extend native local-data rendering to every remaining module and detail route, including preparations, travel and job-linked operations.
 - Add visual comparisons beyond geometry-only assertions, at desktop and Android viewport sizes.
 - Keep attachment, sync, conflict, storage quota, account-switch and business-isolation tests as separate data-safety gates.
