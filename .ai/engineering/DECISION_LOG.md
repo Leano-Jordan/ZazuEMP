@@ -2,16 +2,14 @@
 
 Durable decisions governing the Zazu engineering system.
 
-## DEC-027 — Founder confirmation of the three commercial tiers
+## DEC-027 — Historical three-tier entitlement foundation
 
 - **Date:** 2026-11-21
-- **Status:** ACTIVE
-- **Authority:** Explicit Founder decision in the current Director session.
-- **Decision:** Zazu EMP has exactly three commercial workspace tiers: **Basic**, **Intermediate** and **Advanced**. Basic is the permanent Free tier; Intermediate and Advanced are paid tiers. These same three names are the canonical experience-level labels and signed entitlement identifiers (basic, intermediate, advanced).
-- **Pricing boundary:** The Founder approved the three-tier structure and names only. No monthly rand price, module allocation, user/storage/event quota, or other numerical limit was approved in this decision. The Starter/Team/Business names and R499/R899/R1,499 amounts in the 2026-11-11 valuation are superseded as an unapproved proposal, not adopted pricing. Earlier four-tier price hypotheses are also not current policy.
-- **Entitlement invariants:** Basic remains available indefinitely. Eligible new workspaces receive the existing 30-day Advanced trial, then fall back to Basic unless a valid paid entitlement is installed. Expiry/revocation must not lock the workspace, delete or withhold customer-owned data, or weaken roles, permissions or business isolation.
-- **Implementation boundary:** Do not infer paid feature gates or quotas from tier labels. Publish or enforce a feature matrix only after the Founder approves its contents and downgrade behaviour.
-- **Reason:** Resolve conflicting commercial naming without inventing prices or compromising the existing offline-first/data-continuity contract.
+- **Status:** SUPERSEDED FOR CUSTOMER-FACING NAMING by DEC-030; entitlement continuity rules remain active.
+- **Decision retained:** Zazu has exactly three workspace entitlement levels. Basic remains the permanent free fallback; the existing 30-day trial, signed entitlement lifecycle, data-preservation rules and permission boundaries remain in force.
+- **Historical naming:** The third level was previously called Advanced. Its internal signed identifier remains `advanced` for compatibility; the customer-facing name is now Professional.
+- **Implementation boundary retained:** No numerical quotas or feature gates may be inferred without explicit Founder approval.
+- **Reason:** Preserve the working entitlement architecture while allowing the Founder to update product naming and capability positioning.
 
 ## DEC-001 — Repository isolation
 **Date:** 2026-09-28  
@@ -278,3 +276,18 @@ Working commercial hypotheses:
 - **Legal/identity boundary:** Follow `FOUNDER_LEGAL_BRAND_DECISIONS_2026-11-26.md`. Founder personally owns current IP and is current solo operator; Rosscore Labs is not registered/current owner; ZAZU name clearance is unresolved/high risk; Information Officer registration is incomplete; no production hosting or third-party processor is provisioned; provisional Outlook contact is not a dedicated mailbox. No legal notice or terms may be represented as effective until their publication gates close.
 - **Engineering boundary:** Keep security/recovery/physical offline/commercial gates active. Trust-surface code must be low-risk public GET-only work, reuse existing Laravel architecture, and include access/content/route/accessibility tests. No branches; main only.
 - **Record:** `docs/DIRECTOR_TRUST_SURFACE_EXECUTION_2026-11-26.md` and `.ai/engineering/STATE.md` are the execution handover and current state.
+
+
+## DEC-030 — Basic / Intermediate / Professional capability model
+
+- **Date:** 2026-11-27
+- **Status:** ACTIVE
+- **Authority:** Explicit Founder approval in the Zazu Engine Director session.
+- **Decision:** Zazu's three customer-facing capability levels are **Basic, Intermediate and Professional**. Basic must let a small business genuinely operate; Intermediate adds connected operational control for growing businesses; Professional supports established and more complex operations.
+- **Product model:** One product, three levels. Tier entitlement and approved capacity determine available business capabilities. Individual presentation preference controls surfaced detail only. Role-based permissions and business isolation remain independent.
+- **Shared foundation:** Reliability, supported offline operation, security, data integrity, backup/export and access to existing customer-owned records are foundational across all levels. Offline reliability is never a premium feature.
+- **Capacity boundary:** Customer, active-job, user, device, location, storage and automation limits are candidate dimensions only. No numerical thresholds, prices, billing rules or exact enforcement boundaries are approved by this decision.
+- **Safe limit behaviour:** Limits must not delete or hide historical records, strand existing active work, discard queued offline mutations or prevent export. Prefer restricting creation of additional capacity after a clear explanation; retain access to existing data.
+- **Compatibility:** The existing internal `advanced` entitlement/preference identifier maps to customer-facing Professional. Do not change signed token formats or stored identifiers without a separately tested migration.
+- **Specification:** `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md` is the canonical capability design baseline. It does not assert that every listed capability is already implemented or authorize immediate enforcement.
+- **Reason:** Create a meaningful growth path without undermining Zazu's offline-first reliability, data ownership or product simplicity.
