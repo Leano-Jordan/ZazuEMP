@@ -4820,6 +4820,8 @@ test.describe('Zazu installed PWA offline shell', () => {
             window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
         });
         await login(page);
+        await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('[data-zazu-local-quotes]')).toBeVisible();
         await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
         await page.evaluate(async ({ quoteLocalId, jobLocalId, customerLocalId }) => {
@@ -4862,11 +4864,10 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await context.setOffline(true);
         await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
-        const offlineWorkspace = page.locator('[data-zazu-offline-workspace]');
-        const quotesLink = offlineWorkspace.getByRole('link', { name: 'Quotes', exact: true });
-        await expect(quotesLink).toBeVisible();
-        await quotesLink.click();
-        const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'LOCAL-QUOTE-ACCEPT-001' });
+        await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
+        const quoteRow = page.locator('[data-zazu-local-quotes] [data-zazu-local-record="quote"]').filter({ hasText: 'LOCAL-QUOTE-ACCEPT-001' });
         await expect(quoteRow).toBeVisible();
         await quoteRow.getByRole('button', { name: 'View offline' }).click();
 
@@ -4908,7 +4909,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
-    test('cold installed-app launch opens the local workspace from a cached Work detail URL', async ({ page, context }, testInfo) => {
+    test('cold installed-app launch preserves the native Work detail page from its cached URL', async ({ page, context }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Cold-launch navigation contract runs on desktop and phone viewport.');
 
