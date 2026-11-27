@@ -4220,23 +4220,23 @@ test.describe('Zazu installed PWA offline shell', () => {
             }
         });
 
-        // Cache the real invoice form while connected. After the quote is
-        // accepted locally, the same form must discover that local acceptance.
+        // Prime the native Quotes and invoice forms while connected. Offline
+        // records must render in those same pages, not in a substitute workspace.
         await page.goto('/finance/invoices/create', { waitUntil: 'domcontentloaded' });
         await expect(page.locator('form[data-zazu-offline-entity="invoice"]')).toBeVisible();
-        // Return to the cached Dashboard while online. Do not visit Quotes
-        // before disconnecting: that would cache the normal server-rendered page
-        // and bypass the service-worker Dashboard fallback under test.
+        await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('[data-zazu-local-quotes]')).toBeVisible();
         await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
 
         await context.setOffline(true);
         const quoteRoute = await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
-        expect(quoteRoute?.ok(), 'The unprimed Quotes route must load through the cached Dashboard fallback.').toBe(true);
+        expect(quoteRoute?.ok(), 'The exact cached Quotes page must remain available offline.').toBe(true);
         await waitForOfflineRuntime(page);
-        await expect(page.locator('[data-zazu-offline-active-view="quotes"]')).toBeVisible();
+        await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
 
-        const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'OFFLINE-QUOTE-001' });
+        const quoteRow = page.locator('[data-zazu-local-quotes] [data-zazu-local-record="quote"]').filter({ hasText: 'OFFLINE-QUOTE-001' });
         await expect(quoteRow).toBeVisible();
         await quoteRow.getByRole('button', { name: 'View offline' }).click();
 
