@@ -328,3 +328,14 @@ The exact-head Laravel run on `f064dff` completed with 783 passed, 2 failed and 
 Correction commits: `f9a31c6` (empty rental tab), `a164b77` (catalogue regression), `e896917` (PWA contract regression). All remain on `main`; no branches created.
 
 At the first observed checkpoint for `e896917`: PHPMD passed, Director Health passed, Windows installation candidate build passed; PostgreSQL smoke and Windows archive/install verification were running; Laravel, Zazu Quality and Push-on-main were queued. Exact-head Composer audit/formatting/application/secret-scan results for the previous source checkpoint `f064dff` were all successful. The `e896917` rerun must be used for final acceptance; do not carry forward old green statuses as exact-head proof.
+
+
+## Director continuation — offline acceptance test corrections (2026-11-27)
+
+- `bb28ff1` corrected a stale Laravel source-contract assertion: authenticated route priming is link-discovered and bounded, not a hard-coded list of customer/job paths. Laravel tests passed on that checkpoint.
+- `4adedd6` corrected the remaining Pint method-spacing issue in the same test file.
+- `3fd7cc7` made the Preparation browser test explicitly trust the demo device and run sync before selecting its server-backed parent job; the previous test assumed the demo job was already present in the local collection.
+- `c15d230` made the native catalogue browser test activate the Services & products tab before asserting a service row that correctly lives in that tab.
+- `50f08ec` aligned the device-trust disclosure assertion with the current Settings copy.
+- At this checkpoint, Zazu Quality on `50f08ec` passed, including formatting, Composer security audit, application checks and secret scan. The exact-head Laravel and offline-browser acceptance runs were still in progress; do not mark the browser suite green from earlier runs.
+- Offline product parity remains open. The browser suite must prove same-page navigation, persistence, session transitions and reconnect reconciliation. Founder PC/Android disconnected checks remain outstanding; no release gate is accepted.
