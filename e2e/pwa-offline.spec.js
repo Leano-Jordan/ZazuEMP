@@ -663,7 +663,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         // Prime the real module pages while connected. Offline acceptance must
         // exercise exact cached pages, not the legacy Dashboard fallback.
-        for (const path of ['/suppliers', '/inventory', '/assets', '/purchasing', '/finance', '/quotes']) {
+        for (const path of ['/suppliers', '/inventory', '/assets', '/purchasing', '/finance', '/quotes', '/capabilities', '/work/730001/costs']) {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
             expect(response?.ok(), path + ' must load online before its offline snapshot is cached').toBe(true);
         }
@@ -728,6 +728,8 @@ test.describe('Zazu installed PWA offline shell', () => {
             ['/assets', '.zazu-assets-directory', 'assets', 'Offline Marquee'],
             ['/purchasing', '.zazu-purchasing-page', 'purchase_orders', 'PO-OFF-005'],
             ['/quotes', '[data-zazu-local-quotes]', 'quote', 'Q-OFF-009'],
+            ['/capabilities', '[data-zazu-offline-catalogue-register="services"]', 'catalogue', 'Offline Catering Service'],
+            ['/work/730001/costs', '[data-zazu-offline-collection="costs"]', 'costs', 'Offline venue cost'],
         ];
         for (const [path, containerSelector, collection, label] of nativeExpectations) {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
@@ -754,20 +756,15 @@ test.describe('Zazu installed PWA offline shell', () => {
         await invoiceRow.getByRole('button', { name: 'View saved details' }).click();
         await expect(invoiceRow.locator('xpath=following-sibling::*[1]').getByText('EFT-01')).toBeVisible();
 
-        // These two areas are not yet primed/native-data-adapted. They may use
-        // the explicit fallback temporarily, but must identify it honestly.
-        for (const [path, view, label] of [
-            ['/capabilities', 'catalogue', 'Offline Catering Service'],
-            ['/work/730001/costs', 'costs', 'Offline venue cost'],
-        ]) {
-            const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
-            expect(response?.ok(), path + ' must render the marked fallback shell').toBe(true);
-            await expect(page.locator('meta[name="zazu-offline-fallback"][content="1"]')).toHaveCount(1);
-            const workspace = page.locator('[data-zazu-offline-workspace]');
-            await expect(workspace).toBeVisible();
-            await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', view);
-            await expect(workspace.locator('[data-zazu-offline-view="' + view + '"]').getByText(label, { exact: false }).first()).toBeVisible();
-        }
+        // A route absent from the primed page graph must be labelled honestly.
+        // It may not expose the old reduced collection workspace or hide navigation.
+        const fallbackResponse = await page.goto('/offline-parity-unprimed-probe', { waitUntil: 'domcontentloaded' });
+        expect(fallbackResponse?.ok()).toBe(true);
+        await expect(page.locator('meta[name="zazu-offline-fallback"][content="1"]')).toHaveCount(1);
+        await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(page.locator('[data-zazu-offline-route-unavailable]')).toBeVisible();
+        await expect(page.locator('[data-zazu-requested-offline-path]')).toHaveText('/offline-parity-unprimed-probe');
+        await expect(page.locator('.zazu-nav-link').filter({ visible: true }).first()).toBeVisible();
     });
 
     test('offline updates carry a base revision and preserve same-record queue order', async ({ page }) => {
