@@ -70,7 +70,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("event.data?.type !== 'prime-pages-complete'", $app);
         $this->assertStringContainsString("zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false'", $app);
         $this->assertStringContainsString('zazuOfflinePagesPrimeReason = event.data.reason ||', $app);
-        $this->assertStringContainsString("reason: success ? null : routeDiscoveryTruncated", $worker);
+        $this->assertStringContainsString('reason: success ? null : routeDiscoveryTruncated', $worker);
         $this->assertStringContainsString("'required-pages-not-cached'", $worker);
         $this->assertStringContainsString("'discovered-pages-not-cached'", $worker);
         $this->assertStringContainsString("event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', ...completed })", $worker);
