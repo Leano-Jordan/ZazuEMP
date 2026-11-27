@@ -5072,8 +5072,16 @@ function registerZazuServiceWorker() {
         channel.port1.onmessage = (event) => {
             if (event.data?.type !== 'prime-pages-complete') return;
             document.documentElement.dataset.zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false';
+            document.documentElement.dataset.zazuOfflinePagesPrimeReason = event.data.reason || '';
+            document.documentElement.dataset.zazuOfflinePagesPrimeRouteCount = String(event.data.route_count ?? '');
             window.dispatchEvent(new CustomEvent('zazu:offline-pages-primed', {
-                detail: { success: event.data.success === true },
+                detail: {
+                    success: event.data.success === true,
+                    reason: event.data.reason || null,
+                    routeCount: event.data.route_count ?? null,
+                    requiredMissing: event.data.required_missing || [],
+                    discoveredMissing: event.data.discovered_missing || [],
+                },
             }));
             channel.port1.close();
         };
