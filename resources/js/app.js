@@ -3301,178 +3301,90 @@ function setupZazuOfflineDirectoryViews() {
     // One shared origin state prevents overlapping health probes from
     // racing and hiding the local workspace after a newer offline transition.
     let lastOriginAvailable = navigator.onLine;
-    const initialDocumentPath = window.location.pathname.replace(/\/$/, '') || '/';
     const refreshOfflineWorkspaceVisibility = (state) => {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
         if (!workspace?.isConnected) return lastOriginAvailable;
 
-        const offlineWorkspaceCollections = [
-            'customers', 'jobs', 'quotes', 'preparations',
-            ...Object.keys(offlineCollectionDefinitions),
-        ];
-        const hasPendingRecords = Boolean(state?.local_dirty)
-            || (state?.conflicts || []).some(conflict => conflict?.status === 'open')
-            || offlineWorkspaceCollections.some(collection =>
-                (state?.[collection] || []).some(record =>
-                    record?.local_id && (
-                        record.pending_sync === true
-                        || !(record.server_id ?? record.id)
-                    )
-                )
-            );
-
-        workspace.hidden = !hasPendingRecords && lastOriginAvailable;
+        // The legacy collection workspace is retained temporarily as a local
+        // data adapter while normal page components are migrated. It is never
+        // a user-facing replacement for the application.
+        workspace.hidden = true;
         applyOfflineRouteView();
 
         return lastOriginAvailable;
     };
 
-    // The service worker preserves the exact cached destination on both
-    // in-app navigation and cold launch, using Dashboard only when no exact
-    // authenticated route is available. Unsupported routes must never fall
-    // through to Dashboard with every local collection expanded underneath it.
-    const offlineRouteViews = [
-        [/^\/customers(?:\/|$)/, 'customers'],
-        [/^\/work\/[^/]+\/(?:quotes)(?:\/|$)/, 'quotes'],
-        [/^\/work\/[^/]+\/(?:costs|travel)(?:\/|$)/, 'costs'],
-        [/^\/work(?:\/|$)/, 'jobs'],
-        [/^\/quotes(?:\/|$)/, 'quotes'],
-        [/^\/capabilities(?:\/|$)/, 'catalogue'],
-        [/^\/suppliers(?:\/|$)/, 'suppliers'],
-        [/^\/inventory(?:\/|$)/, 'inventory_items'],
-        [/^\/assets(?:\/|$)/, 'assets'],
-        [/^\/purchasing(?:\/|$)/, 'purchase_orders'],
-        [/^\/finance\/(?:expenses)(?:\/|$)/, 'expenses'],
-        [/^\/finance\/(?:invoices|payments)(?:\/|$)/, 'invoices'],
-        [/^\/finance(?:\/|$)/, 'invoices'],
-    ];
-
     const applyOfflineRouteView = () => {
-        const workspace = document.querySelector('[data-zazu-offline-workspace]');
-        if (!workspace) return;
-
-        // Exact cached application documents are the product UI. Never replace
-        // their normal page, forms, navigation or controls with the legacy
-        // collection workspace. That workspace is only a temporary fallback
-        // for a document explicitly marked by the service worker.
         document.body.classList.toggle('zazu-offline-mode', !lastOriginAvailable);
+
         const isFallbackDocument = document.querySelector(
             'meta[name="zazu-offline-fallback"][content="1"]'
         ) !== null;
+        const workspace = document.querySelector('[data-zazu-offline-workspace]');
+        if (workspace) workspace.hidden = true;
 
-        const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
-        if (!isFallbackDocument && currentPath === initialDocumentPath) {
-            // The document itself is the exact cached route. Keep its server-
-            // rendered page intact; the dashboard may retain its compact
-            // offline overview, but collection/detail pages never get replaced.
-            if (currentPath === '/dashboard') {
-                workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => {
-                    section.hidden = section.dataset.zazuOfflineView !== 'overview';
-                });
-                const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
-                if (unavailable) unavailable.hidden = true;
-                workspace.dataset.zazuOfflineActiveView = 'overview';
-            } else {
-                workspace.hidden = true;
-                workspace.dataset.zazuOfflineActiveView = 'native-page';
-            }
+        const content = document.querySelector('.zazu-content');
+        const existingFallback = content?.querySelector('[data-zazu-offline-route-unavailable]');
+
+        if (!isFallbackDocument) {
+            existingFallback?.remove();
             return;
         }
 
-        // Keep the connected Dashboard and any pending local-record directory
-        // unchanged while the origin is healthy. Route isolation applies only
-        // when this cached shell is serving as the offline fallback.
-        document.body.classList.toggle('zazu-offline-mode', !lastOriginAvailable);
-        const syncOfflineNavigation = (enabled) => {
-            const supportedPath = pathname => pathname === '/dashboard' || offlineRouteViews.some(([pattern]) => pattern.test(pathname));
-            document.querySelectorAll('.zazu-nav-link, .zazu-section-tabs a').forEach(link => {
-                if (!enabled) {
-                    link.hidden = false;
-                    return;
-                }
-                try {
-                    const url = new URL(link.href, window.location.origin);
-                    link.hidden = url.origin !== window.location.origin || !supportedPath(url.pathname.replace(/\/$/, '') || '/');
-                } catch {
-                    link.hidden = true;
-                }
-            });
-            document.querySelectorAll('[data-zazu-nav-area]').forEach(area => {
-                area.hidden = enabled && ![...area.querySelectorAll('.zazu-nav-link')].some(link => !link.hidden);
-            });
-        };
-        syncOfflineNavigation(!lastOriginAvailable);
+        if (!content) return;
 
-        if (lastOriginAvailable) {
-            workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => { section.hidden = false; });
-            const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
-            if (unavailable) unavailable.hidden = true;
-            document.querySelectorAll('.zazu-content > :not([data-zazu-offline-workspace])')
-                .forEach(section => { section.hidden = false; });
-            workspace.dataset.zazuOfflineActiveView = 'online';
-            const pageTitle = document.querySelector('.zazu-page-title');
-            if (pageTitle?.dataset.zazuOnlineTitle) {
-                pageTitle.textContent = pageTitle.dataset.zazuOnlineTitle;
-                delete pageTitle.dataset.zazuOnlineTitle;
-            }
-            document.querySelectorAll('.zazu-nav-link').forEach(link => {
-                link.classList.toggle('active', link.getAttribute('aria-current') === 'page');
-            });
-            return;
+        let fallback = existingFallback;
+        if (!fallback) {
+            fallback = document.createElement('section');
+            fallback.className = 'zazu-dash-surface zazu-offline-route-unavailable';
+            fallback.dataset.zazuOfflineRouteUnavailable = '1';
+            fallback.setAttribute('role', 'status');
+            fallback.setAttribute('aria-live', 'polite');
+
+            const kicker = document.createElement('span');
+            kicker.className = 'zazu-dash-kicker';
+            kicker.textContent = 'Offline page availability';
+
+            const heading = document.createElement('h2');
+            heading.className = 'zazu-dash-panel-heading';
+            heading.textContent = 'This page is not saved on this device yet';
+
+            const description = document.createElement('p');
+            description.className = 'zazu-card-description';
+            description.textContent = 'Zazu could not find an offline copy of the page you requested. Your normal navigation and saved pages remain available. Reconnect and try again to open this page.';
+
+            const requestedPath = document.createElement('code');
+            requestedPath.dataset.zazuRequestedOfflinePath = '1';
+            requestedPath.textContent = window.location.pathname + window.location.search;
+
+            const actions = document.createElement('div');
+            actions.className = 'zazu-action-group';
+
+            const retry = document.createElement('button');
+            retry.type = 'button';
+            retry.className = 'zazu-btn zazu-btn-primary';
+            retry.textContent = 'Try again';
+            retry.addEventListener('click', () => window.location.reload());
+
+            const dashboard = document.createElement('a');
+            dashboard.className = 'zazu-btn zazu-btn-secondary';
+            dashboard.href = '/dashboard';
+            dashboard.textContent = 'Open Dashboard';
+
+            actions.append(retry, dashboard);
+            fallback.append(kicker, heading, description, requestedPath, actions);
         }
 
-        const pathname = window.location.pathname.replace(/\/$/, '') || '/';
-        const route = offlineRouteViews.find(([pattern]) => pattern.test(pathname));
-        let activeView = pathname === '/dashboard'
-            ? 'overview'
-            : (route?.[1] || 'unavailable');
-        // The server-rendered offline workspace omits views the current
-        // business role cannot access. A manually entered cached URL must not
-        // reveal a hidden collection or leave the user on an empty screen.
-        if (activeView !== 'unavailable'
-            && !workspace.querySelector('[data-zazu-offline-view="' + activeView + '"]')) {
-            activeView = 'unavailable';
-        }
-        const offlineTitles = {
-            overview: 'Offline workspace',
-            customers: 'Customers',
-            jobs: 'Jobs',
-            quotes: 'Quotes',
-            costs: 'Event costs',
-            catalogue: 'Services & catalogue',
-            suppliers: 'Suppliers',
-            inventory_items: 'Inventory',
-            assets: 'Assets',
-            purchase_orders: 'Purchasing',
-            invoices: 'Finance',
-            expenses: 'Expenses',
-            unavailable: 'Connection required',
-        };
-        const pageTitle = document.querySelector('.zazu-page-title');
-        if (pageTitle) {
-            if (!pageTitle.dataset.zazuOnlineTitle) pageTitle.dataset.zazuOnlineTitle = pageTitle.textContent.trim();
-            pageTitle.textContent = offlineTitles[activeView] || 'Offline workspace';
-        }
-        document.querySelectorAll('.zazu-nav-link').forEach(link => {
-            const selected = link.href === new URL(pathname, window.location.origin).href;
-            link.classList.toggle('active', selected);
-            if (selected) link.setAttribute('aria-current', 'page');
-            else link.removeAttribute('aria-current');
-        });
-
-        workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => {
-            section.hidden = section.dataset.zazuOfflineView !== activeView;
-        });
-        const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
-        if (unavailable) unavailable.hidden = activeView !== 'unavailable';
-
-        // Dashboard slot content is nested inside .zazu-content, not a
-        // direct child of main#main-content. Hide every cached Dashboard slot
-        // sibling except the offline workspace itself; otherwise the online
-        // dashboard remains visible above/below the selected offline view.
-        document.querySelectorAll('.zazu-content > :not([data-zazu-offline-workspace])')
+        // The service worker served the cached Dashboard document only as a
+        // transport fallback. Do not misrepresent its Dashboard widgets as the
+        // requested page, and do not expose the legacy collection workspace.
+        content.querySelectorAll(':scope > :not([data-zazu-offline-route-unavailable])')
             .forEach(section => { section.hidden = true; });
-        workspace.dataset.zazuOfflineActiveView = activeView;
+        fallback.hidden = false;
+        if (fallback.parentElement !== content) content.append(fallback);
+
+        const pageTitle = document.querySelector('.zazu-page-title');
+        if (pageTitle) pageTitle.textContent = 'Connection required';
     };
 
     const setupOriginAvailabilityMonitor = () => {
@@ -3488,15 +3400,10 @@ function setupZazuOfflineDirectoryViews() {
 
         const message = document.createElement('div');
         message.append(
-            text('strong', '', 'Zazu server is unavailable'),
-            text('p', '', 'Your last saved records remain on this device. Only supported offline screens can be used until the server reconnects.')
+            text('strong', '', 'Zazu is offline'),
+            text('p', '', 'Cached Zazu pages remain available. Supported changes are saved on this device and wait here until the server reconnects.')
         );
-        const action = document.createElement('a');
-        action.className = 'zazu-origin-offline-action';
-        action.href = '/dashboard';
-        action.textContent = 'Open offline workspace';
-        action.hidden = window.location.pathname === '/dashboard';
-        notice.append(message, action);
+        notice.append(message);
 
         const topbar = main.querySelector(':scope > .zazu-topbar');
         if (topbar) topbar.insertAdjacentElement('afterend', notice);
@@ -3516,7 +3423,6 @@ function setupZazuOfflineDirectoryViews() {
             try {
                 lastOriginAvailable = navigator.onLine && await canReachZazuOrigin();
                 notice.hidden = lastOriginAvailable;
-                action.hidden = window.location.pathname === '/dashboard';
                 window.dispatchEvent(new CustomEvent('zazu:origin-availability', {
                     detail: { available: lastOriginAvailable },
                 }));
