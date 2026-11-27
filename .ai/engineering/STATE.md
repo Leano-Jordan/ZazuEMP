@@ -368,3 +368,17 @@ At the first observed checkpoint for `e896917`: PHPMD passed, Director Health pa
 - `50f08ec` aligned the device-trust disclosure assertion with the current Settings copy.
 - At this checkpoint, Zazu Quality on `50f08ec` passed, including formatting, Composer security audit, application checks and secret scan. The exact-head Laravel and offline-browser acceptance runs were still in progress; do not mark the browser suite green from earlier runs.
 - Offline product parity remains open. The browser suite must prove same-page navigation, persistence, session transitions and reconnect reconciliation. Founder PC/Android disconnected checks remain outstanding; no release gate is accepted.
+
+## Director update — 2026-11-27 — CI reconciliation and tier adversarial map
+
+**Latest Director documentation commits:** tier source/test reconciliation `3d0d7f7`; CI failure reconciliation `9b85730` (both on main).
+
+- Historical Laravel failures on `f064dff` were stale test expectations and received source/test corrections (`f9a31c6`, `a164b77`, `e896917`, followed by route/Pint/browser fixture corrections). These are not current failures, but the current offline source candidate still requires exact-head rerun.
+- Historical offline browser failures (60/20, then 78/2 and 79/1) exposed route-classifier and service-worker fallback defects. The rejected shared offline shell was removed; normal cached native pages are preserved. This is an architectural correction, not an acceptance pass.
+- Historical Symfony Composer advisories were corrected by lockfile update to 7.4.24; later Zazu Quality runs `45787154093` and `45787226126` recorded Composer audit PASS.
+- Historical Psalm/PHPMD SARIF publication failure was addressed by pinning the CodeQL SARIF upload action to v4.39.3; later Psalm/SARIF run `45787153999` and PHPMD run `45787154030` recorded PASS on candidate `43e69e6`. Not current-head evidence.
+- The current source/test candidate remains `be3457b3a0e7057010492ff8df700aeac90d001d`. Latest docs-only repository commit is `9b85730574e88f8c04ef2bf1fe2e5dc122623701`. Combined status for the docs HEAD returned no entries; connected workflow lookup returned no PR-triggered runs. Exact-head Laravel/browser/quality/security/Windows results for `be3457b3` remain UNVERIFIED. SonarCloud remains skipped.
+- The capability matrix now maps trial/entitlement tests, signed-license tests, offline mutation tests, business/role boundaries and offline snapshot limitations. It records a 500-record-per-collection technical bootstrap bound, not a commercial quota, and calls for explicit testing above that bound.
+- Required before any tier gates: downgrade with active work, queued offline mutation through expiry/reconnect, invalid-device/cross-business rejection, unchanged roles/ownership and >500-record snapshot coverage. No gates or quotas are authorised.
+- Historical CI failure dispositions and current verification boundary: `docs/DIRECTOR_CI_FAILURE_RECONCILIATION_2026-11-27.md`. Detailed capability/test mapping: `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md` section 13.
+- **Next execution:** secure exact-head workflow evidence for `be3457b3`; correct any actual failure from its logs. Then add downgrade/queued-mutation regression coverage and resolve offline snapshot completeness. Do not mark V1 ready or inherit predecessor PASS states.
