@@ -382,3 +382,11 @@ At the first observed checkpoint for `e896917`: PHPMD passed, Director Health pa
 - Required before any tier gates: downgrade with active work, queued offline mutation through expiry/reconnect, invalid-device/cross-business rejection, unchanged roles/ownership and >500-record snapshot coverage. No gates or quotas are authorised.
 - Historical CI failure dispositions and current verification boundary: `docs/DIRECTOR_CI_FAILURE_RECONCILIATION_2026-11-27.md`. Detailed capability/test mapping: `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md` section 13.
 - **Next execution:** secure exact-head workflow evidence for `be3457b3`; correct any actual failure from its logs. Then add downgrade/queued-mutation regression coverage and resolve offline snapshot completeness. Do not mark V1 ready or inherit predecessor PASS states.
+
+## Director execution update — 2026-11-27 — tier downgrade queue regression
+
+- Added a focused ExperienceLevelTrialTest regression: a valid business/device offline mutation is recorded before the 30-day trial expires; after expiry, the effective experience tier resolves to Basic while the original saved preference remains unchanged and the queued mutation remains present with pending status.
+- Test commits: `1e7d950` (initial regression), `3c77321` (import ordering), `104fefe` (pending-state assertion). The latest application source remains `be3457b3a0e7057010492ff8df700aeac90d001d`; this slice is test-only.
+- Updated matrix section 13 to distinguish what this regression proves from what remains open: full IndexedDB persistence plus authenticated push/apply/acknowledgement after expiry and reconnect is still unproven.
+- Exact-head combined status for `3c77321` returned no status entries and the connected workflow lookup returned no PR-triggered runs. The newest test commit `104fefe` therefore remains unverified until its Laravel/quality workflows are observed. Do not claim the test passes based only on its source.
+- **Next:** obtain exact-head Laravel/quality results for `104fefe`; fix any concrete test or tooling failure from logs. Then implement the full reconnect scenario and test the >500-record bootstrap boundary. No tier gates or quotas.
