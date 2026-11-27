@@ -257,7 +257,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(readiness).toBe('ready');
     });
 
-    test('detects a stopped Zazu host while Wi-Fi remains connected and exposes the local workspace', async ({ page }, testInfo) => {
+    test('detects a stopped Zazu host while Wi-Fi remains connected and preserves the app shell', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Origin-outage monitor contract runs on desktop and phone viewport.');
 
@@ -288,10 +288,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.evaluate(() => window.dispatchEvent(new Event('focus')));
         const notice = page.locator('[data-zazu-origin-offline-notice]');
         await expect(notice).toBeVisible({ timeout: 15_000 });
-        await expect(notice).toContainText('Zazu server is unavailable');
-        await expect(notice).toContainText('Only supported offline screens can be used');
-        await expect(notice.getByRole('link', { name: 'Open offline workspace' })).toBeHidden();
-        await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
+        await expect(notice).toContainText('Zazu is offline');
+        await expect(notice).toContainText('Cached Zazu pages remain available');
+        await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
+        await expect(page.locator('.zazu-page-title')).toHaveText('Dashboard');
 
         await page.locator('[data-zazu-helper-toggle]').click();
         const helperConnectivity = page.locator('[data-zazu-helper-connectivity]');
@@ -3998,8 +3999,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
         await expect(page.locator('.zazu-dash-hero')).toBeVisible();
         await expect(page.locator('.zazu-dash-overview')).toBeVisible();
-        await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
-        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveAttribute('data-zazu-offline-active-view', 'overview');
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
+        await expect(page.locator('[data-zazu-offline-route-unavailable]')).toHaveCount(0);
     });
     test('primes Customers and Work routes for disconnected phone navigation', async ({ page, context }) => {
         test.setTimeout(90_000);
