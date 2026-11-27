@@ -376,6 +376,10 @@ test('sibling browser tabs follow the active authenticated identity', async ({ p
     await expect(sibling.locator('body')).toHaveAttribute('data-zazu-user-id', String(firstUser));
 
     await page.goto('/');
+    // The production logout flow deliberately confirms the action. Playwright
+    // auto-dismisses unhandled dialogs, which would leave the test signed in
+    // and falsely fail the subsequent identity-transition assertion.
+    page.once('dialog', dialog => dialog.accept());
     await page.evaluate(() => {
         const form = document.querySelector('form[action$="/logout"]');
         if (!form) throw new Error('Logout form was not found');
