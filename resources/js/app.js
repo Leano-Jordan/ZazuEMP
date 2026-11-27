@@ -4983,7 +4983,14 @@ function registerZazuServiceWorker() {
             }));
             channel.port1.close();
         };
-        target.postMessage({ type: 'prime-pages', userId, businessId, routes: [...routes].slice(0, 100) }, [channel.port2]);
+        const routeList = [...routes];
+        target.postMessage({
+            type: 'prime-pages',
+            userId,
+            businessId,
+            routes: routeList.slice(0, 100),
+            routesTruncated: routeList.length > 100,
+        }, [channel.port2]);
     };
 
 
