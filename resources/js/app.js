@@ -2655,7 +2655,8 @@ function setupZazuOfflineDirectoryViews() {
             total.textContent = quote.total !== undefined && quote.total !== null
                 ? String(quote.currency || state?.business?.currency || 'ZAR') + ' ' + String(quote.total)
                 : '—';
-            row.append(identity, version, status, total, sync);
+            main.append(sync);
+            row.append(identity, version, status, total);
             addQuoteOfflineDetails(row, quote);
             if (empty?.parentNode === directory) directory.insertBefore(row, empty);
             else directory.append(row);
