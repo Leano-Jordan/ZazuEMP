@@ -253,6 +253,18 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('setupZazuOfflineForms();', $app);
     }
 
+    public function test_travel_creation_is_explicitly_connection_dependent(): void
+    {
+        $view = File::get(resource_path('views/travel/create.blade.php'));
+        $app = File::get(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('data-zazu-online-only', $view);
+        $this->assertStringContainsString('Travel calculations currently require a live server connection', $view);
+        $this->assertStringContainsString("form.addEventListener('submit', async (event) => {", $app);
+        $this->assertStringContainsString('HTMLFormElement.prototype.submit.call(form);', $app);
+        $this->assertStringContainsString('Travel calculations need a live connection', $app);
+    }
+
     public function test_application_navigation_remains_available_in_offline_mode(): void
     {
         $styles = File::get(resource_path('css/app.css'));
