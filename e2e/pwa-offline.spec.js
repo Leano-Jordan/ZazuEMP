@@ -657,9 +657,17 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(() => window.ZazuOffline.getState().sync?.token)).toBe('registration-retry-test-token');
     });
 
-    test('offline workspace exposes locally saved supplier, service, stock, asset and finance records', async ({ page }, testInfo) => {
-        test.skip(testInfo.project.name !== 'chromium', 'Local workspace collection rendering runs once.');
+    test('native module registers render locally saved supplier, stock, asset, purchasing and finance records', async ({ page }, testInfo) => {
+        test.skip(testInfo.project.name !== 'chromium', 'Native module collection rendering runs once.');
         await login(page);
+
+        // Prime the real module pages while connected. Offline acceptance must
+        // exercise exact cached pages, not the legacy Dashboard fallback.
+        for (const path of ['/suppliers', '/inventory', '/assets', '/purchasing', '/finance']) {
+            const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+            expect(response?.ok(), path + ' must load online before its offline snapshot is cached').toBe(true);
+        }
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await page.context().setOffline(true);
 
         await page.evaluate(async () => {
@@ -709,49 +717,51 @@ test.describe('Zazu installed PWA offline shell', () => {
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
         });
 
-        const workspace = page.locator('[data-zazu-offline-workspace]');
-        await expect(workspace).toBeVisible();
-
-        const routeExpectations = [
-            ['/suppliers', 'suppliers', 'Offline Supplier Proof'],
-            ['/capabilities', 'catalogue', 'Offline Catering Service'],
-            ['/inventory', 'inventory_items', 'Offline Stock Proof'],
-            ['/assets', 'assets', 'Offline Marquee'],
-            ['/purchasing', 'purchase_orders', 'PO-OFF-005'],
-            ['/finance/invoices', 'invoices', 'INV-OFF-006'],
-            ['/finance/expenses', 'expenses', 'Offline fuel expense'],
-            ['/work/730001/costs', 'costs', 'Offline venue cost'],
+        const nativeExpectations = [
+            ['/suppliers', '.zazu-suppliers-page', 'suppliers', 'Offline Supplier Proof'],
+            ['/inventory', '.zazu-inventory-directory', 'inventory_items', 'Offline Stock Proof'],
+            ['/assets', '.zazu-assets-directory', 'assets', 'Offline Marquee'],
+            ['/purchasing', '.zazu-purchasing-page', 'purchase_orders', 'PO-OFF-005'],
         ];
-
-        for (const [path, view, label] of routeExpectations) {
+        for (const [path, containerSelector, collection, label] of nativeExpectations) {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
-            expect(response?.ok(), path + ' must render through the cached offline shell').toBe(true);
-            await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', view);
-            const section = workspace.locator('[data-zazu-offline-view="' + view + '"]');
-            await expect(section).toBeVisible();
-            await expect(section.getByText(label, { exact: false }).first()).toBeVisible();
+            expect(response?.ok(), path + ' must render its exact cached application page').toBe(true);
+            await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
+            await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+            await expect(page.locator(containerSelector + ' [data-zazu-local-record="' + collection + '"]').filter({ hasText: label })).toBeVisible();
         }
 
         await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
-        const supplierSection = workspace.locator('[data-zazu-offline-view="suppliers"]');
-        await supplierSection.getByRole('button', { name: 'View saved details' }).first().click();
-        await expect(supplierSection.getByText('supplier@example.test', { exact: true })).toBeVisible();
-        await expect(supplierSection.getByText('Soshanguve')).toBeVisible();
-
-        await page.goto('/capabilities', { waitUntil: 'domcontentloaded' });
-        const catalogueSection = workspace.locator('[data-zazu-offline-view="catalogue"]');
-        await catalogueSection.getByRole('button', { name: 'View saved details' }).first().click();
-        await expect(catalogueSection.getByText('Inactive', { exact: true })).toBeVisible();
+        const supplierRow = page.locator('.zazu-suppliers-page [data-zazu-local-record="suppliers"]').filter({ hasText: 'Offline Supplier Proof' });
+        await supplierRow.getByRole('button', { name: 'View saved details' }).click();
+        await expect(supplierRow.locator('xpath=following-sibling::*[1]').getByText('supplier@example.test', { exact: true })).toBeVisible();
 
         await page.goto('/inventory', { waitUntil: 'domcontentloaded' });
-        const stockSection = workspace.locator('[data-zazu-offline-view="inventory_items"]');
-        await stockSection.getByRole('button', { name: 'View saved details' }).click();
-        await expect(stockSection.getByText('Recent stock movements')).toBeVisible();
+        const stockRow = page.locator('.zazu-inventory-directory [data-zazu-local-record="inventory_items"]').filter({ hasText: 'Offline Stock Proof' });
+        await stockRow.getByRole('button', { name: 'View saved details' }).click();
+        await expect(page.getByText('Recent stock movements')).toBeVisible();
 
-        await page.goto('/finance/invoices', { waitUntil: 'domcontentloaded' });
-        const invoiceSection = workspace.locator('[data-zazu-offline-view="invoices"]');
-        await invoiceSection.getByRole('button', { name: 'View saved details' }).click();
-        await expect(invoiceSection.getByText('EFT-01')).toBeVisible();
+        await page.goto('/finance', { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('[data-zazu-offline-collection="invoices"] [data-zazu-local-record="invoices"]').filter({ hasText: 'INV-OFF-006' })).toBeVisible();
+        await expect(page.locator('[data-zazu-offline-collection="expenses"] [data-zazu-local-record="expenses"]').filter({ hasText: 'Offline fuel expense' })).toBeVisible();
+        const invoiceRow = page.locator('[data-zazu-offline-collection="invoices"] [data-zazu-local-record="invoices"]').filter({ hasText: 'INV-OFF-006' });
+        await invoiceRow.getByRole('button', { name: 'View saved details' }).click();
+        await expect(page.getByText('EFT-01')).toBeVisible();
+
+        // These two areas are not yet primed/native-data-adapted. They may use
+        // the explicit fallback temporarily, but must identify it honestly.
+        for (const [path, view, label] of [
+            ['/capabilities', 'catalogue', 'Offline Catering Service'],
+            ['/work/730001/costs', 'costs', 'Offline venue cost'],
+        ]) {
+            const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+            expect(response?.ok(), path + ' must render the marked fallback shell').toBe(true);
+            await expect(page.locator('meta[name="zazu-offline-fallback"][content="1"]')).toHaveCount(1);
+            const workspace = page.locator('[data-zazu-offline-workspace]');
+            await expect(workspace).toBeVisible();
+            await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', view);
+            await expect(workspace.locator('[data-zazu-offline-view="' + view + '"]').getByText(label, { exact: false }).first()).toBeVisible();
+        }
     });
 
     test('offline updates carry a base revision and preserve same-record queue order', async ({ page }) => {
