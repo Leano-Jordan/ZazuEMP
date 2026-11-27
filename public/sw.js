@@ -411,6 +411,9 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
             || route.password !== ''
             || route.pathname === '/api'
             || route.pathname.startsWith('/api/')
+            // Export actions return files, not navigable HTML workspace pages.
+            // Keep /exports (the export centre) cacheable, but never discover its downloads.
+            || route.pathname.startsWith('/exports/')
             || ['/', '/login', '/register', '/privacy', '/terms', '/logout', '/business/switch', '/up']
                 .includes(route.pathname)
             || route.pathname.startsWith('/forgot-password')
