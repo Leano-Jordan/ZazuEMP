@@ -437,9 +437,11 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     const primedStaticAssetUrls = new Set();
 
     try {
-        for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
+        let offset = 0;
+        while (offset < uniqueRoutes.length) {
             if (controller.signal.aborted) break;
             const batch = uniqueRoutes.slice(offset, offset + PRIME_CONCURRENCY);
+            offset += batch.length;
             await Promise.all(batch.map(async (path) => {
                 try {
                     const request = new Request(new URL(path, self.location.origin), {
