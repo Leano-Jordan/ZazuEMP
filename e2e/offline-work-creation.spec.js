@@ -746,7 +746,7 @@ test('an existing customer can be edited locally while disconnected and synced o
 
     // The cached Customers directory must render the local override rather
     // than showing the older server-rendered snapshot while disconnected.
-    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    await page.goto('/customers', { waitUntil: 'domcontentloaded', referer: page.url() });
     const cachedCustomerRow = page.locator('[data-zazu-local-record="customer"]').filter({ hasText: updatedName });
     await expect(cachedCustomerRow.locator('.zazu-list-title')).toHaveText(updatedName);
     await expect(cachedCustomerRow.locator('.zazu-list-meta')).toContainText('0123456789');
