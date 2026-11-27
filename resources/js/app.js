@@ -2854,6 +2854,7 @@ function setupZazuOfflineDirectoryViews() {
 
                 const status = localSyncStatus(state, 'service', record.local_id, serverId, record.pending_sync === true);
                 const chip = text('span', 'zazu-chip zazu-chip-neutral', status.label);
+                chip.dataset.zazuLocalSyncChip = '1';
                 chip.title = status.title;
                 chip.setAttribute('aria-label', status.label + '. ' + status.title);
                 const canEdit = [...catalogue.querySelectorAll('a[href]')].some(link => {
