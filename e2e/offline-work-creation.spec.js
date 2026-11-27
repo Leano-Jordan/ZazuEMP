@@ -419,9 +419,10 @@ test('offline workspace distinguishes synced local jobs from pending jobs', asyn
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }, { syncedReference, syncedName, pendingCustomerName });
 
-    const workspace = page.locator('[data-zazu-offline-workspace]');
-    await expect(workspace).toBeVisible();
-    const syncedRow = workspace.locator('[data-zazu-local-record="job"]').filter({ hasText: syncedName });
+    // Exact cached Work pages render local records in the normal Work
+    // register; the shared workspace is not the page's substitute.
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    const syncedRow = page.locator('.zazu-ops-register [data-zazu-local-record="job"]').filter({ hasText: syncedName });
     await expect(syncedRow).toBeVisible();
     await expect(syncedRow.locator('.zazu-ops-ref-label')).toHaveText('Job reference');
     await expect(syncedRow.locator('.zazu-ops-ref strong')).toHaveText(syncedReference);
@@ -574,12 +575,19 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const coldLaunchResponse = await coldLaunchPage.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     expect(coldLaunchResponse?.ok()).toBe(true);
     await coldLaunchPage.evaluate(() => window.ZazuOffline.ready);
-    await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Offline workspace');
+    await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Dashboard');
     await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeVisible({ timeout: 8000 });
-    await selectOfflineView(coldLaunchPage, '/customers');
-    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace] [data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
-    await selectOfflineView(coldLaunchPage, '/work');
-    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace] [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toHaveAttribute('data-zazu-offline-active-view', 'overview');
+
+    await coldLaunchPage.goto('/customers', { waitUntil: 'domcontentloaded' });
+    await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Customers');
+    await expect(coldLaunchPage.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeHidden();
+
+    await coldLaunchPage.goto('/work', { waitUntil: 'domcontentloaded' });
+    await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Jobs');
+    await expect(coldLaunchPage.locator('.zazu-ops-register [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeHidden();
     const coldLaunchQueue = await coldLaunchPage.evaluate(async () => await window.ZazuOffline.pending());
     expect(coldLaunchQueue.map((mutation) => mutation.id)).toEqual(expect.arrayContaining(persistedQueue.map((mutation) => mutation.id)));
     await coldLaunchPage.close();
