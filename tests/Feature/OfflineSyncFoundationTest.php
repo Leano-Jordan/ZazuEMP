@@ -2482,8 +2482,15 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $identity = app(SyncEntityIdentityRegistry::class)->identify($asset, 'asset');
         $oldTimestamp = now()->subDays(2);
-        $asset->forceFill(['updated_at' => $oldTimestamp])->save();
-        $identity->forceFill(['updated_at' => $oldTimestamp])->save();
+        // Use direct updates: Eloquent save() refreshes updated_at even when
+        // that attribute was force-filled, which would leave this record in
+        // the newest-500 window and make the boundary test ineffective.
+        DB::table('assets')->where('id', $asset->id)->update([
+            'updated_at' => $oldTimestamp,
+        ]);
+        DB::table('sync_entity_identities')->where('id', $identity->id)->update([
+            'updated_at' => $oldTimestamp,
+        ]);
 
         // Put the delivered asset outside the newest-500 working set. A
         // receiver bootstrap must union explicit delivery targets with that
