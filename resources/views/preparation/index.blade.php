@@ -42,7 +42,8 @@
                     @foreach (['open' => 'Open', 'blocked' => 'Blocked', 'ready' => 'Ready'] as $status => $label)
                         <form method="POST" action="{{ route('work.preparation.status', [$event, $item]) }}" data-zazu-offline-entity="preparation" data-zazu-offline-job-id="{{ $event->id }}" data-zazu-offline-server-id="{{ $item->id }}">
                             @csrf @method('PATCH')
-                            <button name="status" value="{{ $status }}" class="zazu-btn {{ $item->status === $status ? 'zazu-btn-secondary' : 'zazu-btn-ghost' }}">{{ $label }}</button>
+                            <input type="hidden" name="status" value="{{ $status }}">
+                            <button type="submit" class="zazu-btn {{ $item->status === $status ? 'zazu-btn-secondary' : 'zazu-btn-ghost' }}">{{ $label }}</button>
                         </form>
                     @endforeach
                 </div>
