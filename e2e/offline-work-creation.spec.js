@@ -143,6 +143,9 @@ test('offline inventory item edits update the local record and queue a revision-
     const serverId = 7654399;
 
     await login(page);
+    await page.goto('/inventory', { waitUntil: 'domcontentloaded' });
+    await page.goto('/inventory/create', { waitUntil: 'domcontentloaded' });
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.context().setOffline(true);
     await page.evaluate(async ({ localId, serverId }) => {
         await window.ZazuOffline.ready;
@@ -168,16 +171,18 @@ test('offline inventory item edits update the local record and queue a revision-
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }, { localId, serverId });
 
-    const workspace = page.locator('[data-zazu-offline-workspace]');
-    await expect(workspace).toBeVisible();
-    await selectOfflineView(page, '/inventory');
-    const inventory = workspace.locator('[data-zazu-offline-collection="inventory_items"]');
-    await inventory.getByRole('button', { name: 'View saved details' }).click();
-    await inventory.getByRole('button', { name: 'Edit saved item' }).click();
-    await inventory.getByLabel('Name').fill('Updated inventory item');
-    await inventory.getByLabel('SKU').fill('NEW-01');
-    await inventory.getByLabel('Reorder level').fill('5.00');
-    await inventory.getByRole('button', { name: 'Save item' }).click();
+    await page.goto('/inventory', { waitUntil: 'domcontentloaded' });
+    const inventoryRow = page.locator('[data-zazu-offline-collection="inventory_items"] [data-zazu-local-record="inventory_items"]').filter({ hasText: 'Original inventory item' });
+    await expect(inventoryRow).toBeVisible();
+    await inventoryRow.getByRole('link', { name: 'Edit' }).click();
+
+    const form = page.locator('form[data-zazu-offline-entity="inventory_item"]');
+    await expect(form.locator('input[name="name"]')).toHaveValue('Original inventory item');
+    await form.locator('input[name="name"]').fill('Updated inventory item');
+    await form.locator('input[name="sku"]').fill('NEW-01');
+    await form.locator('input[name="reorder_level"]').fill('5.00');
+    await form.getByRole('button', { name: 'Save item changes' }).click();
+    await expect(form.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
 
     await expect.poll(async () => page.evaluate(async localId => {
         const state = window.ZazuOffline.getState();
@@ -209,6 +214,9 @@ test('offline supplier edits update local contact details and queue a revision-c
     const serverId = 7654398;
 
     await login(page);
+    await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
+    await page.goto('/suppliers/create', { waitUntil: 'domcontentloaded' });
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.context().setOffline(true);
     await page.evaluate(async ({ localId, serverId }) => {
         await window.ZazuOffline.ready;
@@ -232,18 +240,20 @@ test('offline supplier edits update local contact details and queue a revision-c
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }, { localId, serverId });
 
-    const workspace = page.locator('[data-zazu-offline-workspace]');
-    await expect(workspace).toBeVisible();
-    await selectOfflineView(page, '/suppliers');
-    const suppliers = workspace.locator('[data-zazu-offline-collection="suppliers"]');
-    await suppliers.getByRole('button', { name: 'View saved details' }).click();
-    await suppliers.getByRole('button', { name: 'Edit saved supplier' }).click();
-    await suppliers.getByLabel('Supplier name').fill('Updated offline supplier');
-    await suppliers.getByLabel('Contact person').fill('Updated Contact');
-    await suppliers.getByLabel('Email').fill('new@example.test');
-    await suppliers.getByLabel('Phone').fill('0111234567');
-    await suppliers.getByLabel('Notes').fill('Updated while disconnected');
-    await suppliers.getByRole('button', { name: 'Save supplier' }).click();
+    await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
+    const supplierRow = page.locator('[data-zazu-offline-collection="suppliers"] [data-zazu-local-record="suppliers"]').filter({ hasText: 'Original offline supplier' });
+    await expect(supplierRow).toBeVisible();
+    await supplierRow.getByRole('link', { name: 'Edit' }).click();
+
+    const form = page.locator('form[data-zazu-offline-entity="supplier"]');
+    await expect(form.locator('input[name="name"]')).toHaveValue('Original offline supplier');
+    await form.locator('input[name="name"]').fill('Updated offline supplier');
+    await form.locator('input[name="contact_name"]').fill('Updated Contact');
+    await form.locator('input[name="email"]').fill('new@example.test');
+    await form.locator('input[name="phone"]').fill('0111234567');
+    await form.locator('textarea[name="notes"]').fill('Updated while disconnected');
+    await form.getByRole('button', { name: 'Save changes' }).click();
+    await expect(form.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
 
     await expect.poll(async () => page.evaluate(async localId => {
         const state = window.ZazuOffline.getState();
