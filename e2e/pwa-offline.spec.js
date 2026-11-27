@@ -102,7 +102,6 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(status).toHaveText('This browser does not support persistent storage requests.');
         await expect(request).toBeHidden();
 
-        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
             Object.defineProperty(navigator, 'storage', {
@@ -116,9 +115,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             await window.ZazuOffline.persist();
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
         });
-        const offlineWorkspace = page.locator('[data-zazu-offline-workspace]');
-        await expect(offlineWorkspace).toBeVisible();
-        await expect(offlineWorkspace.locator('[data-zazu-offline-storage-status]'))
+        await expect(settingsPanel.locator('[data-zazu-offline-storage-status]'))
             .toHaveText('This browser does not support persistent storage requests.');
     });
 
@@ -126,6 +123,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'IndexedDB quota failure contract runs once.');
 
         await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
         await context.setOffline(true);
         await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
         await page.evaluate(async () => {
@@ -169,9 +167,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.name).toBe('QuotaExceededError');
         expect(outcome.message).toContain('Zazu could not save this change');
 
-        const workspace = page.locator('[data-zazu-offline-workspace]');
-        await expect(workspace).toBeVisible();
-        const warning = workspace.locator('[data-zazu-offline-storage-error]');
+        const warning = page.locator('[data-zazu-offline-storage-error]');
         await expect(warning).toBeVisible();
         await expect(warning).toContainText('This device is low on browser storage');
         await expect(warning).toContainText('failed transaction was not committed');
