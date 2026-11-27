@@ -307,3 +307,13 @@ Both source and destination workspaces were unpopulated; target occupancy was no
 **Still open:** installation-wide backup/restore recovery on the intended PC; this is a separate recovery scope. The overall release verdict remains NOT READY because other security, physical offline, commercial and legal gates remain open.
 
 The runbook contains the owner acceptance evidence, incident resolution, operational instructions and explicit verification boundary: [Business archive recovery acceptance](../../docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md#founder-confirmed-business-archive-recovery--2026-11-26).
+
+
+## Director continuation — preparation offline acceptance (2026-11-27)
+
+- Preparation status-update browser acceptance is now committed in `e2e/offline-work-creation.spec.js` at `f064dff847cd14b2b031d7ce32e3501c57d5ac16`.
+- The test asserts the actual offline mutation envelope (`payload.local_id`, `payload.server_id`, nested `payload.record.status` and `event_local_id`), persisted local status after reload, and one queued mutation. It does not assert a revision field that the queue envelope does not expose at enqueue time.
+- The test is an automated CI candidate, not yet a verified pass. Latest observed Laravel workflow is still running.
+- Exact-head Composer security audit, PHP formatting, application checks and secret scan have passed on `f064dff`. Laravel browser acceptance, PHPUnit, coverage, PostgreSQL recovery and CodeQL are still in progress/pending.
+- The parity standard was corrected to distinguish status-chip reconciliation on server-backed rows from selected status controls on local-only rows.
+- Preparation remains open pending exact-head browser/Laravel results and Founder PC/Android disconnected acceptance. No release gate is accepted by this checkpoint.
