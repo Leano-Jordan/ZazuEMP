@@ -2778,6 +2778,153 @@ function setupZazuOfflineDirectoryViews() {
         },
     };
 
+    const renderOfflineCatalogue = (state) => {
+        const catalogue = document.querySelector('[data-zazu-catalogue]');
+        if (!catalogue) return;
+
+        const search = catalogue.querySelector('input[name="search"]')?.value.trim().toLowerCase() || '';
+        const category = catalogue.querySelector('select[name="category"]')?.value || '';
+        const records = (state?.catalogue || []).filter(record => record?.local_id
+            && (!search || String(record.name || '').toLowerCase().includes(search))
+            && (!category || String(record.category || '') === category));
+
+        const groups = {
+            equipment: records.filter(record => record.capability_type === 'rental'),
+            services: records.filter(record => record.capability_type !== 'rental'),
+        };
+
+        Object.entries(groups).forEach(([group, groupRecords]) => {
+            const panel = catalogue.querySelector('[data-catalogue-panel="' + group + '"]');
+            if (!panel) return;
+
+            let register = panel.querySelector('[data-zazu-offline-catalogue-register="' + group + '"]');
+            if (!register) {
+                register = document.createElement('div');
+                register.dataset.zazuOfflineCatalogueRegister = group;
+                register.className = group === 'equipment' ? 'zazu-catalogue-register' : 'zazu-catering-grid';
+                if (group === 'equipment') {
+                    const header = document.createElement('div');
+                    header.className = 'zazu-register-head';
+                    ['SKU / CODE', 'ASSET & CATEGORY', 'STOCK LEDGER', 'DAILY RATE', 'ACTIONS']
+                        .forEach(label => header.append(text('span', '', label)));
+                    register.append(header);
+                }
+                const empty = panel.querySelector('.zazu-empty');
+                if (empty) panel.insertBefore(register, empty);
+                else panel.append(register);
+            }
+
+            register.querySelectorAll('[data-zazu-local-record="catalogue"]').forEach(node => node.remove());
+
+            const countNode = catalogue.querySelector('[data-zazu-catalogue-count="' + group + '"]');
+            const serverRows = [...register.querySelectorAll('[data-zazu-server-record-id]')];
+            let count = serverRows.length;
+
+            groupRecords.forEach(record => {
+                const candidate = record.server_id ?? record.id;
+                const serverId = Number.isFinite(Number(candidate)) && Number(candidate) > 0
+                    ? Number(candidate)
+                    : null;
+                const serverRow = serverId
+                    ? register.querySelector('[data-zazu-server-record-id="' + serverId + '"]')
+                    : null;
+                const price = record.default_price === null || record.default_price === undefined || record.default_price === ''
+                    ? '—'
+                    : (Number.isFinite(Number(record.default_price)) ? Number(record.default_price).toFixed(2) : String(record.default_price));
+                const currency = String(record.currency || state?.business?.currency || 'ZAR');
+                const basis = String(record.pricing_basis || 'custom').replace(/_/g, ' ');
+
+                if (serverRow) {
+                    const title = serverRow.querySelector('.zazu-catalogue-row-title, .zazu-catering-card-head h4');
+                    if (title) title.textContent = record.name || 'Catalogue item';
+                    const categoryNode = serverRow.querySelector('.zazu-catalogue-row-meta, .zazu-catalogue-category');
+                    if (categoryNode) categoryNode.textContent = record.category || 'Uncategorised';
+                    const priceNode = serverRow.querySelector('.zazu-rate-badge, .zazu-catalogue-row > div:nth-child(4)');
+                    if (priceNode) priceNode.textContent = currency + ' ' + price + ' / ' + basis;
+                    const actions = serverRow.querySelector('.zazu-catalogue-actions, .zazu-catering-actions') || serverRow;
+                    let chip = actions.querySelector('[data-zazu-local-sync-chip]');
+                    if (!chip) {
+                        chip = document.createElement('span');
+                        chip.className = 'zazu-chip zazu-chip-neutral';
+                        chip.dataset.zazuLocalSyncChip = '1';
+                        actions.append(chip);
+                    }
+                    const status = localSyncStatus(state, 'service', record.local_id, serverId, record.pending_sync === true);
+                    chip.textContent = status.label;
+                    chip.title = status.title;
+                    chip.setAttribute('aria-label', status.label + '. ' + status.title);
+                    return;
+                }
+
+                const status = localSyncStatus(state, 'service', record.local_id, serverId, record.pending_sync === true);
+                const chip = text('span', 'zazu-chip zazu-chip-neutral', status.label);
+                chip.title = status.title;
+                chip.setAttribute('aria-label', status.label + '. ' + status.title);
+
+                let row;
+                if (group === 'equipment') {
+                    row = document.createElement('article');
+                    row.className = 'zazu-catalogue-row';
+                    const code = String(record.name || 'ITEM').replace(/[^A-Za-z0-9]/g, '').slice(0, 8).toUpperCase();
+                    row.append(text('div', 'font-mono text-xs font-semibold text-[var(--zazu-text-muted)]', 'EQ-' + (code || 'LOCAL')));
+
+                    const identity = document.createElement('div');
+                    identity.append(
+                        text('div', 'zazu-catalogue-row-title', record.name || 'Catalogue item'),
+                        text('div', 'zazu-catalogue-row-meta', (record.category || 'Uncategorised') + ' · ' + ((record.is_active ?? record.active) === false ? 'HIDDEN' : 'ACTIVE')),
+                    );
+                    row.append(identity);
+                    row.append(text('div', 'font-mono text-xs', 'Asset ledger not linked'));
+
+                    const rate = document.createElement('div');
+                    rate.className = 'font-mono text-sm font-semibold';
+                    rate.append(document.createTextNode(currency + ' ' + price + ' '));
+                    rate.append(text('span', 'zazu-catalogue-unit', '/ ' + basis));
+                    row.append(rate);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'zazu-catalogue-actions';
+                    actions.append(chip);
+                    row.append(actions);
+                } else {
+                    row = document.createElement('article');
+                    row.className = 'zazu-catering-card';
+                    const head = document.createElement('div');
+                    head.className = 'zazu-catering-card-head';
+                    const identity = document.createElement('div');
+                    identity.append(
+                        text('div', 'zazu-catalogue-category', record.category || 'Uncategorised'),
+                        text('h4', '', record.name || 'Catalogue item'),
+                    );
+                    head.append(identity, text('div', 'zazu-rate-badge font-mono', currency + ' ' + price + ' / ' + basis));
+                    row.append(head);
+                    if (record.description) row.append(text('p', 'zazu-catering-description', record.description));
+
+                    const meta = document.createElement('div');
+                    meta.className = 'zazu-catering-meta';
+                    meta.append(
+                        text('span', 'zazu-chip zazu-chip-info', String(record.capability_type || 'service')),
+                        text('span', 'font-mono', 'Pricing: ' + basis),
+                        text('span', (record.is_active ?? record.active) === false ? 'zazu-status-muted' : 'zazu-status-active',
+                            (record.is_active ?? record.active) === false ? 'HIDDEN' : 'ACTIVE'),
+                        chip,
+                    );
+                    row.append(meta);
+                }
+
+                row.dataset.zazuLocalRecord = 'catalogue';
+                row.dataset.zazuLocalId = record.local_id;
+                register.append(row);
+                count += 1;
+            });
+
+            if (countNode) countNode.textContent = String(count);
+            const empty = panel.querySelector('.zazu-empty');
+            if (empty) empty.hidden = count > 0;
+            register.hidden = groupRecords.length === 0 && serverRows.length === 0;
+        });
+    };
+
     const renderOfflineCollections = (state) => {
         document.querySelectorAll('[data-zazu-offline-collection]').forEach(section => {
             const collection = section.dataset.zazuOfflineCollection;
@@ -3282,6 +3429,7 @@ function setupZazuOfflineDirectoryViews() {
         renderCustomers(state);
         renderJobs(state);
         renderQuotes(state);
+        renderOfflineCatalogue(state);
         renderOfflineCollections(state);
         renderOfflineOverview(state);
         renderOfflineStorageProtection().catch(() => {});
