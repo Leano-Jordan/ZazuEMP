@@ -3255,6 +3255,21 @@ function setupZazuOfflineDirectoryViews() {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
         if (!workspace) return;
 
+        // Exact cached application documents are the product UI. Never replace
+        // their normal page, forms, navigation or controls with the legacy
+        // collection workspace. That workspace is only a temporary fallback
+        // for a document explicitly marked by the service worker.
+        document.body.classList.toggle('zazu-offline-mode', !lastOriginAvailable);
+        const isFallbackDocument = document.querySelector(
+            'meta[name="zazu-offline-fallback"][content="1"]'
+        ) !== null;
+
+        if (!isFallbackDocument) {
+            workspace.hidden = true;
+            workspace.dataset.zazuOfflineActiveView = 'native-page';
+            return;
+        }
+
         // Keep the connected Dashboard and any pending local-record directory
         // unchanged while the origin is healthy. Route isolation applies only
         // when this cached shell is serving as the offline fallback.
