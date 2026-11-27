@@ -8358,12 +8358,16 @@ body.zazu-has-wallpaper .zazu-content {
 
 /* Keep the operator informed when Wi-Fi is up but the Zazu host is down. */
 .zazu-origin-offline-notice {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 1500;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    width: min(1200px, calc(100% - 2rem));
-    margin: 0.75rem auto;
+    width: min(460px, calc(100vw - 2rem));
+    margin: 0;
     padding: 0.8rem 1rem;
     border: 1px solid #e8b65b;
     border-left-width: 4px;
@@ -8371,6 +8375,7 @@ body.zazu-has-wallpaper .zazu-content {
     background: #fff8e8;
     color: #633f0b;
     line-height: 1.45;
+    box-shadow: 0 10px 28px rgba(18, 30, 44, 0.18);
 }
 .zazu-origin-offline-notice[hidden] {
     display: none;
@@ -8406,11 +8411,14 @@ body.zazu-has-wallpaper .zazu-content {
 }
 @media (max-width: 720px) {
     .zazu-origin-offline-notice {
+        top: 8px;
+        right: 8px;
+        left: 8px;
         align-items: stretch;
         flex-direction: column;
         gap: 0.65rem;
-        width: calc(100% - 1.25rem);
-        margin: 0.6rem auto;
+        width: auto;
+        margin: 0;
         padding: 0.8rem;
     }
     .zazu-origin-offline-action {
