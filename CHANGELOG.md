@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-27 — Offline navigation and cross-tab acceptance corrections
+
+- Corrected cold-launch detection in the service worker. An empty `FetchEvent.clientId` is not sufficient evidence of a cold launch for a top-level navigation; the worker now checks for an existing same-origin window client before preferring the Dashboard shell.
+- Added worker coverage for the browser case where `clientId` is empty but an existing app window is present, while preserving Dashboard preference for a genuine cold launch.
+- Updated the Laravel PWA contract test to assert the live-window detection contract.
+- Corrected the cross-tab identity E2E fixture to accept the intentional logout confirmation dialog. The previous test auto-dismissed it and therefore never exercised the logout transition.
+- The previous offline browser run recorded 77 passed / 3 failed. The above fixes target the identified navigation and test-fixture causes; exact-head CI is pending and no new pass is claimed.
+
+
 ## 2026-11-26 — Authentication session replay regression (acceptance pending)
 
 - Added feature regressions that replay the original pre-authentication browser cookie after successful login and registration.
