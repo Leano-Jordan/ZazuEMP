@@ -452,10 +452,14 @@ function setupZazuCatalogue() {
         };
 
         tabs.forEach((tab, index) => {
-            tab.addEventListener('click', () => selectTab(tab.dataset.catalogueTab));
+            tab.addEventListener('click', () => {
+                catalogue.dataset.zazuCatalogueUserSelected = '1';
+                selectTab(tab.dataset.catalogueTab);
+            });
             tab.addEventListener('keydown', (event) => {
                 if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
                 event.preventDefault();
+                catalogue.dataset.zazuCatalogueUserSelected = '1';
                 const nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :
                     (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
                 selectTab(tabs[nextIndex].dataset.catalogueTab, true);
@@ -2792,6 +2796,7 @@ function setupZazuOfflineDirectoryViews() {
             equipment: records.filter(record => record.capability_type === 'rental'),
             services: records.filter(record => record.capability_type !== 'rental'),
         };
+        const groupCounts = {};
 
         Object.entries(groups).forEach(([group, groupRecords]) => {
             const panel = catalogue.querySelector('[data-catalogue-panel="' + group + '"]');
@@ -2922,7 +2927,23 @@ function setupZazuOfflineDirectoryViews() {
             const empty = panel.querySelector('.zazu-empty');
             if (empty) empty.hidden = count > 0;
             register.hidden = groupRecords.length === 0 && serverRows.length === 0;
+            groupCounts[group] = count;
         });
+
+        if (!catalogue.dataset.zazuCatalogueUserSelected
+            && groupCounts.equipment === 0 && groupCounts.services > 0) {
+            catalogue.querySelectorAll('[data-catalogue-tab]').forEach(tab => {
+                const active = tab.dataset.catalogueTab === 'services';
+                tab.classList.toggle('is-active', active);
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+                tab.tabIndex = active ? 0 : -1;
+            });
+            catalogue.querySelectorAll('[data-catalogue-panel]').forEach(panel => {
+                const active = panel.dataset.cataloguePanel === 'services';
+                panel.hidden = !active;
+                panel.classList.toggle('is-active', active);
+            });
+        }
     };
 
     const renderOfflineCollections = (state) => {
