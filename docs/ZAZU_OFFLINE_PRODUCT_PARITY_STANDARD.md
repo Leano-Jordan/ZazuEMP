@@ -213,3 +213,43 @@ Changes pushed to `main`:
 **Known transitional boundary:** the legacy reduced workspace remains available only when the service worker genuinely has to serve a fallback document, and the Dashboard still retains its existing offline overview. This is not full parity and does not close the requirement. Iteration 2 must move local records and supported actions into the ordinary route components and remove the reduced workspace as a user-facing substitute.
 
 **Validation record:** an initial build caught an over-escaped route-normalization regex; it was corrected. The first service-worker test run then caught an invalid regex in a new test assertion; that assertion was corrected to a literal HTML inclusion check. The current exact-head CI run must pass the service-worker suite, Laravel tests, browser acceptance, PostgreSQL recovery, quality/security checks and Windows packaging before Iteration 1 can be accepted. Physical owner-PC and Android verification remain mandatory.
+
+
+## 11. Iteration 2 — normal-page data integration inventory
+
+The route-preservation change makes this gap explicit: an exact cached route no longer exposes the reduced workspace as a substitute. The normal page must therefore render the local working set itself.
+
+### Existing normal-page adapters
+
+- **Customers:** `renderCustomers()` reconciles local customer records into the normal customer directory, including local-only records and locally edited cached records.
+- **Work:** `renderJobs()` reconciles local jobs into the normal Work register, including sync state and locally saved job details.
+- **Work attachments:** the normal Work detail page includes the attachment form and list. The existing offline attachment handler queues file bytes locally for later upload.
+- **Create flows:** customer and job create forms are normal Blade pages with offline mutation handlers.
+
+### Existing local collection support that still targets the legacy workspace
+
+The generic `renderOfflineCollections()` renderer currently targets `[data-zazu-offline-collection]` sections in `offline-workspace.blade.php`. The collections include:
+
+- Suppliers
+- Services/catalogue
+- Inventory items and movements
+- Assets and allocations
+- Purchase orders and order lines
+- Invoices and payments
+- Expenses
+- Work costs
+
+Quotes have a separate local renderer, but its current `[data-zazu-local-quotes]` target is also in the legacy workspace.
+
+### Iteration 2 implementation order
+
+1. Move quote, supplier, catalogue, inventory, asset and purchasing local records into their existing normal register/list components.
+2. Move invoice, payment, expense and event-cost records into the existing Finance and Work cost views.
+3. Reconcile local edits against cached server rows by stable server identity; never duplicate a record or silently overwrite a newer local edit.
+4. Reuse each page's existing row structure and action semantics. Add sync/conflict state as a compact inline status, not a replacement page.
+5. Add route-level tests for both server-backed local edits and local-only records, including reload and reconnect.
+6. Once all supported records are visible in their native pages, reduce the shared workspace to a compact sync/health surface and remove its collection-directory role.
+
+### Explicitly read-only until separately implemented
+
+Calendar, search, reports, audit/compliance and export/restore routes must retain their normal cached page identity, but their cached data is not proof of freshness and their server-dependent actions must not be simulated offline. Add a clear connection/freshness state where appropriate; do not silently present stale snapshots as live data.
