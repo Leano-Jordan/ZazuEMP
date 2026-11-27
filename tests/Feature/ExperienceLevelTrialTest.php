@@ -174,7 +174,7 @@ class ExperienceLevelTrialTest extends TestCase
             $protocol = app(SyncMutationProtocol::class);
             $deliveries = $protocol->pull($receivingDevice->fresh());
             $this->assertCount(1, $deliveries);
-            $this->assertSame($mutation->id, $deliveries->first()->sync_mutation_id);
+            $this->assertSame($mutation->id, $deliveries->first()->id);
             $protocol->acknowledgeThrough($receivingDevice->fresh(), (int) $deliveries->first()->delivery_sequence);
             $this->assertDatabaseHas('sync_deliveries', [
                 'sync_mutation_id' => $mutation->id,
