@@ -437,7 +437,7 @@ The V1 specification has been checked against the current implementation and the
 
 ### Experience levels
 
-Zazu now defines Basic, Intermediate and Advanced as presentation levels stored per business membership. They change the amount and order of surfaced information and guidance. They do not change roles, permissions or business-data access.
+Zazu now has three customer-facing capability levels: Basic, Intermediate and Professional. The commercial entitlement sets the business capability ceiling. A member's separate presentation preference controls surfaced detail only; roles and permissions continue to govern access.
 
 ### Onboarding
 
@@ -501,7 +501,7 @@ Zazu must be capable without being visually overwhelming. Simplicity is achieved
 - Expandable card/summary for dashboard or event/job context.
 - Sticky summary for quotes and other workflows where a consequential total should remain visible.
 
-Basic/Intermediate/Advanced remains a presentation/guidance preference, not a literal per-page mode switch and never a permission boundary.
+Basic / Intermediate / Professional are commercial capability levels. Presentation preference remains independently selectable within the business entitlement ceiling and is never a permission boundary.
 
 ### Context rule
 Where possible, users should work from the business object they understand — especially the event/job — rather than navigating through implementation-shaped domain boundaries.
@@ -521,119 +521,21 @@ Integration rule: **core business operations first; optional intelligence/enrich
 An external service must not become a hidden dependency for essential offline-capable workflows. Each dependency is governed through docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md.
 
 
-## 29. Commercial packaging requirements — Director consolidation 2026-10-02
+## 29. Three-tier capability model — Founder decision 2026-11-27
 
-Zazu is one product with increasing levels of operational sophistication. Commercial tiers must not become four separate codebases or artificially cripple basic users.
+Zazu is one product with three customer-facing capability levels: **Basic, Intermediate and Professional**. The old four-tier R299 / R499 / R799 / R1,299 packaging proposal is historical and is not current policy.
 
-The working commercial packaging hypothesis is:
+The capability design baseline is maintained in [docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md](ZAZU_THREE_TIER_CAPABILITY_MATRIX.md).
 
-| Tier | Working price | Product promise |
-|---|---:|---|
-| Basic | R299/month | Keep my business organised |
-| Professional | R499/month | Run my jobs and money |
-| Business | R799/month | Run my people and operations |
-| Business Plus | R1,299/month | Control a larger, more complex business |
+- **Basic:** a small business can genuinely run on Zazu, including essential customers, jobs, quotes, invoices, payment recording, supported offline work, local backup and export.
+- **Intermediate:** a growing business gains connected supplier, purchasing, receiving, inventory, assets, costing, profitability, reporting and team workflows where implemented and accepted.
+- **Professional:** established businesses gain advanced oversight such as multi-location operations, consolidated analytics, capacity management, advanced administration, automation and integrations as these are implemented and validated.
 
-These prices are **commercial hypotheses, not fixed entitlements**. Final pricing requires customer validation, operating-cost analysis and a release-ready entitlement/licensing model.
+Reliability, supported offline functionality, security, data integrity, customer-data access and export remain foundational across every level. Limits must preserve historical records, existing active work and queued offline changes.
 
-### R299 — Basic
+No prices, billing rules or numerical quotas are approved. No module gate or capacity restriction may be implemented from this descriptive matrix alone. Each proposed boundary requires source mapping, safe online/offline downgrade behaviour, regression coverage and explicit Founder approval.
 
-The minimum credible paid product should replace the operator's core spreadsheet/admin workflow.
-
-Required capability:
-- business/workspace and authentication;
-- customers and contacts;
-- products/services;
-- events/jobs and requirements;
-- calendar;
-- quotes and quote versions;
-- quote acceptance;
-- deposits;
-- invoices;
-- payments;
-- basic expenses;
-- dashboard and essential reports;
-- search;
-- printable business documents;
-- essential audit/security controls;
-- reliable data protection and recovery.
-
-The customer outcome is: **"I no longer need my main workbook to run the business."**
-
-### R499 — Professional
-
-This tier must add a clear operational and financial control loop rather than merely more screens.
-
-Required commercial spine:
-**Event → Quote → Deposit → Invoice → Payment → Purchasing → Receiving → Costs → Profit → Export**
-
-Required capability:
-- supplier workflow;
-- purchase orders;
-- receiving/goods received;
-- cost capture tied to operational records;
-- usable inventory foundations;
-- product/service costing;
-- event profitability;
-- customer/event history;
-- spreadsheet import with preview and matching;
-- spreadsheet export;
-- stronger operational reporting.
-
-The customer outcome is: **"Zazu is running the operational side of the business, not just recording it."**
-
-### R799 — Business
-
-This tier is for businesses with staff and meaningful operational coordination.
-
-Required capability:
-- staff roles and permissions;
-- manager access with explicit permission boundaries;
-- event/work assignment;
-- workload visibility;
-- operational attention dashboard;
-- staff activity;
-- approval/control workflows where consequential;
-- stock and purchasing alerts;
-- operational notifications/reminders;
-- management-level financial and operational visibility;
-- stronger resource/equipment control.
-
-The customer outcome is: **"My team can use Zazu and I can manage the operation."**
-
-### R1,299 — Business Plus
-
-This tier is for materially more complex businesses. It should not be built simply to justify a price.
-
-Required capability when validated by real customer need:
-- advanced profitability by event/service/customer;
-- resource capacity and allocation;
-- advanced purchasing/stock controls;
-- advanced management reporting;
-- multi-location or equivalent multi-operational-unit controls;
-- advanced import/migration;
-- higher-order automation and cross-team coordination.
-
-The customer outcome is: **"I can control a larger, more complex operation from one system."**
-
-### Commercial entitlement rule
-
-Do not create arbitrary record-count limits as the primary upgrade mechanism.
-
-Upgrade boundaries should be based on meaningful operational sophistication, such as team management, approvals, advanced reporting, resource control and multi-unit operation.
-
-### Commercial readiness order
-
-The engineering sequence is:
-
-1. Close release blockers and prove the current core.
-2. Complete the R299 foundation.
-3. Complete the R299 → R499 operational/financial bridge.
-4. Validate the commercial workflow with real businesses.
-5. Build R799 capabilities from demonstrated team-management needs.
-6. Build R1,299 capabilities only where complexity and willingness-to-pay are evidenced.
-
-This protects V1 from feature sprawl while giving pricing a concrete product architecture.
+The existing 30-day trial and Basic fallback remain unchanged. The third-level internal identifier remains `advanced` for signed-token and stored-preference compatibility; customer-facing UI labels it Professional.
 
 ## 19. Zazu Helper Character System
 
@@ -641,7 +543,7 @@ Zazu Helper is a core product character and interaction layer. It is not merely 
 
 The system uses **one Helper character framework with selectable mascot skins**. Initial candidates are Gecko, Ant and Chameleon. The skin changes the physical expression of the character, not its personality, intelligence, permissions or experience level.
 
-Basic / Intermediate / Advanced remains a presentation and guidance setting. The same selected Helper skin operates across all three levels.
+Basic / Intermediate / Professional are capability levels; presentation preference remains separate. The same selected Helper skin operates across all three levels.
 
 The Helper must use semantic behaviour and responsive workspace targets rather than screen-specific animation logic. Its foundation includes reusable states such as idle, notice, approach, point, explain, think, working, warning, error, offline, syncing, return and sleep.
 
