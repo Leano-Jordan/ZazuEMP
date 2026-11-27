@@ -1172,3 +1172,46 @@ test('cold launches and in-app navigation both preserve an exact cached destinat
     );
     await uncachedColdLaunch.finished();
 });
+
+test('page priming excludes export downloads but keeps the export centre available offline', async () => {
+    const worker = bootWorker(async (request) => {
+        const path = new URL(request.url).pathname;
+        if (path === '/dashboard' || path === '/exports') {
+            return new MockResponse(
+                '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17">' +
+                (path === '/dashboard'
+                    ? '<a href="/exports">Export centre</a><a href="/exports/customers">Download customers</a>'
+                    : '<main>Export centre</main>') +
+                '</body></html>',
+                { headers: { 'content-type': 'text/html; charset=utf-8' } },
+            );
+        }
+        if (path.startsWith('/exports/')) {
+            return new MockResponse('csv,data', {
+                headers: { 'content-type': 'text/csv; charset=utf-8' },
+            });
+        }
+        return new MockResponse('not found', { ok: false, status: 404 });
+    });
+
+    const messages = await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/dashboard'],
+    });
+
+    assert.equal(messages.length, 1);
+    assert.equal(messages[0].type, 'prime-pages-complete');
+    assert.equal(messages[0].success, true);
+    assert.deepEqual(
+        worker.fetchCalls.map(request => new URL(request.url).pathname).sort(),
+        ['/dashboard', '/exports'],
+        'the export centre is a page, but export downloads must not be fetched as offline documents',
+    );
+
+    const cache = await worker.caches.open('zazu-static-v68-user-41-business-17');
+    assert.ok(await cache.match('/dashboard'));
+    assert.ok(await cache.match('/exports'));
+    assert.equal(await cache.match('/exports/customers'), null);
+});
