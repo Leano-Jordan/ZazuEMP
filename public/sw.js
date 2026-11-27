@@ -396,10 +396,6 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     let routeDiscoveryTruncated = false;
     const addRoute = (path) => {
         if (typeof path !== 'string' || path.length > 2048) return;
-        if (uniqueRoutes.length >= MAX_PRIME_ROUTES) {
-            routeDiscoveryTruncated = true;
-            return;
-        }
 
         let route;
         try {
@@ -409,18 +405,25 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         }
 
         // Cache only same-origin application documents. Never prime APIs,
-        // session-changing endpoints, private media or static assets as pages.
+        // public/session-changing endpoints, private media or static assets.
         if (route.origin !== self.location.origin
             || route.username !== ''
             || route.password !== ''
             || route.pathname === '/api'
             || route.pathname.startsWith('/api/')
-            || ['/logout', '/business/switch'].includes(route.pathname)
+            || ['/', '/login', '/register', '/privacy', '/terms', '/logout', '/business/switch', '/up']
+                .includes(route.pathname)
+            || route.pathname.startsWith('/forgot-password')
+            || route.pathname.startsWith('/reset-password')
             || /^\/(?:build|images|icons|media|storage)\//.test(route.pathname)
             || /\.[a-z0-9]{2,8}$/i.test(route.pathname)) return;
 
         const canonicalPath = route.pathname;
         if (seenRoutes.has(canonicalPath)) return;
+        if (uniqueRoutes.length >= MAX_PRIME_ROUTES) {
+            routeDiscoveryTruncated = true;
+            return;
+        }
         seenRoutes.add(canonicalPath);
         uniqueRoutes.push(canonicalPath);
     };
