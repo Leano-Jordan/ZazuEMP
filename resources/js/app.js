@@ -2578,13 +2578,45 @@ function setupZazuOfflineDirectoryViews() {
         for (const quote of quotes) {
             if (!quote?.local_id) continue;
 
-            const serverId = quote.server_id ?? quote.id;
+            const serverIdCandidate = quote.server_id ?? quote.id;
+            const serverId = Number.isFinite(Number(serverIdCandidate)) && Number(serverIdCandidate) > 0
+                ? Number(serverIdCandidate)
+                : null;
+            const serverRow = serverId
+                ? directory.querySelector('[data-zazu-server-quote-id="' + serverId + '"]')
+                : null;
+            if (serverRow) {
+                const title = serverRow.querySelector('.zazu-list-title');
+                if (title) title.textContent = quote.reference || 'Quote #' + serverId;
+                const meta = serverRow.querySelector('.zazu-list-meta');
+                if (meta) {
+                    meta.textContent = [
+                        quote.event_name || 'Work not recorded on this device',
+                        quote.currency || state?.business?.currency || 'ZAR',
+                    ].join(' · ');
+                }
+                const syncStatus = localSyncStatus(state, 'quote', quote.local_id, serverId, quote.pending_sync === true);
+                const syncTarget = meta || serverRow.querySelector('.zazu-list-main') || serverRow;
+                let syncChip = syncTarget.querySelector('[data-zazu-local-sync-chip]');
+                if (!syncChip) {
+                    syncChip = document.createElement('span');
+                    syncChip.className = 'zazu-chip zazu-chip-neutral';
+                    syncChip.dataset.zazuLocalSyncChip = '1';
+                    syncTarget.append(' ', syncChip);
+                }
+                syncChip.textContent = syncStatus.label;
+                syncChip.title = syncStatus.title;
+                syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+                addQuoteOfflineDetails(serverRow, quote);
+                continue;
+            }
+
             const job = (state?.jobs || []).find(item =>
                 (quote.event_local_id && item.local_id === quote.event_local_id)
                 || (quote.event_id && Number(item.id ?? item.server_id) === Number(quote.event_id))
             );
             const row = document.createElement('div');
-            row.className = 'zazu-list-item';
+            row.className = 'zazu-list-item zazu-quote-register-row grid grid-cols-[minmax(0,1fr)_auto_auto_auto]';
             row.dataset.zazuLocalRecord = 'quote';
 
             const identity = document.createElement('div');
@@ -2612,7 +2644,18 @@ function setupZazuOfflineDirectoryViews() {
             chip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
             sync.append(chip);
 
-            row.append(identity, sync);
+            const version = document.createElement('div');
+            version.className = 'zazu-side-primary';
+            version.textContent = quote.version ? 'v' + String(quote.version) : '—';
+            const status = document.createElement('div');
+            const statusChip = text('span', 'zazu-chip zazu-chip-neutral', String(quote.status || 'draft').replace(/_/g, ' '));
+            status.append(statusChip);
+            const total = document.createElement('div');
+            total.className = 'zazu-side-primary';
+            total.textContent = quote.total !== undefined && quote.total !== null
+                ? String(quote.currency || state?.business?.currency || 'ZAR') + ' ' + String(quote.total)
+                : '—';
+            row.append(identity, version, status, total, sync);
             addQuoteOfflineDetails(row, quote);
             if (empty?.parentNode === directory) directory.insertBefore(row, empty);
             else directory.append(row);
