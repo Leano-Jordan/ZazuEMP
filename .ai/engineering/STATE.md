@@ -4,9 +4,22 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest broad verified checkpoint:** `dbda546d677dd80c99bda83bfcdfaa4dc46e8239` remains the last broad all-workflow acceptance candidate; later changes must not inherit its PASS status.
-**Repository HEAD at this state snapshot:** `6f7f511ae596a2160da486e28ebba44e9f412614` (a subsequent documentation-only parity-standard update followed). **Latest application/test source head:** `be3457b3a0e7057010492ff8df700aeac90d001d` on `main`. The latest implementation removes the reduced offline-workspace component, preserves exact cached native pages, adds explicit fallback identity and recursive route-graph priming, and integrates local catalogue records into the normal Services & Prices tabs. The latest service-worker route-completeness correction is `7661bbccfdbbda8fecf76215f45926b225bcf855`; latest application integration is `be3457b3a0e7057010492ff8df700aeac90d001d`. The user reported the pre-implementation baseline checks green; exact-head Laravel/browser, quality/security and Windows package workflows for this new batch are queued/pending and must not inherit that earlier PASS. SonarCloud remains skipped.
+**Repository HEAD at this state snapshot:** `40692998d43575bb1383615e2f986da14d91ae2d` (a subsequent documentation-only parity-standard update followed). **Latest application/test source head:** `be3457b3a0e7057010492ff8df700aeac90d001d` on `main`. The latest implementation removes the reduced offline-workspace component, preserves exact cached native pages, adds explicit fallback identity and recursive route-graph priming, and integrates local catalogue records into the normal Services & Prices tabs. The latest service-worker route-completeness correction is `7661bbccfdbbda8fecf76215f45926b225bcf855`; latest application integration is `be3457b3a0e7057010492ff8df700aeac90d001d`. The user reported the pre-implementation baseline checks green; exact-head Laravel/browser, quality/security and Windows package workflows for this new batch are queued/pending and must not inherit that earlier PASS. SonarCloud remains skipped.
 
 This is the concise live state register, not a session diary. Detailed incident evidence belongs in FAILURE_CASES.md, durable decisions in DECISION_LOG.md, recurring regressions in REGRESSION_LEDGER.md, and historical implementation evidence in dated audit/release records.
+
+## Jarvis execution update — 2026-11-27 — preparation parity slice
+
+**Latest application source commit:** `d832b3a03736e3c45e11e215abecc0a06809461d`.  
+**Latest regression-test commit:** `5f332bd82d52aaaa9aba1516af35de9a366c6553`.  
+**Latest repository documentation checkpoint before this state update:** `40692998d43575bb1383615e2f986da14d91ae2d`.
+
+- Preparation is now wired into the native `[data-zazu-offline-collection]` register on its existing page. Server rows reconcile by stable identity; local-only rows render in the same list.
+- Existing Open / Blocked / Ready controls are offline-aware. Existing records use update mutations and retain their local identity; server-backed rows are not recreated. Status chips reflect the local record state.
+- Travel calculation creation has no local collection or offline mutation handler. Its form now explicitly discloses the live-connection requirement and blocks submission when the origin is unreachable, preserving the entered values on screen. Travel index remains a cached snapshot only.
+- Laravel source-contract tests cover the Preparation native register/status queue and the Travel connection-dependent guard.
+- **Validation:** exact-head CI results are not available in the current GitHub workflow lookup (no status checks/workflow runs were returned for the latest commit). Treat the code as implemented but unverified until the repository's actual build, Laravel, browser, PostgreSQL, quality/security and Windows package workflows report results. No PASS is inherited from earlier commits.
+- **Physical acceptance:** desktop and Android preparation status change, reload/restart and reconnect remain open. Travel remains online-only until its own durable local contract is implemented.
 
 ## Current Director reconciliation — 2026-11-27 — native offline parity
 
