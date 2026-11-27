@@ -739,14 +739,14 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.goto('/inventory', { waitUntil: 'domcontentloaded' });
         const stockRow = page.locator('.zazu-inventory-directory [data-zazu-local-record="inventory_items"]').filter({ hasText: 'Offline Stock Proof' });
         await stockRow.getByRole('button', { name: 'View saved details' }).click();
-        await expect(page.getByText('Recent stock movements')).toBeVisible();
+        await expect(stockRow.locator('xpath=following-sibling::*[1]').getByText('Recent stock movements')).toBeVisible();
 
         await page.goto('/finance', { waitUntil: 'domcontentloaded' });
         await expect(page.locator('[data-zazu-offline-collection="invoices"] [data-zazu-local-record="invoices"]').filter({ hasText: 'INV-OFF-006' })).toBeVisible();
         await expect(page.locator('[data-zazu-offline-collection="expenses"] [data-zazu-local-record="expenses"]').filter({ hasText: 'Offline fuel expense' })).toBeVisible();
         const invoiceRow = page.locator('[data-zazu-offline-collection="invoices"] [data-zazu-local-record="invoices"]').filter({ hasText: 'INV-OFF-006' });
         await invoiceRow.getByRole('button', { name: 'View saved details' }).click();
-        await expect(page.getByText('EFT-01')).toBeVisible();
+        await expect(invoiceRow.locator('xpath=following-sibling::*[1]').getByText('EFT-01')).toBeVisible();
 
         // These two areas are not yet primed/native-data-adapted. They may use
         // the explicit fallback temporarily, but must identify it honestly.
