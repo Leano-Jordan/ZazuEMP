@@ -173,73 +173,38 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await cache.put(pageRequest, response.clone())', $worker);
     }
 
-    public function test_disconnected_navigation_preserves_exact_cached_routes_before_dashboard_fallback(): void
+    public function test_disconnected_navigation_preserves_the_normal_application_and_marks_only_real_fallbacks(): void
     {
         $worker = File::get(public_path('sw.js'));
-        $workspace = File::get(resource_path('views/components/offline-workspace.blade.php'));
-        $layout = File::get(resource_path('views/components/app-layout.blade.php'));
-        $dashboard = File::get(resource_path('views/dashboard.blade.php'));
         $app = File::get(resource_path('js/app.js'));
 
         $this->assertStringContainsString('async function cachedAppPage(request)', $worker);
         $this->assertStringContainsString('if (cachedPage) return cachedPage;', $worker);
         $this->assertStringContainsString('return offlineShell ? markOfflineFallback(offlineShell) : Response.error();', $worker);
+        $this->assertStringContainsString('async function markOfflineFallback(response)', $worker);
         $this->assertStringContainsString('zazu-offline-fallback', $worker);
         $this->assertStringContainsString('const isFallbackDocument = document.querySelector(', $app);
-        $this->assertStringContainsString('currentPath === initialDocumentPath', $app);
-        $this->assertStringContainsString("workspace.dataset.zazuOfflineActiveView = 'native-page';", $app);
-        $this->assertStringContainsString("request.mode === 'navigate' && response.redirected && response.url", $worker);
-        $this->assertStringContainsString('Response.redirect(destination.href, 302)', $worker);
-        $this->assertStringNotContainsString('shouldPreferOfflineShell', $worker);
-        $this->assertStringNotContainsString('preferOfflineShell', $worker);
-        $this->assertStringNotContainsString('preserveExactRoute', $worker);
-        $this->assertSame(3, substr_count($worker, 'return cachedAppPage(request);'));
-        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v65\';', $worker);
+        $this->assertStringContainsString('workspace.hidden = true;', $app);
+        $this->assertStringContainsString('data-zazu-offline-route-unavailable', $app);
+        $this->assertStringContainsString('This page is not saved on this device yet', $app);
+        $this->assertStringContainsString("retry.addEventListener('click', () => window.location.reload());", $app);
+        $this->assertStringNotContainsString('const offlineRouteViews = [', $app);
+        $this->assertStringNotContainsString('workspace.dataset.zazuOfflineActiveView = activeView;', $app);
+        $this->assertStringNotContainsString('workspace.dataset.zazuOfflineActiveView = \'native-page\';', $app);
+        $this->assertStringNotContainsString('.zazu-content > :not([data-zazu-offline-workspace])', $app);
 
-        foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
-            $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $workspace);
-        }
-
-        $this->assertStringContainsString('const offlineRouteViews = [', $app);
-        $this->assertStringContainsString("route('quotes.index')", $workspace);
-        $this->assertStringContainsString("route('inventory.index')", $workspace);
-        $this->assertStringContainsString("route('finance.index')", $workspace);
-
-        foreach (['customers.view', 'work.view', 'quotes.view', 'suppliers.view', 'purchasing.view', 'inventory.view', 'assets.view', 'finance.view'] as $permission) {
-            $expectedPermission = '$can('."'".$permission."')";
-            $this->assertStringContainsString($expectedPermission, $workspace);
-        }
-
-        $this->assertStringContainsString("@include('components.offline-workspace')", $layout);
-        $this->assertStringNotContainsString('data-zazu-offline-workspace', $dashboard);
-        $this->assertStringNotContainsString('offlineWorkspacePermissions', $workspace);
-        foreach ([
-            'dashboard.view', 'customers.view', 'work.view', 'quotes.view',
-            'suppliers.view', 'capabilities.view', 'inventory.view', 'assets.view',
-            'purchasing.view', 'finance.view',
-        ] as $permission) {
-            $this->assertStringContainsString("@if(\$can('".$permission."'))", $workspace);
-        }
-        $this->assertStringContainsString('finance\\/(?:expenses)', $app);
-        $this->assertStringContainsString('(?:costs|travel)', $app);
-        $this->assertStringContainsString("pathname === '/dashboard'", $app);
-        $this->assertStringContainsString("route?.[1] || 'unavailable'", $app);
-        $this->assertStringContainsString('workspace.dataset.zazuOfflineActiveView = activeView;', $app);
+        $this->assertStringContainsString('const uniqueRoutes = [];', $worker);
+        $this->assertStringContainsString('uniqueRoutes.length >= MAX_PRIME_ROUTES', $worker);
+        $this->assertStringContainsString('for (const match of html.matchAll(/<a\\b', $worker);
+        $this->assertStringContainsString('addRoute(match[1].replace(/&amp;/g, \'&\'));', $worker);
+        $this->assertStringContainsString('const routes = new Set([', $app);
+        $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
+        $this->assertStringContainsString("routes: [...routes].slice(0, 100)", $app);
         $this->assertStringContainsString("window.addEventListener('popstate', applyOfflineRouteView);", $app);
-        $this->assertGreaterThanOrEqual(
-            2,
-            substr_count($app, "window.addEventListener('zazu:offline-state-updated', render);")
-        );
-
-        $profileSetup = substr(
-            $app,
-            strpos($app, 'function setupZazuOfflineWorkspaceProfile()'),
-            strpos($app, 'const initializeZazuUi =') - strpos($app, 'function setupZazuOfflineWorkspaceProfile()')
-        );
-        $this->assertStringContainsString("window.addEventListener('zazu:offline-state-updated', render);", $profileSetup);
-        $this->assertStringContainsString("window.addEventListener('zazu:offline-state-updated', render);", $app);
-        $this->assertStringContainsString('.zazu-content > :not([data-zazu-offline-workspace])', $app);
+        $this->assertStringContainsString('Zazu is offline', $app);
+        $this->assertStringNotContainsString('Only supported offline screens can be used', $app);
     }
+
 
     public function test_offline_workspace_navigation_remains_available_in_offline_mode(): void
     {
@@ -466,7 +431,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
         $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString('zazu-static-v65', $worker);
+        $this->assertStringContainsString('zazu-static-v66', $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
