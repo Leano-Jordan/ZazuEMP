@@ -190,3 +190,37 @@ The tier model is ready for implementation only when:
 - Automated regression and physical device acceptance cover the affected workflows.
 
 **North star:** Basic lets a small business run. Intermediate helps it grow. Professional helps it operate at scale. All three remain Zazu.
+
+
+## 12. Current source reconciliation — 2026-11-27
+
+This is a first-pass source map, not a full acceptance sign-off. "Implemented" below means a meaningful source path exists; it does not mean the complete workflow has passed current exact-head or physical-device acceptance.
+
+| Capability area | Current source evidence | Current disposition |
+|---|---|---|
+| Basic customer and job operations | `WorkController`, `DashboardController`, customer/event models and authenticated routes | IMPLEMENTED online; full offline parity remains PARTIAL / acceptance open |
+| Basic quotes, invoices, payments and expenses | `FinanceController`, `Quote`, `Invoice`, `Payment`, `FinanceExpense` and finance routes | IMPLEMENTED online; commercial reconciliation and offline route coverage remain separate acceptance gates |
+| Basic calendar, dashboard, reports and search | Existing calendar/dashboard/report surfaces and business-scoped search foundation | IMPLEMENTED foundation; reporting depth remains basic |
+| Basic offline continuity | `OfflineWorkspaceController`, IndexedDB mutation queue, service worker and native page integration | PARTIAL by supported workflow; exact route parity, restart, attachments, sync and physical acceptance remain open |
+| Intermediate suppliers and purchasing | `Supplier`, `PurchaseOrderController`, `PurchaseOrderReceivingService` and purchasing routes | IMPLEMENTED online foundation; end-to-end operational and offline acceptance required |
+| Intermediate inventory and assets | `InventoryController`, `AssetController`, `InventoryItem`, `Asset`, movement/allocation records | IMPLEMENTED online foundation; offline write/reconciliation coverage remains partial |
+| Intermediate costing and profitability | Finance and event-cost records; reporting surface includes operational costs and profitability summaries | IMPLEMENTED foundation; source-record-to-report reconciliation remains an acceptance gate |
+| Intermediate team collaboration | Business membership, roles and permission middleware | PARTIAL; role/permission foundations exist, but assignment, workload visibility and advanced management controls are not established as complete |
+| Professional multiple locations | No verified multi-location business model/controller was identified in this first-pass search | NOT EVIDENCED; treat as deferred, not shipped |
+| Professional advanced analytics and capacity planning | Current reporting surface is a lean operational summary; no verified advanced BI/capacity engine identified | NOT EVIDENCED; future capability |
+| Professional automation, integrations and API access | No verified customer-facing automation/integration/API capability identified in this first-pass search | NOT EVIDENCED; future capability |
+
+### Entitlement and enforcement baseline
+
+- `app/Support/BusinessEntitlement.php` resolves the business's current tier and 30-day trial fallback.
+- `app/Support/ExperienceLevel.php` clamps each member's selected presentation level to the business ceiling.
+- `app/Models/BusinessLicense.php` resolves local signed entitlement state.
+- Current behaviour enforces the selectable-level ceiling; it does **not** implement the module-level capability matrix or commercial customer/job/user/storage quotas.
+- The internal third-level identifier remains `advanced`; `config/zazu.php` now presents it as **Professional**.
+- The offline bootstrap has bounded snapshot queries (for example, a customer batch limit). Such technical payload bounds are not approved commercial quotas and must not be reused as tier policy.
+
+### Evidence and next action
+
+The current repository state records native offline parity and physical PC/Android acceptance as open. The source paths above must be challenged with exact-head tests and owner-device workflows before any capability is described as fully accepted.
+
+Next: complete the source/test mapping for each row, identify the specific offline support contract per feature, and classify each proposed boundary as shared foundation, capacity candidate, tier-specific capability or deferred. Do not introduce feature gates or quotas in this reconciliation pass.
