@@ -3206,6 +3206,7 @@ function setupZazuOfflineDirectoryViews() {
     // One shared origin state prevents overlapping health probes from
     // racing and hiding the local workspace after a newer offline transition.
     let lastOriginAvailable = navigator.onLine;
+    const initialDocumentPath = window.location.pathname.replace(/\\/$/, '') || '/';
     const refreshOfflineWorkspaceVisibility = (state) => {
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
         if (!workspace?.isConnected) return lastOriginAvailable;
@@ -3264,9 +3265,22 @@ function setupZazuOfflineDirectoryViews() {
             'meta[name="zazu-offline-fallback"][content="1"]'
         ) !== null;
 
-        if (!isFallbackDocument) {
-            workspace.hidden = true;
-            workspace.dataset.zazuOfflineActiveView = 'native-page';
+        const currentPath = window.location.pathname.replace(/\\/$/, '') || '/';
+        if (!isFallbackDocument && currentPath === initialDocumentPath) {
+            // The document itself is the exact cached route. Keep its server-
+            // rendered page intact; the dashboard may retain its compact
+            // offline overview, but collection/detail pages never get replaced.
+            if (currentPath === '/dashboard') {
+                workspace.querySelectorAll('[data-zazu-offline-view]').forEach(section => {
+                    section.hidden = section.dataset.zazuOfflineView !== 'overview';
+                });
+                const unavailable = workspace.querySelector('[data-zazu-offline-unavailable]');
+                if (unavailable) unavailable.hidden = true;
+                workspace.dataset.zazuOfflineActiveView = 'overview';
+            } else {
+                workspace.hidden = true;
+                workspace.dataset.zazuOfflineActiveView = 'native-page';
+            }
             return;
         }
 
