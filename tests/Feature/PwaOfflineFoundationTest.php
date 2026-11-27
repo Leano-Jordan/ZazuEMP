@@ -204,6 +204,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('const uniqueRoutes = [];', $worker);
         $this->assertStringContainsString('uniqueRoutes.length >= MAX_PRIME_ROUTES', $worker);
         $this->assertStringContainsString('routeDiscoveryTruncated', $worker);
+        $this->assertStringContainsString('routesTruncated === true', $worker);
+        $this->assertStringContainsString('routesTruncated: routeList.length > 100', $app);
         $this->assertStringContainsString('discoveredCachedPages.every(Boolean)', $worker);
         $this->assertStringContainsString('for (const match of html.matchAll(/<a\\b', $worker);
         $this->assertStringContainsString('addRoute(match[1].replace(/&amp;/g, \'&\'));', $worker);
@@ -459,7 +461,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
         $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString('zazu-static-v67', $worker);
+        $this->assertStringContainsString('zazu-static-v68', $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
