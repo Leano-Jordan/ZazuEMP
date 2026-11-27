@@ -87,7 +87,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await cache.put(pageRequest, response.clone());', $worker);
         $this->assertStringContainsString('await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);', $worker);
         $this->assertStringNotContainsString('Real navigation takes priority over background cache warming', $worker);
-        $this->assertStringContainsString('responseUrl.pathname !== requestedUrl.pathname', $worker);
+        $this->assertStringContainsString('if (responseUrl.origin !== self.location.origin) return;', $worker);
+        $this->assertStringNotContainsString('responseUrl.pathname !== requestedUrl.pathname', $worker);
         $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringNotContainsString('handleZazuPhonePairing', $app);
@@ -181,7 +182,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('addRoute(match[1].replace(/&amp;/g,', $worker);
         // Route discovery can append URLs while a batch is in flight, so advance by
         // the actual batch size and keep processing until the expanded list is exhausted.
-        $this->assertStringContainsString('let offset = 0;\n        while (offset < uniqueRoutes.length)', $worker);
+        $this->assertStringContainsString('let offset = 0;', $worker);
+        $this->assertStringContainsString('while (offset < uniqueRoutes.length)', $worker);
         $this->assertStringContainsString('const batch = uniqueRoutes.slice(offset, offset + PRIME_CONCURRENCY);', $worker);
         $this->assertStringContainsString('offset += batch.length;', $worker);
         $this->assertStringContainsString('function contextCacheName()', $worker);
