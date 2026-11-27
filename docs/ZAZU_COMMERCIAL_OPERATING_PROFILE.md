@@ -40,7 +40,7 @@ The highest capability level for complex operations, consolidated oversight, adv
 - A valid Intermediate entitlement permits Basic and Intermediate capability levels; a valid Professional entitlement (internal identifier `advanced`) permits all three.
 - An expired, revoked, not-yet-active or unsupported entitlement resolves to Basic and does not restart a trial.
 - No silent paid conversion, workspace lockout, data deletion or withholding of customer-owned records because of expiry or non-payment.
-- The current implementation enforces the **experience-level ceiling only**. It does not yet enforce a module-by-module paid-feature matrix, quotas, team-size limits or storage caps.
+- The current implementation enforces the **selected-level ceiling only**. It does not yet enforce a module-by-module paid-feature matrix, quotas, team-size limits or storage caps.
 - Earlier suggestions of five active events, one owner, three users, 250 MB and 2 GB remain unapproved hypotheses. They must not be implemented until the owner approves the full matrix and downgrade behaviour.
 - Do not advertise a module as a paid-tier entitlement until its access boundary and downgrade behaviour are implemented and verified.
 - Keep role-based permissions and business data isolation independent from commercial tier checks.
