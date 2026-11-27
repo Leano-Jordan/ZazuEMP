@@ -978,7 +978,7 @@ test('failed in-app navigation preserves the exact cached destination instead of
 });
 
 
-test('offline in-app navigation preserves every exact cached destination while cold launches prefer the dashboard', async () => {
+test('offline navigation preserves exact cached destinations and falls back to dashboard only when uncached', async () => {
     const worker = bootWorker(async () => { throw new Error('Host unavailable.'); });
     const staticCache = await worker.caches.open('zazu-static-v64');
     await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({
