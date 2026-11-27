@@ -22,7 +22,7 @@ async function trustCurrentDevice(page) {
     await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
 }
 
-test('offline workspace remains visible for synced device-local records when the Zazu server is unavailable', async ({ page }) => {
+test('synced device-local records render in the native customer, Work and Quotes pages while disconnected', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const customerName = 'Synced offline customer ' + runId;
     const jobName = 'Synced offline job ' + runId;
@@ -70,7 +70,7 @@ test('offline workspace remains visible for synced device-local records when the
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }, { customerName, jobName, jobLocalId, quoteLocalId });
 
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
     await page.goto('/work', { waitUntil: 'domcontentloaded' });
@@ -79,10 +79,10 @@ test('offline workspace remains visible for synced device-local records when the
     await expect(page.locator('[data-zazu-local-quotes] [data-zazu-local-record="quote"]').filter({ hasText: jobName })).toBeVisible();
 
     await page.context().setOffline(false);
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
 });
 
-test('offline workspace stays visible after reconnect while a non-core mutation remains queued', async ({ page }) => {
+test('native Inventory page retains a queued local record after reconnect', async ({ page }) => {
     let healthChecks = 0;
     await page.route('**/up', async route => {
         healthChecks += 1;
@@ -121,7 +121,7 @@ test('offline workspace stays visible after reconnect while a non-core mutation 
     });
 
     await page.goto('/inventory', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
     const inventory = page.locator('[data-zazu-offline-collection="inventory_items"]');
     await expect(inventory.getByText('Offline stock pending update')).toBeVisible();
     await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
@@ -133,7 +133,7 @@ test('offline workspace stays visible after reconnect while a non-core mutation 
 
     // The same native Inventory page remains usable after reconnect while
     // the non-core mutation is still waiting for sync.
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
     await expect(inventory.getByText('Offline stock pending update')).toBeVisible();
     await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
 });
@@ -395,7 +395,7 @@ test('native Quotes register exposes locally stored quotes with their sync state
     }, { jobLocalId, quoteLocalId, jobName });
 
     await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
     const quoteRow = page.locator('[data-zazu-local-quotes] [data-zazu-local-record="quote"]').filter({ hasText: jobName });
     await expect(quoteRow).toHaveCount(1);
     await expect(quoteRow.locator('.zazu-list-title')).toHaveText('Draft quote');
@@ -592,18 +592,18 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     expect(coldLaunchResponse?.ok()).toBe(true);
     await coldLaunchPage.evaluate(() => window.ZazuOffline.ready);
     await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Dashboard');
-    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
     await expect(coldLaunchPage.locator('[data-zazu-offline-route-unavailable]')).toHaveCount(0);
 
     await coldLaunchPage.goto('/customers', { waitUntil: 'domcontentloaded' });
     await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Customers');
     await expect(coldLaunchPage.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
-    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
 
     await coldLaunchPage.goto('/work', { waitUntil: 'domcontentloaded' });
     await expect(coldLaunchPage.locator('.zazu-page-title')).toHaveText('Event Operations');
     await expect(coldLaunchPage.locator('.zazu-ops-register [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
-    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(coldLaunchPage.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
     const coldLaunchQueue = await coldLaunchPage.evaluate(async () => await window.ZazuOffline.pending());
     expect(coldLaunchQueue.map((mutation) => mutation.id)).toEqual(expect.arrayContaining(persistedQueue.map((mutation) => mutation.id)));
     await coldLaunchPage.close();
@@ -631,7 +631,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // The cached Dashboard keeps its normal layout and exposes the offline
     // overview without replacing the operating interface.
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
     await expect(page.locator('.zazu-page-title')).toHaveText('Dashboard');
 
     // Navigation and the original module pages remain the route into local
@@ -838,10 +838,10 @@ test('normal Zazu pages remain in place when the host is unreachable but the bro
     }).toBeGreaterThan(0);
     await expect.poll(() => page.evaluate(() => navigator.onLine)).toBe(true);
     await expect(page.locator('[data-zazu-origin-offline-notice]')).toBeVisible();
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
 
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('.zazu-page-title')).toHaveText('Customers');
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
-    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
 });
