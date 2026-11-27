@@ -3,11 +3,18 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Customer;
 use App\Models\SyncDevice;
 use App\Models\User;
 use App\Support\ExperienceLevel;
 use App\Support\NicheFocus;
+use App\Support\Offline\SyncMutationPushProcessor;
 use App\Support\Offline\SyncMutationRecorder;
+use App\Support\Offline\SyncMutationApplier;
+use App\Support\Offline\SyncConflictRecorder;
+use App\Support\Offline\SyncEntityIdentityRegistry;
+use App\Support\Offline\SyncMutationProtocol;
+use App\Support\Offline\OfflineDomainMutationHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -89,7 +96,7 @@ class ExperienceLevelTrialTest extends TestCase
         );
     }
 
-    public function test_expired_trial_does_not_discard_a_queued_offline_mutation(): void
+    public function test_queued_offline_work_reconnects_and_is_delivered_after_trial_expiry(): void
     {
         $createdAt = Carbon::parse('2026-11-01 09:00:00', 'UTC');
         $business = Business::create([
@@ -107,36 +114,72 @@ class ExperienceLevelTrialTest extends TestCase
             'primary_niche' => NicheFocus::DEFAULT,
         ]);
 
-        $device = SyncDevice::create([
+        $sourceDevice = SyncDevice::create([
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
+        $receivingDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Before offline edit',
+        ]);
+        $identity = app(SyncEntityIdentityRegistry::class)->identify($customer, 'customer');
 
         try {
             Carbon::setTestNow($createdAt->copy()->addDays(29));
             $mutation = app(SyncMutationRecorder::class)->record(
-                $device,
-                'event',
-                'local-job-before-expiry',
-                'upsert',
+                $sourceDevice,
+                'customer',
+                $identity->entity_uuid,
+                'update',
                 [
-                    'local_id' => 'local-job-before-expiry',
-                    'record' => ['name' => 'Existing active job'],
+                    'local_id' => $identity->entity_uuid,
+                    'expected_revision' => 1,
+                    'record' => ['name' => 'Offline edit queued before expiry'],
                 ],
             );
 
+            $this->assertSame('pending', $mutation->status);
+
             Carbon::setTestNow($createdAt->copy()->addDays(30));
             $levels = app(ExperienceLevel::class);
-
             $this->assertSame('basic', $levels->for($user, $business));
             $this->assertSame('advanced', $levels->selected($user, $business));
-            $this->assertDatabaseHas('sync_mutations', [
-                'id' => $mutation->id,
-                'business_id' => $business->id,
-                'sync_device_id' => $device->id,
-                'entity_type' => 'event',
-                'entity_id' => 'local-job-before-expiry',
-                'status' => 'pending',
+
+            // Simulate the phone reconnecting after the trial has expired.
+            // Sync processing is authorised by business/device credentials, not
+            // by the member's presentation preference or commercial tier.
+            $processor = new SyncMutationPushProcessor(
+                app(SyncMutationRecorder::class),
+                app(SyncMutationApplier::class),
+                app(OfflineDomainMutationHandler::class),
+                app(SyncConflictRecorder::class),
+            );
+            $result = $processor->process($sourceDevice->fresh(), [
+                'id' => $mutation->mutation_id,
+                'entity_type' => $mutation->entity_type,
+                'entity_id' => $mutation->entity_id,
+                'operation' => $mutation->operation,
+                'payload' => $mutation->payload,
+            ]);
+
+            $this->assertSame('applied', $result['status']);
+            $this->assertTrue($result['applied']);
+            $this->assertSame('Offline edit queued before expiry', $customer->fresh()->name);
+            $this->assertSame('applied', $mutation->fresh()->status);
+
+            $protocol = app(SyncMutationProtocol::class);
+            $deliveries = $protocol->pull($receivingDevice->fresh());
+            $this->assertCount(1, $deliveries);
+            $this->assertSame($mutation->id, $deliveries->first()->sync_mutation_id);
+            $protocol->acknowledgeThrough($receivingDevice->fresh(), (int) $deliveries->first()->delivery_sequence);
+            $this->assertDatabaseHas('sync_deliveries', [
+                'sync_mutation_id' => $mutation->id,
+                'destination_device_id' => $receivingDevice->id,
+                'status' => 'applied',
             ]);
         } finally {
             Carbon::setTestNow();
