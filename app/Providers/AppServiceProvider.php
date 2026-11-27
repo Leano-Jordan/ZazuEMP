@@ -141,10 +141,22 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('login', function (Request $request) {
             $identifier = Str::lower(trim($request->string('identifier')->toString()));
+            $clientIp = $request->ip();
+
+            // Browser acceptance gives each test an isolated forwarded address.
+            // Honor it only under the explicit E2E flag; production continues to
+            // use Laravel's trusted-proxy resolution exclusively.
+            if (env('ZAZU_TEST_TRUST_FORWARDED_IPS', false)) {
+                $forwardedIp = trim(explode(',', (string) $request->header('X-Forwarded-For', ''))[0]);
+
+                if (filter_var($forwardedIp, FILTER_VALIDATE_IP)) {
+                    $clientIp = $forwardedIp;
+                }
+            }
 
             return [
-                Limit::perMinute(6)->by('login:identifier-ip:'.$identifier.'|'.$request->ip()),
-                Limit::perMinute(30)->by('login:ip:'.$request->ip()),
+                Limit::perMinute(6)->by('login:identifier-ip:'.$identifier.'|'.$clientIp),
+                Limit::perMinute(30)->by('login:ip:'.$clientIp),
             ];
         });
 
