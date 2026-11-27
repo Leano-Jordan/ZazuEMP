@@ -390,3 +390,16 @@ At the first observed checkpoint for `e896917`: PHPMD passed, Director Health pa
 - Updated matrix section 13 to distinguish what this regression proves from what remains open: full IndexedDB persistence plus authenticated push/apply/acknowledgement after expiry and reconnect is still unproven.
 - Exact-head combined status for `3c77321` returned no status entries and the connected workflow lookup returned no PR-triggered runs. The newest test commit `104fefe` therefore remains unverified until its Laravel/quality workflows are observed. Do not claim the test passes based only on its source.
 - **Next:** obtain exact-head Laravel/quality results for `104fefe`; fix any concrete test or tooling failure from logs. Then implement the full reconnect scenario and test the >500-record bootstrap boundary. No tier gates or quotas.
+
+## Jarvis execution update — 2026-11-27 — reconnect path and bootstrap asset fix
+
+**Latest source fix:** `0f8447b` — correct asset delivery target key in `SyncBootstrapDeliveryTargetResolver`.  
+**Latest regression tests:** `b30de1b` — delivered asset bootstrap contract; `dc761af` — imports for trial-expiry reconnect test.  
+**Latest capability matrix:** `e6de4f6`.
+
+- Replaced the queue-presence-only trial-expiry test with a server-side reconnect integration regression. It queues a customer update before expiry, resolves the workspace to Basic, submits the same queued mutation through `SyncMutationPushProcessor`, asserts the customer update is applied, pulls the resulting delivery on a second active device, and acknowledges the receiver-specific delivery sequence.
+- Found a concrete bootstrap mismatch: the delivery-target resolver returned `Asset::class` as its array key, but the bootstrap builder reads `asset`. Corrected the resolver to return the literal `asset` key. Added a regression to assert asset delivery target resolution and presence in the receiver bootstrap payload.
+- These are source and test changes only. No PHP/Laravel test command was executed in this environment. Latest test commit `b30de1b` has an empty combined status list; the connected workflow lookup returns no PR-triggered runs. CI is NOT VERIFIED.
+- Remaining acceptance: actual IndexedDB queue persistence; browser API push/pull/ack across expiry; force-close/restart; physical PC and Android reconnect; and a >500-record working-set test proving delivery-target inclusion for records outside the default window.
+- No Basic/Intermediate/Professional feature gates, capacity quotas or billing logic have been introduced.
+- **Next:** verify test execution on GitHub; extend the asset regression to a record outside the default 500-row window; then review the other delivery target keys and nested aggregate relationships for similar contract mismatches.
