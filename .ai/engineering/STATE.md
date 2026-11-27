@@ -4,6 +4,19 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest broad verified checkpoint:** `dbda546d677dd80c99bda83bfcdfaa4dc46e8239` remains the last broad all-workflow acceptance candidate; later changes must not inherit its PASS status.
+## Director reconciliation — 2026-11-27 — tier source mapping and terminology
+
+**Latest repository work:** capability matrix and first-pass source map are committed on `main`. Latest known documentation commit: `5325656524253979731e7f85c10743a674c76c49`. Latest application/UI/test commit in this batch: `1921eb94b108237f32747157ba1a829ba775e01f`.
+
+- The matrix now records the intended capability progression and a source-evidence snapshot. Basic customer/job and finance workflows have existing source paths; offline support remains route/workflow-specific and acceptance-open.
+- Intermediate supplier/purchasing/receiving, inventory/assets and finance/costing have existing online foundations. Offline parity and full commercial reconciliation remain separate acceptance gates. Team role foundations exist; assignment/workload/advanced controls are incomplete.
+- Professional multi-location, advanced analytics/capacity planning, automation, integrations and API capabilities were not evidenced in the first-pass source search and remain deferred/not evidenced, not shipped claims.
+- Entitlement code currently resolves the tier ceiling and clamps presentation selection; it does not implement module-level gates or customer/job/user/storage quotas.
+- Customer-facing UI now says Professional. Internal `advanced` and legacy `solo` identifiers remain intact for signed licence and stored-preference compatibility.
+- The previous four-tier price proposal is explicitly historical; the old customer terms draft is withdrawn. No prices, billing terms or numerical limits are approved.
+- **Verification:** exact combined-status lookups returned zero status entries for the UI/test commits and latest documentation commit. No PASS is claimed. The Laravel suite, browser suite, quality/security and Windows package checks still need exact-head confirmation. Rendered UI and physical PC/Android acceptance are unverified.
+- **Next target:** complete adversarial source/test mapping for each capability row, with particular attention to existing active work, downgrade, queued offline mutations, reconnect and permission boundaries. Then return any proposed numerical capacity boundaries for explicit Founder approval. No feature gate or quota implementation is authorised by this matrix.
+
 ## Director update — 2026-11-27 — Basic / Intermediate / Professional model
 
 **Product decision:** DEC-030 records the Founder-approved customer-facing levels Basic, Intermediate and Professional. The canonical design matrix is `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md`.
