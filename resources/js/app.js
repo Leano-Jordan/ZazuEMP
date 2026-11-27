@@ -2730,7 +2730,9 @@ function setupZazuOfflineDirectoryViews() {
         document.querySelectorAll('[data-zazu-offline-collection]').forEach(section => {
             const collection = section.dataset.zazuOfflineCollection;
             const definition = offlineCollectionDefinitions[collection];
-            const directory = section.querySelector('[data-zazu-offline-collection-list]');
+            const directory = section.matches('[data-zazu-offline-collection-list]')
+                ? section
+                : section.querySelector('[data-zazu-offline-collection-list]');
             if (!definition || !directory) return;
 
             directory.querySelectorAll('[data-zazu-local-record]').forEach(node => {
@@ -2742,6 +2744,47 @@ function setupZazuOfflineDirectoryViews() {
             const records = (state?.[collection] || []).filter(record => record?.local_id);
             const empty = directory.querySelector('.zazu-empty');
             for (const record of records) {
+                const serverIdCandidate = record.server_id ?? record.id;
+                const serverId = Number.isFinite(Number(serverIdCandidate)) && Number(serverIdCandidate) > 0
+                    ? Number(serverIdCandidate)
+                    : null;
+                const serverRow = serverId
+                    ? directory.querySelector('[data-zazu-server-record-id="' + serverId + '"]')
+                    : null;
+
+                if (serverRow) {
+                    // Reconcile local edits into the existing native row instead
+                    // of duplicating the record in a second offline directory.
+                    const title = serverRow.querySelector('.zazu-list-title');
+                    if (title) {
+                        const firstTextNode = [...title.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
+                        if (firstTextNode) firstTextNode.textContent = definition.title(record);
+                        else title.textContent = definition.title(record);
+                    }
+                    const meta = serverRow.querySelector('.zazu-list-meta');
+                    if (meta) meta.textContent = definition.meta(record);
+
+                    const actions = serverRow.querySelector('.zazu-action-group, .zazu-list-side') || serverRow;
+                    let syncChip = actions.querySelector('[data-zazu-local-sync-chip]');
+                    if (!syncChip) {
+                        syncChip = document.createElement('span');
+                        syncChip.className = 'zazu-chip zazu-chip-neutral';
+                        syncChip.dataset.zazuLocalSyncChip = '1';
+                        actions.append(syncChip);
+                    }
+                    const syncStatus = localSyncStatus(
+                        state,
+                        definition.entity,
+                        record.local_id,
+                        serverId,
+                        record.pending_sync === true,
+                    );
+                    syncChip.textContent = syncStatus.label;
+                    syncChip.title = syncStatus.title;
+                    syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+                    continue;
+                }
+
                 const row = document.createElement('article');
                 row.className = 'zazu-list-item';
                 row.dataset.zazuLocalRecord = collection;
