@@ -403,3 +403,10 @@ At the first observed checkpoint for `e896917`: PHPMD passed, Director Health pa
 - Remaining acceptance: actual IndexedDB queue persistence; browser API push/pull/ack across expiry; force-close/restart; physical PC and Android reconnect; and a >500-record working-set test proving delivery-target inclusion for records outside the default window.
 - No Basic/Intermediate/Professional feature gates, capacity quotas or billing logic have been introduced.
 - **Next:** verify test execution on GitHub; extend the asset regression to a record outside the default 500-row window; then review the other delivery target keys and nested aggregate relationships for similar contract mismatches.
+## Jarvis execution update — 2026-11-27 — verification trigger clarification
+
+- Confirmed `.github/workflows/laravel.yml` is configured for `push` to `main` on `tests/**` and application paths. Its jobs include Laravel/PHPUnit, PostgreSQL migration/recovery, and the dedicated offline browser acceptance sequence. PHPMD and Psalm workflows also have main-push path filters for app/tests.
+- The connected `fetch_commit_workflow_runs` function explicitly returns PR-triggered runs only. Its empty response cannot be used to conclude that push workflows did not run. The combined-status function also returned no status entries; no actual check-run/job payload or logs are exposed by the currently available GitHub actions functions.
+- Latest source fix: `0f8447b` asset bootstrap delivery-key correction. Latest test changes: `54177fd`/`dc761af` trial-expiry server reconnect and `c2987a5`/`ae02b53`/`b30de1b` asset delivery bootstrap regression. Latest docs/state records are being updated on main.
+- Do not report CI as failed or passed based on these empty responses. It is **UNVERIFIED through this connector**. The workflow trigger contract means Laravel/PG/offline-browser and PHPMD/Psalm should be queued by the test/source pushes; their real run results still need to be read in GitHub Actions.
+- No branches created. No Render/AMPPS. No tier restrictions or quotas.
