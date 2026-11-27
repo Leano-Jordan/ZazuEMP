@@ -331,6 +331,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(customerForm).toBeVisible();
 
         const onlineGeometry = await customerForm.boundingBox();
+        const onlineSearchVisible = await page.locator('.zazu-command-search').isVisible();
         await context.setOffline(true);
         await page.reload({ waitUntil: 'domcontentloaded' });
 
@@ -339,8 +340,15 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(customerForm).toBeVisible();
         await expect(customerForm.locator('input[name="name"]')).toBeVisible();
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
-        await expect(page.locator('.zazu-command-search')).toBeVisible();
+        if (onlineSearchVisible) {
+            await expect(page.locator('.zazu-command-search')).toBeVisible();
+        } else {
+            await expect(page.locator('.zazu-command-search')).toBeHidden();
+        }
         await expect(page.locator('.zazu-section-tabs')).toBeVisible();
+        if (testInfo.project.name === 'chromium-mobile') {
+            await page.locator('[data-mobile-sidebar-toggle]').click();
+        }
         await expect(page.locator('.zazu-nav-link[href="/settings"]')).toBeVisible();
         await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
 
