@@ -17,6 +17,7 @@
             default => 'zazu-chip-neutral',
         };
         $latestQuote = $event->quotes->sortByDesc('created_at')->first();
+        $scopeLocked = $event->quotes->contains('status', 'accepted');
         $hasRequirements = $event->requirements->isNotEmpty();
         $latestQuoteNeedsRevision = $latestQuote?->latestVersion
             ? !$latestQuote->latestVersion->matchesRequirements($event->requirements)
@@ -238,9 +239,9 @@
                         <div class="zazu-panel-title">Services for this job</div>
                         <div class="zazu-panel-copy">These are the services or items you are providing. Add another one without leaving the job.</div>
                     </div>
-                    @unless ($event->isClosed())
+                    @if (!$event->isClosed() && !$scopeLocked)
                         <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add service</a>
-                    @endunless
+                    @endif
                 </div>
 
                 @forelse ($event->requirements as $requirement)
@@ -260,9 +261,9 @@
                     <div class="zazu-empty">
                         <div class="zazu-empty-title">No services added yet</div>
                         <p class="zazu-empty-copy">Choose Catering, Decor, Sound, Furniture & Equipment, Photography & Video, Baking, Transport or another service.</p>
-                        @unless ($event->isClosed())
+                        @if (!$event->isClosed() && !$scopeLocked)
                             <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Choose services</a>
-                        @endunless
+                        @endif
                     </div>
                 @endforelse
 
