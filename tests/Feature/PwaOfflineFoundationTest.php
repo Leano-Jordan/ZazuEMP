@@ -507,7 +507,23 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
         $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString('zazu-static-v68', $worker);
+        $this->assertStringContainsString('zazu-static-v69', $worker);
+    }
+
+    public function test_offline_route_priming_excludes_signed_public_documents_and_closed_job_actions(): void
+    {
+        $worker = File::get(public_path('sw.js'));
+        $workShow = File::get(resource_path('views/work/show.blade.php'));
+        $requirementsIndex = File::get(resource_path('views/requirements/index.blade.php'));
+
+        $this->assertStringContainsString(
+            "|^\\\\/(?:quotes\\\\/[^/]+\\\\/view|invoices\\\\/[^/]+\\\\/view|payments\\\\/[^/]+\\\\/receipt)$|.test(route.pathname)",
+            $worker
+        );
+        $this->assertStringContainsString("$event->isClosed() ? route('work.quotes.index', $event)", $workShow);
+        $this->assertStringContainsString("@unless ($event->isClosed())", $workShow);
+        $this->assertStringContainsString("@if (!$latestQuote && !$event->isClosed())", $workShow);
+        $this->assertStringContainsString("@unless ($scopeLocked)", $requirementsIndex);
     }
 
     public function test_pwa_icon_files_are_present(): void
