@@ -586,9 +586,6 @@ self.addEventListener('fetch', (event) => {
     }
 
     const requestGeneration = activeUserGeneration;
-    // A top-level navigation with no initiating client is a cold app launch
-    // (for example, opening the installed Zazu icon while the host is down).
-    const preferOfflineShell = await shouldPreferOfflineShell(request, event);
     const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
     const isAppPage = request.method === 'GET'
         && url.origin === self.location.origin
@@ -596,7 +593,12 @@ self.addEventListener('fetch', (event) => {
         && (request.mode === 'navigate' || acceptsHtml);
 
     if (isAppPage) {
+        // respondWith must be called synchronously during the fetch event.
+        // Cold-launch detection is asynchronous because it inspects live clients,
+        // so resolve it inside the response promise rather than the event callback.
         event.respondWith((async () => {
+            const preferOfflineShell = await shouldPreferOfflineShell(request, event);
+
             // When the browser reports no network, do not spend four seconds
             // attempting the unreachable Laravel host. Resolve the authenticated
             // page from its user/business cache immediately instead.
