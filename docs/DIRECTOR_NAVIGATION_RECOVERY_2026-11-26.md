@@ -1,7 +1,7 @@
 # Director Incident Record — Collapsed Navigation Falling Back to Dashboard
 
 **Date:** 2026-11-26  
-**Status:** NAVIGATION FALLBACK REWORKED / EXACT-HEAD ACCEPTANCE PENDING  
+**Status:** EXACT-ROUTE FALLBACK IMPLEMENTED / EXACT-HEAD ACCEPTANCE PENDING  
 **Repository:** Leano-Jordan/ZazuEMP  
 **Write target:** main only
 
@@ -20,24 +20,23 @@ Two service-worker fallback defects combined to produce the symptom:
 
 The second defect is the more direct explanation for a broad class of in-app navigation failures. The precise network state/latency observed on the Founder device has not been captured, so do not claim the exact trigger for every occurrence.
 
-3. **Cold-launch detection assumption (third correction):** the first policy correction used an empty `FetchEvent.clientId` as the cold-launch signal. That is not reliable for top-level navigation requests. A follow-up attempt used `clients.matchAll()` to look for any same-origin window, but that also failed: the previous page may no longer be discoverable during a same-tab navigation, while an unrelated existing tab can make a genuinely new installed-app launch look like an in-app route change. The 5ec4799 browser run exposed both directions of this error.
+3. **Cold-launch detection is not reliable enough to drive route selection:** the empty `FetchEvent.clientId`, same-origin referrer and live-window enumeration attempts did not reliably distinguish an installed-app launch from a same-tab navigation in the browser acceptance environment. The 5ec4799 and subsequent referrer-based runs demonstrated false classification in both directions. The worker must not make exact-route selection depend on these signals.
 
 ## Correction committed
 
 - Keep the 5,000 ms authenticated navigation timeout and static cache v64.
-- When `clientId` is empty, use the navigation request's referrer as the discriminant: a same-origin referrer is an in-app route transition and preserves the exact cached destination; an absent, `about:client`, malformed or non-local referrer is treated as a cold launch and prefers Dashboard. The app's `strict-origin-when-cross-origin` policy preserves full same-origin referrers.
-- Keep `respondWith()` synchronous in the fetch event. The referrer decision is synchronous and does not require asynchronous client enumeration.
-- Update browser acceptance to pass the current same-origin URL as `referer` for programmatic navigation that is intended to model an in-app transition. The true cold-launch test deliberately omits a referrer.
-- For in-app navigation, prefer the exact route from the active user/business cache when the host is offline, returns a transient 5xx, or the request times out. Use Dashboard only when the requested route has no exact cached entry.
+- Remove the cold-launch Dashboard preference entirely. Every navigation first requests its exact URL from the active user/business cache, regardless of `clientId`, referrer or whether the browser is opening a new installed-app window.
+- Dashboard is a safe fallback only when the requested URL has no exact cached entry. A cold launch on a supported cached deep link therefore opens that destination; the installed app's configured start URL continues to open Dashboard normally.
+- Keep `respondWith()` synchronous in the fetch event. No asynchronous client enumeration or browser launch heuristic is required.
 - Preserve the security boundary: 401/403 and other client responses are not replaced with stale authenticated cache content. Authenticated HTML remains isolated to the active user/business cache.
-- Update worker regressions so a failed in-app /customers navigation returns its exact cached destination, a cached /work directory remains on /work, query variants without an exact cache entry fall back safely, and a true cold launch still prefers Dashboard.
-- Model browser navigation correctly in the worker harness: an empty `clientId` with an existing same-origin window must preserve the exact cached destination; an empty client set is a cold launch.
-- Fix the cross-tab logout E2E fixture to accept the production confirmation dialog. The previous test auto-dismissed the intentional `window.confirm`, so it never actually signed out; production logout behavior was not weakened.
-- Retain the slow-but-healthy /quotes regression and the collapsed desktop rail Playwright test.
+- Worker regressions now prove exact-route selection for cold launch and in-app navigation, with Dashboard fallback only for an uncached route/query variant.
+- Browser acceptance now uses actual same-tab anchor navigation rather than `page.goto()` to model a user click. The offline customer edit journey uses the same real navigation path.
+- Keep the slow-but-healthy /quotes regression, hanging-host timeout coverage, collapsed desktop rail and responsive navigation click-through checks.
+- Keep the cross-tab logout E2E fixture accepting the intentional production confirmation dialog; production logout behaviour was not weakened.
 
 ## Verification boundary
 
-The source and worker regressions are committed. The first exact-head run after the live-client attempt (`5ec4799`) passed Laravel, coverage, PostgreSQL, Zazu Quality and Windows packaging, but offline browser acceptance remained 77 passed / 3 failed. The failures were the offline customer edit, priming Customers/Work routes, and cold installed-app launch. They showed the global-client heuristic was not reliable. The current referrer-based correction is committed across worker `a2b8957`, worker tests `102b6fa`, Laravel feature contract `0871121`, PWA route acceptance `b769a63`, and customer edit acceptance `651ac45`. Exact-head workflows for this correction set are queued; no pass is claimed. Physical Founder-device reproduction remains required after the corrected worker is installed.
+The referrer-based attempt passed Laravel, coverage, PostgreSQL and Zazu Quality, but offline browser acceptance remained 78 passed / 2 failed: the customer local-edit override was absent after navigation and the Jobs route rendered the Dashboard shell. The follow-up test correction to use actual same-tab anchor clicks still reproduced both failures, proving the issue was not merely a `page.goto()` fixture artefact. The current worker now removes the unreliable cold-launch preference and always selects an exact cached destination before Dashboard fallback. Commits: worker `2332115`, worker unit contract `880b6b6`, Laravel PWA contract `c90f256`, offline route-click acceptance `1e87892`, customer edit navigation `d6d0ee3`, and application contract comment `b6c7d1c`. Exact-head workflows for this final policy are pending; no pass is claimed. Physical Founder-device verification remains required after the corrected worker is installed.
 
 ## Operational notes
 
