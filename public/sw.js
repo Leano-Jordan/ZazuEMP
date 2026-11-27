@@ -499,14 +499,16 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         '/dashboard',
         ...uniqueRoutes.filter(path => ['/customers', '/customers/create', '/work', '/work/create'].includes(path)),
     ];
-    if (controller.signal.aborted || primeGeneration !== activeUserGeneration) return false;
+    if (controller.signal.aborted || primeGeneration !== activeUserGeneration) return { success: false, reason: 'superseded', route_count: uniqueRoutes.length };
 
     // Report ready only when every discovered same-origin application route
     // has an authenticated page snapshot. A partial cache or a truncated route
     // graph must never be represented as a fully prepared offline application.
     const cache = await dynamicCache();
     if (!cache || primeGeneration !== activeUserGeneration
-        || primeUserId !== activeUserId || primeBusinessId !== activeBusinessId) return false;
+        || primeUserId !== activeUserId || primeBusinessId !== activeBusinessId) {
+        return { success: false, reason: 'context-changed-or-cache-unavailable', route_count: uniqueRoutes.length };
+    }
 
     const requiredCachedPages = await Promise.all(requiredOfflineRoutes.map((path) => (
         cache.match(new Request(new URL(path, self.location.origin)))
@@ -515,9 +517,21 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         cache.match(new Request(new URL(path, self.location.origin)))
     )));
 
-    return !routeDiscoveryTruncated
-        && requiredCachedPages.every(Boolean)
-        && discoveredCachedPages.every(Boolean);
+    const requiredMissing = requiredOfflineRoutes.filter((path, index) => !requiredCachedPages[index]);
+    const discoveredMissing = uniqueRoutes.filter((path, index) => !discoveredCachedPages[index]);
+    const success = !routeDiscoveryTruncated && requiredMissing.length === 0 && discoveredMissing.length === 0;
+
+    return {
+        success,
+        reason: success ? null : routeDiscoveryTruncated
+            ? 'route-limit-exceeded'
+            : requiredMissing.length > 0
+                ? 'required-pages-not-cached'
+                : 'discovered-pages-not-cached',
+        route_count: uniqueRoutes.length,
+        required_missing: requiredMissing,
+        discovered_missing: discoveredMissing.slice(0, 20),
+    };
 }
 
 async function clearActiveContext() {
@@ -552,7 +566,7 @@ self.addEventListener('message', (event) => {
             : null;
 
         if (!taskContext) {
-            event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: false });
+            event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: false, reason: 'invalid-user-or-business-context' });
             return;
         }
 
@@ -561,16 +575,16 @@ self.addEventListener('message', (event) => {
         // account/workspace instead of aborting it and reporting a false failure.
         if (activePrimeTask && activePrimeTaskContext === taskContext) {
             const completed = await activePrimeTask;
-            event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed });
+            event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', ...completed });
             return;
         }
 
         const task = (async () => {
             const generation = activeUserGeneration;
             await loadActiveContext(generation);
-            if (generation !== activeUserGeneration) return false;
+            if (generation !== activeUserGeneration) return { success: false, reason: 'generation-changed-before-context-load' };
             const activeGeneration = await setContext(requestedUserId, requestedBusinessId, generation);
-            if (activeGeneration === null) return false;
+            if (activeGeneration === null) return { success: false, reason: 'context-activation-rejected' };
             return primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId, event.data.routesTruncated === true);
         })();
 
@@ -581,7 +595,7 @@ self.addEventListener('message', (event) => {
             activePrimeTask = null;
             activePrimeTaskContext = null;
         }
-        event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed });
+        event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', ...completed });
     })());
 });
 
