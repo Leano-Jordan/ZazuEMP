@@ -4858,7 +4858,9 @@ function registerZazuServiceWorker() {
                 if (url.origin !== window.location.origin
                     || url.username || url.password
                     || url.pathname === '/api' || url.pathname.startsWith('/api/')
-                    || ['/logout', '/business/switch'].includes(url.pathname)
+                    || ['/', '/login', '/register', '/privacy', '/terms', '/logout', '/business/switch', '/up'].includes(url.pathname)
+                    || url.pathname.startsWith('/forgot-password')
+                    || url.pathname.startsWith('/reset-password')
                     || /^\/(?:build|images|icons|media|storage)\//.test(url.pathname)
                     || /\.[a-z0-9]{2,8}$/i.test(url.pathname)) return;
                 routes.add(url.pathname);
