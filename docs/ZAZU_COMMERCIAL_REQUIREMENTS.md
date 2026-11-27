@@ -1,11 +1,13 @@
 # Zazu EMP — Commercial Requirements & Tier Readiness
 
-**Status:** Director commercial baseline  
+**Status:** Historical commercial hypothesis — superseded for current tier design  
 **Date:** 2026-10-02  
 **Authority:** Zazu EMP repository + Product Specification  
 **Purpose:** Consolidate the working commercial packaging model, current capability position and build requirements without turning pricing into a premature feature factory.
 
-## 1. Commercial model
+> **Current authority (2026-11-27):** This document's four-tier prices, names and allocations below are retained only as historical research. They are not current product policy and must not be quoted, implemented or used for pricing decisions. The current customer-facing levels are **Basic, Intermediate and Professional**. See [ZAZU_THREE_TIER_CAPABILITY_MATRIX.md](ZAZU_THREE_TIER_CAPABILITY_MATRIX.md). No prices or numerical quotas are approved. Shared offline reliability, data ownership and export remain foundational across all levels.
+
+## 1. Historical commercial model (superseded)
 
 Zazu is one operational product with increasing levels of sophistication.
 
