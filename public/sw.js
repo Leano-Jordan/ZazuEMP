@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v64';
+const CACHE_NAME = 'zazu-static-v65';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -125,6 +125,29 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
+async function markOfflineFallback(response) {
+    if (!response || !response.ok) return response;
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.toLowerCase().includes('text/html')) return response;
+
+    const html = await response.clone().text();
+    const marker = '<meta name="zazu-offline-fallback" content="1">';
+    const markedHtml = /<head(?:\\s[^>]*)?>/i.test(html)
+        ? html.replace(/<head((?:\\s[^>]*)?)>/i, '<head$1>' + marker)
+        : marker + html;
+
+    // The body length and validators no longer describe the injected HTML.
+    const headers = new Headers(response.headers);
+    ['content-length', 'content-encoding', 'etag', 'content-md5'].forEach(name => headers.delete(name));
+
+    return new Response(markedHtml, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+    });
+}
+
 async function cachedAppPage(request) {
     const cache = await dynamicCache();
     const cachedPage = cache ? await cache.match(new Request(request.url)) : null;
@@ -136,7 +159,8 @@ async function cachedAppPage(request) {
     // Never replace a valid destination with Dashboard based on browser launch
     // heuristics: FetchEvent client/referrer metadata is not consistent enough
     // across installed mobile browsers to make that distinction safely.
-    return cachedPage || offlineShell || Response.error();
+    if (cachedPage) return cachedPage;
+    return offlineShell ? markOfflineFallback(offlineShell) : Response.error();
 }
 
 async function cacheRenderedPage(request, response, requestGeneration) {
