@@ -837,3 +837,92 @@ test('normal Zazu pages remain in place when the host is unreachable but the bro
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
     await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
 });
+
+
+test('native Preparation page queues a status update against the existing local identity while disconnected', async ({ page }) => {
+    const preparationLocalId = randomUUID();
+    const preparationServerId = 7654491;
+    let job = null;
+
+    await login(page);
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    job = await page.evaluate(async () => {
+        await window.ZazuOffline.ready;
+        const candidate = window.ZazuOffline.getState().jobs.find(item =>
+            Number(item.id ?? item.server_id) > 0 && item.local_id
+        );
+
+        return candidate ? {
+            id: Number(candidate.id ?? candidate.server_id),
+            local_id: candidate.local_id,
+        } : null;
+    });
+    expect(job, 'Demo workspace must provide a synced job for preparation ownership').not.toBeNull();
+
+    const preparationPath = '/work/' + job.id + '/preparation';
+    await page.goto(preparationPath, { waitUntil: 'domcontentloaded' });
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await page.context().setOffline(true);
+    await page.evaluate(({ preparationLocalId, preparationServerId, job }) => {
+        const state = window.ZazuOffline.getState();
+        state.preparations = [{
+            id: preparationServerId,
+            server_id: preparationServerId,
+            local_id: preparationLocalId,
+            revision: 2,
+            event_id: job.id,
+            event_local_id: job.local_id,
+            event_name: 'Offline preparation parent job',
+            title: 'Offline readiness status check',
+            category: 'equipment',
+            quantity: '1.00',
+            unit: 'unit',
+            due_date: null,
+            status: 'open',
+            notes: 'Must survive a disconnected reload',
+        }];
+        state.local_dirty = false;
+        return window.ZazuOffline.persist({ allowSessionChange: true });
+    }, { preparationLocalId, preparationServerId, job });
+
+    await page.goto(preparationPath, { waitUntil: 'domcontentloaded' });
+    const register = page.locator('[data-zazu-offline-collection="preparations"]');
+    const row = register.locator('[data-zazu-local-record="preparations"]').filter({ hasText: 'Offline readiness status check' });
+    await expect(row).toBeVisible();
+    await row.getByRole('button', { name: 'Ready' }).click();
+
+    await expect.poll(async () => page.evaluate(async ({ preparationLocalId }) => {
+        const state = window.ZazuOffline.getState();
+        const record = state.preparations.find(item => item.local_id === preparationLocalId);
+        const mutation = (await window.ZazuOffline.pending()).find(item =>
+            item.entity_type === 'preparation' && item.payload?.local_id === preparationLocalId
+        );
+
+        return {
+            status: record?.status,
+            operation: mutation?.operation,
+            serverId: mutation?.payload?.server_id,
+            localId: mutation?.payload?.local_id,
+            expectedRevision: mutation?.payload?.expected_revision,
+            localDirty: state.local_dirty,
+        };
+    }, { preparationLocalId })).toEqual({
+        status: 'ready',
+        operation: 'update',
+        serverId: preparationServerId,
+        localId: preparationLocalId,
+        expectedRevision: 2,
+        localDirty: true,
+    });
+    await expect(row.locator('.zazu-chip')).toHaveText('Ready');
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    const reloadedRow = page.locator('[data-zazu-offline-collection="preparations"] [data-zazu-local-record="preparations"]').filter({ hasText: 'Offline readiness status check' });
+    await expect(reloadedRow).toBeVisible();
+    await expect(reloadedRow.locator('.zazu-chip')).toHaveText('Ready');
+    await expect.poll(async () => page.evaluate(async ({ preparationLocalId }) =>
+        (await window.ZazuOffline.pending()).filter(item =>
+            item.entity_type === 'preparation' && item.payload?.local_id === preparationLocalId
+        ).length
+    , { preparationLocalId })).toBe(1);
+});
