@@ -4077,24 +4077,15 @@ test.describe('Zazu installed PWA offline shell', () => {
                 await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
             }
 
-            // These routes are deliberately not primed. The service worker
-            // must fall back to the cached Dashboard shell, and the client must
-            // isolate the requested local view instead of showing the Dashboard
-            // and every collection together.
-            const supplierFallback = await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
-            expect(supplierFallback?.ok()).toBe(true);
-            await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
-            await expect(page.locator('[data-zazu-offline-active-view="suppliers"]')).toBeVisible();
-            await expect(page.locator('[data-zazu-offline-view="suppliers"]')).toBeVisible();
-            await expect(page.locator('.zazu-dash-hero')).toBeHidden();
-            await expect(page.locator('.zazu-dash-overview')).toBeHidden();
-            await expect(page.locator('.zazu-content > .zazu-dash-grid')).toBeHidden();
-
-            const unsupportedFallback = await page.goto('/calendar', { waitUntil: 'domcontentloaded' });
-            expect(unsupportedFallback?.ok()).toBe(true);
-            await expect(page.locator('[data-zazu-offline-unavailable]')).toBeVisible();
-            await expect(page.locator('[data-zazu-offline-view]:visible')).toHaveCount(0);
-            await expect(page.locator('.zazu-dash-hero')).toBeHidden();
+            // An uncached route must never be presented as a different module.
+            const fallbackResponse = await page.goto('/work/730001/costs', { waitUntil: 'domcontentloaded' });
+            expect(fallbackResponse?.ok()).toBe(true);
+            await expect(page.locator('meta[name="zazu-offline-fallback"][content="1"]')).toHaveCount(1);
+            await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
+            await expect(page.locator('[data-zazu-offline-route-unavailable]')).toBeVisible();
+            await expect(page.locator('[data-zazu-requested-offline-path]')).toHaveText('/work/730001/costs');
+            await expect(page.locator('.zazu-nav-link:visible').first()).toBeVisible();
+            await expect(page.locator('.zazu-page-title')).toHaveText('Connection required');
         } finally {
             await context.setOffline(false);
         }
