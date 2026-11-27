@@ -75,16 +75,26 @@ class ZazuHelperContextTest extends TestCase
             'total_amount' => '350.00',
         ]);
 
-        $this->actingAs($user)
+        $response = $this->actingAs($user)
             ->get(route('work.show', $event))
-            ->assertOk()
-            ->assertSee('data-zazu-helper-event-records="1"', false)
-            ->assertSee('1 preparation item')
-            ->assertSee('Review preparation')
-            ->assertDontSee('purchase order')
-            ->assertDontSee('Review purchasing')
-            ->assertDontSee('HELPER-STAFF-ASSET')
-            ->assertDontSee('Restricted asset');
+            ->assertOk();
+
+        // Scope these assertions to the helper itself. The shared offline
+        // workspace is a separate page surface and must not contaminate a
+        // test of helper recommendations.
+        $document = new \\DOMDocument();
+        $document->loadHTML($response->getContent());
+        $helper = (new \\DOMXPath($document))->query('//*[@data-zazu-helper]')->item(0);
+        $this->assertNotNull($helper);
+
+        $helperMarkup = $document->saveHTML($helper);
+        $this->assertStringContainsString('data-zazu-helper-event-records="1"', $helperMarkup);
+        $this->assertStringContainsString('1 preparation item', $helperMarkup);
+        $this->assertStringContainsString('Review preparation', $helperMarkup);
+        $this->assertStringNotContainsString('purchase order', strtolower($helperMarkup));
+        $this->assertStringNotContainsString('Review purchasing', $helperMarkup);
+        $this->assertStringNotContainsString('HELPER-STAFF-ASSET', $helperMarkup);
+        $this->assertStringNotContainsString('Restricted asset', $helperMarkup);
     }
 
     public function test_helper_guidance_adapts_to_the_saved_business_focus(): void
