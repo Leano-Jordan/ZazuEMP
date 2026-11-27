@@ -82,7 +82,7 @@ class ZazuHelperContextTest extends TestCase
         // Scope these assertions to the helper itself. The shared offline
         // workspace is a separate page surface and must not contaminate a
         // test of helper recommendations.
-        $document = new \DOMDocument();
+        $document = new \DOMDocument;
         $document->loadHTML($response->getContent());
         $helper = (new \DOMXPath($document))->query('//*[@data-zazu-helper]')->item(0);
         $this->assertNotNull($helper);
