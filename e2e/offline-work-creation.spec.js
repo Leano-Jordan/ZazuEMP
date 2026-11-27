@@ -288,6 +288,9 @@ test('editing a locally created supplier preserves the queued create-before-upda
     const localId = randomUUID();
 
     await login(page);
+    await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
+    await page.goto('/suppliers/create', { waitUntil: 'domcontentloaded' });
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.context().setOffline(true);
     await page.evaluate(async localId => {
         await window.ZazuOffline.ready;
@@ -320,13 +323,17 @@ test('editing a locally created supplier preserves the queued create-before-upda
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }, localId);
 
-    await selectOfflineView(page, '/suppliers');
-    const suppliers = page.locator('[data-zazu-offline-workspace] [data-zazu-offline-collection="suppliers"]');
-    await suppliers.getByRole('button', { name: 'View saved details' }).click();
-    await suppliers.getByRole('button', { name: 'Edit saved supplier' }).click();
-    await suppliers.getByLabel('Supplier name').fill('Locally created supplier updated');
-    await suppliers.getByLabel('Contact person').fill('Second Contact');
-    await suppliers.getByRole('button', { name: 'Save supplier' }).click();
+    await page.goto('/suppliers', { waitUntil: 'domcontentloaded' });
+    const supplierRow = page.locator('[data-zazu-offline-collection="suppliers"] [data-zazu-local-record="suppliers"]').filter({ hasText: 'Locally created supplier' });
+    await expect(supplierRow).toBeVisible();
+    await supplierRow.getByRole('link', { name: 'Edit' }).click();
+
+    const form = page.locator('form[data-zazu-offline-entity="supplier"]');
+    await expect(form.locator('input[name="name"]')).toHaveValue('Locally created supplier');
+    await form.locator('input[name="name"]').fill('Locally created supplier updated');
+    await form.locator('input[name="contact_name"]').fill('Second Contact');
+    await form.getByRole('button', { name: 'Save changes' }).click();
+    await expect(form.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
 
     await expect.poll(async () => page.evaluate(async localId => {
         const state = window.ZazuOffline.getState();
@@ -353,13 +360,15 @@ test('editing a locally created supplier preserves the queued create-before-upda
     })).toBe(true);
 });
 
-test('offline workspace exposes locally stored quotes with their sync state', async ({ page }) => {
+test('native Quotes register exposes locally stored quotes with their sync state', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const jobLocalId = randomUUID();
     const quoteLocalId = randomUUID();
     const jobName = 'Offline quote parent ' + runId;
 
     await login(page);
+    await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.evaluate(async ({ jobLocalId, quoteLocalId, jobName }) => {
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
@@ -385,9 +394,9 @@ test('offline workspace exposes locally stored quotes with their sync state', as
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }, { jobLocalId, quoteLocalId, jobName });
 
-    const workspace = page.locator('[data-zazu-offline-workspace]');
-    await expect(workspace).toBeVisible();
-    const quoteRow = workspace.locator('[data-zazu-local-record="quote"]').filter({ hasText: jobName });
+    await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+    const quoteRow = page.locator('[data-zazu-local-quotes] [data-zazu-local-record="quote"]').filter({ hasText: jobName });
     await expect(quoteRow).toHaveCount(1);
     await expect(quoteRow.locator('.zazu-list-title')).toHaveText('Draft quote');
     await expect(quoteRow.locator('.zazu-list-meta')).toContainText(jobName);
