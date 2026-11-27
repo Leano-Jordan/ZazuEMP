@@ -3011,6 +3011,15 @@ function setupZazuOfflineDirectoryViews() {
                     }
                     const meta = serverRow.querySelector('.zazu-list-meta');
                     if (meta) meta.textContent = definition.meta(record);
+                    if (collection === 'preparations') {
+                        const statusChip = serverRow.querySelector('.zazu-list-main .zazu-chip');
+                        if (statusChip) {
+                            const status = String(record.status || 'open');
+                            statusChip.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                            statusChip.classList.remove('zazu-chip-success', 'zazu-chip-danger', 'zazu-chip-info');
+                            statusChip.classList.add(status === 'ready' ? 'zazu-chip-success' : (status === 'blocked' ? 'zazu-chip-danger' : 'zazu-chip-info'));
+                        }
+                    }
 
                     const actions = serverRow.querySelector('.zazu-action-group, .zazu-list-side') || serverRow;
                     let syncChip = actions.querySelector('[data-zazu-local-sync-chip]');
