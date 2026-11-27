@@ -53,7 +53,7 @@ class BusinessCapabilityCatalogueTest extends TestCase
             ->assertSee('Services & products')
             ->assertSee('DJ performance')
             ->assertSee('Lighting package')
-            ->assertDontSee('catalogue-panel-equipment', false)
+            ->assertDontSee('data-catalogue-tab="equipment"', false)
             ->assertDontSee('Hire &amp; rental', false);
     }
 
