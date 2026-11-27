@@ -83,6 +83,35 @@ class WorkCompletionGuardTest extends TestCase
         $this->assertSame('in_progress', $event->fresh()->status);
     }
 
+    public function test_closed_work_does_not_offer_edit_actions_in_work_or_customer_views(): void
+    {
+        foreach (['completed', 'cancelled'] as $status) {
+            $customer = Customer::create(['name' => 'Closed Work Customer '.$status]);
+            $event = Event::create([
+                'customer_id' => $customer->id,
+                'reference' => 'ZAZ-CLOSED-'.strtoupper($status).'-'.Str::upper(Str::random(6)),
+                'name' => 'Closed Work '.$status,
+                'event_type' => 'Catering order',
+                'event_date' => '2026-11-15',
+                'status' => $status,
+            ]);
+
+            $editUrl = route('work.edit', $event);
+
+            $this->get(route('work.index'))
+                ->assertOk()
+                ->assertDontSee($editUrl, false);
+
+            $this->get(route('work.show', $event))
+                ->assertOk()
+                ->assertDontSee($editUrl, false);
+
+            $this->get(route('customers.show', $customer))
+                ->assertOk()
+                ->assertDontSee($editUrl, false);
+        }
+    }
+
     private function eventForCompletion(string $name): Event
     {
         $customer = Customer::create(['name' => $name.' Customer']);
