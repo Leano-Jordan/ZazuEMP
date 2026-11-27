@@ -845,9 +845,11 @@ test('native Preparation page queues a status update against the existing local 
     let job = null;
 
     await login(page);
+    await trustCurrentDevice(page);
     await page.goto('/work', { waitUntil: 'domcontentloaded' });
     job = await page.evaluate(async () => {
         await window.ZazuOffline.ready;
+        await window.ZazuOffline.sync();
         const candidate = window.ZazuOffline.getState().jobs.find(item =>
             Number(item.id ?? item.server_id) > 0 && item.local_id
         );
