@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\SyncController;
+use App\Models\Asset;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\CustomerContact;
@@ -38,7 +39,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -2471,7 +2471,7 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $asset = \App\Models\Asset::create([
+        $asset = Asset::create([
             'business_id' => $business->id,
             'asset_tag' => 'BOOTSTRAP-ASSET-001',
             'name' => 'Delivered marquee',
@@ -2496,7 +2496,7 @@ class OfflineSyncFoundationTest extends TestCase
         // receiver bootstrap must union explicit delivery targets with that
         // bounded set rather than silently losing a pending change.
         for ($index = 1; $index <= 500; $index++) {
-            \App\Models\Asset::create([
+            Asset::create([
                 'business_id' => $business->id,
                 'asset_tag' => 'BOOTSTRAP-RECENT-'.str_pad((string) $index, 3, '0', STR_PAD_LEFT),
                 'name' => 'Recent asset '.$index,
