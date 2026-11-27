@@ -2505,6 +2505,17 @@ class OfflineSyncFoundationTest extends TestCase
         );
 
         $this->assertSame([$asset->id], $targets['asset'] ?? []);
+
+        $snapshot = app(SyncBootstrapPayloadBuilder::class)->build(
+            $receivingDevice,
+            [(int) $delivery->delivery_sequence],
+        );
+
+        $this->assertContains(
+            $asset->id,
+            collect($snapshot['assets'])->pluck('server_id')->all(),
+            'A delivered asset must be present in the receiver bootstrap even when it is outside the default working set.',
+        );
     }
 
     public function test_empty_pairing_selection_bootstraps_a_bounded_offline_working_set_with_local_relationships(): void
