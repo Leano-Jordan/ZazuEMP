@@ -3021,21 +3021,40 @@ function setupZazuOfflineDirectoryViews() {
     };
 
     const renderOfflineOverview = (state) => {
+        const workspace = document.querySelector('[data-zazu-offline-workspace]');
+        const allowedViews = new Set(
+            [...(workspace?.querySelectorAll('[data-zazu-offline-view]') || [])]
+                .map(section => section.dataset.zazuOfflineView)
+        );
         const collections = [
-            ['customers', 'Customers'],
-            ['jobs', 'Jobs'],
-            ['quotes', 'Quotes'],
-            ['suppliers', 'Suppliers'],
-            ['purchase_orders', 'Purchasing'],
-            ['inventory_items', 'Inventory'],
-            ['assets', 'Assets'],
-            ['invoices', 'Invoices'],
-            ['expenses', 'Expenses'],
-            ['costs', 'Event costs'],
-        ];
+            ['customers', 'Customers', 'customers'],
+            ['jobs', 'Jobs', 'jobs'],
+            ['quotes', 'Quotes', 'quotes'],
+            ['suppliers', 'Suppliers', 'suppliers'],
+            ['purchase_orders', 'Purchasing', 'purchase_orders'],
+            ['inventory_items', 'Inventory', 'inventory_items'],
+            ['assets', 'Assets', 'assets'],
+            ['invoices', 'Invoices', 'invoices'],
+            ['expenses', 'Expenses', 'expenses'],
+            ['costs', 'Event costs', 'costs'],
+        ].filter(([, , view]) => allowedViews.has(view));
         const total = collections.reduce((sum, [key]) => sum + (Array.isArray(state?.[key]) ? state[key].length : 0), 0);
         const pending = collections.reduce((sum, [key]) => sum + (Array.isArray(state?.[key]) ? state[key].filter(record => record?.pending_sync === true || !(record?.server_id ?? record?.id)).length : 0), 0);
-        const conflicts = (state?.conflicts || []).filter(conflict => conflict?.status === 'open').length;
+        const viewByEntityType = {
+            customer: 'customers',
+            job: 'jobs',
+            quote: 'quotes',
+            supplier: 'suppliers',
+            purchase_order: 'purchase_orders',
+            inventory_item: 'inventory_items',
+            asset: 'assets',
+            invoice: 'invoices',
+            expense: 'expenses',
+            event_cost: 'costs',
+        };
+        const conflicts = (state?.conflicts || []).filter(conflict =>
+            conflict?.status === 'open' && allowedViews.has(viewByEntityType[conflict?.entity_type])
+        ).length;
         const values = {
             records: total,
             pending,
@@ -3280,9 +3299,16 @@ function setupZazuOfflineDirectoryViews() {
 
         const pathname = window.location.pathname.replace(/\/$/, '') || '/';
         const route = offlineRouteViews.find(([pattern]) => pattern.test(pathname));
-        const activeView = pathname === '/dashboard'
+        let activeView = pathname === '/dashboard'
             ? 'overview'
             : (route?.[1] || 'unavailable');
+        // The server-rendered offline workspace omits views the current
+        // business role cannot access. A manually entered cached URL must not
+        // reveal a hidden collection or leave the user on an empty screen.
+        if (activeView !== 'unavailable'
+            && !workspace.querySelector('[data-zazu-offline-view="' + activeView + '"]')) {
+            activeView = 'unavailable';
+        }
         const offlineTitles = {
             overview: 'Offline workspace',
             customers: 'Customers',
