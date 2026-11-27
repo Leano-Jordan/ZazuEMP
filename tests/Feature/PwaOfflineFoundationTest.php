@@ -68,8 +68,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("event.data?.type !== 'prime-pages-complete'", $app);
         $this->assertStringContainsString("zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false'", $app);
         $this->assertStringContainsString("event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed })", $worker);
-        $this->assertStringContainsString("const requiredOfflineRoutes = ['/dashboard', '/customers', '/customers/create', '/work', '/work/create'];", $worker);
+        $this->assertStringContainsString("'/dashboard',", $worker);
+        $this->assertStringContainsString("uniqueRoutes.filter(path => ['/customers', '/customers/create', '/work', '/work/create'].includes(path))", $worker);
         $this->assertStringContainsString('requiredCachedPages.every(Boolean)', $worker);
+        $this->assertStringContainsString('discoveredCachedPages.every(Boolean)', $worker);
+        $this->assertStringContainsString('!routeDiscoveryTruncated', $worker);
         $this->assertStringContainsString('const requiredCachedPages = await Promise.all(requiredOfflineRoutes.map', $worker);
         $this->assertStringContainsString('let activePrimeTask = null;', $worker);
         $this->assertStringContainsString('activePrimeTaskContext === taskContext', $worker);
