@@ -2,11 +2,11 @@
 
 ## 2026-11-27 — Offline navigation and cross-tab acceptance corrections
 
-- Corrected cold-launch detection in the service worker. An empty `FetchEvent.clientId` is not sufficient evidence of a cold launch for a top-level navigation; the worker now checks for an existing same-origin window client before preferring the Dashboard shell.
-- Added worker coverage for the browser case where `clientId` is empty but an existing app window is present, while preserving Dashboard preference for a genuine cold launch.
-- Updated the Laravel PWA contract test to assert the live-window detection contract.
+- Corrected cold-launch detection in the service worker. An empty `FetchEvent.clientId` is not sufficient evidence of a cold launch; checking for any same-origin window was also unreliable because same-tab navigations may no longer expose the old client and unrelated tabs can produce false positives.
+- The worker now uses a same-origin navigation referrer to preserve in-app route intent when `clientId` is empty. An absent, `about:client`, malformed or non-local referrer retains the cold-launch Dashboard behaviour. The app's strict-origin-when-cross-origin policy preserves same-origin referrers.
+- Added unit and feature coverage for same-origin referrer versus cold-launch behaviour. Updated offline browser journeys to explicitly model same-origin in-app navigation; the installed-app cold-launch test omits a referrer.
 - Corrected the cross-tab identity E2E fixture to accept the intentional logout confirmation dialog. The previous test auto-dismissed it and therefore never exercised the logout transition.
-- The previous offline browser run recorded 77 passed / 3 failed. The above fixes target the identified navigation and test-fixture causes; exact-head CI is pending and no new pass is claimed.
+- The intermediate live-client attempt passed Laravel, coverage, PostgreSQL, Zazu Quality and Windows packaging, but offline browser acceptance remained 77 passed / 3 failed. The referrer-based correction is committed across worker `a2b8957`, worker tests `102b6fa`, feature contract `0871121`, PWA acceptance `b769a63` and customer edit acceptance `651ac45`. Exact-head CI is pending; no new pass is claimed.
 
 
 ## 2026-11-26 — Authentication session replay regression (acceptance pending)
