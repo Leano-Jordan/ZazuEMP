@@ -25,6 +25,7 @@ use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
 use App\Support\CurrentBusiness;
 use App\Support\Offline\OfflineDomainMutationHandler;
+use App\Support\Offline\SyncBootstrapDeliveryTargetResolver;
 use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use App\Support\Offline\SyncConflictRecorder;
 use App\Support\Offline\SyncEntityIdentityRegistry;
@@ -2452,6 +2453,58 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->expectException(ValidationException::class);
         $controller->provision($makeRequest());
+    }
+
+    public function test_asset_delivery_is_included_in_the_asset_bootstrap_working_set(): void
+    {
+        $business = Business::create([
+            'name' => 'Asset Delivery Bootstrap Business',
+            'slug' => 'asset-delivery-bootstrap-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $receivingDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $asset = \App\Models\Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'BOOTSTRAP-ASSET-001',
+            'name' => 'Delivered marquee',
+            'status' => 'available',
+            'condition' => 'good',
+            'purchase_cost' => '1000.00',
+            'currency' => 'ZAR',
+        ]);
+        $identity = app(SyncEntityIdentityRegistry::class)->identify($asset, 'asset');
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $sourceDevice,
+            'asset',
+            $identity->entity_uuid,
+            'upsert',
+            [
+                'local_id' => $identity->entity_uuid,
+                'record' => ['name' => 'Delivered marquee'],
+            ],
+        );
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+        app(SyncMutationRecorder::class)->publish($mutation);
+
+        $delivery = SyncDelivery::query()
+            ->where('destination_device_id', $receivingDevice->id)
+            ->where('sync_mutation_id', $mutation->id)
+            ->firstOrFail();
+
+        $targets = app(SyncBootstrapDeliveryTargetResolver::class)->resolve(
+            $receivingDevice,
+            [(int) $delivery->delivery_sequence],
+        );
+
+        $this->assertSame([$asset->id], $targets['asset'] ?? []);
     }
 
     public function test_empty_pairing_selection_bootstraps_a_bounded_offline_working_set_with_local_relationships(): void
