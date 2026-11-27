@@ -20,8 +20,10 @@ Zazu replaces fragmented spreadsheets, paper processes and disconnected tools wi
 ### Simplicity without sacrificing capability
 Zazu hides unnecessary complexity without weakening the underlying system.
 
-### One product, multiple experience levels
-Zazu provides one product across three commercial tiers: **Basic (Free), Intermediate (paid) and Advanced (paid)**. Each member selects a presentation level during onboarding and can change it later, within the workspace's active entitlement ceiling. Changing level must not delete, corrupt or unnecessarily restructure data.
+### One product, three capability levels
+Zazu provides one product across three levels: **Basic, Intermediate and Professional**. The commercial entitlement determines the capabilities and approved capacity available to the business. Each member separately chooses how much detail and guidance they want to see. Changing a presentation preference must not grant capabilities, alter permissions or restructure business data.
+
+The third level is customer-facing **Professional**. The existing internal `advanced` entitlement and preference identifiers remain compatibility mappings until a separately tested migration is justified.
 
 ### Mobile and desktop are first-class
 Neither platform is secondary. Zazu must provide professional experiences on phones, tablets and desktops. Interfaces adapt to context rather than simply shrinking or expanding another layout.
@@ -46,42 +48,35 @@ Zazu is designed for people and businesses responsible for planning or deliverin
 
 The initial commercial V1 is focused on owner-led event and event-service operators. This launch focus does not redefine Zazu as catering software.
 
-## 4. Three Workspace Tiers and Experience Levels
+## 4. Three Workspace Capability Levels
 
-**Founder decision — 2026-11-21 (DEC-027):** The canonical commercial tier names are Basic (Free), Intermediate (paid) and Advanced (paid). These are the only three tiers. This confirms the existing entitlement identifiers and supersedes conflicting Starter/Team/Business naming in the historical valuation proposal. The Founder has not approved exact monthly prices, module allocations or numerical quotas; none may be presented as final or enforced by inference.
+**Founder decision — 2026-11-27:** The customer-facing levels are **Basic, Intermediate and Professional**. They represent increasing business capacity and operational sophistication, not three separate products. No prices or numerical capacity limits are approved by this decision.
 
+The workspace's commercial entitlement determines the highest capability level available. Each member's presentation preference is independent and may be simpler or more detailed than the business's entitlement level. Presentation preference never grants an entitlement or changes roles and permissions.
 
-The three experience levels are also the three commercial workspace tiers:
+### Basic — genuine small-business operation
+A small business must be able to run meaningful day-to-day work on Basic, including customers, events/jobs, essential requirements and preparation, quotes, invoices, payment recording, essential expenses, calendar, business history, relevant products/services, supported offline workflows, local backup and data export.
 
-- **Basic — Free, ongoing:** essential business continuity.
-- **Intermediate — paid:** connected operational control across the business.
-- **Advanced — paid:** the fullest operational picture, controls and guidance.
+Basic is a lasting foundation, not a crippled demo. It may have a smaller approved operational allowance, but reaching a limit must not disable existing records or prevent completion of existing work.
 
-The workspace's active entitlement determines the highest experience level available. Each member retains an individual presentation preference within that ceiling. The preference changes the detail and guidance Zazu surfaces; it does not grant a paid entitlement or change the member's role.
+### Intermediate — connected business operations
+Intermediate builds on Basic with broader operational capacity and connected control across suppliers, purchasing, receiving, inventory, assets, costing, profitability, operational reporting, team collaboration, permissions and broader device synchronisation where those capabilities are implemented and accepted.
 
-### Basic — essential business continuity
-Keep the day-to-day workspace clear and focused on customers, jobs, essential commercial work and the next action. This remains useful after a trial or paid entitlement expires.
+### Professional — advanced business control
+Professional builds on Intermediate for established and more complex operations, with intended capabilities such as multiple locations, consolidated oversight, advanced analytics, resource/capacity management, advanced team administration, automation, integrations and API access where securely implemented.
 
-### Intermediate — connected operational control
-Surface the operational flow across jobs, resources, purchasing, costs, suppliers and finance with more connected context and detail.
+The canonical capability allocation, safe capacity rules and implementation sequence are maintained in `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md`. The matrix is a product design baseline, not proof that every listed capability is currently implemented or approved for enforcement.
 
-### Advanced — full operational picture
-Surface the fullest operational picture, detailed controls, deeper search and more sophisticated guidance.
+### Trial and entitlement continuity
+- The existing eligible-workspace 30-day trial and Basic fallback remain unchanged.
+- The existing internal `advanced` plan identifier remains a compatibility mapping for the customer-facing Professional level.
+- Expired, revoked, not-yet-active or unsupported entitlements resolve to Basic continuity.
+- Trial expiry never silently starts billing.
+- Expiry or downgrade never locks the workspace, deletes data or withholds customer-owned records solely because payment ended.
+- Existing work and durable offline queue entries must remain safe through downgrade and reconnect.
 
-These descriptions establish a coherent progression in operational sophistication. They do **not** define a final module-by-module feature matrix, user/storage quotas or numerical restrictions. Those commercial boundaries require explicit owner approval before any application feature or customer-data workflow is gated.
+**Critical separation:** commercial entitlement determines the available capability ceiling. Presentation preference controls surfaced detail and guidance. Roles and permissions determine which actions and records a person may access. None substitutes for another.
 
-### Trial and entitlement rules
-
-- An eligible new workspace receives a **30-day Advanced trial**, measured from the workspace creation timestamp.
-- At the exact trial-expiry timestamp, the effective tier becomes **Basic Free**, unless an active signed Intermediate or Advanced entitlement is installed.
-- An active Intermediate entitlement permits Basic and Intermediate experience levels. An active Advanced entitlement permits all three.
-- Expired, revoked, not-yet-active or unsupported entitlements resolve to Basic. A recorded licence prevents a second trial from starting.
-- Trial expiry never silently starts paid billing.
-- Expiry or revocation never locks the workspace, deletes data or withholds customer-owned records solely because payment ended.
-- The legacy signed plan identifier `solo` remains an Advanced compatibility alias; new tokens use `basic`, `intermediate` or `advanced`.
-
-**Critical distinction:** commercial tier determines the maximum selectable experience and, once approved, the paid entitlement boundary. The experience preference controls presentation within that tier. Roles and permissions continue to determine which actions and records a person may access. The tier ceiling is not a substitute for authorization.
- 
 ## 5. Onboarding
 
 Onboarding is a core capability.
@@ -337,7 +332,7 @@ V1 must provide a reliable, coherent operational foundation covering:
 - Registration
 - Onboarding
 - Business setup
-- Basic / Intermediate / Advanced experience levels
+- Basic / Intermediate / Professional capability levels
 - Users and permissions
 - Clients
 - Events
@@ -384,7 +379,7 @@ V1 is ready when:
 - The accepted V1 event lifecycle works coherently end-to-end across its supported capabilities.
 - The application feels like one professional product.
 - Basic users are not overwhelmed.
-- Advanced users can access necessary operational depth.
+- Professional users can access necessary operational depth.
 - Critical workflows work properly on mobile.
 - Complex operational, administrative and financial workflows work properly on desktop.
 - Domain boundaries are clear.
