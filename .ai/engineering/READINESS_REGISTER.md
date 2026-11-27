@@ -374,7 +374,7 @@ Founder clarification: the DB-001 occurrence under discussion happened while tes
 - No score uplift; release remains NOT READY.
 ## Documentation and commercial decisions
 - Offline work is ACTIVE/RESUMED; stale pause notes are historical and archived.
-- Tier conflict remains OWNER-DECISION: product-specification/operating-profile describe three tiers (Basic Free, Intermediate, Advanced), while commercial requirements specify four paid prices (R299, R499, R799, R1,299). No tier or price decision inferred.
+- Tier naming and capability direction are resolved by DEC-030: Basic, Intermediate and Professional. The four-tier price tables are historical hypotheses only. No prices or numerical capacity limits are approved. The capability design baseline is `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md`; enforcement remains out of scope until each boundary and downgrade behaviour is approved.
 - Root ROSCORE_PROJECT_MANIFEST.md is canonical; docs/ROSCOR_PROJECT_MANIFEST.md is a legacy pointer.
 - Prior long-form state/register/memory, checklist and changelog are preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.
 
