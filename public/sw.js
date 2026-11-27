@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v68';
+const CACHE_NAME = 'zazu-static-v69';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -414,6 +414,8 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
             // Export actions return files, not navigable HTML workspace pages.
             // Keep /exports (the export centre) cacheable, but never discover its downloads.
             || route.pathname.startsWith('/exports/')
+            // Signed customer-facing documents are time-limited public links, not offline workspace pages.
+            || /^\/(?:quotes\/[^/]+\/view|invoices\/[^/]+\/view|payments\/[^/]+\/receipt)$/.test(route.pathname)
             || ['/', '/login', '/register', '/privacy', '/terms', '/logout', '/business/switch', '/up']
                 .includes(route.pathname)
             || route.pathname.startsWith('/forgot-password')
