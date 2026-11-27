@@ -6,7 +6,10 @@
 - Removed the cold-launch Dashboard preference. Every navigation now prefers the exact URL from the active user/business cache; Dashboard is used only when the requested route is not cached. The configured installed-app start URL remains Dashboard, while cached deep links preserve their destination.
 - Added worker and Laravel feature assertions for exact-route selection on both cold launch and in-app navigation, plus safe Dashboard fallback for uncached routes. Browser acceptance now uses real same-tab anchor clicks rather than `page.goto()` to model user navigation.
 - The referrer-based run passed Laravel, coverage, PostgreSQL and Zazu Quality, but browser acceptance remained 78 passed / 2 failed. The actual-anchor test correction reproduced both failures, confirming the worker fallback policy—not merely the test fixture—was at fault.
-- Current exact-route correction is committed across worker `2332115`, worker tests `880b6b6`, feature contract `c90f256`, route-click acceptance `1e87892`, customer edit acceptance `d6d0ee3`, and application comment `b6c7d1c`. Exact-head CI is pending; no pass is claimed.
+- The exact-route worker run then reached 79 passed / 1 failed: a cached Work detail route loaded correctly, but the offline workspace shell was absent because its markup existed only in the Dashboard view.
+- Extracted the offline workspace into `resources/views/components/offline-workspace.blade.php` and mounted it from the authenticated application layout for every active business. Its navigation continues to use the current business's permission checks; Dashboard no longer owns the offline workspace shell.
+- Shared-shell correction commits: partial `de8b334`, Dashboard extraction `f2fe975`, layout mount `6f62622`, feature contract `df32c6e`, assertion fixes `47bf2e6`, `9044bf9` and `13c8e38`. Exact-head Laravel, browser and Windows checks are pending; no pass is claimed.
+- Earlier exact-route worker commits: `2332115`, worker tests `880b6b6`, feature contract `c90f256`, route-click acceptance `1e87892`, customer edit acceptance `d6d0ee3`, and application comment `b6c7d1c`.
 - Corrected the cross-tab identity E2E fixture to accept the intentional logout confirmation dialog. The previous test auto-dismissed it and therefore never exercised the logout transition.
 
 
