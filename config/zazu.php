@@ -86,8 +86,8 @@ return [
             'description' => 'Surface the operational flow across jobs, resources, purchasing, costs and finance.',
         ],
         'advanced' => [
-            'label' => 'Advanced',
-            'description' => 'Expose the full operational picture, controls, deeper search and more detailed guidance.',
+            'label' => 'Professional',
+            'description' => 'Support complex operations with advanced controls, deeper insight and consolidated oversight.',
         ],
     ],
 
