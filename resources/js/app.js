@@ -3325,64 +3325,6 @@ function setupZazuOfflineDirectoryViews() {
         });
     };
 
-    const renderOfflineOverview = (state) => {
-        const workspace = document.querySelector('[data-zazu-offline-workspace]');
-        const allowedViews = new Set(
-            [...(workspace?.querySelectorAll('[data-zazu-offline-view]') || [])]
-                .map(section => section.dataset.zazuOfflineView)
-        );
-        const collections = [
-            ['customers', 'Customers', 'customers'],
-            ['jobs', 'Jobs', 'jobs'],
-            ['quotes', 'Quotes', 'quotes'],
-            ['suppliers', 'Suppliers', 'suppliers'],
-            ['purchase_orders', 'Purchasing', 'purchase_orders'],
-            ['inventory_items', 'Inventory', 'inventory_items'],
-            ['assets', 'Assets', 'assets'],
-            ['invoices', 'Invoices', 'invoices'],
-            ['expenses', 'Expenses', 'expenses'],
-            ['costs', 'Event costs', 'costs'],
-        ].filter(([, , view]) => allowedViews.has(view));
-        const total = collections.reduce((sum, [key]) => sum + (Array.isArray(state?.[key]) ? state[key].length : 0), 0);
-        const pending = collections.reduce((sum, [key]) => sum + (Array.isArray(state?.[key]) ? state[key].filter(record => record?.pending_sync === true || !(record?.server_id ?? record?.id)).length : 0), 0);
-        const viewByEntityType = {
-            customer: 'customers',
-            job: 'jobs',
-            quote: 'quotes',
-            supplier: 'suppliers',
-            purchase_order: 'purchase_orders',
-            inventory_item: 'inventory_items',
-            asset: 'assets',
-            invoice: 'invoices',
-            expense: 'expenses',
-            event_cost: 'costs',
-        };
-        const conflicts = (state?.conflicts || []).filter(conflict =>
-            conflict?.status === 'open' && allowedViews.has(viewByEntityType[conflict?.entity_type])
-        ).length;
-        const values = {
-            records: total,
-            pending,
-            conflicts,
-            customers: Array.isArray(state?.customers) ? state.customers.length : 0,
-            jobs: Array.isArray(state?.jobs) ? state.jobs.length : 0,
-            quotes: Array.isArray(state?.quotes) ? state.quotes.length : 0,
-        };
-        Object.entries(values).forEach(([key, value]) => {
-            document.querySelectorAll('[data-zazu-offline-overview-count="' + key + '"]').forEach(node => {
-                node.textContent = String(value);
-            });
-        });
-        const status = document.querySelector('[data-zazu-offline-overview-status]');
-        if (status) {
-            status.textContent = conflicts > 0
-                ? conflicts + ' change' + (conflicts === 1 ? '' : 's') + ' need review'
-                : pending > 0
-                    ? pending + ' change' + (pending === 1 ? '' : 's') + ' waiting to sync'
-                    : 'Your saved workspace is ready on this device';
-        }
-    };
-
     const formatOfflineStorageBytes = (bytes) => {
         if (!Number.isFinite(bytes) || bytes < 0) return null;
         if (bytes < 1024) return Math.round(bytes) + ' B';
@@ -3494,9 +3436,8 @@ function setupZazuOfflineDirectoryViews() {
         renderQuotes(state);
         renderOfflineCatalogue(state);
         renderOfflineCollections(state);
-        renderOfflineOverview(state);
         renderOfflineStorageProtection().catch(() => {});
-        refreshOfflineWorkspaceVisibility(state);
+        refreshOfflineApplicationState();
         refreshLocalAttachmentLists();
     };
 
@@ -3512,16 +3453,8 @@ function setupZazuOfflineDirectoryViews() {
     // One shared origin state prevents overlapping health probes from
     // racing and hiding the local workspace after a newer offline transition.
     let lastOriginAvailable = navigator.onLine;
-    const refreshOfflineWorkspaceVisibility = (state) => {
-        const workspace = document.querySelector('[data-zazu-offline-workspace]');
-        if (!workspace?.isConnected) return lastOriginAvailable;
-
-        // The legacy collection workspace is retained temporarily as a local
-        // data adapter while normal page components are migrated. It is never
-        // a user-facing replacement for the application.
-        workspace.hidden = true;
+    const refreshOfflineApplicationState = () => {
         applyOfflineRouteView();
-
         return lastOriginAvailable;
     };
 
@@ -3531,9 +3464,6 @@ function setupZazuOfflineDirectoryViews() {
         const isFallbackDocument = document.querySelector(
             'meta[name="zazu-offline-fallback"][content="1"]'
         ) !== null;
-        const workspace = document.querySelector('[data-zazu-offline-workspace]');
-        if (workspace) workspace.hidden = true;
-
         const content = document.querySelector('.zazu-content');
         const existingFallback = content?.querySelector('[data-zazu-offline-route-unavailable]');
 
@@ -3588,7 +3518,7 @@ function setupZazuOfflineDirectoryViews() {
 
         // The service worker served the cached Dashboard document only as a
         // transport fallback. Do not misrepresent its Dashboard widgets as the
-        // requested page, and do not expose the legacy collection workspace.
+        // requested page or show data from the fallback Dashboard.
         content.querySelectorAll(':scope > :not([data-zazu-offline-route-unavailable])')
             .forEach(section => { section.hidden = true; });
         fallback.hidden = false;
