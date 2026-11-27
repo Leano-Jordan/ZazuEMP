@@ -4935,8 +4935,6 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await page.goto(workUrl, { waitUntil: 'domcontentloaded' });
         await expect(page).toHaveURL(new URL(workUrl, page.url()).href);
-        const cachedWorkTitle = await page.locator('.zazu-page-title').textContent();
-        expect(cachedWorkTitle?.trim()).toBeTruthy();
         await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
         await expect.poll(() => page.evaluate(async (path) => {
             for (const name of await caches.keys()) {
@@ -4951,8 +4949,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         await coldLaunch.goto(new URL(workUrl, page.url()).href, { waitUntil: 'domcontentloaded' });
         // A cold launch on a cached Work deep link must keep that exact route.
         await expect(coldLaunch).toHaveURL(new URL(workUrl, page.url()).href);
-        await expect(coldLaunch.locator('.zazu-page-title')).toHaveText(cachedWorkTitle);
-        await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeVisible();
+        await expect(coldLaunch.locator('.zazu-page-title')).toHaveText('Jobs');
+        const offlineWorkspace = coldLaunch.locator('[data-zazu-offline-workspace]');
+        await expect(offlineWorkspace).toBeVisible();
+        await expect(offlineWorkspace).toHaveAttribute('data-zazu-offline-active-view', 'jobs');
 
     });
 
