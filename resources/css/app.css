@@ -8760,12 +8760,7 @@ body.zazu-has-wallpaper .zazu-content {
 }
 
 
-/* Offline mode is a deliberate workspace state, not an online dashboard overlay. */
-.zazu-offline-mode .zazu-command-search,
-.zazu-offline-mode .zazu-section-tabs {
-    display: none !important;
-}
-.zazu-offline-overview {
+/* Offline mode preserves the normal application navigation and command tools. */.zazu-offline-overview {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     align-items: stretch;
 }
