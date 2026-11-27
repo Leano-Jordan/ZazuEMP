@@ -10,7 +10,7 @@
         <div class="zazu-command-meta"><div class="zazu-command-meta-label">Ready</div><div class="zazu-command-meta-value">{{ $items->where('status', 'ready')->count() }}/{{ $items->count() }}</div></div>
     </section>
 
-    <section class="zazu-card zazu-list">
+    <section class="zazu-card zazu-list" data-zazu-offline-collection="preparations" data-zazu-offline-collection-list>
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Readiness records</div>
             <div class="zazu-section-heading"><div><div class="zazu-card-title mt-1">Preparation list</div></div><a href="{{ route('work.preparation.create', $event) }}" class="zazu-btn zazu-btn-primary">Add preparation item</a></div>
@@ -24,7 +24,7 @@
             </div>
         @endif
         @forelse ($items as $item)
-            <div class="zazu-list-item">
+            <div class="zazu-list-item" data-zazu-server-record-id="{{ $item->id }}">
                 <div class="zazu-list-main">
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="zazu-list-title">{{ $item->title }}</span>
@@ -40,7 +40,7 @@
                 <div class="zazu-list-side"><div class="zazu-side-primary">{{ $item->due_date?->format('d M Y') ?? 'No due date' }}</div></div>
                 <div class="zazu-action-group">
                     @foreach (['open' => 'Open', 'blocked' => 'Blocked', 'ready' => 'Ready'] as $status => $label)
-                        <form method="POST" action="{{ route('work.preparation.status', [$event, $item]) }}">
+                        <form method="POST" action="{{ route('work.preparation.status', [$event, $item]) }}" data-zazu-offline-entity="preparation" data-zazu-offline-job-id="{{ $event->id }}" data-zazu-offline-server-id="{{ $item->id }}">
                             @csrf @method('PATCH')
                             <button name="status" value="{{ $status }}" class="zazu-btn {{ $item->status === $status ? 'zazu-btn-secondary' : 'zazu-btn-ghost' }}">{{ $label }}</button>
                         </form>
