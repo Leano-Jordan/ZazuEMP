@@ -383,6 +383,10 @@
                 @endif
 
                 {{ $slot }}
+
+                @if($business)
+                    @include('components.offline-workspace')
+                @endif
             </div>
 
             <footer class="zazu-app-footer {{ $isOwner ? 'has-system-links' : 'without-system-links' }}">
