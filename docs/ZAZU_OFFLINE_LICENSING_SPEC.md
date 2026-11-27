@@ -132,13 +132,13 @@ The current implementation has advanced beyond the original stage list above. Tr
 - **Automated regression coverage present:** valid offline import, expired and revoked states, signature tampering, cross-business rejection, missing-key fail-closed behaviour, strict timestamps/calendar dates, rollback prevention and owner authorization.
 - **Not implemented / not certified:** production issuer and private-key custody; installation identity and reactivation; application-wide plan/feature enforcement; storage/user limits; and end-to-end production licence lifecycle.
 - **Important boundary:** the presence of a signed entitlement record and BusinessLicense::isActive() does not itself enforce commercial access. Current route declarations continue to use role/permission middleware; no global entitlement gate was evidenced in the inspected route group. Do not add a blanket “no licence = blocked” middleware: that would risk locking existing workspaces and conflicts with the agreed Basic Free fallback and 30-day trial model.
-- **Commercial dependency:** enforceable entitlements require an owner-approved Basic/Advanced feature matrix and exact downgrade behaviour. The current commercial profile describes limits as proposed, not final. Until those rules are approved, implementation must not invent limits or silently disable customer data/workflows.
+- **Commercial dependency:** enforceable entitlements require an Founder-approved Basic/Intermediate/Professional capability matrix and exact downgrade behaviour. The current commercial profile describes limits as proposed, not final. Until those rules are approved, implementation must not invent limits or silently disable customer data/workflows.
 - **Production key custody:** never generate or commit a real issuer private key in this repository. Production signing must be performed in a separate controlled issuer environment with protected backup and documented recovery/rotation. The app receives only the public key.
 
 ### Next safe engineering sequence
 
 1. Keep exact-head CI green and finish the current browser smoke workflow.
-2. Reconcile and approve the Basic/Advanced entitlement matrix, including the existing 30-day trial → Basic Free downgrade and data-preservation rules.
+2. Map the Basic/Intermediate/Professional capability matrix to source and tests; preserve the existing 30-day trial → Basic continuity and data-preservation rules.
 3. Implement a central, testable entitlement evaluator and apply it only to explicitly premium capabilities after the matrix is approved. Core local business data access must remain available in Basic Free and offline.
 4. Add adversarial tests for downgrade, expired/revoked tokens, direct-route bypass, queued offline mutations and preservation/export of customer data.
 5. Build the issuer separately from the customer app; complete installation identity/reactivation and key-custody controls before claiming commercial enforcement.
@@ -148,14 +148,14 @@ No V1 readiness uplift is claimed by this documentation reconciliation. Release 
 
 ## Three-tier lifecycle alignment — 2026-11-13
 
-The owner has confirmed that the three experience levels are also the three commercial tiers. Their canonical identifiers are `basic`, `intermediate` and `advanced`, matching `config/zazu.php`.
+Historical note: the original customer-facing labels were Basic, Intermediate and Advanced. DEC-030 supersedes the third label with Professional. The stable internal identifiers remain `basic`, `intermediate` and `advanced`, matching `config/zazu.php`.
 
 - A signed active entitlement may carry one of those three plan identifiers.
-- A 30-day trial uses the Advanced tier and its signed expiry timestamp; when it expires, the effective commercial tier resolves to Basic Free.
+- A 30-day trial uses the Professional capability ceiling (internal identifier `advanced`) and its signed expiry timestamp; when it expires, the effective level resolves to Basic continuity.
 - An expired, not-yet-active, revoked, absent or unrecognised entitlement must resolve to Basic Free. It must never create a workspace lockout.
 - The tier resolver is a commercial-state decision, not permission to invent feature restrictions. Until the owner-approved capability matrix is implemented and tested, it must not disable routes or prevent reading, exporting or retaining customer-owned data.
 - The existing per-membership experience preference remains a presentation choice; it must not mint, upgrade or replace the signed business entitlement. The business entitlement is the commercial source of truth.
-- Intermediate and Advanced capability allocations and public prices remain unapproved. No limits or feature gates are inferred from the labels alone.
+- Intermediate and Professional capability allocation is defined in `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md`; numerical limits, pricing and enforcement boundaries remain unapproved. No limits or feature gates are inferred from the labels alone.
 
 
 
