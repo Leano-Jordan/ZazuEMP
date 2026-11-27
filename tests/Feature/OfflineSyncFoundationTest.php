@@ -2489,7 +2489,7 @@ class OfflineSyncFoundationTest extends TestCase
         // receiver bootstrap must union explicit delivery targets with that
         // bounded set rather than silently losing a pending change.
         for ($index = 1; $index <= 500; $index++) {
-            \\App\\Models\\Asset::create([
+            \App\Models\Asset::create([
                 'business_id' => $business->id,
                 'asset_tag' => 'BOOTSTRAP-RECENT-'.str_pad((string) $index, 3, '0', STR_PAD_LEFT),
                 'name' => 'Recent asset '.$index,
