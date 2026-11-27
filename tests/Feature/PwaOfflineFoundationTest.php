@@ -207,6 +207,24 @@ class PwaOfflineFoundationTest extends TestCase
     }
 
 
+    public function test_catalogue_renders_local_records_inside_its_native_tabs(): void
+    {
+        $view = File::get(resource_path('views/capabilities/index.blade.php'));
+        $app = File::get(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('data-zazu-offline-catalogue-tabs', $view);
+        $this->assertStringContainsString('data-zazu-offline-catalogue-register="equipment"', $view);
+        $this->assertStringContainsString('data-zazu-offline-catalogue-register="services"', $view);
+        $this->assertStringContainsString('data-zazu-server-record-id="{{ $capability->id }}"', $view);
+        $this->assertStringContainsString('data-zazu-catalogue-count="equipment"', $view);
+        $this->assertStringContainsString('data-zazu-catalogue-count="services"', $view);
+        $this->assertStringContainsString('const renderOfflineCatalogue = (state) => {', $app);
+        $this->assertStringContainsString("row.dataset.zazuLocalRecord = 'catalogue';", $app);
+        $this->assertStringContainsString("localSyncStatus(state, 'service'", $app);
+        $this->assertStringContainsString('renderOfflineCatalogue(state);', $app);
+        $this->assertStringNotContainsString('data-zazu-offline-collection="catalogue"', $view);
+    }
+
     public function test_offline_workspace_navigation_remains_available_in_offline_mode(): void
     {
         $styles = File::get(resource_path('css/app.css'));
