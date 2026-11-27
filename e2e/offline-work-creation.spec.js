@@ -763,7 +763,9 @@ test('an existing customer can be edited locally while disconnected and synced o
     const customerNavigationResponse = await customerNavigation;
     expect(customerNavigationResponse.ok()).toBe(true);
     await page.waitForURL(url => url.pathname === '/customers');
-    const cachedCustomerRow = page.locator('[data-zazu-local-record="customer"]').filter({ hasText: updatedName });
+    // This is an existing server-backed customer, so the cached server row
+    // is updated in place rather than duplicated as a local-only record.
+    const cachedCustomerRow = page.locator('[data-zazu-server-customer-id="' + customerId + '"]');
     await expect(cachedCustomerRow.locator('.zazu-list-title')).toHaveText(updatedName);
     await expect(cachedCustomerRow.locator('.zazu-list-meta')).toContainText('0123456789');
 
