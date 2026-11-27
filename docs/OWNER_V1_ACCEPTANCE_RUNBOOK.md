@@ -42,7 +42,7 @@ Phase 2 remains OPEN until exact-head CI passes and the Founder confirms the phy
 ## Before testing
 
 - Zazu must be reachable from both the PC and phone at the **same stable HTTPS origin**. A temporary LAN `http://` address is not sufficient for installed-PWA acceptance.
-- Sign in while connected and allow the dashboard plus the supported offline workspace to finish loading.
+- Sign in while connected and allow the normal application page set to finish priming. Check the page-priming status before disconnecting.
 - Confirm the device has been paired/authorised for sync and has completed an initial successful sync.
 - Keep the PC/server available for the connected preparation phase only.
 
