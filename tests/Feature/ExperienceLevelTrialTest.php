@@ -136,10 +136,10 @@ class ExperienceLevelTrialTest extends TestCase
                 'sync_device_id' => $device->id,
                 'entity_type' => 'event',
                 'entity_id' => 'local-job-before-expiry',
+                'status' => 'pending',
             ]);
         } finally {
             Carbon::setTestNow();
         }
     }
-
 }
