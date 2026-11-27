@@ -179,7 +179,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await target.put(request, response.clone())', $worker);
         $this->assertStringContainsString('uniqueRoutes.length >= MAX_PRIME_ROUTES', $worker);
         $this->assertStringContainsString('addRoute(match[1].replace(/&amp;/g,', $worker);
-        $this->assertStringContainsString('for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY)', $worker);
+        // Route discovery can append URLs while a batch is in flight, so advance by
+        // the actual batch size and keep processing until the expanded list is exhausted.
+        $this->assertStringContainsString('let offset = 0;\n        while (offset < uniqueRoutes.length)', $worker);
+        $this->assertStringContainsString('const batch = uniqueRoutes.slice(offset, offset + PRIME_CONCURRENCY);', $worker);
+        $this->assertStringContainsString('offset += batch.length;', $worker);
         $this->assertStringContainsString('function contextCacheName()', $worker);
         $this->assertStringContainsString("const ACTIVE_CONTEXT_STATE = new Request('/__zazu-active-context__');", $worker);
         $this->assertStringContainsString('data-zazu-user-id="(\\d+)"', $worker);
