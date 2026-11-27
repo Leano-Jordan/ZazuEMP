@@ -732,6 +732,9 @@ test.describe('Zazu installed PWA offline shell', () => {
             expect(response?.ok(), path + ' must render its exact cached application page').toBe(true);
             await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
             await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
+            if (path === '/capabilities') {
+                await page.getByRole('tab', { name: /Services & products/ }).click();
+            }
             await expect(page.locator(containerSelector + ' [data-zazu-local-record="' + collection + '"]').filter({ hasText: label })).toBeVisible();
         }
 
