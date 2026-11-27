@@ -355,6 +355,33 @@ test('page priming rejects cross-origin and API routes before making credentiale
     );
 });
 
+test('page priming caches same-origin canonical redirects under the requested route', async () => {
+    const worker = bootWorker(async (request) => {
+        const path = new URL(request.url).pathname;
+        const canonicalPath = path === '/quotes/1/view' ? '/quotes/1' : path;
+        return new MockResponse(
+            '<body data-zazu-user-id="41" data-zazu-business-id="17"><main>' + canonicalPath + '</main></body>',
+            {
+                redirected: path !== canonicalPath,
+                url: ORIGIN + canonicalPath,
+                headers: { 'content-type': 'text/html; charset=utf-8' },
+            },
+        );
+    });
+
+    const result = await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/quotes/1/view'],
+    });
+
+    assert.equal(result[0].success, true);
+    const cache = await worker.caches.open('zazu-static-v68-user-41-business-17');
+    assert.ok(await cache.match('/quotes/1/view'));
+    assert.equal(await cache.match('/quotes/1'), null);
+});
+
 test('page priming caches referenced private images before disconnected launch', async () => {
     let hostAvailable = true;
     const worker = bootWorker(async (request) => {
