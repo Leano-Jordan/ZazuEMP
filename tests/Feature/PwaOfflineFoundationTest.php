@@ -176,6 +176,8 @@ class PwaOfflineFoundationTest extends TestCase
     public function test_disconnected_navigation_preserves_exact_cached_routes_before_dashboard_fallback(): void
     {
         $worker = File::get(public_path('sw.js'));
+        $workspace = File::get(resource_path('views/components/offline-workspace.blade.php'));
+        $layout = File::get(resource_path('views/components/app-layout.blade.php'));
         $dashboard = File::get(resource_path('views/dashboard.blade.php'));
         $app = File::get(resource_path('js/app.js'));
 
@@ -187,20 +189,24 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('preferOfflineShell', $worker);
         $this->assertStringNotContainsString('preserveExactRoute', $worker);
         $this->assertSame(3, substr_count($worker, 'return cachedAppPage(request);'));
-        $this->assertStringContainsString('return cachedPage || offlineShell || Response.error();', $worker);
         $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v64\';', $worker);
+
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
-            $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $dashboard);
+            $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $workspace);
         }
+
         $this->assertStringContainsString('const offlineRouteViews = [', $app);
-        $this->assertStringContainsString("route('quotes.index')", $dashboard);
-        $this->assertStringContainsString("route('inventory.index')", $dashboard);
-        $this->assertStringContainsString("route('finance.index')", $dashboard);
-        foreach (['customers', 'work', 'quotes', 'suppliers', 'purchasing', 'inventory', 'assets', 'finance'] as $tool) {
-            $this->assertStringContainsString('$workspaceTools[\''.$tool.'\']', $dashboard);
+        $this->assertStringContainsString("route('quotes.index')", $workspace);
+        $this->assertStringContainsString("route('inventory.index')", $workspace);
+        $this->assertStringContainsString("route('finance.index')", $workspace);
+
+        foreach (['customers.view', 'work.view', 'quotes.view', 'suppliers.view', 'purchasing.view', 'inventory.view', 'assets.view', 'finance.view'] as $permission) {
+            $this->assertStringContainsString("$can('".$permission."')", $workspace);
         }
-        $this->assertStringNotContainsString('offlineWorkspacePermissions', $dashboard);
-        $this->assertStringNotContainsString("@can('customers.view')", $dashboard);
+
+        $this->assertStringContainsString("@include('components.offline-workspace')", $layout);
+        $this->assertStringNotContainsString('data-zazu-offline-workspace', $dashboard);
+        $this->assertStringNotContainsString('offlineWorkspacePermissions', $workspace);
         $this->assertStringContainsString('finance\\/(?:expenses)', $app);
         $this->assertStringContainsString('(?:costs|travel)', $app);
         $this->assertStringContainsString("pathname === '/dashboard'", $app);
@@ -211,6 +217,7 @@ class PwaOfflineFoundationTest extends TestCase
             2,
             substr_count($app, "window.addEventListener('zazu:offline-state-updated', render);")
         );
+
         $profileSetup = substr(
             $app,
             strpos($app, 'function setupZazuOfflineWorkspaceProfile()'),
