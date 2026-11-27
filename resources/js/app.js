@@ -3212,11 +3212,10 @@ function setupZazuOfflineDirectoryViews() {
         return lastOriginAvailable;
     };
 
-    // The service worker deliberately returns the cached dashboard shell for
-    // cold launches and unavailable-host navigations. Keep the requested URL,
-    // but render exactly one offline view for that route. Unsupported routes
-    // must never fall through to the dashboard with every local collection
-    // expanded underneath it.
+    // The service worker preserves the exact cached destination on both
+    // in-app navigation and cold launch, using Dashboard only when no exact
+    // authenticated route is available. Unsupported routes must never fall
+    // through to Dashboard with every local collection expanded underneath it.
     const offlineRouteViews = [
         [/^\/customers(?:\/|$)/, 'customers'],
         [/^\/work\/[^/]+\/(?:quotes)(?:\/|$)/, 'quotes'],
