@@ -203,6 +203,7 @@ jobs:
       APP_ENV: local
       DB_CONNECTION: sqlite
       DB_DATABASE: database/database.sqlite
+      ZAZU_TEST_TRUST_FORWARDED_IPS: 'true'
       # Isolate rate-limit state between E2E requests; auth throttling is covered by feature tests.
       CACHE_STORE: array
       ZAZU_SEED_DEMO: 'true'
