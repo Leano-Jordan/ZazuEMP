@@ -125,36 +125,18 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
-function shouldPreferOfflineShell(request, event) {
-    if (request.mode !== 'navigate') return false;
-
-    // Some browsers expose an empty clientId for every top-level navigation.
-    // A same-origin referrer identifies a route transition from the existing
-    // app; an absent/non-local referrer is a genuine cold launch.
-    if (event.clientId) return false;
-
-    const referrer = request.referrer;
-    if (!referrer || referrer === 'about:client') return true;
-
-    try {
-        const referrerUrl = new URL(referrer);
-        return referrerUrl.origin !== self.location.origin;
-    } catch {
-        return true;
-    }
-}
-
-async function cachedAppPage(request, preferShell = false) {
+async function cachedAppPage(request) {
     const cache = await dynamicCache();
     const cachedPage = cache ? await cache.match(new Request(request.url)) : null;
     const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;
 
-    // A restored Android tab can resume on a route whose cached HTML is only
-    // an old server snapshot. On a disconnected top-level launch, prefer the
-    // dashboard: it boots the local IndexedDB workspace and exposes the
-    // device-local directory/record panels instead of trapping the user on
-    // the last server-rendered page. Keep exact-route fallback for subrequests.
-    return (preferShell && offlineShell) || cachedPage || offlineShell || Response.error();
+    // Preserve navigation intent whenever the exact authenticated route is
+    // cached, including a cold launch that resumes on a supported route. The
+    // dashboard shell is only a safe fallback when that exact route is absent.
+    // Never replace a valid destination with Dashboard based on browser launch
+    // heuristics: FetchEvent client/referrer metadata is not consistent enough
+    // across installed mobile browsers to make that distinction safely.
+    return cachedPage || offlineShell || Response.error();
 }
 
 async function cacheRenderedPage(request, response, requestGeneration) {
@@ -585,7 +567,6 @@ self.addEventListener('fetch', (event) => {
     }
 
     const requestGeneration = activeUserGeneration;
-    const preferOfflineShell = shouldPreferOfflineShell(request, event);
     const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
     const isAppPage = request.method === 'GET'
         && url.origin === self.location.origin
@@ -598,7 +579,7 @@ self.addEventListener('fetch', (event) => {
             // attempting the unreachable Laravel host. Resolve the authenticated
             // page from its user/business cache immediately instead.
             if (self.navigator?.onLine === false) {
-                return cachedAppPage(request, preferOfflineShell);
+                return cachedAppPage(request);
             }
 
             try {
