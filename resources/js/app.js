@@ -4676,14 +4676,31 @@ function registerZazuServiceWorker() {
         // These are the two device-local creation routes currently supported
         // by the offline mutation queue. Prime them even when responsive navigation
         // or role-specific shortcuts do not expose links on the dashboard.
-        const routes = [...new Set([
+        const routes = new Set([
             '/dashboard',
             '/customers',
             '/work',
             '/customers/create',
             '/work/create',
             window.location.pathname,
-        ])];
+        ]);
+
+        // Prime every same-origin page the signed-in user can actually reach
+        // from the rendered application, not just the original five routes.
+        document.querySelectorAll('a[href]').forEach(anchor => {
+            try {
+                const url = new URL(anchor.href, window.location.origin);
+                if (url.origin !== window.location.origin
+                    || url.username || url.password
+                    || url.pathname === '/api' || url.pathname.startsWith('/api/')
+                    || ['/logout', '/business/switch'].includes(url.pathname)
+                    || /^\/(?:build|images|icons|media|storage)\//.test(url.pathname)
+                    || /\.[a-z0-9]{2,8}$/i.test(url.pathname)) return;
+                routes.add(url.pathname);
+            } catch {
+                // Ignore malformed or non-navigation links.
+            }
+        });
 
         const target = navigator.serviceWorker.controller || registration.active;
         if (!target) return;
@@ -4697,7 +4714,7 @@ function registerZazuServiceWorker() {
             }));
             channel.port1.close();
         };
-        target.postMessage({ type: 'prime-pages', userId, businessId, routes }, [channel.port2]);
+        target.postMessage({ type: 'prime-pages', userId, businessId, routes: [...routes].slice(0, 100) }, [channel.port2]);
     };
 
 
