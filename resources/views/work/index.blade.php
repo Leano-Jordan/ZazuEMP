@@ -85,7 +85,9 @@
                     <span><span class="zazu-chip {{ $statusClass }}"><x-icon name="{{ $statusIcon }}" size="14" class="mr-1" />{{ $statusLabel }}</span></span>
                 </button>
                 <div class="zazu-ops-actions">
-                    <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost"><x-icon name="pencil" size="15" class="mr-1" />Edit</a>
+                    @unless ($event->isClosed())
+                        <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost"><x-icon name="pencil" size="15" class="mr-1" />Edit</a>
+                    @endunless
                     <button type="button" class="zazu-btn zazu-btn-ghost" data-zazu-inspector-open><x-icon name="eye" size="15" class="mr-1" />View function sheet</button>
                     <form method="POST" action="{{ route('work.destroy', $event) }}" data-zazu-confirm="Remove this work from active operations? Historical records will be retained." data-zazu-confirm-title="Remove work?">
                         @csrf @method('DELETE')
