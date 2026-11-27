@@ -4043,7 +4043,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
             return Promise.all([prime(), prime(), prime()]);
         });
-        expect(primingResults.map(result => result?.success)).toEqual([true, true, true]);
+        expect(primingResults.map(result => result?.success), JSON.stringify(primingResults)).toEqual([true, true, true]);
         await expect.poll(() => page.evaluate(() => document.documentElement.dataset.zazuOfflinePagesPrimed || 'pending'), {
             timeout: 45_000,
         }).toBe('true');
