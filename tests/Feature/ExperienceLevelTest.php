@@ -34,7 +34,7 @@ class ExperienceLevelTest extends TestCase
             ->assertOk()
             ->assertSee('Basic')
             ->assertSee('Intermediate')
-            ->assertSee('Advanced');
+            ->assertSee('Professional');
 
         $this->put(route('preferences.experience.update'), [
             'experience_level' => 'advanced',
