@@ -12,9 +12,9 @@
 
 ## Offline shell route-isolation defect — 2026-11-24
 
-The Founder observed that host-loss navigation displayed the Dashboard together with all local collections. Source investigation found the Dashboard content is nested under `.zazu-content`; the previous code hid only elements incorrectly assumed to be direct children of `main#main-content`. Route selection also was not reapplied after local workspace update events.
+Historical observation: host-loss navigation once displayed the Dashboard together with all local collections. That secondary workspace architecture has since been removed. The current standard is exact cached native pages, with a connection-required state only when the requested route has no cached page.
 
-The correction hides all cached Dashboard slot content except the offline workspace itself, then shows only the collection matching the requested route. Unsupported routes show the explicit connection-required panel. On origin recovery, the cached content is restored. Browser acceptance must test actual service-worker fallback navigation for an unprimed supported route and an unsupported route, not only manipulate `history.replaceState`.
+The current implementation never hides native cached pages to reveal a collection workspace. Unsupported routes receive an explicit connection-required panel in the normal shell. Reconnect and retry must fetch the requested route. Browser acceptance must test actual service-worker fallback navigation for an unprimed supported route and an unsupported route, not only manipulate `history.replaceState`.
 
 **Retest rule:** do not repeat Phase 1. After exact-head CI passes, reconnect the phone to the existing HTTPS test origin, reload once online to receive the current release assets, then stop the PC host and Caddy while keeping Wi-Fi on. Verify Dashboard, Customers and one unprimed route such as Suppliers. Confirm the Dashboard hero/metrics/panels are absent on the Suppliers view. Open Calendar and confirm the connection-required panel appears without the Dashboard or unrelated collections. Preserve IndexedDB and all pending work.
 
