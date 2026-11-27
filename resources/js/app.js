@@ -3825,6 +3825,24 @@ function setupZazuOfflineEditForms() {
 }
 
 function setupZazuOfflineForms() {
+    document.querySelectorAll('form[data-zazu-online-only]').forEach((form) => {
+        if (form.dataset.zazuOnlineOnlyBound === '1') return;
+        form.dataset.zazuOnlineOnlyBound = '1';
+        form.addEventListener('submit', async (event) => {
+            if (navigator.onLine && await canReachZazuOrigin()) return;
+            event.preventDefault();
+            let notice = form.querySelector('[data-zazu-online-only-notice]');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.className = 'zazu-warning-note mb-4';
+                notice.setAttribute('role', 'alert');
+                notice.dataset.zazuOnlineOnlyNotice = '1';
+                form.prepend(notice);
+            }
+            notice.textContent = 'Travel calculations need a live connection and are not saved on this device yet. Keep this page open and reconnect before saving.';
+        });
+    });
+
     document.querySelectorAll('form[data-zazu-offline-entity]').forEach((form) => {
         if (form.dataset.zazuOfflineBound === '1') return;
         form.dataset.zazuOfflineBound = '1';
