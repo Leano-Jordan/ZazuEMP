@@ -339,7 +339,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('.zazu-page-title')).toHaveText('New customer');
         await expect(customerForm).toBeVisible();
         await expect(customerForm.locator('input[name="name"]')).toBeVisible();
-        await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
         if (onlineSearchVisible) {
             await expect(page.locator('.zazu-command-search')).toBeVisible();
         } else {
@@ -370,7 +370,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('.zazu-page-title')).toHaveText('New job');
         await expect(jobForm).toBeVisible();
         await expect(jobForm.locator('#customer_id')).toBeVisible();
-        await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
         await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
     });
 
@@ -731,7 +731,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
             expect(response?.ok(), path + ' must render its exact cached application page').toBe(true);
             await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
-            await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+            await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
             await expect(page.locator(containerSelector + ' [data-zazu-local-record="' + collection + '"]').filter({ hasText: label })).toBeVisible();
         }
 
@@ -757,7 +757,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const fallbackResponse = await page.goto('/work/730001/costs', { waitUntil: 'domcontentloaded' });
         expect(fallbackResponse?.ok()).toBe(true);
         await expect(page.locator('meta[name="zazu-offline-fallback"][content="1"]')).toHaveCount(1);
-        await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
         await expect(page.locator('[data-zazu-offline-route-unavailable]')).toBeVisible();
         await expect(page.locator('[data-zazu-requested-offline-path]')).toHaveText('/work/730001/costs');
         await expect(page.locator('.zazu-nav-link:visible').first()).toBeVisible();
@@ -4946,7 +4946,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(coldLaunch).toHaveURL(new URL(workUrl, page.url()).href);
         await expect(coldLaunch.locator('body')).toHaveClass(/zazu-offline-mode/);
         await expect(coldLaunch.locator('.zazu-page-title')).toHaveText(expectedWorkPageTitle);
-        await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toHaveCount(0);
         await expect(coldLaunch.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
         await expect(coldLaunch.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
         await expect(coldLaunch.locator('[data-zazu-offline-attachment-form] input[type="file"]')).toBeVisible();
