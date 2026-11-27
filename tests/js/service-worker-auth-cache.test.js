@@ -1113,7 +1113,7 @@ test('a hanging host with Wi-Fi still connected preserves the cached in-app dest
 });
 
 
-test('cold offline app launch prefers the local dashboard while in-app Work navigation preserves cached detail', async () => {
+test('cold launches and in-app navigation both preserve an exact cached destination before using the dashboard fallback', async () => {
     const worker = bootWorker(async () => { throw new Error('Host unavailable.'); });
     const staticCache = await worker.caches.open('zazu-static-v64');
     await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({
@@ -1124,17 +1124,18 @@ test('cold offline app launch prefers the local dashboard while in-app Work navi
     await businessCache.put('/dashboard', new MockResponse('<main>Offline dashboard</main>'));
     await businessCache.put('/work/42', new MockResponse('<main>Offline Work detail with attachments</main>'));
 
+    // A genuine cold launch on a cached deep link must not be redirected to
+    // Dashboard merely because the browser supplied no initiating client.
     const coldLaunch = worker.dispatchFetch(new worker.Request('/work/42', {
         method: 'GET',
         mode: 'navigate',
         headers: { accept: 'text/html' },
     }), '');
     const coldResponse = await coldLaunch.response;
-    assert.equal(await coldResponse.text(), '<main>Offline dashboard</main>');
+    assert.equal(await coldResponse.text(), '<main>Offline Work detail with attachments</main>');
     await coldLaunch.finished();
 
-    // Browser navigation requests can have an empty clientId; a same-origin
-    // referrer still distinguishes a real in-app route transition from a launch.
+    // The same exact-route contract applies to in-app navigation.
     const inAppNavigation = worker.dispatchFetch(new worker.Request('/work/42', {
         method: 'GET',
         mode: 'navigate',
@@ -1144,4 +1145,13 @@ test('cold offline app launch prefers the local dashboard while in-app Work navi
     const inAppResponse = await inAppNavigation.response;
     assert.equal(await inAppResponse.text(), '<main>Offline Work detail with attachments</main>');
     await inAppNavigation.finished();
+
+    const uncachedColdLaunch = worker.dispatchFetch(new worker.Request('/work/99', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }), '');
+    const fallbackResponse = await uncachedColdLaunch.response;
+    assert.equal(await fallbackResponse.text(), '<main>Offline dashboard</main>');
+    await uncachedColdLaunch.finished();
 });
