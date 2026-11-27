@@ -330,9 +330,9 @@
         @endif
 
         <div class="zazu-panel mt-4 p-4">
-            <strong>Current workspace tier: {{ ucfirst($currentTier) }}</strong>
+            <strong>Current workspace tier: {{ config('zazu.experience_levels.'.$currentTier.'.label', ucfirst($currentTier)) }}</strong>
             @if ($isTrial)
-                <p class="zazu-field-help mt-1">Advanced trial ends {{ $trialEndsAt?->format('d M Y H:i') }}. At expiry, the workspace continues on Basic Free unless an active paid entitlement is installed. No payment starts automatically.</p>
+                <p class="zazu-field-help mt-1">Professional trial ends {{ $trialEndsAt?->format('d M Y H:i') }}. At expiry, the workspace continues on Basic Free unless an active paid entitlement is installed. No payment starts automatically.</p>
             @elseif ($currentTier === 'basic')
                 <p class="zazu-field-help mt-1">Basic Free keeps the workspace available and preserves access to existing business records.</p>
             @else
