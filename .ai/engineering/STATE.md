@@ -410,3 +410,11 @@ At the first observed checkpoint for `e896917`: PHPMD passed, Director Health pa
 - Latest source fix: `0f8447b` asset bootstrap delivery-key correction. Latest test changes: `54177fd`/`dc761af` trial-expiry server reconnect and `c2987a5`/`ae02b53`/`b30de1b` asset delivery bootstrap regression. Latest docs/state records are being updated on main.
 - Do not report CI as failed or passed based on these empty responses. It is **UNVERIFIED through this connector**. The workflow trigger contract means Laravel/PG/offline-browser and PHPMD/Psalm should be queued by the test/source pushes; their real run results still need to be read in GitHub Actions.
 - No branches created. No Render/AMPPS. No tier restrictions or quotas.
+
+## Jarvis execution update — 2026-11-27 — asset fallback and >500 regression
+
+- Rechecked Leano-Jordan/ZazuEMP main and corrected two remaining resolver contract defects: expectedModel('asset') now returns Asset::class; appendTarget('asset') now writes the literal asset key expected by the bootstrap builder.
+- Expanded the asset regression to create 500 newer assets and make the delivered asset older than the default window. The expected snapshot is 501 assets: newest 500 plus the explicitly delivered older record.
+- Commits: source f7d9e89c27a33309ee76a61d24b847d8bc748100; test 772188194293ae100b0a40174d94ef0efb99d4a9; test namespace correction 3274b7bb381aa40f87b718db7b0cac70d33bc23e.
+- Current combined status returned no entries; connected workflow lookup returned no PR-triggered runs. Push-triggered Laravel, PostgreSQL, offline-browser, PHPMD and Psalm results remain UNVERIFIED, not failed and not passed. No PHP test command was executed in this environment.
+- Remaining: inspect other resolver/builder mappings and nested aggregate relationships; then secure actual exact-head Actions evidence and continue browser IndexedDB/restart/physical PC+Android acceptance. No commercial quotas or tier gates added.
