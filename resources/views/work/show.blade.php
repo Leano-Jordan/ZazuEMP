@@ -2,7 +2,9 @@
     <x-slot:title>{{ $event->name }}</x-slot:title>
     <x-slot:heading>{{ $event->name }}</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-secondary">Edit job</a>
+        @unless ($event->isClosed())
+            <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-secondary">Edit job</a>
+        @endunless
         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">All jobs</a>
     </x-slot:headerAction>
 
