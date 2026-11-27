@@ -4847,10 +4847,6 @@ function registerZazuServiceWorker() {
         // or role-specific shortcuts do not expose links on the dashboard.
         const routes = new Set([
             '/dashboard',
-            '/customers',
-            '/work',
-            '/customers/create',
-            '/work/create',
             window.location.pathname,
         ]);
 
@@ -4904,7 +4900,7 @@ function registerZazuServiceWorker() {
         const title = document.createElement('strong');
         title.textContent = 'Offline workspace is not fully prepared.';
         const description = document.createElement('p');
-        description.textContent = 'Zazu could not cache the Customers and Work pages. Stay connected and reload before relying on this device offline.';
+        description.textContent = 'Zazu could not cache every page linked from this workspace. Stay connected and reload before relying on the full application offline.';
         notice.append(title, description);
         document.body.prepend(notice);
     });
