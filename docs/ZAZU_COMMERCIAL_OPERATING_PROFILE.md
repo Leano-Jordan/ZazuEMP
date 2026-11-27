@@ -27,7 +27,7 @@ The three capability levels are Basic, Intermediate and Professional. A business
 ### Basic — Free, ongoing
 The permanent continuity tier. It must remain useful for day-to-day work and preserve access to existing customer-owned records after a trial or paid subscription ends. No active-event, user, storage or other numerical cap is approved for enforcement yet.
 
-### Intermediate — paid
+### Intermediate
 The middle tier for businesses that need more connected operational control across jobs, resources, purchasing, costs, suppliers and finance. The price and exact included features/quotas are **not approved**. Do not publish a price or enforce a module restriction on the basis of this description alone.
 
 ### Professional
@@ -36,7 +36,7 @@ The highest capability level for complex operations, consolidated oversight, adv
 ### Commercial and engineering safeguards
 
 - A new eligible workspace receives a 30-day Professional trial from its creation timestamp.
-- At trial expiry, the effective tier becomes Basic Free unless an active signed Intermediate or Advanced entitlement is installed.
+- At trial expiry, the effective tier becomes Basic continuity unless an active higher-level entitlement is installed.
 - A valid Intermediate entitlement permits Basic and Intermediate capability levels; a valid Professional entitlement (internal identifier `advanced`) permits all three.
 - An expired, revoked, not-yet-active or unsupported entitlement resolves to Basic and does not restart a trial.
 - No silent paid conversion, workspace lockout, data deletion or withholding of customer-owned records because of expiry or non-payment.
@@ -45,14 +45,12 @@ The highest capability level for complex operations, consolidated oversight, adv
 - Do not advertise a module as a paid-tier entitlement until its access boundary and downgrade behaviour are implemented and verified.
 - Keep role-based permissions and business data isolation independent from commercial tier checks.
 
-## 3. Trial and billing recommendation
+## 3. Trial and commercialisation boundary
 
 - Trial duration: **30 days**.
-- Trial should not require a payment method unless the checkout flow clearly explains the billing transition and obtains valid consent.
-- Trial expiry automatically moves the workspace to Basic Free; it must not silently start a paid subscription.
-- Access to the purchased tier resumes after successful payment/renewal.
-- Recommended billing: monthly in advance, cancellable before the next billing date.
-- Pricing, checkout, billing cadence, cancellation and payment fees are outside the current tier-design scope and require a later explicit Founder decision.
+- The existing 30-day trial falls back to Basic continuity at expiry.
+- Trial expiry must not silently start billing.
+- Pricing, checkout, billing cadence, cancellation, payment methods and fees are outside the current capability-design scope and require a later explicit Founder decision.
 - No storage, media, uptime or support commitment is approved as part of a tier at this stage.
 
 ## 4. Deployment and hosting recommendation
@@ -121,7 +119,7 @@ These are operational defaults for legal/accounting review. They must be impleme
 
 ## 8. Decisions still required before public launch
 
-- Approve the complete Basic/Intermediate/Advanced feature matrix, including any event, team or storage limits, before implementing or publishing those restrictions. Earlier numeric proposals remain unapproved.
+- Map the Basic/Intermediate/Professional capability matrix to current source and tests. Obtain separate Founder approval for any numerical capacity limits or enforced restrictions.
 - Confirm VAT treatment, payment channel, billing terms and refund/cancellation flow.
 - Confirm final support hours and approved public contact details.
 - Confirm final hosting provider, region, data-processing terms and independent backup destination.
@@ -142,9 +140,9 @@ Last updated: 2026-11-10.
 
 ## Three-tier owner direction — 2026-11-13
 
-The commercial experience has three canonical tiers: **Basic**, **Intermediate** and **Advanced**. These map directly to the existing `basic`, `intermediate` and `advanced` experience-level identifiers. Basic is the permanent free continuity tier. The 30-day trial exposes Advanced and falls back to Basic Free at expiry. Intermediate is a genuine middle commercial tier, not merely a cosmetic preference.
+The current product has three customer-facing capability levels: **Basic**, **Intermediate** and **Professional**. These map to the existing `basic`, `intermediate` and `advanced` internal identifiers. Basic is the permanent continuity level. The 30-day trial exposes Professional and falls back to Basic at expiry. The levels represent genuine increases in operational capability, not cosmetic presentation modes.
 
-The exact Intermediate/Advanced feature allocation, quotas and public prices are not yet approved. The earlier two-tier packaging and suggestion to add a separate Team tier are superseded by this three-tier direction. Do not publish or enforce guessed feature limits. The confirmed R99/month figure remains an initial paid-subscription target only; it is not assigned to a specific tier by this note. Existing customer data and data export remain available regardless of tier or expiry.
+The capability allocation is recorded in `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md`. No prices, billing terms or numerical quotas are approved. Earlier R99 and multi-tier price suggestions are historical hypotheses only. Do not publish or enforce guessed feature limits. Existing customer data, active work and data export remain available regardless of tier or expiry.
 
 
 ## Founder decision update — 2026-11-26 (authoritative)
