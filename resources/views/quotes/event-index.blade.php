@@ -2,7 +2,9 @@
     <x-slot:title>Quotes · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Quotes</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.quotes.create', $event) }}" class="zazu-btn zazu-btn-primary">Create quote</a>
+        @if (!$event->isClosed() && !$quotes->contains('status', 'accepted'))
+            <a href="{{ route('work.quotes.create', $event) }}" class="zazu-btn zazu-btn-primary">Create quote</a>
+        @endif
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
@@ -48,7 +50,9 @@
             <div class="zazu-empty">
                 <div class="zazu-empty-title">No quotes for this work</div>
                 <p class="zazu-empty-copy">Create the first quote from the current requirement register.</p>
-                <a href="{{ route('work.quotes.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Create quote</a>
+                @if (!$event->isClosed() && !$quotes->contains('status', 'accepted'))
+                    <a href="{{ route('work.quotes.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Create quote</a>
+                @endif
             </div>
         @endforelse
     </section>
