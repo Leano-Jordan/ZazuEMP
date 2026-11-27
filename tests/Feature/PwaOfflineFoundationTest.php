@@ -236,6 +236,23 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('data-zazu-offline-collection="catalogue"', $view);
     }
 
+    public function test_preparation_register_and_status_controls_use_native_offline_records(): void
+    {
+        $view = File::get(resource_path('views/preparation/index.blade.php'));
+        $app = File::get(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('data-zazu-offline-collection="preparations"', $view);
+        $this->assertStringContainsString('data-zazu-server-record-id="{{ $item->id }}"', $view);
+        $this->assertStringContainsString('data-zazu-offline-entity="preparation"', $view);
+        $this->assertStringContainsString('data-zazu-offline-job-id="{{ $event->id }}"', $view);
+        $this->assertStringContainsString('data-zazu-offline-server-id="{{ $item->id }}"', $view);
+        $this->assertStringContainsString("preparations: {", $app);
+        $this->assertStringContainsString("collection === 'preparations'", $app);
+        $this->assertStringContainsString("payload.__operation = existing?.local_id ? 'update' : 'create';", $app);
+        $this->assertStringContainsString('This preparation item is not available in this device copy yet', $app);
+        $this->assertStringContainsString('setupZazuOfflineForms();', $app);
+    }
+
     public function test_application_navigation_remains_available_in_offline_mode(): void
     {
         $styles = File::get(resource_path('css/app.css'));
