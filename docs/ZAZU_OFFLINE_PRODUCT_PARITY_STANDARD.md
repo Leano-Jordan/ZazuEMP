@@ -206,7 +206,7 @@ Changes pushed to `main`:
 - `applyOfflineRouteView()` no longer classifies routes into replacement collection screens. Exact cached pages retain their native content; the legacy collection workspace is always hidden and is no longer a user-facing fallback.
 - The service worker returns exact cached pages unchanged. When the Dashboard document is used because the requested route is not cached, it injects `<meta name="zazu-offline-fallback" content="1">`; the client displays a connection-required state in the normal shell without showing Dashboard data as the requested page.
 - The offline stylesheet no longer hides command search or section tabs.
-- Cache version advanced to `zazu-static-v66` so installed clients receive the updated service worker.
+- Cache version advanced to `zazu-static-v68` so installed clients receive the updated service worker.
 - Added service-worker regression assertions for exact-page preservation and explicit fallback identity.
 - Replaced the previous route-workspace-only browser test with a desktop/mobile scenario covering cached customer-create and job-create pages, their titles, forms, navigation controls and layout geometry.
 - Page priming now starts from the user's real same-origin navigation links and recursively discovers linked pages from primed HTML, bounded to 100 routes and excluding APIs, session-changing endpoints, private media and static assets.
@@ -275,7 +275,7 @@ A first browser run after Iteration 1 showed that some older tests still expecte
 
 ## 13. Implementation update — 2026-11-27
 
-**Current source checkpoint before this documentation update:** `79e623083d8ddf6a0a3de6552ef41e7709948113` on `main`.  
+**Current source checkpoint before this documentation update:** `be05bb7ee02359caac256664d6177abe49976473` on `main`.  
 **Status:** implementation in progress; current-head CI is queued/pending; no offline parity acceptance claim.
 
 ### Iteration 1 correction
@@ -313,3 +313,14 @@ A first browser run after Iteration 1 showed that some older tests still expecte
 ### Acceptance boundary
 
 No automated green check by itself proves visual or functional parity. The current source changes remain unaccepted until the latest single commit passes Laravel, browser acceptance, PostgreSQL recovery, quality/security and Windows packaging. Owner-PC and Android physical host-loss, cold-launch, restart, local-work and reconnect tests remain open.
+
+## 14. Secondary interface removal and page-priming integrity — 2026-11-27
+
+- Deleted `resources/views/components/offline-workspace.blade.php` and removed its include from the authenticated application layout. No reduced offline collection interface is shipped in the DOM.
+- Removed the legacy offline overview renderer and workspace-specific runtime visibility controller. Origin-state refresh now updates the normal application shell directly.
+- Removed the unused workspace-specific responsive styling.
+- The native module renderers now operate against the normal page registers only. Supplier and Inventory local edits use their existing native inline editors; local catalogue records appear in the normal Services & Prices tabs.
+- Page-priming success now requires every discovered route to have a cached authenticated page. If either the client-side link list or service-worker recursive discovery exceeds the 100-route cap, the result is incomplete rather than a false "ready" state.
+- The browser suite was rewritten to use native Customers, Work, Quotes, Inventory, Suppliers, Finance, Settings and Catalogue pages. Uncached route tests now assert a connection-required state in the same shell.
+
+**Validation:** these changes are on `main`; exact-head Laravel, browser, quality/security and Windows package runs are queued/pending at this checkpoint. Do not treat the previous green baseline as validation of these new changes. Physical PC and Android acceptance remain open.
