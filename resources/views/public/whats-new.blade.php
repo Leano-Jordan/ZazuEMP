@@ -24,7 +24,7 @@
             <section class="update">
                 <time datetime="2026-11-25">25 November 2026 · Product foundation</time>
                 <h2>Clearer event-management identity and offline navigation</h2>
-                <p>Zazu's product definition was aligned around event management rather than a single service category. Offline workspace navigation and related regression coverage were also refined. Supported offline workflows remain narrower than the complete online application.</p>
+                <p>Zazu's product definition was aligned around event management rather than a single service category. Offline behaviour is being aligned with the normal application pages rather than a reduced secondary interface. Supported offline workflows remain narrower than the complete online application.</p>
             </section>
         </article>
         <aside>
