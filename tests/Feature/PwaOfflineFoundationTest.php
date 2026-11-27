@@ -186,7 +186,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('shouldPreferOfflineShell', $worker);
         $this->assertStringNotContainsString('preferOfflineShell', $worker);
         $this->assertStringNotContainsString('preserveExactRoute', $worker);
-        $this->assertSame(3, substr_count($worker, 'cachedAppPage(request)'));
+        $this->assertSame(3, substr_count($worker, 'return cachedAppPage(request);'));
         $this->assertStringContainsString('return cachedPage || offlineShell || Response.error();', $worker);
         $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v64\';', $worker);
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
