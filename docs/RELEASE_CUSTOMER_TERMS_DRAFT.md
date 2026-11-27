@@ -10,7 +10,9 @@
 
 > This draft records the intended commercial model. It is not a signed contract or legal opinion. The final terms must match the actual release, checkout flow, payment method and South African legal requirements.
 
-> **Withdrawal notice (2026-11-27):** This draft contains superseded pricing, tier names and quota proposals. It is retained for history only and is not an offer, operative terms, approved pricing or an implementation specification. The current product direction is Basic / Intermediate / Professional with no approved prices or numerical quotas. Rewrite this document only after the Founder separately approves a commercial model and the shipped capabilities are verified.\n\n## 1. Service and deployment
+> **Withdrawal notice (2026-11-27):** This draft contains superseded pricing, tier names and quota proposals. It is retained for history only and is not an offer, operative terms, approved pricing or an implementation specification. The current product direction is Basic / Intermediate / Professional with no approved prices or numerical quotas. Rewrite this document only after the Founder separately approves a commercial model and the shipped capabilities are verified.
+
+## 1. Service and deployment
 
 Zazu EMP is an event and catering/business-management application. The exact modules and features available are those described in the applicable product documentation and the customer's active subscription.
 
