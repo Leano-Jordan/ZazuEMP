@@ -10,8 +10,8 @@
 
 Zazu's current offline client is an installed-capable web application using a service worker, cached route/assets, IndexedDB business workspace, durable mutation queue and a trusted sync-device credential. It is not yet an independently hosted native desktop/mobile application.
 
-- **Host unavailable, Wi-Fi still connected:** the client must detect that the Zazu origin is unavailable, expose the cached offline workspace and avoid leaving the operator on a stale server snapshot.
-- **No network:** already-cached supported routes and device-local data can be read; supported forms can persist local mutations in IndexedDB.
+- **Host unavailable, Wi-Fi still connected:** the client must detect that the Zazu origin is unavailable, preserve the same cached application page and clearly indicate stale/offline state without switching to a secondary interface.
+- **No network:** already-cached normal application routes and device-local data can be read; supported forms can persist local mutations in IndexedDB. Uncached routes must show a clear connection-required state in the same application shell.
 - **Reconnect:** queued mutations are pushed in ordered batches (maximum 100 per request), server acknowledgements reconcile canonical IDs/revisions, and the queue drains. A lost response/retry must not duplicate a business operation.
 - **Server-dependent collaboration:** other devices cannot receive live changes while the host is unavailable. They reconcile only after connectivity returns.
 - **Trust boundary:** offline mutation sync requires a business-matched, owner-approved device pairing. Revoked/replaced/expired credentials stop sync; they must not erase local business data or queued changes. Re-pairing is an owner-controlled recovery action.
