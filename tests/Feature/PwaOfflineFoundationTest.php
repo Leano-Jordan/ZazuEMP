@@ -182,14 +182,19 @@ class PwaOfflineFoundationTest extends TestCase
         $app = File::get(resource_path('js/app.js'));
 
         $this->assertStringContainsString('async function cachedAppPage(request)', $worker);
-        $this->assertStringContainsString('return cachedPage || offlineShell || Response.error();', $worker);
+        $this->assertStringContainsString('if (cachedPage) return cachedPage;', $worker);
+        $this->assertStringContainsString('return offlineShell ? markOfflineFallback(offlineShell) : Response.error();', $worker);
+        $this->assertStringContainsString('zazu-offline-fallback', $worker);
+        $this->assertStringContainsString('const isFallbackDocument = document.querySelector(', $app);
+        $this->assertStringContainsString('currentPath === initialDocumentPath', $app);
+        $this->assertStringContainsString("workspace.dataset.zazuOfflineActiveView = 'native-page';", $app);
         $this->assertStringContainsString("request.mode === 'navigate' && response.redirected && response.url", $worker);
         $this->assertStringContainsString('Response.redirect(destination.href, 302)', $worker);
         $this->assertStringNotContainsString('shouldPreferOfflineShell', $worker);
         $this->assertStringNotContainsString('preferOfflineShell', $worker);
         $this->assertStringNotContainsString('preserveExactRoute', $worker);
         $this->assertSame(3, substr_count($worker, 'return cachedAppPage(request);'));
-        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v64\';', $worker);
+        $this->assertStringContainsString('const CACHE_NAME = \'zazu-static-v65\';', $worker);
 
         foreach (['customers', 'jobs', 'quotes', 'suppliers', 'catalogue', 'inventory_items', 'assets', 'purchase_orders', 'invoices', 'expenses', 'costs'] as $view) {
             $this->assertStringContainsString('data-zazu-offline-view="'.$view.'"', $workspace);
@@ -461,7 +466,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("route('settings.sync.pairing')", $settingsView);
         $this->assertStringNotContainsString('data-zazu-phone-pairing-submit', $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
-        $this->assertStringContainsString('zazu-static-v64', $worker);
+        $this->assertStringContainsString('zazu-static-v65', $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
