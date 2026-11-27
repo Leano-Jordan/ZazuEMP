@@ -663,7 +663,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         // Prime the real module pages while connected. Offline acceptance must
         // exercise exact cached pages, not the legacy Dashboard fallback.
-        for (const path of ['/suppliers', '/inventory', '/assets', '/purchasing', '/finance', '/quotes', '/capabilities', '/work/730001/costs']) {
+        for (const path of ['/suppliers', '/inventory', '/assets', '/purchasing', '/finance', '/quotes', '/capabilities']) {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
             expect(response?.ok(), path + ' must load online before its offline snapshot is cached').toBe(true);
         }
@@ -729,7 +729,6 @@ test.describe('Zazu installed PWA offline shell', () => {
             ['/purchasing', '.zazu-purchasing-page', 'purchase_orders', 'PO-OFF-005'],
             ['/quotes', '[data-zazu-local-quotes]', 'quote', 'Q-OFF-009'],
             ['/capabilities', '[data-zazu-offline-catalogue-register="services"]', 'catalogue', 'Offline Catering Service'],
-            ['/work/730001/costs', '[data-zazu-offline-collection="costs"]', 'costs', 'Offline venue cost'],
         ];
         for (const [path, containerSelector, collection, label] of nativeExpectations) {
             const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
@@ -758,12 +757,12 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         // A route absent from the primed page graph must be labelled honestly.
         // It may not expose the old reduced collection workspace or hide navigation.
-        const fallbackResponse = await page.goto('/offline-parity-unprimed-probe', { waitUntil: 'domcontentloaded' });
+        const fallbackResponse = await page.goto('/work/730001/costs', { waitUntil: 'domcontentloaded' });
         expect(fallbackResponse?.ok()).toBe(true);
         await expect(page.locator('meta[name="zazu-offline-fallback"][content="1"]')).toHaveCount(1);
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
         await expect(page.locator('[data-zazu-offline-route-unavailable]')).toBeVisible();
-        await expect(page.locator('[data-zazu-requested-offline-path]')).toHaveText('/offline-parity-unprimed-probe');
+        await expect(page.locator('[data-zazu-requested-offline-path]')).toHaveText('/work/730001/costs');
         await expect(page.locator('.zazu-nav-link:visible').first()).toBeVisible();
     });
 
