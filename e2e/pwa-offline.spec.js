@@ -4055,7 +4055,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 ['/work', 'Jobs'],
                 ['/work/create', 'New job'],
             ]) {
-                const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+                const response = await page.goto(path, { waitUntil: 'domcontentloaded', referer: page.url() });
                 expect(response?.ok(), path + ' must be available from the authenticated offline cache').toBe(true);
                 await expect(page.locator('.zazu-page-title')).toHaveText(heading);
                 await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
