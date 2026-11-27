@@ -387,7 +387,7 @@ test('page priming excludes signed public quote, invoice and payment documents',
 test('page priming caches same-origin canonical redirects under the requested route', async () => {
     const worker = bootWorker(async (request) => {
         const path = new URL(request.url).pathname;
-        const canonicalPath = path === '/quotes/1/view' ? '/quotes/1' : path;
+        const canonicalPath = path === '/work/1' ? '/work/1/details' : path;
         return new MockResponse(
             '<body data-zazu-user-id="41" data-zazu-business-id="17"><main>' + canonicalPath + '</main></body>',
             {
@@ -402,13 +402,13 @@ test('page priming caches same-origin canonical redirects under the requested ro
         type: 'prime-pages',
         userId: '41',
         businessId: '17',
-        routes: ['/dashboard', '/quotes/1/view'],
+        routes: ['/dashboard', '/work/1'],
     });
 
     assert.equal(result[0].success, true);
     const cache = await worker.caches.open('zazu-static-v69-user-41-business-17');
-    assert.ok(await cache.match('/quotes/1/view'));
-    assert.equal(await cache.match('/quotes/1'), null);
+    assert.ok(await cache.match('/work/1'));
+    assert.equal(await cache.match('/work/1/details'), null);
 });
 
 test('page priming caches referenced private images before disconnected launch', async () => {
