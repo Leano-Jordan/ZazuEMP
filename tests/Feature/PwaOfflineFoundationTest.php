@@ -208,6 +208,13 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("@include('components.offline-workspace')", $layout);
         $this->assertStringNotContainsString('data-zazu-offline-workspace', $dashboard);
         $this->assertStringNotContainsString('offlineWorkspacePermissions', $workspace);
+        foreach ([
+            'dashboard.view', 'customers.view', 'work.view', 'quotes.view',
+            'suppliers.view', 'capabilities.view', 'inventory.view', 'assets.view',
+            'purchasing.view', 'finance.view',
+        ] as $permission) {
+            $this->assertStringContainsString("@if(\$can('".$permission."'))", $workspace);
+        }
         $this->assertStringContainsString('finance\\/(?:expenses)', $app);
         $this->assertStringContainsString('(?:costs|travel)', $app);
         $this->assertStringContainsString("pathname === '/dashboard'", $app);
