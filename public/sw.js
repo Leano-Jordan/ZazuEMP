@@ -452,7 +452,10 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                     if (!response.ok) return;
                     const requestedUrl = new URL(path, self.location.origin);
                     const responseUrl = response.url ? new URL(response.url) : requestedUrl;
-                    if (responseUrl.origin !== self.location.origin || responseUrl.pathname !== requestedUrl.pathname) return;
+                    // Same-origin redirects are normal route guards/canonicalisation. Cache the final HTML
+                    // under the requested URL, matching the page the browser would render online.
+                    // Public login redirects remain excluded by the authenticated context markers below.
+                    if (responseUrl.origin !== self.location.origin) return;
                     const contentType = response.headers.get('content-type') || '';
                     if (!contentType.includes('text/html')) return;
 
