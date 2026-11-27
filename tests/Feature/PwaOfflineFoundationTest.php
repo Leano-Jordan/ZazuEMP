@@ -515,6 +515,7 @@ class PwaOfflineFoundationTest extends TestCase
         $worker = File::get(public_path('sw.js'));
         $workShow = File::get(resource_path('views/work/show.blade.php'));
         $requirementsIndex = File::get(resource_path('views/requirements/index.blade.php'));
+        $bootstrap = File::get(base_path('bootstrap/app.php'));
 
         $this->assertStringContainsString('quotes\\/[^/]+\\/view', $worker);
         $this->assertStringContainsString('invoices\\/[^/]+\\/view', $worker);
@@ -523,6 +524,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('@unless ($event->isClosed())', $workShow);
         $this->assertStringContainsString('@if (!$latestQuote && !$event->isClosed())', $workShow);
         $this->assertStringContainsString('@unless ($scopeLocked)', $requirementsIndex);
+        $this->assertStringContainsString("app()->environment('testing') ? '*' : ['127.0.0.1', '::1']", $bootstrap);
     }
 
     public function test_pwa_icon_files_are_present(): void
