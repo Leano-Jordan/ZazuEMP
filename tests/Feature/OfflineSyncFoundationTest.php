@@ -2514,7 +2514,7 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertContains(
             $asset->id,
             collect($snapshot['assets'])->pluck('server_id')->all(),
-            'A delivered asset must be present in the receiver bootstrap even when it is outside the default working set.',
+            'A delivered asset must be present in the receiver bootstrap snapshot.',
         );
     }
 
