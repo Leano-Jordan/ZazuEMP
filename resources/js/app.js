@@ -3829,8 +3829,11 @@ function setupZazuOfflineForms() {
         if (form.dataset.zazuOnlineOnlyBound === '1') return;
         form.dataset.zazuOnlineOnlyBound = '1';
         form.addEventListener('submit', async (event) => {
-            if (navigator.onLine && await canReachZazuOrigin()) return;
             event.preventDefault();
+            if (navigator.onLine && await canReachZazuOrigin()) {
+                HTMLFormElement.prototype.submit.call(form);
+                return;
+            }
             let notice = form.querySelector('[data-zazu-online-only-notice]');
             if (!notice) {
                 notice = document.createElement('div');
