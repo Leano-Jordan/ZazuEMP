@@ -1,7 +1,7 @@
 # Director Incident Record — Collapsed Navigation Falling Back to Dashboard
 
 **Date:** 2026-11-26  
-**Status:** SECOND ROOT CAUSE CORRECTED / EXACT-HEAD ACCEPTANCE PENDING  
+**Status:** THREE ROOT CAUSES CORRECTED / EXACT-HEAD ACCEPTANCE PENDING  
 **Repository:** Leano-Jordan/ZazuEMP  
 **Write target:** main only
 
@@ -20,18 +20,22 @@ Two service-worker fallback defects combined to produce the symptom:
 
 The second defect is the more direct explanation for a broad class of in-app navigation failures. The precise network state/latency observed on the Founder device has not been captured, so do not claim the exact trigger for every occurrence.
 
+3. **Cold-launch detection assumption (third correction):** the first policy correction used an empty `FetchEvent.clientId` as the cold-launch signal. That is not a reliable distinction for top-level navigation requests: browser navigation requests can have an empty `clientId` even when an existing page initiated the route change. The worker therefore still treated some in-app navigations as cold launches and returned Dashboard. This was exposed by the exact-route mobile offline acceptance tests.
+
 ## Correction committed
 
 - Keep the 5,000 ms authenticated navigation timeout and static cache v64.
-- Change the fallback policy so **only a cold app launch** (no initiating client) deliberately prefers the Dashboard shell.
+- Detect a genuine cold launch by checking `clients.matchAll({ type: 'window', includeUncontrolled: true })` for an existing same-origin app window when the navigation event has no initiating `clientId`. Existing app windows mean preserve the requested route; no same-origin app window means prefer Dashboard.
 - For in-app navigation, prefer the exact route from the active user/business cache when the host is offline, returns a transient 5xx, or the request times out. Use Dashboard only when the requested route has no exact cached entry.
 - Preserve the security boundary: 401/403 and other client responses are not replaced with stale authenticated cache content. Authenticated HTML remains isolated to the active user/business cache.
 - Update worker regressions so a failed in-app /customers navigation returns its exact cached destination, a cached /work directory remains on /work, query variants without an exact cache entry fall back safely, and a true cold launch still prefers Dashboard.
+- Model browser navigation correctly in the worker harness: an empty `clientId` with an existing same-origin window must preserve the exact cached destination; an empty client set is a cold launch.
+- Fix the cross-tab logout E2E fixture to accept the production confirmation dialog. The previous test auto-dismissed the intentional `window.confirm`, so it never actually signed out; production logout behavior was not weakened.
 - Retain the slow-but-healthy /quotes regression and the collapsed desktop rail Playwright test.
 
 ## Verification boundary
 
-The source and worker regressions are committed. GitHub Actions for the worker/test commits are queued or running; exact-head acceptance is not yet claimed. Physical Founder-device reproduction remains required after the corrected worker is installed.
+The source and worker regressions are committed. The prior offline-browser run completed 77 passed / 3 failed. Its failures were: the empty-clientId navigation misclassification (affecting offline route fallback), a cross-tab test that auto-dismissed the logout confirmation, and a customer offline-edit assertion that depended on the requested cached route being served. The worker, its unit/feature contracts and the cross-tab fixture are now corrected in commits `e78a805`, `9d934e2`, `9025b95` and `349f59c`. Exact-head CI for this correction set is pending; no pass is claimed. Physical Founder-device reproduction remains required after the corrected worker is installed.
 
 ## Operational notes
 
@@ -44,6 +48,8 @@ The source and worker regressions are committed. GitHub Actions for the worker/t
 
 - public/sw.js
 - tests/js/service-worker-auth-cache.test.js
+- tests/Feature/PwaOfflineFoundationTest.php
+- e2e/offline-session-transition.spec.js
 - resources/css/app.css
 - e2e/navigation-responsive.spec.js
 - tests/Feature/SidebarNavigationPresentationTest.php
