@@ -6,9 +6,11 @@ use App\Models\Business;
 use App\Models\User;
 use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class AuthenticationSessionSecurityTest extends TestCase
@@ -137,6 +139,41 @@ class AuthenticationSessionSecurityTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
         $this->assertDatabaseMissing('sessions', ['id' => $preResetSessionId]);
+    }
+
+    public function test_late_database_session_write_cannot_resurrect_a_session_destroyed_after_read(): void
+    {
+        config(['session.driver' => 'database']);
+
+        $sessionId = 'in-flight-authenticated-session';
+        DB::table('sessions')->insert([
+            'id' => $sessionId,
+            'user_id' => User::factory()->create()->id,
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'concurrent-request-a',
+            'payload' => base64_encode(json_encode([
+                'login_web_' . sha1('App\\Models\\User') => 42,
+                '_token' => Str::random(40),
+            ], JSON_THROW_ON_ERROR)),
+            'last_activity' => now()->timestamp,
+        ]);
+
+        // Request A reads the authenticated session before its controller runs.
+        $inFlightHandler = new DatabaseSessionHandler(
+            DB::connection(),
+            config('session.table', 'sessions'),
+            (int) config('session.lifetime', 120),
+        );
+        $this->assertStringContainsString('login_web_', $inFlightHandler->read($sessionId));
+
+        // Request B logs out / resets the account and destroys that session.
+        $this->assertTrue($inFlightHandler->destroy($sessionId));
+        $this->assertDatabaseMissing('sessions', ['id' => $sessionId]);
+
+        // Request A finishes later. Laravel's database handler must UPDATE the
+        // row it previously read, never INSERT a deleted authenticated session.
+        $this->assertTrue($inFlightHandler->write($sessionId, '{"late":"request-save"}'));
+        $this->assertDatabaseMissing('sessions', ['id' => $sessionId]);
     }
 
     public function test_business_switch_rejects_a_stale_authenticated_password_hash(): void
