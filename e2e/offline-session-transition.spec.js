@@ -10,10 +10,26 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
     await page.getByLabel('Username or email').fill(email);
     await page.locator('#auth_password').fill(password);
+    const loginResponsePromise = page.waitForResponse(response =>
+        response.url().includes('/login') && response.request().method() === 'POST',
+    );
     await page.locator('[data-auth-submit]').click();
+    const loginResponse = await loginResponsePromise;
+    const loginLocation = loginResponse.headers().location
+        ? new URL(loginResponse.headers().location, loginResponse.url()).pathname
+        : '(no redirect)';
+    const sessionCookiePresent = (await page.context().cookies()).some(cookie =>
+        /session/i.test(cookie.name) && cookie.name.toUpperCase() !== 'XSRF-TOKEN',
+    );
+    console.log(`[offline-e2e-login] status=${loginResponse.status()} destination=${loginLocation} session-cookie=${sessionCookiePresent}`);
     await page.waitForURL(url => url.pathname !== '/' && url.pathname !== '/login');
+    const postLoginPath = new URL(page.url()).pathname;
+    if (postLoginPath === '/workspace/recovery') {
+        const recoveryText = (await page.locator('body').innerText()).slice(0, 700);
+        throw new Error(`Login reached workspace recovery instead of an active workspace: ${recoveryText}`);
+    }
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page, `post-login destination was ${postLoginPath}; session cookie present: ${sessionCookiePresent}`).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
 
