@@ -1,6 +1,6 @@
 # Director Adversarial Authentication Audit — 2026-11-26
 
-**Status:** Investigation in progress. Session replay regressions added on 2026-11-26; exact-head CI pending. This remains a source-inspection checkpoint, not a completed penetration test or release clearance.  
+**Status:** Investigation in progress. Stale pre-authentication cookie replay regressions are present; Laravel 13.43 database-session write semantics have been inspected. The app-level concurrency race test and broader adversarial tracks remain open. This remains a source-inspection checkpoint, not a completed penetration test or release clearance.  
 **Repository:** Leano-Jordan/ZazuEMP  
 **Reference:** main at ebeda7a266c0564a0cff48bcf96a7335028d55d1 when this checkpoint began.  
 **Scope:** Session fixation/hijacking and concurrent account transitions; browser credential exposure/XSS/backups; pairing-code brute force/device takeover; cross-business token substitution/stale replay; password reset/owner removal/device revocation races; offline logout/account switching/queued transaction preservation.
@@ -23,13 +23,17 @@ No exploit against a live system was attempted. No production data was accessed 
 - Password reset rotates the remember token, logs the user in on a regenerated session, deletes other database-backed sessions, invokes logoutOtherDevices, and revokes trusted devices for currently owned businesses.
 - Session defaults: database driver, 120-minute lifetime, HttpOnly cookie, SameSite=Lax, Secure in production by default. SESSION_ENCRYPT defaults false; this concerns server-side session storage, not whether the browser cookie is encrypted by Laravel's cookie middleware.
 - Main workspace routes use auth, auth.session, and business.context.
-- The business.switch route is inside the auth/auth.session route group. A regression test now verifies a stale password-hash session cannot switch the selected business.
+- The business.switch route is inside the auth/auth.session route group. A regression test verifies a stale password-hash session cannot switch the selected business.
+- The installed dependency is Laravel Framework 13.43.0 (composer.lock reference `72aa7e151062e218704d8660f407e6070040d8bc`). Its database session handler marks an existing session on read and later performs an UPDATE-only write for that session. If logout/reset deletes the row after an in-flight request read it, the late save cannot recreate the deleted authenticated row. If the request writes first, the later delete removes it. This closes the specific database-session-row resurrection hypothesis at the framework-handler level; it does not cancel a domain action that was already authorized and executing.
+- Laravel's `StartSession` supports per-session blocking through `session.block` or route `block()`, holding the lock through response handling and session persistence. Zazu does not currently enable `session.block`, configure block timeouts/store, or apply route-level `block()`; the framework default is non-blocking. Cache defaults to the database store and the installation includes `cache_locks`, so the capability is available but not active.
 
 ### Open adversarial checks
 
 - Reuse a pre-authentication session ID after login/registration and prove it cannot authenticate. **New regression committed:** replay the original browser cookie after successful login and registration; require guest redirection while the newly rotated cookie remains authenticated. The AuthenticationSessionSecurityTest suite passed in the latest completed Laravel run, including both stale pre-authentication cookie replay regressions. The overall Laravel workflow was still red on that run because a separate PWA feature assertion referenced the removed narrow route allowlist; that assertion has been updated in commit dcbded07 and exact-head rerun is pending. Earlier failures in the same implementation cycle (stale v63/1.8-second worker assertions, an incorrect registration destination assertion, and public accent contrast 3.79:1) were corrected by aligning to v64/5 seconds, asserting workspace access, and darkening teal to #0f6b70 (5.81:1 against the public background).
-- Race two login/logout/password-reset requests sharing the old session; prove stale writes cannot resurrect an authenticated session or overwrite the selected business context.
-- Test password reset against concurrent authenticated requests and remembered-device cookies.
+- Add an explicit regression for the framework database-session race: request A reads an authenticated session; request B destroys/deletes it during logout/reset; request A later saves. Assert the old authenticated session row is not recreated. Framework source indicates UPDATE-only semantics, but the app-level regression is not yet present.
+- Race two login/logout/password-reset requests sharing the old session and prove that an already-running domain mutation cannot cross an account transition unexpectedly or overwrite the selected business context.
+- Decide whether to enable session blocking. Global `session.block` would serialize all requests sharing a browser session and could affect long-running pages/downloads; route-level blocking only helps when every conflicting route participates. Do not enable either without measuring request duration, timeout and contention behaviour.
+- Test password reset against concurrent authenticated requests across multiple browser sessions and remembered-device cookies. Same-session blocking alone would not serialize different device sessions.
 - Test session cookie attributes under actual production HTTPS/reverse-proxy configuration, not only config defaults.
 
 ## 2. Credential leakage through browser storage, XSS and backups
