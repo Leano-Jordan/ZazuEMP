@@ -96,9 +96,9 @@
                             @endif
                             <div class="zazu-list-side">
                                 <div class="zazu-side-primary">{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}</div>
-                                @unless ($event->trashed())
+                                @if (!$event->trashed() && !$event->isClosed())
                                     <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
-                                @endunless
+                                @endif
                             </div>
                         </div>
                     @empty
