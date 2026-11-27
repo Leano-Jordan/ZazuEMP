@@ -393,9 +393,13 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
 
     const uniqueRoutes = [];
     const seenRoutes = new Set();
+    let routeDiscoveryTruncated = false;
     const addRoute = (path) => {
-        if (typeof path !== 'string' || path.length > 2048
-            || uniqueRoutes.length >= MAX_PRIME_ROUTES) return;
+        if (typeof path !== 'string' || path.length > 2048) return;
+        if (uniqueRoutes.length >= MAX_PRIME_ROUTES) {
+            routeDiscoveryTruncated = true;
+            return;
+        }
 
         let route;
         try {
@@ -488,11 +492,15 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         if (activePrimeController === controller) activePrimeController = null;
     }
 
-    const requiredOfflineRoutes = ['/dashboard', '/customers', '/customers/create', '/work', '/work/create'];
+    const requiredOfflineRoutes = [
+        '/dashboard',
+        ...uniqueRoutes.filter(path => ['/customers', '/customers/create', '/work', '/work/create'].includes(path)),
+    ];
     if (controller.signal.aborted || primeGeneration !== activeUserGeneration) return false;
 
-    // A transient fetch failure must not report the workspace as unprepared
-    // when the required authenticated pages are already safely cached.
+    // Report ready only when every discovered same-origin application route
+    // has an authenticated page snapshot. A partial cache or a truncated route
+    // graph must never be represented as a fully prepared offline application.
     const cache = await dynamicCache();
     if (!cache || primeGeneration !== activeUserGeneration
         || primeUserId !== activeUserId || primeBusinessId !== activeBusinessId) return false;
@@ -500,8 +508,13 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     const requiredCachedPages = await Promise.all(requiredOfflineRoutes.map((path) => (
         cache.match(new Request(new URL(path, self.location.origin)))
     )));
+    const discoveredCachedPages = await Promise.all(uniqueRoutes.map((path) => (
+        cache.match(new Request(new URL(path, self.location.origin)))
+    )));
 
-    return requiredCachedPages.every(Boolean);
+    return !routeDiscoveryTruncated
+        && requiredCachedPages.every(Boolean)
+        && discoveredCachedPages.every(Boolean);
 }
 
 async function clearActiveContext() {
