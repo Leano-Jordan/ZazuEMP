@@ -13,7 +13,8 @@
         </div>
     </section>
 
-    <form method="POST" action="{{ route('work.travel.store', $event) }}">
+    <form method="POST" action="{{ route('work.travel.store', $event) }}" data-zazu-online-only>
+        <p class="zazu-panel-copy mb-4">Travel calculations currently require a live server connection. This form does not save a local draft while disconnected.</p>
         @csrf
 
         <div class="zazu-editor">
