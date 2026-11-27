@@ -2481,6 +2481,25 @@ class OfflineSyncFoundationTest extends TestCase
             'currency' => 'ZAR',
         ]);
         $identity = app(SyncEntityIdentityRegistry::class)->identify($asset, 'asset');
+        $oldTimestamp = now()->subDays(2);
+        $asset->forceFill(['updated_at' => $oldTimestamp])->save();
+        $identity->forceFill(['updated_at' => $oldTimestamp])->save();
+
+        // Put the delivered asset outside the newest-500 working set. A
+        // receiver bootstrap must union explicit delivery targets with that
+        // bounded set rather than silently losing a pending change.
+        for ($index = 1; $index <= 500; $index++) {
+            \\App\\Models\\Asset::create([
+                'business_id' => $business->id,
+                'asset_tag' => 'BOOTSTRAP-RECENT-'.str_pad((string) $index, 3, '0', STR_PAD_LEFT),
+                'name' => 'Recent asset '.$index,
+                'status' => 'available',
+                'condition' => 'good',
+                'purchase_cost' => '1000.00',
+                'currency' => 'ZAR',
+            ]);
+        }
+
         $mutation = app(SyncMutationRecorder::class)->record(
             $sourceDevice,
             'asset',
@@ -2511,10 +2530,17 @@ class OfflineSyncFoundationTest extends TestCase
             [(int) $delivery->delivery_sequence],
         );
 
+        $snapshotAssetIds = collect($snapshot['assets'])->pluck('server_id')->all();
+
         $this->assertContains(
             $asset->id,
-            collect($snapshot['assets'])->pluck('server_id')->all(),
-            'A delivered asset must be present in the receiver bootstrap snapshot.',
+            $snapshotAssetIds,
+            'A delivered asset outside the newest-500 window must be included in the receiver bootstrap snapshot.',
+        );
+        $this->assertCount(
+            501,
+            $snapshotAssetIds,
+            'The snapshot should contain the newest 500 assets plus the explicitly delivered older asset.',
         );
     }
 
