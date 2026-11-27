@@ -45,7 +45,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         await page.goto('/settings', { waitUntil: 'domcontentloaded' });
 
-        const settingsPanel = page.locator('[data-zazu-offline-storage]');
+        const settingsPanel = page.locator('.zazu-context-card [data-zazu-offline-storage]').first();
         await expect(settingsPanel).toBeVisible();
         await page.evaluate(() => {
             Object.defineProperty(navigator, 'storage', {
@@ -332,6 +332,9 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const onlineGeometry = await customerForm.boundingBox();
         const onlineSearchVisible = await page.locator('.zazu-command-search').isVisible();
+        const onlineNavHrefs = await page.locator('.zazu-nav-link').evaluateAll(links =>
+            links.map(link => link.getAttribute('href')).filter(Boolean).sort()
+        );
         await context.setOffline(true);
         await page.reload({ waitUntil: 'domcontentloaded' });
 
@@ -349,7 +352,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         if (testInfo.project.name === 'chromium-mobile') {
             await page.locator('[data-mobile-sidebar-toggle]').click();
         }
-        await expect(page.locator('.zazu-nav-link[href="/settings"]')).toBeVisible();
+        const offlineNavHrefs = await page.locator('.zazu-nav-link').evaluateAll(links =>
+            links.map(link => link.getAttribute('href')).filter(Boolean).sort()
+        );
+        expect(offlineNavHrefs).toEqual(onlineNavHrefs);
         await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
 
         const offlineGeometry = await customerForm.boundingBox();
@@ -3979,11 +3985,13 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const offlineResponse = await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         expect(offlineResponse?.ok()).toBe(true);
-        await expect(page.locator('.zazu-page-title')).toHaveText('Offline workspace');
+        await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
+        await expect(page.locator('.zazu-page-title')).toHaveText('Dashboard');
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+        await expect(page.locator('.zazu-dash-hero')).toBeVisible();
+        await expect(page.locator('.zazu-dash-overview')).toBeVisible();
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
-        await expect(page.locator('.zazu-dash-hero')).toBeHidden();
-        await expect(page.locator('.zazu-dash-overview')).toBeHidden();
+        await expect(page.locator('[data-zazu-offline-workspace]')).toHaveAttribute('data-zazu-offline-active-view', 'overview');
     });
     test('primes Customers and Work routes for disconnected phone navigation', async ({ page, context }) => {
         test.setTimeout(90_000);
@@ -4927,15 +4935,20 @@ test.describe('Zazu installed PWA offline shell', () => {
             return false;
         }, workUrl)).toBe(true);
 
+        const expectedWorkPageTitle = (await page.locator('.zazu-page-title').textContent())?.trim();
+        expect(expectedWorkPageTitle).toBeTruthy();
+
         await context.setOffline(true);
         const coldLaunch = await context.newPage();
         await coldLaunch.goto(new URL(workUrl, page.url()).href, { waitUntil: 'domcontentloaded' });
-        // A cold launch on a cached Work deep link must keep that exact route.
+        // A cold launch on a cached Work deep link must preserve the real detail page.
         await expect(coldLaunch).toHaveURL(new URL(workUrl, page.url()).href);
-        await expect(coldLaunch.locator('.zazu-page-title')).toHaveText('Jobs');
-        const offlineWorkspace = coldLaunch.locator('[data-zazu-offline-workspace]');
-        await expect(offlineWorkspace).toBeVisible();
-        await expect(offlineWorkspace).toHaveAttribute('data-zazu-offline-active-view', 'jobs');
+        await expect(coldLaunch.locator('body')).toHaveClass(/zazu-offline-mode/);
+        await expect(coldLaunch.locator('.zazu-page-title')).toHaveText(expectedWorkPageTitle);
+        await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(coldLaunch.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
+        await expect(coldLaunch.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
+        await expect(coldLaunch.locator('[data-zazu-offline-attachment-form] input[type="file"]')).toBeVisible();
 
     });
 
