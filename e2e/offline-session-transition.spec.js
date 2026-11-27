@@ -19,10 +19,12 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     const loginLocation = loginResponse.headers().location
         ? new URL(loginResponse.headers().location, loginResponse.url()).pathname
         : '(no redirect)';
+    const loginHtml = await loginResponse.text().catch(() => '');
+    const loginError = loginHtml.match(/<p class="auth-modal-error">([\\s\\S]*?)<\\/p>/)?.[1]?.replace(/<[^>]*>/g, '').trim() || '(none)';
     const sessionCookiePresent = (await page.context().cookies()).some(cookie =>
         /session/i.test(cookie.name) && cookie.name.toUpperCase() !== 'XSRF-TOKEN',
     );
-    console.log(`[offline-e2e-login] status=${loginResponse.status()} destination=${loginLocation} session-cookie=${sessionCookiePresent}`);
+    console.log(`[offline-e2e-login] status=${loginResponse.status()} destination=${loginLocation} session-cookie=${sessionCookiePresent} error=${loginError}`);
     await page.waitForURL(url => url.pathname !== '/' && url.pathname !== '/login');
     const postLoginPath = new URL(page.url()).pathname;
     if (postLoginPath === '/workspace/recovery') {
