@@ -4947,7 +4947,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await context.setOffline(true);
         const coldLaunch = await context.newPage();
         await coldLaunch.goto(new URL(workUrl, page.url()).href, { waitUntil: 'domcontentloaded' });
-        // The service worker returns the cached dashboard shell for this navigation without rewriting the browser URL.
+        // A cold launch on a cached Work deep link must keep that exact route.
         await expect(coldLaunch).toHaveURL(new URL(workUrl, page.url()).href);
         await expect(coldLaunch.locator('.zazu-page-title')).toHaveText('Jobs');
         await expect(coldLaunch.locator('[data-zazu-offline-workspace]')).toBeVisible();
