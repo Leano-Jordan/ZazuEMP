@@ -2607,7 +2607,6 @@ function setupZazuOfflineDirectoryViews() {
                 syncChip.textContent = syncStatus.label;
                 syncChip.title = syncStatus.title;
                 syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
-                addQuoteOfflineDetails(serverRow, quote);
                 continue;
             }
 
