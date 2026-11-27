@@ -4,6 +4,22 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest broad verified checkpoint:** `dbda546d677dd80c99bda83bfcdfaa4dc46e8239` remains the last broad all-workflow acceptance candidate; later changes must not inherit its PASS status.
+## Director update — 2026-11-27 — Basic / Intermediate / Professional model
+
+**Product decision:** DEC-030 records the Founder-approved customer-facing levels Basic, Intermediate and Professional. The canonical design matrix is `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md`.
+
+- Basic is intended to support genuine small-business operation, not a crippled demo.
+- Intermediate adds connected operational capacity across suppliers, purchasing, receiving, inventory/assets, costs, profitability, reporting and team collaboration.
+- Professional adds advanced oversight for complex operations, including multiple locations, analytics, capacity management, advanced administration, automation and integrations where implemented.
+- Reliability, supported offline workflows, security, data integrity, local backup/export and access to existing customer-owned records are shared foundations across all levels.
+- No prices, billing terms or numerical quotas are approved. Capacity dimensions are design candidates only; no limits or feature gates have been enforced.
+- Downgrade rules must preserve historical records, existing active work, exports and durable offline queue entries. Role/permission and business-isolation checks remain independent.
+- The customer-facing third-tier label is now Professional in configuration, onboarding, preferences and Business Settings. The signed/stored internal identifier remains `advanced`; no token or database migration was attempted.
+- The product specification and commercial requirements were reconciled; the four-tier pricing document is explicitly historical. The operating profile, offline licensing notes and readiness register now point to the new capability model.
+- **Changed commits:** matrix `72d811d`; product specification `114db7f`; decision log `a9ba1e4`; historical commercial requirements marker `0d0906e`; UI label/config/tests `4c404e2` through `1921eb9`; operating profile/licensing/readiness reconciliation through `e405d5b`.
+- **Verification:** GitHub combined status lookup returned no status entries for the UI/test commits or latest documentation commit. No exact-head PASS is claimed. Laravel, browser, quality/security and Windows package workflows must be checked after the push; rendered UI and physical device behaviour remain unverified.
+- **Next target:** map every proposed tier capability to current source and tests as IMPLEMENTED / PARTIAL / MISSING / DEFERRED. Then define safe, non-numeric capacity enforcement candidates and downgrade behaviour. Do not implement feature gates or quotas until the Founder approves exact boundaries.
+
 **Repository HEAD at this state snapshot:** `40692998d43575bb1383615e2f986da14d91ae2d` (a subsequent documentation-only parity-standard update followed). **Latest application/test source head:** `be3457b3a0e7057010492ff8df700aeac90d001d` on `main`. The latest implementation removes the reduced offline-workspace component, preserves exact cached native pages, adds explicit fallback identity and recursive route-graph priming, and integrates local catalogue records into the normal Services & Prices tabs. The latest service-worker route-completeness correction is `7661bbccfdbbda8fecf76215f45926b225bcf855`; latest application integration is `be3457b3a0e7057010492ff8df700aeac90d001d`. The user reported the pre-implementation baseline checks green; exact-head Laravel/browser, quality/security and Windows package workflows for this new batch are queued/pending and must not inherit that earlier PASS. SonarCloud remains skipped.
 
 This is the concise live state register, not a session diary. Detailed incident evidence belongs in FAILURE_CASES.md, durable decisions in DECISION_LOG.md, recurring regressions in REGRESSION_LEDGER.md, and historical implementation evidence in dated audit/release records.
