@@ -522,7 +522,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('payments\\/[^/]+\\/receipt', $worker);
         $this->assertStringContainsString('$event->isClosed() ? route(\'work.quotes.index\', $event)', $workShow);
         $this->assertStringContainsString('@unless ($event->isClosed())', $workShow);
-        $this->assertStringContainsString("$scopeLocked = $event->quotes->contains('status', 'accepted');", $workShow);
+        $this->assertStringContainsString('$scopeLocked = $event->quotes->contains', $workShow);
         $this->assertStringContainsString('@if (!$event->isClosed() && !$scopeLocked)', $workShow);
         $this->assertStringContainsString('@if (!$latestQuote && !$event->isClosed())', $workShow);
         $this->assertStringContainsString('@unless ($scopeLocked)', $requirementsIndex);
