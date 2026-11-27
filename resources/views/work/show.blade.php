@@ -186,7 +186,7 @@
         <a href="{{ route('work.requirements.index', $event) }}" class="zazu-work-progress-step {{ $hasRequirements ? 'complete' : ($progressCurrent === 'scope' ? 'current' : '') }}" @if ($progressCurrent === 'scope') aria-current="step" @endif>
             <span>2</span><strong>Services</strong><small>{{ $hasRequirements ? $event->requirements->count().' added' : 'No services yet' }}</small>
         </a>
-        <a href="{{ $latestQuote ? route('quotes.show', $latestQuote) : route('work.quotes.create', $event) }}" class="zazu-work-progress-step {{ $latestQuote?->status === 'accepted' ? 'complete' : (in_array($latestQuote?->status, ['declined', 'expired'], true) ? 'current' : ($progressCurrent === 'quote' ? 'current' : '')) }}" @if ($progressCurrent === 'quote') aria-current="step" @endif>
+        <a href="{{ $latestQuote ? route('quotes.show', $latestQuote) : ($event->isClosed() ? route('work.quotes.index', $event) : route('work.quotes.create', $event)) }}" class="zazu-work-progress-step {{ $latestQuote?->status === 'accepted' ? 'complete' : (in_array($latestQuote?->status, ['declined', 'expired'], true) ? 'current' : ($progressCurrent === 'quote' ? 'current' : '')) }}" @if ($progressCurrent === 'quote') aria-current="step" @endif>
             <span>3</span><strong>Quote & decision</strong><small>{{ $quoteProgressLabel }}</small>
         </a>
         <a href="{{ $invoiceWorkspaceTarget ? route('finance.invoices.show', $invoiceWorkspaceTarget) : ($latestQuote?->status === 'accepted' ? route('finance.invoices.create', ['quote_id' => $latestQuote->id]) : ($latestQuote ? route('quotes.show', $latestQuote) : route('work.quotes.create', $event))) }}" class="zazu-work-progress-step {{ $latestInvoice && $outstandingInvoices->isEmpty() ? 'complete' : ($progressCurrent === 'finance' ? 'current' : '') }}" @if ($progressCurrent === 'finance') aria-current="step" @endif>
@@ -238,7 +238,9 @@
                         <div class="zazu-panel-title">Services for this job</div>
                         <div class="zazu-panel-copy">These are the services or items you are providing. Add another one without leaving the job.</div>
                     </div>
-                    <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add service</a>
+                    @unless ($event->isClosed())
+                        <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add service</a>
+                    @endunless
                 </div>
 
                 @forelse ($event->requirements as $requirement)
@@ -258,14 +260,16 @@
                     <div class="zazu-empty">
                         <div class="zazu-empty-title">No services added yet</div>
                         <p class="zazu-empty-copy">Choose Catering, Decor, Sound, Furniture & Equipment, Photography & Video, Baking, Transport or another service.</p>
-                        <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Choose services</a>
+                        @unless ($event->isClosed())
+                            <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Choose services</a>
+                        @endunless
                     </div>
                 @endforelse
 
                 @if ($hasRequirements)
                     <div class="mt-4 flex flex-wrap gap-2">
                         <a href="{{ route('work.requirements.index', $event) }}" class="zazu-btn zazu-btn-ghost">View all services</a>
-                        @if (!$latestQuote)
+                        @if (!$latestQuote && !$event->isClosed())
                             <a href="{{ route('work.quotes.create', $event) }}" class="zazu-btn zazu-btn-secondary">Create quote →</a>
                         @endif
                     </div>
