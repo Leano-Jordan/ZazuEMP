@@ -21,20 +21,13 @@
         </section>
 
         <section class="zazu-catalogue-toolbar">
-            <div class="zazu-catalogue-tabs" role="tablist" aria-label="Business catalogue">
-                @if($equipment->isNotEmpty())
-                    <button type="button" class="zazu-catalogue-tab {{ $equipment->isNotEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isNotEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-equipment" data-catalogue-tab="equipment">
-                        <span>Hire &amp; rental</span><span class="zazu-tab-count font-mono">{{ $equipment->count() }}</span>
-                    </button>
-                @endif
-                @if($services->isNotEmpty())
-                    <button type="button" class="zazu-catalogue-tab {{ $equipment->isEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-services" data-catalogue-tab="services">
-                        <span>Services &amp; products</span><span class="zazu-tab-count font-mono">{{ $services->count() }}</span>
-                    </button>
-                @endif
-                @if($equipment->isEmpty() && $services->isEmpty())
-                    <span class="zazu-field-help">No catalogue items yet. Add the services or products this business actually provides.</span>
-                @endif
+            <div class="zazu-catalogue-tabs" role="tablist" aria-label="Business catalogue" data-zazu-offline-catalogue-tabs>
+                <button type="button" class="zazu-catalogue-tab {{ $equipment->isNotEmpty() || $services->isEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isNotEmpty() || $services->isEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-equipment" data-catalogue-tab="equipment" data-zazu-catalogue-tab-count="equipment">
+                    <span>Hire &amp; rental</span><span class="zazu-tab-count font-mono" data-zazu-catalogue-count="equipment">{{ $equipment->count() }}</span>
+                </button>
+                <button type="button" class="zazu-catalogue-tab {{ $equipment->isEmpty() && $services->isNotEmpty() ? 'is-active' : '' }}" role="tab" aria-selected="{{ $equipment->isEmpty() && $services->isNotEmpty() ? 'true' : 'false' }}" aria-controls="catalogue-panel-services" data-catalogue-tab="services" data-zazu-catalogue-tab-count="services">
+                    <span>Services &amp; products</span><span class="zazu-tab-count font-mono" data-zazu-catalogue-count="services">{{ $services->count() }}</span>
+                </button>
             </div>
 
             <form method="GET" class="zazu-catalogue-filters">
@@ -58,8 +51,7 @@
             </form>
         </section>
 
-        @if($equipment->isNotEmpty())
-        <section id="catalogue-panel-equipment" role="tabpanel" tabindex="0" data-catalogue-panel="equipment" class="zazu-catalogue-panel is-active">
+        <section id="catalogue-panel-equipment" role="tabpanel" tabindex="0" data-catalogue-panel="equipment" class="zazu-catalogue-panel {{ $equipment->isNotEmpty() || $services->isEmpty() ? 'is-active' : '' }}" @if($equipment->isEmpty() && $services->isNotEmpty()) hidden @endif>
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Hire and rental</div>
@@ -70,7 +62,7 @@
             </div>
 
             @if($equipment->isNotEmpty())
-                <div class="zazu-catalogue-register">
+                <div class="zazu-catalogue-register" data-zazu-offline-catalogue-register="equipment">
                     <div class="zazu-register-head">
                         <span>SKU / CODE</span><span>ASSET &amp; CATEGORY</span><span>STOCK LEDGER</span><span>DAILY RATE</span><span>ACTIONS</span>
                     </div>
@@ -81,7 +73,7 @@
                             $rate = $capability->default_price !== null ? number_format((float) $capability->default_price, 2) : '—';
                             $code = 'EQ-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $capability->name), 0, 8));
                         @endphp
-                        <article class="zazu-catalogue-row">
+                        <article class="zazu-catalogue-row" data-zazu-server-record-id="{{ $capability->id }}">
                             <div class="font-mono text-xs font-semibold text-[var(--zazu-text-muted)]">{{ $code }}</div>
                             <div>
                                 <div class="zazu-catalogue-row-title">{{ $capability->name }}</div>
@@ -109,10 +101,8 @@
                 </div>
             @endif
         </section>
-        @endif
 
-        @if($services->isNotEmpty())
-        <section id="catalogue-panel-services" role="tabpanel" tabindex="0" data-catalogue-panel="services" class="zazu-catalogue-panel {{ $equipment->isEmpty() ? 'is-active' : '' }}" @if($equipment->isNotEmpty()) hidden @endif>
+        <section id="catalogue-panel-services" role="tabpanel" tabindex="0" data-catalogue-panel="services" class="zazu-catalogue-panel {{ $equipment->isEmpty() && $services->isNotEmpty() ? 'is-active' : '' }}" @if($equipment->isNotEmpty() || $services->isEmpty()) hidden @endif>
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Business capability stream</div>
@@ -123,9 +113,9 @@
             </div>
 
             @if($services->isNotEmpty())
-                <div class="zazu-catering-grid">
+                <div class="zazu-catering-grid" data-zazu-offline-catalogue-register="services">
                     @foreach($services as $capability)
-                        <article class="zazu-catering-card">
+                        <article class="zazu-catering-card" data-zazu-server-record-id="{{ $capability->id }}">
                             <div class="zazu-catering-card-head">
                                 <div>
                                     <div class="zazu-catalogue-category">{{ $capability->category }}</div>
@@ -154,7 +144,6 @@
                 </div>
             @endif
         </section>
-        @endif
 
         @if($isOwner)
             <aside class="zazu-catalogue-drawer" data-catalogue-drawer hidden aria-hidden="true">
