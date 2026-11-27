@@ -1128,7 +1128,9 @@ test('cold launches and in-app navigation both preserve an exact cached destinat
         business_id: '17',
     })));
     const businessCache = await worker.caches.open('zazu-static-v65-user-41-business-17');
-    await businessCache.put('/dashboard', new MockResponse('<main>Offline dashboard</main>'));
+    await businessCache.put('/dashboard', new MockResponse('<!doctype html><html><head></head><body><main>Offline dashboard</main></body></html>', {
+        headers: { 'content-type': 'text/html; charset=utf-8' },
+    }));
     await businessCache.put('/work/42', new MockResponse('<main>Offline Work detail with attachments</main>'));
 
     // A genuine cold launch on a cached deep link must not be redirected to
