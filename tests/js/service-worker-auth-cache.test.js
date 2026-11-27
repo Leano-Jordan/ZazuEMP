@@ -991,7 +991,9 @@ test('offline navigation preserves exact cached destinations and falls back to d
         business_id: '17',
     })));
     const businessCache = await worker.caches.open('zazu-static-v65-user-41-business-17');
-    await businessCache.put('/dashboard', new MockResponse('<main>Offline dashboard</main>'));
+    await businessCache.put('/dashboard', new MockResponse('<!doctype html><html><head></head><body><main>Offline dashboard</main></body></html>', {
+        headers: { 'content-type': 'text/html; charset=utf-8' },
+    }));
 
     const preservedRoutes = [
         ['/customers/create', '<main>Offline customer form</main>'],
