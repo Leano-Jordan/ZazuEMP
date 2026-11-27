@@ -373,7 +373,7 @@ test('page priming caches same-origin canonical redirects under the requested ro
         type: 'prime-pages',
         userId: '41',
         businessId: '17',
-        routes: ['/quotes/1/view'],
+        routes: ['/dashboard', '/quotes/1/view'],
     });
 
     assert.equal(result[0].success, true);
