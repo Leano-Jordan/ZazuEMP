@@ -1162,7 +1162,7 @@ test('cold launches and in-app navigation both preserve an exact cached destinat
     }), '');
     const fallbackResponse = await uncachedColdLaunch.response;
     const fallbackHtml = await fallbackResponse.text();
-    assert.match(fallbackHtml, /<main>Offline dashboard<\\/main>/);
+    assert.ok(fallbackHtml.includes('<main>Offline dashboard</main>'));
     assert.match(
         fallbackHtml,
         /<meta name="zazu-offline-fallback" content="1">/,
