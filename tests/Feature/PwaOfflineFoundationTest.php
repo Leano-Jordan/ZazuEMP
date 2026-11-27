@@ -223,7 +223,6 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('Only supported offline screens can be used', $app);
     }
 
-
     public function test_catalogue_renders_local_records_inside_its_native_tabs(): void
     {
         $view = File::get(resource_path('views/capabilities/index.blade.php'));
