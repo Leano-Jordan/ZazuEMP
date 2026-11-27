@@ -88,10 +88,14 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringNotContainsString('handleZazuPhonePairing', $app);
         $this->assertStringNotContainsString('data-zazu-phone-pairing', $html);
-        $this->assertStringContainsString("'/customers/create'", $app);
-        $this->assertStringContainsString("'/work/create'", $app);
+        // Authenticated route discovery is link-driven so the same cache-prime
+        // mechanism covers every page exposed by the active business and role.
+        $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
+        $this->assertStringContainsString('routes: routeList.slice(0, 100)', $app);
+        $this->assertStringContainsString('routesTruncated: routeList.length > 100', $app);
+        $this->assertStringContainsString("url.pathname.startsWith('/api/')", $app);
+        $this->assertStringContainsString("'/', '/login', '/register'", $app);
         $this->assertStringContainsString('Offline workspace is not fully prepared.', $app);
-        $this->assertStringNotContainsString("document.querySelectorAll('a[href]')", $app);
         $layout = File::get(resource_path('views/components/app-layout.blade.php'));
         $offlineScriptPosition = strpos($layout, '<script src="/zazu-offline.js" defer></script>');
         $viteScriptPosition = strpos($layout, "@vite(['resources/css/app.css'");
