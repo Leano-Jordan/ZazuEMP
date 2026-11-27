@@ -2680,7 +2680,6 @@ function setupZazuOfflineDirectoryViews() {
     const offlineCollectionDefinitions = {
         suppliers: {
             entity: 'supplier',
-            editPath: '/suppliers/create',
             title: record => record.name || 'Unnamed supplier',
             meta: record => [record.phone, record.email].filter(Boolean).join(' · ') || 'Contact details not recorded',
             fields: record => [
@@ -2690,7 +2689,6 @@ function setupZazuOfflineDirectoryViews() {
         },
         inventory_items: {
             entity: 'inventory_item',
-            editPath: '/inventory/create',
             title: record => record.name || 'Inventory item',
             meta: record => [record.sku ? 'SKU '+record.sku : '', record.on_hand !== undefined ? String(record.on_hand)+' '+(record.unit || 'units')+' on hand' : ''].filter(Boolean).join(' · '),
             fields: record => [
@@ -2706,7 +2704,6 @@ function setupZazuOfflineDirectoryViews() {
         },
         assets: {
             entity: 'asset',
-            editPath: '/assets/create',
             title: record => record.name || record.asset_tag || 'Asset',
             meta: record => [record.asset_tag, record.status, record.condition].filter(Boolean).join(' · '),
             fields: record => [
@@ -3041,21 +3038,6 @@ function setupZazuOfflineDirectoryViews() {
                 chip.title = syncStatus.title;
                 chip.setAttribute('aria-label', syncStatus.label+'. '+syncStatus.title);
                 actions.append(chip);
-
-                const canEdit = definition.editPath && [...document.querySelectorAll('a[href]')].some(link => {
-                    try {
-                        return new URL(link.href, window.location.origin).pathname === definition.editPath;
-                    } catch {
-                        return false;
-                    }
-                });
-                if (canEdit) {
-                    const editLink = document.createElement('a');
-                    editLink.className = 'zazu-btn zazu-btn-ghost';
-                    editLink.href = definition.editPath + '#offline-edit=' + encodeURIComponent(record.local_id);
-                    editLink.textContent = 'Edit';
-                    actions.append(editLink);
-                }
 
                 const detailButton = document.createElement('button');
                 detailButton.type = 'button';
