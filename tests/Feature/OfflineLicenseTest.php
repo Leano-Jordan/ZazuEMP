@@ -171,7 +171,7 @@ class OfflineLicenseTest extends TestCase
 
         $this->get(route('settings.index'))
             ->assertOk()
-            ->assertSee('Installed entitlement: Advanced · Expired')
+            ->assertSee('Installed entitlement: Professional · Expired')
             ->assertSee('Current workspace tier: Basic');
     }
 
