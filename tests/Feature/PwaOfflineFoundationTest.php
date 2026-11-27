@@ -526,7 +526,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('@if (!$event->isClosed() && !$scopeLocked)', $workShow);
         $this->assertStringContainsString('@if (!$latestQuote && !$event->isClosed())', $workShow);
         $this->assertStringContainsString('@unless ($scopeLocked)', $requirementsIndex);
-        $this->assertStringContainsString("env('APP_ENV') === 'testing' ? '*' : ['127.0.0.1', '::1']", $bootstrap);
+        $this->assertStringContainsString("env('APP_ENV') === 'testing' || env('ZAZU_TEST_TRUST_FORWARDED_IPS', false)", $bootstrap);
     }
 
     public function test_pwa_icon_files_are_present(): void
