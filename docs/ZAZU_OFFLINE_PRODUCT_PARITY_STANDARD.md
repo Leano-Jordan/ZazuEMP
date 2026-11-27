@@ -275,7 +275,7 @@ A first browser run after Iteration 1 showed that some older tests still expecte
 
 ## 13. Implementation update — 2026-11-27
 
-**Current source checkpoint before this documentation update:** `be05bb7ee02359caac256664d6177abe49976473` on `main`.  
+**Latest application/test source head:** `be3457b3a0e7057010492ff8df700aeac90d001d` on `main` (cache generation `zazu-static-v68`).  
 **Status:** implementation in progress; current-head CI is queued/pending; no offline parity acceptance claim.
 
 ### Iteration 1 correction
