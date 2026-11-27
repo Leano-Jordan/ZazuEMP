@@ -515,7 +515,9 @@ class PwaOfflineFoundationTest extends TestCase
         $worker = File::get(public_path('sw.js'));
         $workShow = File::get(resource_path('views/work/show.blade.php'));
         $requirementsIndex = File::get(resource_path('views/requirements/index.blade.php'));
+        $quoteEventIndex = File::get(resource_path('views/quotes/event-index.blade.php'));
         $bootstrap = File::get(base_path('bootstrap/app.php'));
+        $provider = File::get(app_path('Providers/AppServiceProvider.php'));
 
         $this->assertStringContainsString('quotes\\/[^/]+\\/view', $worker);
         $this->assertStringContainsString('invoices\\/[^/]+\\/view', $worker);
@@ -526,6 +528,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('@if (!$event->isClosed() && !$scopeLocked)', $workShow);
         $this->assertStringContainsString('@if (!$latestQuote && !$event->isClosed())', $workShow);
         $this->assertStringContainsString('@unless ($scopeLocked)', $requirementsIndex);
+        $this->assertSame(2, substr_count($quoteEventIndex, 'if (!$event->isClosed() && !$quotes->contains'));
+        $this->assertStringContainsString("'ZAZU_TEST_TRUST_FORWARDED_IPS'", $provider);
         $this->assertStringContainsString("env('ZAZU_TEST_TRUST_FORWARDED_IPS', false) ? '*'", $bootstrap);
     }
 
