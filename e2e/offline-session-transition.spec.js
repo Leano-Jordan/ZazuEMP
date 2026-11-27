@@ -20,7 +20,7 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
         ? new URL(loginResponse.headers().location, loginResponse.url()).pathname
         : '(no redirect)';
     const loginHtml = await loginResponse.text().catch(() => '');
-    const loginError = loginHtml.match(/<p class="auth-modal-error">([\\s\\S]*?)<\\/p>/)?.[1]?.replace(/<[^>]*>/g, '').trim() || '(none)';
+    const loginError = loginHtml.match(/<p class="auth-modal-error">([\s\S]*?)<\/p>/)?.[1]?.replace(/<[^>]*>/g, '').trim() || '(none)';
     const sessionCookiePresent = (await page.context().cookies()).some(cookie =>
         /session/i.test(cookie.name) && cookie.name.toUpperCase() !== 'XSRF-TOKEN',
     );
