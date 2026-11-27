@@ -20,10 +20,10 @@ This record separates historical failures that have been corrected from the curr
 
 ## Current verification boundary
 
-- Latest application source candidate remains be3457b3a0e7057010492ff8df700aeac90d001d.
-- Added a test-only downgrade regression on 104fefe: a queued server-side mutation created before trial expiry remains pending after the effective tier resolves to Basic. The test has not yet been executed by an observed CI run.
-- Latest repository documentation/state commit at this reconciliation is ebd222a096674226d4ac5a5611abbe43b4cc5158.
-- GitHub combined status for the test commit 104fefe and documentation/state commit ebd222a returned empty status lists; the connected workflow-run lookup returned no PR-triggered runs. The lookup is limited to PR-triggered runs, so an empty response is not proof that Actions has no run or that CI passed.
+- Latest offline source fix is `0f8447b`: align asset delivery target key with the bootstrap builder's `asset` collection key.
+- Latest regression test commit is `b30de1b`: cover asset delivery target resolution and receiver bootstrap inclusion. Trial expiry reconnect/push/apply/pull/ack coverage is in `dc761af` and preceding test commit `54177fd`.
+- Latest engineering state commit is `760097c`; latest capability matrix commit is `e6de4f6`.
+- GitHub combined status for `b30de1b` and the connected workflow lookup returned no status entries / no PR-triggered runs. The lookup is limited to PR-triggered runs, so an empty response is not proof that Actions has no run or that CI passed.
 - Exact-head Laravel, offline browser, quality/security, PHPMD/Psalm SARIF and Windows package results for the latest source/test state remain unconfirmed through the available repository status interface.
 - SonarCloud is SKIPPED, not passed.
 
