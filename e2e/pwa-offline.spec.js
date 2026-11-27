@@ -309,83 +309,51 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(helperConnectivity).toBeHidden({ timeout: 15_000 });
     });
 
-    test('renders one route-specific offline view and never expands every collection into the dashboard', async ({ page }, testInfo) => {
-        test.setTimeout(25_000);
-        test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Offline route rendering contract runs on desktop and phone viewport.');
+    test('keeps exact cached customer and job pages visually intact while disconnected', async ({ page, context }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'Cached-page parity contract runs on desktop and phone viewport.');
 
         await page.setViewportSize({ width: 390, height: 844 });
-        await page.route('**/up', route => route.fulfill({
-            status: 503,
-            contentType: 'text/plain',
-            body: 'unavailable',
-        }));
         await login(page);
 
-        const workspace = page.locator('[data-zazu-offline-workspace]');
-        await expect(workspace).toBeVisible({ timeout: 15_000 });
-        await expect(page.locator('.zazu-dash-hero')).toBeHidden();
-        await expect(page.locator('.zazu-dash-overview')).toBeHidden();
-        await expect(page.locator('.zazu-content > .zazu-dash-grid')).toBeHidden();
+        // These routes are part of the required offline page-prime set.
+        await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+        const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
+        await expect(customerForm).toBeVisible();
+        await expect(page.locator('.zazu-page-title')).toHaveText('New customer');
+        await expect(customerForm.locator('input[name="name"]')).toBeVisible();
 
-        const visitOfflinePath = async (path) => page.evaluate(pathname => {
-            history.replaceState({}, '', pathname);
-            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
-        }, path);
-
-        await visitOfflinePath('/dashboard');
-        await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', 'overview');
-        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(1);
-        await expect(workspace.locator('[data-zazu-offline-view="overview"]')).toBeVisible();
-        await expect(workspace.locator('[data-zazu-offline-overview-count="records"]')).toHaveText(/\d+/);
-        const offlineNavigation = workspace.locator('[aria-label="Offline workspace navigation"]');
-        await expect(offlineNavigation).toBeVisible();
-        await expect(offlineNavigation.getByRole('link', { name: 'Open customers' })).toBeVisible();
-        await expect(offlineNavigation.getByRole('link', { name: 'Open work' })).toBeVisible();
-        await expect(offlineNavigation.getByRole('link', { name: 'Quotes', exact: true })).toBeVisible();
-
-        const offlineHeaderGeometry = await workspace.locator('.zazu-offline-workspace-head').evaluate(header => {
-            const intro = header.querySelector(':scope > .zazu-dash-panel-heading')?.getBoundingClientRect();
-            const navigation = header.querySelector(':scope > [aria-label="Offline workspace navigation"]')?.getBoundingClientRect();
-            return {
-                intro: intro ? { x: intro.x, y: intro.y, width: intro.width, height: intro.height } : null,
-                navigation: navigation ? { x: navigation.x, y: navigation.y, width: navigation.width, height: navigation.height } : null,
-            };
-        });
-        expect(offlineHeaderGeometry.intro).not.toBeNull();
-        expect(offlineHeaderGeometry.navigation).not.toBeNull();
-        expect(offlineHeaderGeometry.navigation.y).toBeGreaterThanOrEqual(
-            offlineHeaderGeometry.intro.y + offlineHeaderGeometry.intro.height
-        );
-        expect(Math.abs(offlineHeaderGeometry.navigation.x - offlineHeaderGeometry.intro.x)).toBeLessThanOrEqual(2);
-        expect(Math.abs(offlineHeaderGeometry.navigation.width - offlineHeaderGeometry.intro.width)).toBeLessThanOrEqual(2);
+        const onlineGeometry = await customerForm.boundingBox();
+        await context.setOffline(true);
+        await page.reload({ waitUntil: 'domcontentloaded' });
 
         await expect(page.locator('body')).toHaveClass(/zazu-offline-mode/);
-        await expect(page.locator('.zazu-page-title')).toHaveText('Offline workspace');
-        await expect(page.locator('.zazu-command-search')).toBeHidden();
-        await expect(page.locator('.zazu-nav-link[href="/calendar"]')).toBeHidden();
-        await expect(page.locator('.zazu-section-tabs a[href="/calendar"]')).toBeHidden();
-        const settingsLink = page.locator('.zazu-nav-link[href="/settings"]');
-        await expect(settingsLink).toHaveCount(0);
-        await expect(page.locator('[data-zazu-nav-area]:has(.zazu-nav-link[href="/settings"])')).toHaveCount(0);
+        await expect(page.locator('.zazu-page-title')).toHaveText('New customer');
+        await expect(customerForm).toBeVisible();
+        await expect(customerForm.locator('input[name="name"]')).toBeVisible();
+        await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(page.locator('.zazu-command-search')).toBeVisible();
+        await expect(page.locator('.zazu-section-tabs')).toBeVisible();
+        await expect(page.locator('.zazu-nav-link[href="/settings"]')).toBeVisible();
+        await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
 
-        await visitOfflinePath('/customers');
-        await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', 'customers');
-        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(1);
-        await expect(workspace.locator('[data-zazu-offline-view="customers"]')).toBeVisible();
+        const offlineGeometry = await customerForm.boundingBox();
+        expect(onlineGeometry).not.toBeNull();
+        expect(offlineGeometry).not.toBeNull();
+        expect(Math.abs(offlineGeometry.x - onlineGeometry.x)).toBeLessThanOrEqual(2);
+        expect(Math.abs(offlineGeometry.y - onlineGeometry.y)).toBeLessThanOrEqual(2);
+        expect(Math.abs(offlineGeometry.width - onlineGeometry.width)).toBeLessThanOrEqual(2);
 
-        await visitOfflinePath('/capabilities');
-        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(1);
-        await expect(workspace.locator('[data-zazu-offline-view="catalogue"]')).toBeVisible();
+        await customerForm.locator('input[name="name"]').fill('Offline parity probe');
+        await expect(customerForm.locator('input[name="name"]')).toHaveValue('Offline parity probe');
 
-        await visitOfflinePath('/calendar');
-        await expect(workspace.locator('[data-zazu-offline-view]:visible')).toHaveCount(0);
-        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toBeVisible();
-        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toContainText('This screen is not available offline yet');
-
-        await visitOfflinePath('/settings');
-        await expect(workspace).toHaveAttribute('data-zazu-offline-active-view', 'unavailable');
-        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toBeVisible();
-        await expect(workspace.locator('[data-zazu-offline-unavailable]')).toContainText('This screen is not available offline yet');
+        await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+        const jobForm = page.locator('form#new-job-form');
+        await expect(page.locator('.zazu-page-title')).toHaveText('New job');
+        await expect(jobForm).toBeVisible();
+        await expect(jobForm.locator('#customer_id')).toBeVisible();
+        await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
+        await expect(page.locator('meta[name="zazu-offline-fallback"]')).toHaveCount(0);
     });
 
     test('reconciles exact delivered aggregates before acknowledging receiver sync', async ({ page }, testInfo) => {
