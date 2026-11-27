@@ -10,7 +10,7 @@
             @if($isFounder)
                 <p class="zazu-field-help mt-3" role="status">Founder access: all experience levels are available to this configured account. This does not change the business licence or customer entitlements.</p>
             @elseif($isTrial)
-                <p class="zazu-field-help mt-3" role="status">Your 30-day Advanced trial ends {{ $trialEndsAt?->format('j M Y') }}. At expiry, your workspace continues on Basic Free unless an active paid entitlement is installed. No payment starts automatically.</p>
+                <p class="zazu-field-help mt-3" role="status">Your 30-day Professional trial ends {{ $trialEndsAt?->format('j M Y') }}. At expiry, your workspace continues on Basic Free unless an active paid entitlement is installed. No payment starts automatically.</p>
             @else
                 <p class="zazu-field-help mt-3" role="status">Workspace tier: <strong>{{ $maximumLevelLabel }}</strong>. Higher experience levels require an active matching entitlement.</p>
             @endif
