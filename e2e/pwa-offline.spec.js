@@ -764,7 +764,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.locator('[data-zazu-offline-workspace]')).toBeHidden();
         await expect(page.locator('[data-zazu-offline-route-unavailable]')).toBeVisible();
         await expect(page.locator('[data-zazu-requested-offline-path]')).toHaveText('/offline-parity-unprimed-probe');
-        await expect(page.locator('.zazu-nav-link').filter({ visible: true }).first()).toBeVisible();
+        await expect(page.locator('.zazu-nav-link:visible').first()).toBeVisible();
     });
 
     test('offline updates carry a base revision and preserve same-record queue order', async ({ page }) => {
