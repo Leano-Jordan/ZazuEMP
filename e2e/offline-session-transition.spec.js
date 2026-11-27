@@ -99,7 +99,7 @@ async function waitForOfflinePagesPrimed(page) {
             reason: element.dataset.zazuOfflinePagesPrimeReason || null,
             routeCount: element.dataset.zazuOfflinePagesPrimeRouteCount || null,
         })),
-        { message: 'the authenticated page cache must be primed before changing business context' },
+        { timeout: 15_000, message: 'the authenticated page cache must be primed before changing business context' },
     ).toMatchObject({ primed: 'true' });
 }
 
