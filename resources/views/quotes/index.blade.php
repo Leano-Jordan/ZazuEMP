@@ -14,7 +14,7 @@
         </div>
     </section>
 
-    <section class="zazu-card zazu-list" data-zazu-anchor="quotes.register">        <div class="zazu-card-header">
+    <section class="zazu-card zazu-list" data-zazu-anchor="quotes.register" data-zazu-local-quotes>        <div class="zazu-card-header">
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Records</div>
@@ -44,7 +44,7 @@
                     default => 'info-circle',
                 };
             @endphp
-            <a href="{{ route('quotes.show', $quote) }}" class="zazu-list-item zazu-quote-register-row grid grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+            <a href="{{ route('quotes.show', $quote) }}" class="zazu-list-item zazu-quote-register-row grid grid-cols-[minmax(0,1fr)_auto_auto_auto]" data-zazu-server-quote-id="{{ $quote->id }}">
                 <div class="zazu-list-main">
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="zazu-list-title">{{ $quote->reference }}</span>
