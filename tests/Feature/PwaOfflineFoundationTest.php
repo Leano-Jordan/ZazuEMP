@@ -173,14 +173,14 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await cache.put(pageRequest, response.clone())', $worker);
     }
 
-    public function test_disconnected_top_level_navigation_prefers_the_local_dashboard_over_a_stale_route_snapshot(): void
+    public function test_disconnected_navigation_preserves_exact_cached_routes_before_dashboard_fallback(): void
     {
         $worker = File::get(public_path('sw.js'));
         $dashboard = File::get(resource_path('views/dashboard.blade.php'));
         $app = File::get(resource_path('js/app.js'));
 
-        $this->assertStringContainsString('async function cachedAppPage(request, preferShell = false)', $worker);
-        $this->assertStringContainsString('(preferShell && offlineShell) || cachedPage || offlineShell || Response.error()', $worker);
+        $this->assertStringContainsString('async function cachedAppPage(request)', $worker);
+        $this->assertStringContainsString('return cachedPage || offlineShell || Response.error();', $worker);
         $this->assertStringContainsString("request.mode === 'navigate' && response.redirected && response.url", $worker);
         $this->assertStringContainsString('Response.redirect(destination.href, 302)', $worker);
         $this->assertStringNotContainsString('shouldPreferOfflineShell', $worker);
