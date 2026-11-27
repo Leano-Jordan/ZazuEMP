@@ -254,7 +254,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('data-zazu-offline-server-id="{{ $item->id }}"', $view);
         $this->assertStringContainsString('<input type="hidden" name="status" value="{{ $status }}">', $view);
         $this->assertStringContainsString('<button type="submit" class="zazu-btn', $view);
-        $this->assertStringContainsString("preparations: {", $app);
+        $this->assertStringContainsString('preparations: {', $app);
         $this->assertStringContainsString("collection === 'preparations'", $app);
         $this->assertStringContainsString("payload.__operation = existing?.local_id ? 'update' : 'create';", $app);
         $this->assertStringContainsString('This preparation item is not available in this device copy yet', $app);
