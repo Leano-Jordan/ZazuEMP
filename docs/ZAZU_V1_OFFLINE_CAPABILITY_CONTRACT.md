@@ -2,7 +2,9 @@
 
 **Status:** Engineering contract — automated behaviour mapped; physical Android and owner-PC acceptance remain OPEN.  
 **Original contract baseline:** `main` at `803c02c23a14347810ae51c3afbfa0e88c6f627e` (2026-11-24). Current implementation and acceptance status are tracked in `.ai/engineering/STATE.md`.  
-**Purpose:** state exactly what an operator may expect when the Zazu host is unreachable. This contract is intentionally narrower than a promise that every screen or workflow is a standalone offline application.
+**Product requirement:** Zazu must retain full application parity while disconnected: the same application shell, navigation, page layouts, components, forms, workflows and visual identity. Offline is an operating condition of Zazu, not a second reduced product. The binding product and architecture standard is [Zazu Offline Product Parity Standard](ZAZU_OFFLINE_PRODUCT_PARITY_STANDARD.md).
+
+**Implementation boundary:** this document records what the current implementation has actually demonstrated; it does not lower the product requirement. A capability not yet implemented or evidenced remains an engineering gap, not an acceptable permanent offline limitation. Do not market an unimplemented capability as available.
 
 ## 1. Operating model
 
@@ -62,15 +64,17 @@ This is a local snapshot, not a live view of another device or server. Fresh rec
 
 All route isolation and offline fallback visibility changes rely on the HTML `hidden` attribute. Component styles must not override that semantic state. The shared stylesheet therefore enforces `[hidden] { display: none !important; }`; future dashboard or component display rules must preserve this invariant. Browser acceptance must assert that hidden Dashboard content is actually not rendered, not merely that the attribute was set.
 
-### Offline navigation contract
+### Offline navigation contract — parity target supersedes the legacy fallback
 
-The service worker may return the cached Dashboard HTML shell for a requested authenticated route when the host is unavailable; it preserves the requested URL. The client must then render one route-specific offline view inside that shell. The Dashboard offline landing view is navigation-only and must not expand every local collection into one long page. Supported routes map to their corresponding local collection view. Routes without an implemented offline view must show an explicit connection-required message and must not expose unrelated collections.
+**Required behaviour:** offline navigation must preserve the same route, page structure, navigation hierarchy, page-specific layout, controls and visual treatment used online. The normal application page must not be hidden and replaced by a generic Dashboard/offline collection screen merely because connectivity is lost.
 
-A physical run on 2026-11-24 exposed a regression against this contract: links fell back to the Dashboard shell and multiple offline sections appeared together. Root cause: the cached Dashboard slot is nested in `.zazu-content`, but the earlier route isolation attempted to hide Dashboard sections as direct children of `main#main-content`; that selector did not match. Local workspace update events also did not reapply route selection.
+The service worker may serve a cached page or an offline-capable application document, but the resulting route must render the corresponding normal Zazu page using local data and the same UI components. When a route document is not cached, the application must still resolve the requested route into its normal page composition where that page's offline capability is implemented. A connection-required restriction may disable only the server-dependent action or data operation; it must not silently replace the entire page with a lesser interface.
 
-The correction isolates content at the actual `.zazu-content` boundary, preserves only the offline workspace shell, maps supported URLs to one local collection, presents a connection-required state for unsupported URLs, and restores Dashboard content when the origin is reachable. Browser regression coverage must include actual service-worker fallback navigation to an unprimed supported route and an unsupported route, with explicit assertions that the online Dashboard is hidden. History-only route manipulation is supplementary, not sufficient.
+A previous implementation used a shared Dashboard shell and broad route-family matching to select collection views. That is a transitional implementation detail, not the product contract. In particular, broad route matching must never hide a cached server-rendered form, detail page, attachment control or settings component. A route being in the same family as a collection does not prove that the collection view is the correct page for that URL.
 
-Do not mark offline navigation accepted until exact-head CI and the Founder’s physical host-loss test both pass.
+The browser must distinguish an exact cached page from an actual service-worker fallback response using an explicit, testable response/document marker—not referrer heuristics, window enumeration or assumptions based on an empty client ID. Exact cached pages remain intact. A true fallback must render the same page composition for the requested route, or clearly explain the specific unavailable operation without exposing unrelated data.
+
+Do not mark navigation accepted until exact-head browser acceptance proves route and visual parity across cached and fallback navigation, and the Founder’s physical host-loss test passes. See [Zazu Offline Product Parity Standard](ZAZU_OFFLINE_PRODUCT_PARITY_STANDARD.md) for the binding architecture and acceptance requirements.
 
 The current cached-Dashboard fallback maps these route families to one device-local view:
 
