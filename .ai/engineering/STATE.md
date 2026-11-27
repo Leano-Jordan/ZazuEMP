@@ -317,3 +317,14 @@ The runbook contains the owner acceptance evidence, incident resolution, operati
 - Exact-head Composer security audit, PHP formatting, application checks and secret scan have passed on `f064dff`. Laravel browser acceptance, PHPUnit, coverage, PostgreSQL recovery and CodeQL are still in progress/pending.
 - The parity standard was corrected to distinguish status-chip reconciliation on server-backed rows from selected status controls on local-only rows.
 - Preparation remains open pending exact-head browser/Laravel results and Founder PC/Android disconnected acceptance. No release gate is accepted by this checkpoint.
+
+
+## CI failure analysis and correction — 2026-11-27
+
+The exact-head Laravel run on `f064dff` completed with 783 passed, 2 failed and 1 skipped (5,613 assertions). Both failures were stale expectations unrelated to the preparation mutation implementation:
+- `BusinessCapabilityCatalogueTest` expected the equipment panel identifier to be absent, but the page still exposed an empty rental tab for a service-only business. The Blade view now omits that empty tab; the test asserts the actual tab control is absent.
+- `PwaOfflineFoundationTest` expected an obsolete one-line service-worker message. The current app sends a structured message with a bounded route list and truncation flag; the test now asserts that contract.
+
+Correction commits: `f9a31c6` (empty rental tab), `a164b77` (catalogue regression), `e896917` (PWA contract regression). All remain on `main`; no branches created.
+
+At the first observed checkpoint for `e896917`: PHPMD passed, Director Health passed, Windows installation candidate build passed; PostgreSQL smoke and Windows archive/install verification were running; Laravel, Zazu Quality and Push-on-main were queued. Exact-head Composer audit/formatting/application/secret-scan results for the previous source checkpoint `f064dff` were all successful. The `e896917` rerun must be used for final acceptance; do not carry forward old green statuses as exact-head proof.
