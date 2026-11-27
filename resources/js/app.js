@@ -2680,6 +2680,7 @@ function setupZazuOfflineDirectoryViews() {
     const offlineCollectionDefinitions = {
         suppliers: {
             entity: 'supplier',
+            editPath: '/suppliers/create',
             title: record => record.name || 'Unnamed supplier',
             meta: record => [record.phone, record.email].filter(Boolean).join(' · ') || 'Contact details not recorded',
             fields: record => [
@@ -2698,6 +2699,7 @@ function setupZazuOfflineDirectoryViews() {
         },
         inventory_items: {
             entity: 'inventory_item',
+            editPath: '/inventory/create',
             title: record => record.name || 'Inventory item',
             meta: record => [record.sku ? 'SKU '+record.sku : '', record.on_hand !== undefined ? String(record.on_hand)+' '+(record.unit || 'units')+' on hand' : ''].filter(Boolean).join(' · '),
             fields: record => [
@@ -2713,6 +2715,7 @@ function setupZazuOfflineDirectoryViews() {
         },
         assets: {
             entity: 'asset',
+            editPath: '/assets/create',
             title: record => record.name || record.asset_tag || 'Asset',
             meta: record => [record.asset_tag, record.status, record.condition].filter(Boolean).join(' · '),
             fields: record => [
@@ -3023,6 +3026,21 @@ function setupZazuOfflineDirectoryViews() {
                 chip.title = syncStatus.title;
                 chip.setAttribute('aria-label', syncStatus.label+'. '+syncStatus.title);
                 actions.append(chip);
+
+                const canEdit = definition.editPath && [...document.querySelectorAll('a[href]')].some(link => {
+                    try {
+                        return new URL(link.href, window.location.origin).pathname === definition.editPath;
+                    } catch {
+                        return false;
+                    }
+                });
+                if (canEdit) {
+                    const editLink = document.createElement('a');
+                    editLink.className = 'zazu-btn zazu-btn-ghost';
+                    editLink.href = definition.editPath + '#offline-edit=' + encodeURIComponent(record.local_id);
+                    editLink.textContent = 'Edit';
+                    actions.append(editLink);
+                }
 
                 const detailButton = document.createElement('button');
                 detailButton.type = 'button';
@@ -3670,6 +3688,156 @@ function setupZazuOfflineCustomerOptions() {
     });
 }
 
+function setupZazuOfflineEditForms() {
+    const localId = new URLSearchParams(window.location.hash.slice(1)).get('offline-edit');
+    if (!localId) return;
+
+    const form = document.querySelector('form[data-zazu-offline-entity]');
+    if (!form) return;
+
+    const entity = form.dataset.zazuOfflineEntity;
+    const collectionByEntity = {
+        customer: 'customers',
+        supplier: 'suppliers',
+        inventory_item: 'inventory_items',
+        asset: 'assets',
+        service: 'catalogue',
+    };
+    const collection = collectionByEntity[entity];
+    if (!collection) return;
+
+    form.dataset.zazuOfflineLocalId = localId;
+    form.dataset.zazuOfflineForceQueue = '1';
+    form.dataset.zazuOfflineHydrating = '1';
+
+    const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
+    if (submit) submit.disabled = true;
+
+    const hydrate = async () => {
+        if (!window.ZazuOffline) {
+            window.addEventListener('zazu:offline-ready', hydrate, { once: true });
+            return;
+        }
+
+        await window.ZazuOffline.ready;
+        const record = (window.ZazuOffline.getState()?.[collection] || [])
+            .find(item => item?.local_id === localId);
+        if (!record) {
+            form.dataset.zazuOfflineHydrationError = '1';
+            const notice = document.createElement('p');
+            notice.className = 'zazu-notice';
+            notice.setAttribute('role', 'alert');
+            notice.textContent = 'This saved record is not available in the local device copy. Reconnect and refresh the register before editing it.';
+            form.prepend(notice);
+            delete form.dataset.zazuOfflineHydrating;
+            if (submit) submit.disabled = true;
+            return;
+        }
+
+        if (record.server_id ?? record.id) {
+            form.dataset.zazuOfflineServerId = String(record.server_id ?? record.id);
+        }
+
+        const fieldMap = {
+            customer: {
+                name: record.name,
+                primary_contact_name: record.contact_name,
+                primary_contact_phone: record.phone,
+                primary_contact_email: record.email,
+                legal_name: record.legal_name,
+                registration_number: record.registration_number,
+                tax_number: record.tax_number,
+                vat_number: record.vat_number,
+                billing_address: record.billing_address,
+                notes: record.notes,
+            },
+            supplier: {
+                name: record.name,
+                contact_name: record.contact_name,
+                email: record.email,
+                phone: record.phone,
+                notes: record.notes,
+            },
+            inventory_item: {
+                name: record.name,
+                sku: record.sku,
+                unit: record.unit,
+                reorder_level: record.reorder_level,
+                capability_id: record.capability_id,
+            },
+            asset: {
+                asset_tag: record.asset_tag,
+                name: record.name,
+                condition: record.condition,
+                location: record.location,
+                acquired_at: record.acquired_at,
+                purchase_cost: record.purchase_cost,
+                capability_id: record.capability_id,
+                notes: record.notes,
+            },
+            service: {
+                name: record.name,
+                capability_type: record.capability_type,
+                pricing_basis: record.pricing_basis,
+                default_price: record.default_price,
+                currency: record.currency,
+                default_unit: record.default_unit,
+                description: record.description,
+            },
+        }[entity] || {};
+
+        Object.entries(fieldMap).forEach(([name, value]) => {
+            if (value === null || value === undefined) return;
+            const fields = [...form.querySelectorAll('[name="' + name + '"]')];
+            fields.forEach(field => {
+                if (field.type === 'radio') {
+                    field.checked = String(field.value) === String(value);
+                } else if (field.type === 'checkbox') {
+                    field.checked = Boolean(value);
+                } else {
+                    field.value = String(value);
+                }
+            });
+        });
+
+        if (entity === 'service') {
+            const category = record.category;
+            if (category) {
+                const categoryField = form.querySelector('[name="category"][value="' + CSS.escape(String(category)) + '"]');
+                if (categoryField?.type === 'radio') categoryField.checked = true;
+                else if (categoryField) categoryField.value = String(category);
+            }
+            const activeField = form.querySelector('[name="is_active"]');
+            if (activeField?.type === 'checkbox') activeField.checked = (record.is_active ?? record.active) !== false;
+        }
+
+        const heading = document.querySelector('.zazu-page-title');
+        if (heading) heading.textContent = 'Edit saved ' + ({
+            customer: 'customer',
+            supplier: 'supplier',
+            inventory_item: 'inventory item',
+            asset: 'asset',
+            service: 'catalogue item',
+        }[entity] || 'record');
+
+        if (submit) {
+            submit.disabled = false;
+            if (entity === 'supplier') submit.textContent = 'Save changes';
+            if (entity === 'inventory_item') submit.textContent = 'Save item changes';
+            if (entity === 'asset') submit.textContent = 'Save asset changes';
+            if (entity === 'service') submit.textContent = 'Save catalogue changes';
+        }
+
+        delete form.dataset.zazuOfflineHydrating;
+    };
+
+    hydrate().catch(() => {
+        form.dataset.zazuOfflineHydrationError = '1';
+        delete form.dataset.zazuOfflineHydrating;
+        if (submit) submit.disabled = true;
+    });
+}
+
 function setupZazuOfflineForms() {
     document.querySelectorAll('form[data-zazu-offline-entity]').forEach((form) => {
         if (form.dataset.zazuOfflineBound === '1') return;
@@ -3713,6 +3881,10 @@ function setupZazuOfflineForms() {
 
             event.preventDefault();
             if (form.dataset.zazuOfflineSubmitting === '1') return;
+            if (form.dataset.zazuOfflineHydrating === '1' || form.dataset.zazuOfflineHydrationError === '1') {
+                event.preventDefault();
+                return;
+            }
             form.dataset.zazuOfflineSubmitting = '1';
 
             try {
@@ -4114,10 +4286,12 @@ function setupZazuOfflineForms() {
                 const state = window.ZazuOffline.getState();
                 const image = formData.get('image');
                 serviceImageChangeDeferred = image instanceof File && image.size > 0;
+                const localRecordId = form.dataset.zazuOfflineLocalId;
                 const serverId = form.dataset.zazuOfflineServerId;
-                const existing = serverId
-                    ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
-                    : null;
+                const existing = state?.catalogue?.find(item =>
+                    (localRecordId && item.local_id === localRecordId)
+                    || (serverId && Number(item.id ?? item.server_id) === Number(serverId))
+                ) || null;
                 payload = {
                     local_id: existing?.local_id || localId,
                     server_id: existing?.server_id ?? (serverId ? Number(serverId) : null),
@@ -4625,6 +4799,7 @@ function setupZazuOfflineForms() {
 }
 
 setupZazuOfflineDirectoryViews();
+setupZazuOfflineEditForms();
 setupZazuOfflineForms();
 setupZazuOfflineCustomerOptions();
 setupZazuOfflineAttachments();
