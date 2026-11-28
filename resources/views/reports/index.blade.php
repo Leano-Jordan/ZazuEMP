@@ -135,7 +135,7 @@
         <div class="zazu-panel-head">
             <div>
                 <div class="zazu-panel-title">Event contribution</div>
-                <div class="zazu-panel-copy">Net invoiced value excluding output VAT, less actual costs as recorded. Input-tax recovery and other accounting adjustments are not calculated, so this is an operational estimate rather than an accounting profit figure.</div>
+                <div class="zazu-panel-copy">Net invoiced value excluding output VAT, less recorded actual job costs and paid job-linked expenses. Unpaid expenses are excluded. Avoid recording the same purchase in both job costs and finance expenses. Input-tax recovery and other accounting adjustments are not calculated, so this is an operational estimate rather than an accounting profit figure.</div>
             </div>
         </div>
         <div class="mt-4 grid gap-3">
