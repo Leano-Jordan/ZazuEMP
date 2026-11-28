@@ -158,7 +158,7 @@ The application already separates database selection through Laravel's configure
 Current private-file boundary:
 - The standalone installation keeps **ZAZU_PRIVATE_STORAGE_DRIVER=local** and stores private files under the installation's private storage directory.
 - Attachment workflows store the logical disk name **private** and use Laravel's filesystem API.
-- Business-archive export now reads configured disks through streams and stages them in owner-only temporary files only because the ZIP library needs local source paths. This removes the previous local-path assumption from archive export.
+- Business-archive export now reads configured disks through streams and stages them in temporary files in the operating-system temp directory, with restrictive file modes where supported and inherited operating-system permissions only because the ZIP library needs local source paths. This removes the previous local-path assumption from archive export.
 - A configuration path exists for an S3-compatible private disk, but **league/flysystem-aws-s3-v3** is not in the current Composer lock and no object-storage provider has been selected or accepted. Do not set the driver to **s3** or claim remote storage support until the adapter is installed and provider security, permissions, upload/download, archive, backup, restore, lifecycle and recovery tests pass.
 - Never make private business files public to work around remote-storage access. Application authorization must remain in force.
 
