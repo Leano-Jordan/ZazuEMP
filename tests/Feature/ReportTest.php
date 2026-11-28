@@ -5,8 +5,9 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
-use App\Models\EventPreparationItem;
 use App\Models\EventCost;
+use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
 use App\Models\Invoice;
 use App\Services\EventProfitabilityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -71,14 +72,12 @@ class ReportTest extends TestCase
         $this->actingAs($user)
             ->get(route('reports.index'))
             ->assertOk()
-            ->assertViewHas('metrics', static fn (array $metrics): bool =>
-                $metrics['active_jobs'] === 1
+            ->assertViewHas('metrics', static fn (array $metrics): bool => $metrics['active_jobs'] === 1
                 && $metrics['upcoming_jobs'] === 1
                 && $metrics['customers'] === 1
                 && $metrics['outstanding_preparation'] === 1
             );
     }
-
 
     public function test_event_contribution_excludes_output_vat_and_discloses_unadjusted_cost_tax(): void
     {
@@ -174,7 +173,7 @@ class ReportTest extends TestCase
             'status' => 'incurred',
         ]);
 
-        \App\Models\FinanceExpense::create([
+        FinanceExpense::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
             'description' => 'Paid event transport',
