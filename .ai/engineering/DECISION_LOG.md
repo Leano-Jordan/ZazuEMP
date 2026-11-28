@@ -291,3 +291,17 @@ Working commercial hypotheses:
 - **Compatibility:** The existing internal `advanced` entitlement/preference identifier maps to customer-facing Professional. Do not change signed token formats or stored identifiers without a separately tested migration.
 - **Specification:** `docs/ZAZU_THREE_TIER_CAPABILITY_MATRIX.md` is the canonical capability design baseline. It does not assert that every listed capability is already implemented or authorize immediate enforcement.
 - **Reason:** Create a meaningful growth path without undermining Zazu's offline-first reliability, data ownership or product simplicity.
+## DEC-031 — Production portability without development-infrastructure coupling
+
+- **Date:** 2026-11-28
+- **Status:** ACTIVE
+- **Authority:** Explicit Founder approval of the Director recommendation.
+- **Decision:** Build Zazu for deployment, not around development. Application and domain logic must remain independent of the current owner-PC development host, temporary network addresses, local certificate authority and development access techniques.
+- **Development boundary:** The current Windows LAN HTTPS/Caddy route is a development and physical-acceptance harness only. Do not add LAN discovery daemons, .local naming, VPN/tunnel clients, router port-forwarding or cloud hosting merely to remove development inconvenience.
+- **Application boundary:** Use existing Laravel contracts for database, filesystem, session, cache and queue selection. Keep a supported standalone/local default. Do not introduce provider SDKs or managed infrastructure before a provider and production workload are selected.
+- **Storage rule:** Private business files remain behind the logical private filesystem disk and application authorization. Provider configuration alone does not establish provider support. A remote storage choice requires adapter installation and security, tenant isolation, upload/download, archive, backup, restore, retention and recovery acceptance.
+- **Recovery rule:** Existing installation backup/restore is local-directory recovery. It must not be represented as a remote-object-storage backup path. Remote storage requires its own verified consistency-aware backup and restore mechanism.
+- **Database rule:** SQLite remains the fully exercised standalone baseline. PostgreSQL 16 currently has migration and selected recovery smoke coverage, not full application certification. No production database is selected by this decision.
+- **Commercial boundary:** Production provider, server, domain, region, storage, database selection and recurring cost remain deferred until workload/cost analysis and explicit Founder approval. No infrastructure purchase is authorized.
+- **Reason:** Avoid paying to build temporary development infrastructure twice, prevent production migration rewrites, and preserve a small, supportable application architecture.
+- **Execution record:** docs/LOCAL_PC_HOST_DEPLOYMENT.md and .ai/engineering/STATE.md, 2026-11-28.
