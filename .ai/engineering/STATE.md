@@ -1,3 +1,47 @@
+## Director audit and execution — 2026-11-28 — pilot-critical closure work
+
+**Current repository:** `Leano-Jordan/ZazuEMP`, `main` only.  
+**Latest implementation/test head:** `94a69c4af79bc3dc52aae388694e7eb65048023e`.  
+**Latest documentation/main head at this update:** `b7c2e277f785bb823c085a4da7ad38b2604be58c`.
+
+### Baseline and findings
+- Re-read the canonical Director contract, commercial V1 mandate, release engine, readiness register, failure registry, error index, offline capability contract, physical acceptance and owner runbooks.
+- Release mandate remains a controlled first-business pilot target of 2026-11-30, conditional on ordered evidence gates. V1 is **NOT READY**; formal evidence-maturity baseline remains 71/100. No uplift is claimed.
+- Reconciled the stale release checklist: CASE-ZAZU-0054 records the Founder-confirmed successful restore of the original 2.20 MB encrypted Rosscore business archive on 2026-11-26. This closes the **business archive restore** gate. It does not close installation-wide recovery/key custody on the intended PC. The old failed attempt was caused by the Windows child PHP worker not receiving upload limits; the correction and successful retry are already documented.
+- Exact-head source review found the remote-private-storage omission risk in installation-wide `zazu:backup` / `zazu:restore`. `InstallationBackupStorageGuard` now fails closed before backup destination creation or restore archive processing unless the private disk driver is local. Two feature regressions cover backup and restore under simulated S3 configuration. This is a safety boundary, not S3 support.
+- The restore guard's first integration had a Pint import-style failure. Corrected with a normal import in `ZazuRestoreCommand`; exact-head Zazu Quality now passes.
+- Session-transition helper no longer forces a dashboard navigation after login. Added an explicit Playwright case that starts from protected `/finance/invoices/create`, signs in, and asserts the exact requested route plus authenticated user/business context. This directly covers the previously missing protected deep-link assertion.
+
+### Verification evidence
+- Zazu Quality exact implementation/test head `94a69c4`, run `46140230749`: **PASS** (including formatting, Composer audit, application and secret scan).
+- Push-on-main `94a69c4`, run `46140231363`: **PASS**.
+- Laravel workflow `46140230781` on `94a69c4`: Laravel feature/unit tests **PASS**, coverage **PASS**, PostgreSQL migration smoke **PASS**; offline browser acceptance was still running at this update. Do not claim the whole workflow complete until browser job finishes.
+- Windows V1 package/fresh install plus encrypted/legacy archive checks `46140157017` on `001b82a`: **PASS**. The application source at `001b82a` is the same as `94a69c4`; the latter adds only the E2E deep-link test.
+- Psalm security scan and PHPMD on `001b82a`: **PASS**. SonarCloud: **SKIPPED**, not passed.
+- Populated upgrade/rollback and Director Health on `001b82a`: **PASS**.
+- Physical PC/Android acceptance remains separate. Existing owner evidence for connected operation and phone-side page/data rendering is retained; do not ask the Founder to repeat those checks.
+
+### Changed surfaces
+- `app/Support/InstallationBackupStorageGuard.php`
+- `app/Console/Commands/ZazuBackupCommand.php`
+- `app/Console/Commands/ZazuRestoreCommand.php`
+- `tests/Feature/InstallationBackupStorageGuardTest.php`
+- `e2e/offline-session-transition.spec.js`
+- `docs/V1_RELEASE_CHECKLIST.md`
+
+### Active next target
+**Gate 1 — supported offline continuity, exact-head acceptance.** Finish the in-progress offline browser workflow including the new protected deep-link test. Then reconcile the remaining physical Android cold-launch/restart/reconnect requirements and prepare the separate Gate 2 intended-PC installation-wide recovery drill. Do not repeat the already accepted business archive restore. Do not provision hosting/storage or add development networking. Preserve the current local-first architecture.
+
+### Still open for controlled pilot
+- Physical Android disconnected cold launch, supported writes, force-close/restart and exactly-once reconnect.
+- Full installation backup/restore and key custody on intended PC.
+- Populated quote → acceptance → invoice → payment → actual cost → profit reconciliation.
+- DEC-019 shared-profile trust risk and independent adversarial security review.
+- POPIA operational sign-off and ZAZU name clearance.
+- Pilot support/incident procedure, release notes and known-limitations handover.
+
+---
+
 ## Director execution update — 2026-11-28 — installation recovery storage safety
 
 **Implementation head:** `71caf2fb15cd766aa5200cfed47f7eec0e21bf98` (`71caf2f`).
