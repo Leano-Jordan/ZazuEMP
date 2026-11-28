@@ -1,3 +1,17 @@
+## Current engineering reconciliation — 2026-11-28
+
+**Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md). This reconciliation supersedes the 2026-11-26 status below.
+
+- **Latest implementation/test candidate:** [`94a69c4`](https://github.com/Leano-Jordan/ZazuEMP/commit/94a69c4af79bc3dc52aae388694e7eb65048023e). It adds the protected deep-link login acceptance case. The preceding implementation adds a fail-closed guard to installation-wide backup/restore when private storage is not local.
+- **Exact-head Zazu Quality:** [run 46140230749](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46140230749) PASS; formatting, application, secret scan and Composer security audit passed. Push-on-main [run 46140231363](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46140231363) PASS.
+- **Exact-head Laravel/browser:** [run 46140230781](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46140230781) was still running at this reconciliation. Laravel feature/unit tests, coverage and PostgreSQL migration smoke passed; offline browser acceptance remained in progress. Do not claim the complete workflow green until the browser job finishes.
+- **Windows package/fresh-install and encrypted/legacy archive verification:** [run 46140157017](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46140157017) PASS on source-equivalent [`001b82a`](https://github.com/Leano-Jordan/ZazuEMP/commit/001b82a9045c45d45e008ec9f1ab75853cb474c5). Psalm security and PHPMD also PASS on that source head. SonarCloud is skipped, not passed.
+- **Business archive restore:** CLOSED / OWNER-ACCEPTED. CASE-ZAZU-0054 records the Founder-confirmed successful restore of the original 2.20 MB encrypted Rosscore archive on 2026-11-26. This supersedes the old unresolved-restore status below.
+- **Still open:** intended-PC installation-wide recovery and key custody; physical Android disconnected cold-launch/restart/reconnect; populated quote-to-profit reconciliation; DEC-019 shared-profile risk and independent adversarial security review; POPIA operations and ZAZU name clearance.
+- **Formal evidence maturity:** 71/100, unchanged. V1 remains NOT READY. No score uplift is claimed.
+
+---
+
 **Canonical policy:** `docs/ZAZU_ENGINE_DIRECTOR_COMMERCIAL_V1_MANDATE.md` governs commercial positioning, V1 scope, formal scorecard, ordered release gates and the controlled-pilot target. This register is evidence/status, not a competing strategy document. Current-main evidence supersedes older dated checkpoints below.
 
 ## Current engineering reconciliation — 2026-11-26
