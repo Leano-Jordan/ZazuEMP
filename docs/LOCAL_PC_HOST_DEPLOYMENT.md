@@ -151,7 +151,16 @@ No cloud provider, server size, operating system image, database engine, or mont
 
 ## 4. Database and file-storage decision gate
 
-The current development environment uses SQLite. The repository also contains SQLite/MySQL backup and restore paths. This does not by itself certify a production database choice.
+The current development environment uses SQLite. PostgreSQL 16 is exercised by CI for the full migration set, last-batch rollback/reapplication, registration and selected backup/recovery smoke paths. That is not full application certification or a production selection. MySQL/MariaDB are not certified Zazu V1 deployment targets. See [Database Compatibility](DATABASE_COMPATIBILITY.md) for the exact current test boundary.
+
+The application already separates database selection through Laravel's configured connection and private business files through the logical **private** filesystem disk. Preserve those application contracts instead of binding business workflows to a provider SDK or host path.
+
+Current private-file boundary:
+- The standalone installation keeps **ZAZU_PRIVATE_STORAGE_DRIVER=local** and stores private files under the installation's private storage directory.
+- Attachment workflows store the logical disk name **private** and use Laravel's filesystem API.
+- Business-archive export now reads configured disks through streams and stages them in owner-only temporary files only because the ZIP library needs local source paths. This removes the previous local-path assumption from archive export.
+- A configuration path exists for an S3-compatible private disk, but **league/flysystem-aws-s3-v3** is not in the current Composer lock and no object-storage provider has been selected or accepted. Do not set the driver to **s3** or claim remote storage support until the adapter is installed and provider security, permissions, upload/download, archive, backup, restore, lifecycle and recovery tests pass.
+- Never make private business files public to work around remote-storage access. Application authorization must remain in force.
 
 Before selecting the production database:
 1. Run the full migration and feature-test suite against the candidate engine.
@@ -163,6 +172,8 @@ Before selecting the production database:
 Do not silently switch engines or assume a database migration is a simple file copy. SQLite-to-server-database migration needs a rehearsed export/import and reconciliation procedure.
 
 Private attachments are part of the business data set. A database-only backup is incomplete. The backup set must include the database, private storage, required configuration/recovery material and a manifest/checksum strategy. Backups must be stored independently of the production server.
+
+The configured **private** disk is the storage integration boundary; it does not make every storage backend interchangeable by assertion. Any future provider selection must prove streaming semantics, private object ACL/visibility, tenant-authorized downloads, delete behaviour, archive export/import, backup completeness, outage handling, retention and recovery. Local Windows installations must continue to work without a cloud account or network dependency.
 
 ## 5. Offline behaviour is a separate product requirement
 
@@ -214,6 +225,8 @@ Do not expose development tools, debug endpoints, database ports, private storag
 - Keep local setup disposable and reproducible.
 - Do not configure the owner's PC as a customer production host.
 - Keep local development data clearly separate from future customer/production data.
+- Treat the Windows LAN HTTPS launcher and Caddy route as a development/acceptance harness only. A changing development IP is not a reason to add LAN discovery, a local name service, VPN/tunnel integration or router port-forwarding to the Zazu application.
+- Do not embed a temporary development host, address, certificate authority or remote-access technique into the product's permanent runtime architecture.
 
 ### Phase B — Production portability
 - Audit environment-specific paths, URLs, filesystem assumptions, PHP extensions and process dependencies.
@@ -252,7 +265,7 @@ Do not expose development tools, debug endpoints, database ports, private storag
 | Trusted private-Wi-Fi LAN launcher | IMPLEMENTED in repository; owner-PC/firewall/phone reachability not yet verified |
 | Production provider/server selected | NOT SELECTED — intentionally deferred |
 | Production release artifact/deployment pipeline | NOT ESTABLISHED |
-| Production database engine certified | NOT ESTABLISHED |
+| Database compatibility | SQLite full application/recovery coverage; PostgreSQL 16 migration and selected recovery smoke only; full PostgreSQL application certification pending |
 | Production backup/restore drill | NOT PROVEN |
 | Installed-device offline workflows | PARTIALLY IMPLEMENTED; full acceptance pending |
 | Offline attachment transfer | NOT ACCEPTED |
@@ -260,6 +273,12 @@ Do not expose development tools, debug endpoints, database ports, private storag
 
 ## 10. Current next engineering target
 
-**Private LAN HTTPS origin — repository implementation and physical acceptance.**
+**Production portability and storage-boundary verification — no infrastructure purchase.**
 
-Implement the Caddy internal-CA reverse proxy, loopback-only Laravel upstream, restricted trusted-proxy handling and stable HTTPS URL generation. Add tests for secure request detection, secure session behaviour and service-worker registration. Then verify root-certificate trust and the offline journey on the actual phone. Keep public hosting/provider selection and spending deferred.
+1. Verify the stream-based private-storage and archive-export changes on the exact main head, including cleanup on success/failure and the existing Windows installation/recovery workflows.
+2. Complete the compatibility evidence for the chosen production database before selecting it. PostgreSQL 16 migration/recovery smoke is not full application certification.
+3. Verify the production build artifact can be installed and upgraded without development dependencies or machine-specific paths.
+4. Keep production provider, server, domain, region, storage adapter package, backup destination and monthly spend unselected until workload estimates and cost comparisons are available and the Founder approves the purchase.
+5. When a provider is selected, add its adapter and provider-specific integration tests as a bounded deployment task. Do not pre-install cloud infrastructure or add development-only networking to the product.
+
+The local LAN HTTPS launcher remains available for current physical acceptance. It is not the future production hosting architecture.
