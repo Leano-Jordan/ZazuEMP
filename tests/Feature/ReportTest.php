@@ -138,6 +138,80 @@ class ReportTest extends TestCase
             ->assertSee('operational estimate rather than an accounting profit figure');
     }
 
+    public function test_event_contribution_includes_paid_job_linked_finance_expenses_but_excludes_unpaid_expenses(): void
+    {
+        $business = $this->makeBusiness('Finance Expense Contribution Business');
+        $user = $this->signInAsOwner($business);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'REPORT-EXPENSE-001',
+            'name' => 'Finance Expense Contribution Event',
+            'status' => 'confirmed',
+            'event_date' => now()->addDays(7)->toDateString(),
+        ]);
+
+        Invoice::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'number' => 'INV-REPORT-EXPENSE-001',
+            'idempotency_key' => (string) Str::uuid(),
+            'status' => 'paid',
+            'currency' => 'ZAR',
+            'subtotal' => '10000.00',
+            'tax_total' => '1500.00',
+            'total' => '11500.00',
+        ]);
+
+        EventCost::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'category' => 'Supplies',
+            'description' => 'Recorded event supplies',
+            'currency' => 'ZAR',
+            'projected_amount' => '4000.00',
+            'actual_amount' => '4000.00',
+            'status' => 'incurred',
+        ]);
+
+        \App\Models\FinanceExpense::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'description' => 'Paid event transport',
+            'amount' => '1500.00',
+            'currency' => 'ZAR',
+            'expense_date' => now()->toDateString(),
+            'status' => 'paid',
+            'idempotency_key' => (string) Str::uuid(),
+        ]);
+
+        \App\Models\FinanceExpense::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'description' => 'Unpaid event supplier bill',
+            'amount' => '2000.00',
+            'currency' => 'ZAR',
+            'expense_date' => now()->toDateString(),
+            'status' => 'unpaid',
+            'idempotency_key' => (string) Str::uuid(),
+        ]);
+
+        $result = app(EventProfitabilityService::class)
+            ->forBusiness($business)
+            ->firstWhere('event_id', $event->id);
+
+        $this->assertNotNull($result);
+        $this->assertSame(1000000, $result['net_sales_cents']);
+        $this->assertSame(550000, $result['actual_cost_cents']);
+        $this->assertSame(450000, $result['indicative_result_cents']);
+        $this->assertSame(45.0, $result['indicative_margin_percentage']);
+
+        $this->actingAs($user)
+            ->get(route('reports.index'))
+            ->assertOk()
+            ->assertSee('paid job-linked expenses');
+    }
+
     private function makeBusiness(string $name): Business
     {
         return Business::create([
