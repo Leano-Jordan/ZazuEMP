@@ -22,9 +22,8 @@ final class BusinessArchiveZipWriter
      */
     public function create(Business $business, array $data, array $files): string
     {
+        $stagedSources = array_values($files['sources'] ?? []);
         $archivePath = null;
-        $zip = new ZipArchive;
-        $zipOpened = false;
 
         try {
             $archivePath = tempnam(sys_get_temp_dir(), 'zazu-business-archive-');
@@ -32,41 +31,53 @@ final class BusinessArchiveZipWriter
                 throw new RuntimeException('Unable to create a temporary business archive.');
             }
 
-            if ($zip->open($archivePath, ZipArchive::OVERWRITE) !== true) {
-                throw new RuntimeException('Unable to open the business archive.');
-            }
-            $zipOpened = true;
-
-            $this->addManifest($zip, $business, $data, $files['manifest']);
-            $this->addDataset($zip, $data);
-            $this->addFileEntries($zip, $files['sources']);
-
-            $closed = $zip->close();
-            $zipOpened = false;
-            if (! $closed) {
-                throw new RuntimeException('The business archive could not be finalized.');
-            }
-
+            $this->populateArchive($archivePath, $business, $data, $files);
             $this->assertCompletedArchive($archivePath, $files['sources']);
 
             return $archivePath;
         } catch (Throwable $exception) {
-            if ($zipOpened) {
-                $zip->close();
-            }
-
-            if (is_string($archivePath) && is_file($archivePath) && ! is_link($archivePath)) {
-                @unlink($archivePath);
-            }
+            $this->removeArchive($archivePath);
 
             throw $exception;
         } finally {
-            // The collector creates these private temporary files specifically
-            // for this archive. Release them only after ZipArchive has closed.
-            foreach (array_values($files['sources'] ?? []) as $sourcePath) {
-                if (is_string($sourcePath) && is_file($sourcePath) && ! is_link($sourcePath)) {
-                    @unlink($sourcePath);
-                }
+            $this->removeStagedSources($stagedSources);
+        }
+    }
+
+    private function populateArchive(string $archivePath, Business $business, array $data, array $files): void
+    {
+        $zip = new ZipArchive;
+        if ($zip->open($archivePath, ZipArchive::OVERWRITE) !== true) {
+            throw new RuntimeException('Unable to open the business archive.');
+        }
+
+        try {
+            $this->addManifest($zip, $business, $data, $files['manifest']);
+            $this->addDataset($zip, $data);
+            $this->addFileEntries($zip, $files['sources']);
+        } catch (Throwable $exception) {
+            $zip->close();
+
+            throw $exception;
+        }
+
+        if (! $zip->close()) {
+            throw new RuntimeException('The business archive could not be finalized.');
+        }
+    }
+
+    private function removeArchive(string|false|null $archivePath): void
+    {
+        if (is_string($archivePath) && is_file($archivePath) && ! is_link($archivePath)) {
+            @unlink($archivePath);
+        }
+    }
+
+    private function removeStagedSources(array $sourcePaths): void
+    {
+        foreach ($sourcePaths as $sourcePath) {
+            if (is_string($sourcePath) && is_file($sourcePath) && ! is_link($sourcePath)) {
+                @unlink($sourcePath);
             }
         }
     }
