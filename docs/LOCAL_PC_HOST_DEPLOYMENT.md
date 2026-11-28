@@ -175,6 +175,8 @@ Private attachments are part of the business data set. A database-only backup is
 
 The configured **private** disk is the storage integration boundary; it does not make every storage backend interchangeable by assertion. Any future provider selection must prove streaming semantics, private object ACL/visibility, tenant-authorized downloads, delete behaviour, archive export/import, backup completeness, outage handling, retention and recovery. Local Windows installations must continue to work without a cloud account or network dependency.
 
+The existing Zazu installation-level backup/restore commands are local-storage recovery tools: they copy and replace the installation's local private-storage directory. They are not a complete remote-object-storage backup path. A production deployment using remote private storage must add a separately tested provider snapshot or stream-based backup/restore procedure and prove database-to-object consistency. Do not assume the current local directory backup includes remote objects.
+
 ## 5. Offline behaviour is a separate product requirement
 
 A paid cloud server does not make Zazu offline-first. The app must continue to distinguish:
