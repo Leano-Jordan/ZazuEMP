@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\Invoice;
+use App\Models\FinanceExpense;
 use App\Support\Money;
 use Illuminate\Support\Collection;
 
@@ -64,6 +65,25 @@ final class EventProfitabilityService
                 'actual_cost_cents' => 0,
             ];
             $totals[$key]['actual_cost_cents'] = Money::toCents((string) $row->aggregate_total);
+        }
+
+        $paidExpenseTotals = FinanceExpense::query()
+            ->where('business_id', $business->id)
+            ->whereNotNull('event_id')
+            ->where('status', 'paid')
+            ->selectRaw('event_id, currency, SUM(amount) as aggregate_total')
+            ->groupBy('event_id', 'currency')
+            ->get();
+
+        foreach ($paidExpenseTotals as $row) {
+            $key = $this->key((int) $row->event_id, (string) $row->currency);
+            $totals[$key] ??= [
+                'event_id' => (int) $row->event_id,
+                'currency' => (string) $row->currency,
+                'net_sales_cents' => 0,
+                'actual_cost_cents' => 0,
+            ];
+            $totals[$key]['actual_cost_cents'] += Money::toCents((string) $row->aggregate_total);
         }
 
         if ($totals === []) {
