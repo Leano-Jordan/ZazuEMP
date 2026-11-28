@@ -208,7 +208,7 @@ class ReportTest extends TestCase
         $this->actingAs($user)
             ->get(route('reports.index'))
             ->assertOk()
-            ->assertSee('paid job-linked expenses');
+            ->assertSeeText('paid job-linked expenses');
     }
 
     private function makeBusiness(string $name): Business

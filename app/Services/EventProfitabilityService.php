@@ -70,6 +70,7 @@ final class EventProfitabilityService
         $paidExpenseTotals = FinanceExpense::query()
             ->where('business_id', $business->id)
             ->whereNotNull('event_id')
+            ->whereNull('purchase_order_id')
             ->where('status', 'paid')
             ->selectRaw('event_id, currency, SUM(amount) as aggregate_total')
             ->groupBy('event_id', 'currency')

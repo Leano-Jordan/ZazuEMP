@@ -89,9 +89,9 @@ class CommercialReconciliationTest extends TestCase
 
         $this->assertNotNull($profit);
         $this->assertSame(1000000, $profit['net_sales_cents']);
-        $this->assertSame(280000, $profit['actual_cost_cents']);
-        $this->assertSame(720000, $profit['indicative_result_cents']);
-        $this->assertSame(72.0, $profit['indicative_margin_percentage']);
+        $this->assertSame(322000, $profit['actual_cost_cents']);
+        $this->assertSame(678000, $profit['indicative_result_cents']);
+        $this->assertSame(67.8, $profit['indicative_margin_percentage']);
         $this->assertCount(
             1,
             app(EventProfitabilityService::class)->forBusiness($business)
@@ -101,8 +101,8 @@ class CommercialReconciliationTest extends TestCase
         $this->get(route('reports.index'))
             ->assertOk()
             ->assertSee('Event contribution')
-            ->assertSee('ZAR 7,200.00')
-            ->assertSee('72.00%')
+            ->assertSee('ZAR 6,780.00')
+            ->assertSee('67.80%')
             ->assertViewHas('financeTotalsByCurrency', function ($totals): bool {
                 return $totals->get('ZAR')['invoiced_cents'] === 1150000;
             });
