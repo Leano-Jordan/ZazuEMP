@@ -31,9 +31,16 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
         const recoveryText = (await page.locator('body').innerText()).slice(0, 700);
         throw new Error(`Login reached workspace recovery instead of an active workspace: ${recoveryText}`);
     }
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page, `post-login destination was ${postLoginPath}; session cookie present: ${sessionCookiePresent}`).toHaveURL(/\/dashboard$/);
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    // A protected deep link may be the correct post-login destination. Do not
+    // force every successful sign-in through /dashboard: doing so discards the
+    // intended route and makes session-transition coverage depend on one page.
+    const identity = await page.locator('body').evaluate(body => ({
+        userId: Number(body.dataset.zazuUserId || 0),
+        businessId: Number(body.dataset.zazuBusinessId || 0),
+    }));
+    expect(identity.userId, `sign-in did not establish an authenticated user at ${postLoginPath}`).toBeGreaterThan(0);
+    expect(identity.businessId, `sign-in did not establish an active workspace at ${postLoginPath}`).toBeGreaterThan(0);
+    await expect(page.locator('main')).toBeVisible();
 }
 
 test('pre-authentication session cookie cannot be replayed after successful login', async ({ page, browser }, testInfo) => {
