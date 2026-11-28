@@ -14,6 +14,7 @@ class PrivateStorageDiskConfigurationTest extends TestCase
 
         $this->assertIsArray($privateConfig);
         $this->assertSame('local', $privateConfig['driver']);
+        $this->assertSame('private', $privateConfig['visibility']);
         $this->assertSame(storage_path('app/private'), $privateConfig['root']);
         $this->assertNotSame(
             config('filesystems.disks.public.root'),
