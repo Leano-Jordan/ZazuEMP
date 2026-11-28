@@ -1,3 +1,15 @@
+## Director reconciliation — 2026-11-28 — offline session acceptance and portability continuation
+
+**Verified main HEAD:** `b5652d76a96cd96e488f84f7a2a7295bf493a01a` (`b5652d7`). The preceding calendar fixture correction is `b78ba5a`.
+
+- Latest commit changes only `e2e/offline-session-transition.spec.js`. It removes the helper's unconditional navigation to `/dashboard`, then checks that an authenticated user, active business and main content exist at the post-login route. This is a sound correction to avoid masking protected-route redirects with a forced dashboard navigation.
+- Review limitation: the helper still begins from `/?auth=login`; it does not itself initiate a protected deep-link request or assert a specific expected destination. The current change therefore prevents destination overwriting, but is not standalone proof that every protected deep link is preserved. Add a route-specific acceptance case when the session-transition suite next changes.
+- Exact-head Laravel workflow `46130211356`: **PASS** — laravel-tests, PostgreSQL migration/recovery smoke and offline-browser-acceptance all succeeded; coverage report succeeded.
+- Exact-head Zazu Quality workflow `46130211389`: **PASS**. Push-on-main workflow `46130211544`: **PASS**. SonarCloud was **SKIPPED**, not passed.
+- PHPMD and Windows V1 package did not run on `b5652d7`: the commit touched only the E2E spec, outside both workflows' path filters. Windows package/fresh-install passed on preceding `b78ba5a`; do not relabel that as exact-head evidence. No new source-code regression is indicated by the latest test-only change.
+- Production portability boundary remains intact: no development LAN discovery, VPN/tunnel, router exposure, cloud dependency or paid infrastructure was added. SQLite remains the standalone baseline; PostgreSQL remains migration/registration/selected recovery-smoke coverage only, not full application certification. S3/object storage remains uninstalled and unselected; installation backup/restore remains local-directory recovery.
+
+**Next target — bounded production-portability audit:** inspect production package reproducibility and clean-install assumptions, identify the precise PostgreSQL application-compatibility gap without changing the supported database claim, and audit the provider-neutral private-file/backup seams (including the difference between business archives and installation backups). Preserve local-first behaviour and do not select or purchase a server, database, domain or storage provider. No deployment-specific development networking is authorised.
 # Zazu EMP — Current Engineering State
 
 **Last reconciled:** 2026-11-28
