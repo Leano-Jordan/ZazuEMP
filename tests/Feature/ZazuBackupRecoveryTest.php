@@ -79,6 +79,74 @@ class ZazuBackupRecoveryTest extends TestCase
         }
     }
 
+    public function test_verify_only_checks_installation_backup_without_mutating_live_database_or_private_storage(): void
+    {
+        if (! class_exists(ZipArchive::class) || ! in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+            $this->markTestSkipped('PHP Zip and SQLite extensions are required for backup verification tests.');
+        }
+
+        $database = storage_path('app/zazu-verify-only.sqlite');
+        $output = storage_path('app/zazu-verify-only-archives');
+        $privateProbe = storage_path('app/private/zazu-verify-only-probe.txt');
+        $originalDefault = config('database.default');
+        $originalDatabase = config('database.connections.sqlite.database');
+
+        File::delete($database);
+        File::deleteDirectory($output);
+        File::ensureDirectoryExists(dirname($database));
+        File::put($database, '');
+
+        config([
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => $database,
+        ]);
+
+        try {
+            DB::purge('sqlite');
+            DB::connection('sqlite')->getSchemaBuilder()->create('verify_only_probe', function ($table): void {
+                $table->id();
+                $table->string('value');
+            });
+            DB::connection('sqlite')->table('verify_only_probe')->insert(['value' => 'before-backup']);
+
+            File::ensureDirectoryExists(dirname($privateProbe));
+            File::put($privateProbe, 'private media before backup');
+
+            $this->artisan('zazu:backup', ['--output' => $output])
+                ->assertExitCode(0);
+
+            $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
+            $this->assertCount(1, $archives);
+
+            DB::connection('sqlite')->table('verify_only_probe')->update(['value' => 'after-backup']);
+            File::put($privateProbe, 'private media after backup');
+
+            $exitCode = Artisan::call('zazu:restore', [
+                'archive' => $archives[0],
+                '--verify-only' => true,
+            ]);
+
+            $this->assertSame(0, $exitCode, Artisan::output());
+            $this->assertStringContainsString('read-only installation recovery verification', Artisan::output());
+            $this->assertStringContainsString('No installation database or private files were changed', Artisan::output());
+            $this->assertSame(
+                'after-backup',
+                DB::connection('sqlite')->table('verify_only_probe')->value('value'),
+            );
+            $this->assertSame('private media after backup', File::get($privateProbe));
+        } finally {
+            DB::purge('sqlite');
+            File::delete($database);
+            File::delete($privateProbe);
+            File::deleteDirectory($output);
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.sqlite.database' => $originalDatabase,
+            ]);
+            DB::purge('sqlite');
+        }
+    }
+
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_mysql_restore_attempts_pre_restore_rollback_after_partial_import_failure(): void
     {

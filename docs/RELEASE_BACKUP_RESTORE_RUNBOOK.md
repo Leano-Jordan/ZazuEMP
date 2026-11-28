@@ -149,6 +149,18 @@ The Windows host launcher maintains a per-installation Task Scheduler task named
 
 **Off-disk protection remains an operator action:** copy the newest archive to a separate USB drive or independently stored cloud-synchronised folder. The daily local copy is on the same PC/disk and does not protect against disk failure, theft or loss of the machine. Treat the archive as sensitive because it contains every business in the installation.
 
+## Read-only installation backup verification
+
+Before any restore attempt, validate an installation-wide backup without replacing the current database or private files:
+
+```powershell
+php artisan zazu:restore "C:/path/to/zazu-backup-<id>.zip" --verify-only
+```
+
+This mode checks the ZIP structure, Zazu manifest, database-driver compatibility, archive entry/expanded-size limits, safe paths, payload membership and SHA-256 checksums. It stages the archive in an owner-only temporary directory and validates the staged database. SQLite receives a full `PRAGMA integrity_check`; MySQL and PostgreSQL dumps are checked for presence and non-zero size, but are **not imported or syntax-validated** by this read-only command.
+
+The command does not ask for destructive confirmation, replace the live database, replace private storage, or import records. It is a preflight check only; a successful result does not prove that the selected target's database role can complete a real import or that off-disk media/key custody is sound. Follow it with the controlled restore drill on an isolated installation target.
+
 ## Restore preflight
 
 1. Identify the intended installation-wide backup artifact and confirm explicit operator authority.

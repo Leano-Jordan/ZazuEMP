@@ -19,7 +19,7 @@ class ZazuRestoreCommand extends Command
 {
     private const FORMAT_VERSION = 2;
 
-    protected $signature = 'zazu:restore {archive : Path to a Zazu backup ZIP} {--force : Skip the interactive confirmation}';
+    protected $signature = 'zazu:restore {archive : Path to a Zazu backup ZIP} {--force : Skip the interactive confirmation} {--verify-only : Validate the backup without changing the installation}';
 
     protected $description = 'Restore a Zazu database and private storage from a verified backup archive';
 
@@ -50,7 +50,7 @@ class ZazuRestoreCommand extends Command
             return self::FAILURE;
         }
 
-        if (! $this->option('force') && ! $this->confirm('This replaces the current Zazu database and private files. Continue?')) {
+        if (! $this->option('verify-only') && ! $this->option('force') && ! $this->confirm('This replaces the current Zazu database and private files. Continue?')) {
             return self::SUCCESS;
         }
 
@@ -409,6 +409,13 @@ class ZazuRestoreCommand extends Command
 
             if (! $this->validateStagedDatabase($driver, $work)) {
                 return self::FAILURE;
+            }
+
+            if ($this->option('verify-only')) {
+                $this->info('Backup passed read-only installation recovery verification.');
+                $this->line('No installation database or private files were changed.');
+
+                return self::SUCCESS;
             }
 
             // MySQL imports are not atomic. Capture a verified pre-restore dump before
