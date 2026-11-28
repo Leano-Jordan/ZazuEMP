@@ -29,7 +29,7 @@ class ZazuRestoreCommand extends Command
      */
     public function handle(): int
     {
-        if (! class_exists(ZipArchive::class)) {
+        if (($reason = app(\\App\\Support\\InstallationBackupStorageGuard::class)->unsupportedReason()) !== null) {\n            $this->error($reason);\n\n            return self::FAILURE;\n        }\n\n        if (! class_exists(ZipArchive::class)) {
             $this->error('The PHP Zip extension is required for Zazu restores.');
 
             return self::FAILURE;
