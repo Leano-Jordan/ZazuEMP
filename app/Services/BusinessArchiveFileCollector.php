@@ -214,11 +214,17 @@ final class BusinessArchiveFileCollector
                 throw new RuntimeException('A staged business file could not be finalized.');
             }
         } catch (Throwable $exception) {
+            if (is_resource($target)) {
+                fclose($target);
+                $target = false;
+            }
             @unlink($path);
 
             throw $exception;
         } finally {
-            fclose($target);
+            if (is_resource($target)) {
+                fclose($target);
+            }
         }
 
         return [$path, $bytes];
