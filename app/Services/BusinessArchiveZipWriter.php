@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Business;
 use RuntimeException;
+use Throwable;
 use ZipArchive;
 
 /**
@@ -21,42 +22,53 @@ final class BusinessArchiveZipWriter
      */
     public function create(Business $business, array $data, array $files): string
     {
-        $archivePath = tempnam(sys_get_temp_dir(), 'zazu-business-archive-');
-        if ($archivePath === false) {
-            throw new RuntimeException('Unable to create a temporary business archive.');
-        }
-
+        $archivePath = null;
         $zip = new ZipArchive;
-        if ($zip->open($archivePath, ZipArchive::OVERWRITE) !== true) {
-            @unlink($archivePath);
-            throw new RuntimeException('Unable to open the business archive.');
-        }
+        $zipOpened = false;
 
         try {
+            $archivePath = tempnam(sys_get_temp_dir(), 'zazu-business-archive-');
+            if ($archivePath === false) {
+                throw new RuntimeException('Unable to create a temporary business archive.');
+            }
+
+            if ($zip->open($archivePath, ZipArchive::OVERWRITE) !== true) {
+                throw new RuntimeException('Unable to open the business archive.');
+            }
+            $zipOpened = true;
+
             $this->addManifest($zip, $business, $data, $files['manifest']);
             $this->addDataset($zip, $data);
             $this->addFileEntries($zip, $files['sources']);
-        } catch (\Throwable $exception) {
-            $zip->close();
-            @unlink($archivePath);
 
-            throw $exception;
-        }
+            $closed = $zip->close();
+            $zipOpened = false;
+            if (! $closed) {
+                throw new RuntimeException('The business archive could not be finalized.');
+            }
 
-        if (! $zip->close()) {
-            @unlink($archivePath);
-            throw new RuntimeException('The business archive could not be finalized.');
-        }
-
-        try {
             $this->assertCompletedArchive($archivePath, $files['sources']);
-        } catch (\Throwable $exception) {
-            @unlink($archivePath);
+
+            return $archivePath;
+        } catch (Throwable $exception) {
+            if ($zipOpened) {
+                $zip->close();
+            }
+
+            if (is_string($archivePath) && is_file($archivePath) && ! is_link($archivePath)) {
+                @unlink($archivePath);
+            }
 
             throw $exception;
+        } finally {
+            // The collector creates these private temporary files specifically
+            // for this archive. Release them only after ZipArchive has closed.
+            foreach (array_values($files['sources'] ?? []) as $sourcePath) {
+                if (is_string($sourcePath) && is_file($sourcePath) && ! is_link($sourcePath)) {
+                    @unlink($sourcePath);
+                }
+            }
         }
-
-        return $archivePath;
     }
 
     private function addManifest(ZipArchive $zip, Business $business, array $data, array $fileManifest): void
