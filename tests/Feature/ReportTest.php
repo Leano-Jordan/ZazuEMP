@@ -184,7 +184,7 @@ class ReportTest extends TestCase
             'idempotency_key' => (string) Str::uuid(),
         ]);
 
-        \App\Models\FinanceExpense::create([
+        FinanceExpense::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
             'description' => 'Unpaid event supplier bill',
