@@ -112,23 +112,19 @@ class BusinessArchiveStoragePortabilityTest extends TestCase
         $this->assertNotFalse($sourcePath);
         file_put_contents($sourcePath, 'private staged payload');
 
-        $missingPath = $sourcePath.'-missing';
+        $recursiveManifest = [];
+        $recursiveManifest['self'] = &$recursiveManifest;
 
         try {
             try {
                 app(BusinessArchiveZipWriter::class)->create($business, [], [
-                    'manifest' => [],
-                    'sources' => [
-                        'payload/files/source.bin' => $sourcePath,
-                        'payload/files/missing.bin' => $missingPath,
-                    ],
+                    'manifest' => $recursiveManifest,
+                    'sources' => ['payload/files/source.bin' => $sourcePath],
                 ]);
-                $this->fail('Archive creation should fail when a staged source is missing.');
-            } catch (RuntimeException) {
+                $this->fail('Archive creation should fail when its manifest cannot be encoded.');
+            } catch (\JsonException) {
                 $this->assertFileDoesNotExist($sourcePath);
             }
-
-            $this->assertFileDoesNotExist($sourcePath);
         } finally {
             if (is_file($sourcePath) && ! is_link($sourcePath)) {
                 @unlink($sourcePath);
