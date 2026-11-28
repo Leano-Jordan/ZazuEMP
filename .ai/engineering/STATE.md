@@ -1,3 +1,18 @@
+## Director execution update — 2026-11-28 — installation recovery storage safety
+
+**Implementation head:** `71caf2fb15cd766aa5200cfed47f7eec0e21bf98` (`71caf2f`).
+
+- Portability audit confirmed that installation-wide `zazu:backup` and `zazu:restore` still snapshot/replace `storage/app/private` directly. A future non-local `private` disk could therefore be omitted by installation backup/restore even though the filesystem config exposes an S3 driver.
+- Added `InstallationBackupStorageGuard` and applied it before backup destination creation or restore archive processing. Installation-wide recovery now fails closed unless the configured private disk driver is `local`; remote private files are explicitly reported as unsupported and no installation data is changed.
+- Added feature coverage for both backup and restore refusal under a simulated S3 private disk. This does **not** enable S3 or claim remote backup support.
+- Business archives already read file content through Laravel storage streams and stage bounded temporary files for ZIP creation. Their current source-disk resolver still only permits `private` / `local`; the S3 Flysystem adapter is absent from `composer.lock`. Provider support remains deferred pending adapter, security, consistency and restore acceptance.
+- Production package workflow builds production-only Composer dependencies and compiled assets, assembles a clean ZIP and runs a Windows fresh-install/recovery job. The exact-head Windows package run is now queued.
+- PostgreSQL remains migration/rollback/reapplication, registration and selected backup/recovery smoke only. The complete Laravel application suite is still SQLite-only; no PostgreSQL production-compatibility claim is made.
+
+**Exact-head verification:** populated upgrade/rollback workflow `46136617785` **PASS**. Laravel `46136617862`, Windows V1 package `46136617791`, PHPMD `46136617777` and Zazu Quality `46136617820` were queued at the time of this reconciliation; do not claim them as passed until they complete. SonarCloud is not a release gate and any skipped result is not a pass.
+
+**Next:** inspect exact-head CI outcomes and repair any failures. Then add a route-specific deep-link session acceptance case and continue the bounded deployment portability audit. Do not install a remote storage adapter, select a provider, or purchase infrastructure without a separate Founder-approved deployment decision.
+
 ## Director reconciliation — 2026-11-28 — offline session acceptance and portability continuation
 
 **Verified main HEAD:** `b5652d76a96cd96e488f84f7a2a7295bf493a01a` (`b5652d7`). The preceding calendar fixture correction is `b78ba5a`.
