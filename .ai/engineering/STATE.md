@@ -1,9 +1,29 @@
 # Zazu EMP — Current Engineering State
 
-**Last reconciled:** 2026-11-27
+**Last reconciled:** 2026-11-28
 **Repository:** Leano-Jordan/ZazuEMP
 **Canonical branch / write target:** `main` only
 **Latest broad verified checkpoint:** `dbda546d677dd80c99bda83bfcdfaa4dc46e8239` remains the last broad all-workflow acceptance candidate; later changes must not inherit its PASS status.
+
+## Director execution update — 2026-11-28 — production portability, not development infrastructure
+
+**Founder direction:** Build for deployment, not around development. Keep product/application contracts independent of the present owner-PC development host. Production server, domain, storage provider, region, database choice and monthly spend remain deferred until workload/cost review and explicit Founder approval.
+
+**Latest application/test source head:** 0c2f507a7f7408975719889342d36d8e75c5a641.  
+**Latest documentation/main head at this reconciliation:** bf3e1d0fdb676adbc41044fc4304d36250029963.
+
+- No LAN discovery daemon, .local name service, Tailscale/VPN/tunnel integration, router port-forwarding or cloud-hosting dependency was added to Zazu. The existing Windows LAN HTTPS/Caddy route remains a development and physical-acceptance harness, not the commercial hosting architecture.
+- Database audit: SQLite remains the full-application standalone baseline. PostgreSQL 16 has migration/rollback/reapplication, registration and selected backup/recovery smoke coverage only; it is not fully application-certified or selected for production. MySQL/MariaDB are not declared supported V1 deployment engines.
+- Session, cache and queue selection already uses Laravel's standard configurable drivers. No Redis, managed database or extra process dependency was introduced.
+- Private files retain one logical Laravel disk named private, with ZAZU_PRIVATE_STORAGE_DRIVER=local as the default. A configuration path exists for S3, but the S3 Flysystem adapter is not in the Composer lock and no object-storage provider is installed, selected or accepted.
+- Business-archive export now reads file sources through the filesystem stream contract and uses a bounded temporary staging helper for the ZIP library. The ZIP writer cleans staged sources after success and failure. Regression tests cover stream-only sources and staging cleanup.
+- The installation-level zazu:backup / zazu:restore commands remain local-directory recovery operations. They are not a remote-object-storage backup system. Any selected remote provider requires a separately proven object snapshot/stream backup, consistency, retention and restore path before production use.
+- The production portability record is docs/LOCAL_PC_HOST_DEPLOYMENT.md; it now states the no-development-network-subsystem boundary, storage-provider gate, database certification boundary and remote backup limitation.
+- **Verification:** PHPMD passed on source head f09cfcad6136493a77b57e65765393b46e7869a1; populated upgrade/rollback also passed on that source head. The later test-only change is 0c2f507; its exact-head Laravel, Zazu quality, Windows package and PHPMD workflows were pending at the time of this record. No broad PASS is claimed. SonarCloud is skipped.
+- **Acceptance:** no production provider/server has been purchased or provisioned. No real S3/object-storage adapter test has been run. Owner-PC and Android offline, origin migration, database migration and provider restore acceptance remain separate gates.
+
+**Next target:** complete exact-head Laravel/quality/PHPMD/Windows verification; then continue a bounded audit of production-build reproducibility, PostgreSQL application compatibility and provider-neutral backup/recovery. Do not add temporary networking or purchase infrastructure to close development convenience gaps.
+
 ## Director reconciliation — 2026-11-27 — tier source mapping and terminology
 
 **Latest repository work:** capability matrix and first-pass source map are committed on `main`. Latest known documentation commit: `5325656524253979731e7f85c10743a674c76c49`. Latest application/UI/test commit in this batch: `1921eb94b108237f32747157ba1a829ba775e01f`.
