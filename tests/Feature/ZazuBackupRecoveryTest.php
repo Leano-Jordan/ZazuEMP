@@ -121,14 +121,13 @@ class ZazuBackupRecoveryTest extends TestCase
             DB::connection('sqlite')->table('verify_only_probe')->update(['value' => 'after-backup']);
             File::put($privateProbe, 'private media after backup');
 
-            $exitCode = Artisan::call('zazu:restore', [
+            $this->artisan('zazu:restore', [
                 'archive' => $archives[0],
                 '--verify-only' => true,
-            ]);
-
-            $this->assertSame(0, $exitCode, Artisan::output());
-            $this->assertStringContainsString('read-only installation recovery verification', Artisan::output());
-            $this->assertStringContainsString('No installation database or private files were changed', Artisan::output());
+            ])
+                ->expectsOutput('Backup passed read-only installation recovery verification.')
+                ->expectsOutput('No installation database or private files were changed.')
+                ->assertExitCode(0);
             $this->assertSame(
                 'after-backup',
                 DB::connection('sqlite')->table('verify_only_probe')->value('value'),
