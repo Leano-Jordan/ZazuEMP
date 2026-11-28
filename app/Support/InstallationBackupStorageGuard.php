@@ -1,6 +1,6 @@
 <?php
 
-namespace App\\Support;
+namespace App\Support;
 
 /**
  * Prevents installation-wide recovery from silently omitting remote private files.
