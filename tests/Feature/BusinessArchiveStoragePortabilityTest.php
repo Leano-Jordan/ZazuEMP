@@ -6,7 +6,6 @@ use App\Models\Business;
 use App\Services\BusinessArchiveFileCollector;
 use App\Services\BusinessArchiveZipWriter;
 use Illuminate\Support\Facades\Storage;
-use RuntimeException;
 use Tests\TestCase;
 use ZipArchive;
 
