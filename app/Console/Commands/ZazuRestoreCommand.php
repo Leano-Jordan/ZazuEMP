@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Support\BackupArchiveLimits;
+use App\Support\InstallationBackupStorageGuard;
 use App\Support\PostgresBackupSupport;
 use App\Support\PrivateStoragePermissions;
 use App\Support\ProcessFileStream;
@@ -29,7 +30,7 @@ class ZazuRestoreCommand extends Command
      */
     public function handle(): int
     {
-        if (($reason = app(\App\Support\InstallationBackupStorageGuard::class)->unsupportedReason()) !== null) {
+        if (($reason = app(InstallationBackupStorageGuard::class)->unsupportedReason()) !== null) {
             $this->error($reason);
 
             return self::FAILURE;
