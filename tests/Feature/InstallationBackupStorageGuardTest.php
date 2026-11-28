@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use Illuminate\\Support\\Facades\\Artisan;
-use Illuminate\\Support\\Facades\\File;
-use Tests\\TestCase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+use Tests\TestCase;
 
 class InstallationBackupStorageGuardTest extends TestCase
 {
