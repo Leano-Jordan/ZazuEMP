@@ -1,3 +1,38 @@
+## Director execution update — 2026-11-28 — commercial reconciliation accuracy and offline acceptance
+
+**Repository:** `Leano-Jordan/ZazuEMP` · `main` only  
+**Implementation/test head:** [`57c41d2`](https://github.com/Leano-Jordan/ZazuEMP/commit/57c41d26870853747eb2e8ca49fbecb612247d1b)  
+**Formal evidence maturity:** 71/100 — unchanged. **V1 remains NOT READY.**
+
+### Implementation
+- `EventProfitabilityService` now includes paid finance expenses linked directly to a job when they are not linked to a purchase order.
+- Unpaid expenses are excluded from actual cost. Purchase-order-linked expenses are excluded from the additional expense total to avoid counting the same procurement twice when its received cost is already represented by an `EventCost` record.
+- Reports now disclose the calculation boundary and tell operators to record received purchase costs as job costs. Input-tax recovery and other accounting adjustments remain outside this operational estimate.
+- Regression coverage proves a R10,000 net invoice, R4,000 job cost and R1,500 paid job expense produce R5,500 actual cost, R4,500 indicative contribution and 45% margin; an unpaid R2,000 expense is excluded.
+- The populated commercial reconciliation fixture proves R10,000 net sales less R2,800 job cost and R420 separate paid job expense = R6,780 indicative contribution (67.8%). Its R2,800 PO-linked finance expense is excluded from the additional total to prevent double-counting the purchase. This is seeded automated evidence, not owner acceptance of the Founder’s existing live populated records.
+
+### Exact-head verification — `57c41d2`
+- Laravel workflow [46150774646](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774646): **PASS** — 795 passed / 1 skipped / 5,738 assertions; coverage PASS; PostgreSQL migration/recovery smoke PASS; offline browser acceptance PASS.
+- Zazu Quality [46150774631](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774631): **PASS** — formatting, application, Composer security audit and secret scan.
+- Windows V1 package [46150774678](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774678): **PASS** — package assembly, encrypted/legacy archive checks and Windows PowerShell fresh-install/recovery smoke.
+- Populated upgrade/rollback [46150774654](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774654): **PASS**.
+- PHPMD [46150774626](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774626): **PASS**.
+- Psalm security scan [46150774643](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774643): **PASS**.
+- Director Health [46150774659](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774659) and Push-on-main [46150775086](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150775086): **PASS**.
+- SonarCloud [46150774670](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774670): **SKIPPED**, not passed.
+- An earlier parallel run on parent `80e4de4` had a single intermittent offline visual-geometry failure (81 passed); the subsequent exact-head run `57c41d2` completed the full browser workflow successfully. Do not report the earlier superseded failure as the current result, but retain it as a flaky-run observation.
+
+### Release gates still open
+- Physical Android disconnected cold launch, host stop, supported offline writes, force-close/restart, attachment round-trip and exactly-once reconnect. CI/mobile emulation does not replace the actual device check. Installed PWA acceptance requires a trusted HTTPS origin; current local HTTP development address is not that environment.
+- Intended-PC installation-wide backup/restore, independent off-disk copy, private-media verification and key custody. The business-level encrypted Rosscore archive restore remains separately owner-accepted under CASE-ZAZU-0054; do not repeat it.
+- Founder-operated reconciliation of the existing populated fictional workspace, not the seeded CI scenario.
+- DEC-019 shared-profile trust risk and independent adversarial security review; POPIA operational sign-off; ZAZU name clearance; pilot support/incident and known-limitations handover.
+
+### Next target
+**Recovery gate — intended-PC installation-wide recovery and off-disk/key-custody drill preparation.** Keep the actual-device offline acceptance open until a trusted HTTPS install origin is available. Preserve local-first architecture; do not buy hosting/storage or add a development-networking layer without a separate Founder decision.
+
+---
+
 ## Director audit and execution — 2026-11-28 — pilot-critical closure work
 
 **Current repository:** `Leano-Jordan/ZazuEMP`, `main` only.  

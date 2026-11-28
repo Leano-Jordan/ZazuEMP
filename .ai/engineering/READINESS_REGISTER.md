@@ -1,3 +1,18 @@
+## Current engineering reconciliation — 2026-11-28 — exact implementation head 57c41d2
+
+**Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md).
+
+- **Implementation/test head:** [`57c41d2`](https://github.com/Leano-Jordan/ZazuEMP/commit/57c41d26870853747eb2e8ca49fbecb612247d1b).
+- **Commercial reconciliation correction:** event contribution now includes paid job-linked finance expenses not tied to a purchase order; unpaid and PO-linked expenses are excluded from the additional total to avoid double-counting. Seeded reconciliation now produces R6,780 indicative contribution at 67.8% after R2,800 job cost and R420 separate paid expense. Live owner reconciliation remains OPEN.
+- **Exact-head Laravel/browser** [46150774646](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774646): PASS — 795 passed / 1 skipped / 5,738 assertions; coverage, PostgreSQL smoke and full desktop/mobile/offline browser suite PASS.
+- **Zazu Quality** [46150774631](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774631), **Windows package/fresh install/archive** [46150774678](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774678), **PHPMD** [46150774626](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774626), **Psalm** [46150774643](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774643), **populated upgrade/rollback** [46150774654](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774654), **Director Health** [46150774659](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774659) and **Push-on-main** [46150775086](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150775086): PASS.
+- SonarCloud [46150774670](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/46150774670): SKIPPED, not passed.
+- Earlier parent run `80e4de4` recorded one intermittent offline visual-geometry failure; the subsequent full exact-head run `57c41d2` passed. Retain the earlier run as a flake observation, not as current-head failure.
+- **Still open:** physical Android disconnected launch/restart/reconnect on a trusted HTTPS install origin; intended-PC installation-wide recovery/off-disk copy/key custody; Founder-operated populated-record quote-to-profit reconciliation; DEC-019/shared-profile and independent security review; POPIA operations; ZAZU name clearance and pilot support handover.
+- **Formal evidence maturity:** 71/100, unchanged. V1 remains NOT READY; no uplift claimed.
+
+---
+
 ## Current engineering reconciliation — 2026-11-28
 
 **Live status authority:** [`.ai/engineering/STATE.md`](STATE.md). **Canonical acceptance ledger:** [`docs/V1_RELEASE_CHECKLIST.md`](../../docs/V1_RELEASE_CHECKLIST.md). This reconciliation supersedes the 2026-11-26 status below.
