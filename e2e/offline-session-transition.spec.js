@@ -43,6 +43,36 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await expect(page.locator('main')).toBeVisible();
 }
 
+test('login preserves a requested protected deep link instead of always opening the dashboard', async ({ page }, testInfo) => {
+    test.setTimeout(30_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Protected deep-link session transition runs once on desktop Chromium.');
+
+    const destination = '/finance/invoices/create';
+    await page.goto(destination, { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
+
+    await page.getByLabel('Username or email').fill(DEMO_EMAIL);
+    await page.locator('#auth_password').fill(DEMO_PASSWORD);
+
+    const loginResponsePromise = page.waitForResponse(
+        response => response.url().includes('/login') && response.request().method() === 'POST',
+        { timeout: 10_000 },
+    );
+    await page.locator('[data-auth-submit]').click();
+    const loginResponse = await loginResponsePromise;
+    expect(loginResponse.status()).toBeLessThan(400);
+
+    await page.waitForURL(url => url.pathname === destination);
+    const identity = await page.locator('body').evaluate(body => ({
+        userId: Number(body.dataset.zazuUserId || 0),
+        businessId: Number(body.dataset.zazuBusinessId || 0),
+    }));
+
+    expect(identity.userId, 'deep-link destination must be served to an authenticated user').toBeGreaterThan(0);
+    expect(identity.businessId, 'deep-link destination must retain the active business context').toBeGreaterThan(0);
+    await expect(page.locator('main')).toBeVisible();
+});
+
 test('pre-authentication session cookie cannot be replayed after successful login', async ({ page, browser }, testInfo) => {
     test.setTimeout(30_000);
     test.skip(testInfo.project.name !== 'chromium', 'Session fixation replay runs once on desktop Chromium.');
