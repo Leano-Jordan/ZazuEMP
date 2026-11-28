@@ -41,19 +41,24 @@ class InterfaceRegressionTest extends TestCase
             'name' => 'Calendar Test Customer',
         ]);
 
+        // Keep the fixture inside the month being displayed. Near month-end,
+        // adding three days can cross into the following month and correctly
+        // hide the job from this month's agenda.
+        $eventDate = now()->addDays(3);
+
         Event::create([
             'business_id' => $business->id,
             'customer_id' => $customer->id,
             'reference' => 'CAL-REGRESSION',
             'name' => 'Calendar Regression Job',
             'event_type' => 'Catering order',
-            'event_date' => now()->addDays(3)->toDateString(),
+            'event_date' => $eventDate->toDateString(),
             'status' => 'confirmed',
         ]);
 
         $response = $this->actingAs($user)->get(route('calendar.index', [
             'view' => 'agenda',
-            'month' => now()->format('Y-m'),
+            'month' => $eventDate->format('Y-m'),
         ]));
 
         $response->assertOk()
