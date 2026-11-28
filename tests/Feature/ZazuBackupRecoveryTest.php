@@ -150,7 +150,7 @@ class ZazuBackupRecoveryTest extends TestCase
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_mysql_restore_attempts_pre_restore_rollback_after_partial_import_failure(): void
     {
-        if (!class_exists(ZipArchive::class)) {
+        if (! class_exists(ZipArchive::class)) {
             $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
         }
 
