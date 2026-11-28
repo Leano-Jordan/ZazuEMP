@@ -255,7 +255,7 @@ final class BusinessArchiveFileCollector
         }
     }
 
-    /** @param resource $target */
+    /** @param  resource  $target */
     private function writeAll($target, string $contents): void
     {
         $offset = 0;
