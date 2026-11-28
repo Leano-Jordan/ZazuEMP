@@ -19,7 +19,6 @@ $privateDisk = match ($privateStorageDriver) {
     'local' => [
         'driver' => 'local',
         'root' => env('ZAZU_PRIVATE_STORAGE_ROOT', storage_path('app/private')),
-        'serve' => true,
         'visibility' => 'private',
         'throw' => false,
         'report' => false,
