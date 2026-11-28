@@ -95,7 +95,7 @@ final class BusinessArchiveFileCollector
 
     private function assertSafePath(string $path, string $table, int $id): void
     {
-        if (Str::contains($path, ['..', '\\\\'])) {
+        if (Str::contains($path, ['..', '\\'])) {
             throw new RuntimeException("A referenced business file path is unsafe: {$table}#{$id}.");
         }
     }
