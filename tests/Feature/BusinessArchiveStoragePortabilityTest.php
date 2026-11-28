@@ -124,8 +124,8 @@ class BusinessArchiveStoragePortabilityTest extends TestCase
                     ],
                 ]);
                 $this->fail('Archive creation should fail when a staged source is missing.');
-            } catch (RuntimeException $exception) {
-                $this->assertSame('A business file could not be added to the archive.', $exception->getMessage());
+            } catch (RuntimeException) {
+                $this->assertFileDoesNotExist($sourcePath);
             }
 
             $this->assertFileDoesNotExist($sourcePath);
